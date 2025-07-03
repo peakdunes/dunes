@@ -1,0 +1,6 @@
+@APIZEBRA_HostAddress = http://localhost:5251
+
+GET {{APIZEBRA_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
