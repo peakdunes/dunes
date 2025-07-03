@@ -1,1 +1,62 @@
+## Build folders
+bin/
+obj/
 .vs/
+TestResults/
+logs/
+publish/
+
+## User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Configuration files
+*.config
+*.launchSettings.json
+
+## Sensitive environment files
+.env
+.env.*
+
+## IDE folders
+.idea/
+.vscode/
+
+## OS-specific
+*.DS_Store
+Thumbs.db
+
+## Log files
+*.log
+
+## Dependency caches
+packages/
+project.lock.json
+project.assets.json
+project.nuget.cache
+
+## Runtime-generated
+*.dll
+*.exe
+*.pdb
+*.mdb
+*.cache
+*.bak
+*.tmp
+
+## Database files
+*.mdf
+*.ldf
+*.db
+*.sqlite
+
+## BarTender or temp label files (por si usas etiquetas)
+*.btw
+*.txt
+*.print
+
+## Others
+node_modules/
+wwwroot/lib/
