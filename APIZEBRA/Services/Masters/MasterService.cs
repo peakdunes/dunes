@@ -1,4 +1,5 @@
 ﻿using APIZEBRA.Repositories.Masters;
+using APIZEBRA.Utils.Responses;
 
 namespace APIZEBRA.Services.Masters
 {
@@ -11,29 +12,40 @@ namespace APIZEBRA.Services.Masters
             _repository = repository;
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<ApiResponse<IEnumerable<T>>> GetAllAsync()
         {
-            return await _repository.GetAllAsync();
+            var result = await _repository.GetAllAsync();
+            return ApiResponseFactory.Ok(result);
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<ApiResponse<T>> GetByIdAsync(int id)
         {
-            return await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id);
+            return entity == null
+                ? ApiResponseFactory.NotFound<T>("No se encontró el recurso")
+                : ApiResponseFactory.Ok(entity);
         }
 
-        public async Task<T> AddAsync(T entity)
+        public async Task<ApiResponse<T>> AddAsync(T entity)
         {
-            return await _repository.AddAsync(entity);
+            var created = await _repository.AddAsync(entity);
+            return ApiResponseFactory.Created(created);
         }
 
-        public async Task<T> UpdateAsync(T entity)
+        public async Task<ApiResponse<T>> UpdateAsync(T entity)
         {
-            return await _repository.UpdateAsync(entity);
+            var updated = await _repository.UpdateAsync(entity);
+            return updated == null
+                ? ApiResponseFactory.NotFound<T>("No se pudo actualizar (no encontrado)")
+                : ApiResponseFactory.Ok(updated, "Actualizado correctamente");
         }
 
-        public async Task<bool> DeleteByIdAsync(int id)
+        public async Task<ApiResponse<bool>> DeleteByIdAsync(int id)
         {
-            return await _repository.DeleteByIdAsync(id);
+            var deleted = await _repository.DeleteByIdAsync(id);
+            return deleted
+                ? ApiResponseFactory.Ok(true, "Eliminado correctamente")
+                : ApiResponseFactory.NotFound<bool>("No se encontró el recurso a eliminar");
         }
     }
 }

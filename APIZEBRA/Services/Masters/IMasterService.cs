@@ -1,11 +1,13 @@
-﻿namespace APIZEBRA.Services.Masters
+﻿using APIZEBRA.Utils.Responses;
+
+namespace APIZEBRA.Services.Masters
 {
     public interface IMasterService<T> where T : class
     {
-        Task<IEnumerable<T>> GetAllAsync();
-        Task<T> GetByIdAsync(int id);
-        Task<T> AddAsync(T entity);
-        Task<T> UpdateAsync(T entity);
-        Task<bool> DeleteByIdAsync(int id);
+        Task<ApiResponse<IEnumerable<T>>> GetAllAsync();
+        Task<ApiResponse<T>> GetByIdAsync(int id);
+        Task<ApiResponse<T>> AddAsync(T entity);
+        Task<ApiResponse<T>> UpdateAsync(T entity);
+        Task<ApiResponse<bool>> DeleteByIdAsync(int id);
     }
 }

@@ -18,6 +18,8 @@ namespace APIZEBRA.Data
         public virtual DbSet<TzebB2bConsignmentCallsType> TzebB2bConsignmentCallsType { get; set; }
         public virtual DbSet<TzebB2bInventoryType> TzebB2bInventoryType { get; set; }
         public virtual DbSet<TrepairActionsCodes> TrepairActionsCodes { get; set; }
+        public virtual DbSet<TzebFaultCodes> TzebFaultCodes { get; set; }
+        public virtual DbSet<TzebWorkCodesTargets> TzebWorkCodesTargets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -25,6 +27,41 @@ namespace APIZEBRA.Data
 
             modelBuilder.Entity<DbkMvcLogApi>()
                 .ToTable("dbk_mvc_logs_api");
+
+            modelBuilder.Entity<TzebFaultCodes>(entity =>
+            {
+                entity.HasKey(e => e.FaultCode);
+
+                entity.ToTable("_TZEB_FAULT_CODES");
+
+                entity.Property(e => e.FaultCode)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Fault_Code");
+                entity.Property(e => e.Categorization)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.DateInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.FaultCodeDefinition)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Fault_Code_Definition");
+                entity.Property(e => e.FaultCodeGroup)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Fault_Code_Group");
+                entity.Property(e => e.FaultDesc)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Fault_Desc");
+                entity.Property(e => e.ProductGroup)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("Product_Group");
+                entity.Property(e => e.Show).HasDefaultValue(true);
+            });
 
             modelBuilder.Entity<TzebB2bConsignmentCallsType>(entity =>
             {
@@ -81,6 +118,26 @@ namespace APIZEBRA.Data
                 entity.Property(e => e.ActionDesc)
                     .HasMaxLength(50)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<TzebWorkCodesTargets>(entity =>
+            {
+                entity.HasKey(e => e.WorkCodeTarget);
+
+                entity.ToTable("_TZEB_WORK_CODES_TARGETS");
+
+                entity.Property(e => e.WorkCodeTarget)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Work_Code_Target");
+                entity.Property(e => e.ConsideredForBer)
+                    .HasDefaultValue(false)
+                    .HasColumnName("Considered_For_BER");
+                entity.Property(e => e.Show).HasDefaultValue(true);
+                entity.Property(e => e.WorkDescTarget)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Work_Desc_Target");
             });
         }
     }

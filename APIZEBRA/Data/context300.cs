@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using APIZEBRA.Models.Masters;
+using Microsoft.EntityFrameworkCore;
+
+namespace APIZEBRA.Data;
+
+public partial class context300 : DbContext
+{
+    public context300()
+    {
+    }
+
+    public context300(DbContextOptions<context300> options)
+        : base(options)
+    {
+    }
+
+    public virtual DbSet<TzebFaultCodes> TzebFaultCodes { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Server=10.101.10.241;Database=DBK;TrustServerCertificate=true;persist security info=True;user id=radeon;password=ghee8PHED-lism1cich");
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TzebFaultCodes>(entity =>
+        {
+            entity.HasKey(e => e.FaultCode);
+
+            entity.ToTable("_TZEB_FAULT_CODES");
+
+            entity.Property(e => e.FaultCode)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Fault_Code");
+            entity.Property(e => e.Categorization)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.DateInserted)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.FaultCodeDefinition)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("Fault_Code_Definition");
+            entity.Property(e => e.FaultCodeGroup)
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("Fault_Code_Group");
+            entity.Property(e => e.FaultDesc)
+                .HasMaxLength(200)
+                .IsUnicode(false)
+                .HasColumnName("Fault_Desc");
+            entity.Property(e => e.ProductGroup)
+                .HasMaxLength(25)
+                .IsUnicode(false)
+                .HasColumnName("Product_Group");
+            entity.Property(e => e.Show).HasDefaultValue(true);
+        });
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
+}
