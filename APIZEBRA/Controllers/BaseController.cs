@@ -3,12 +3,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace APIZEBRA.Controllers
 {
+
+    /// <summary>
+    /// Base controller that provides centralized error handling and standardized API responses.
+    /// </summary>
+    /// 
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
         /// <summary>
-        /// Manejo centralizado de llamadas async con respuesta ApiResponse<T>
+        /// Handles asynchronous operations that return a data result, with automatic error handling and ApiResponse wrapping.
         /// </summary>
+        /// <typeparam name="T">The type of data returned by the action.</typeparam>
+        /// <param name="action">The asynchronous function to execute.</param>
+        /// <returns>Standardized ApiResponse wrapped in IActionResult.</returns>
         protected async Task<IActionResult> Handle<T>(Func<Task<T>> action)
         {
             try
@@ -28,8 +36,10 @@ namespace APIZEBRA.Controllers
         }
 
         /// <summary>
-        /// Manejo centralizado para métodos sin retorno de tipo concreto (ej. IActionResult)
+        /// Handles asynchronous operations that return an IActionResult directly, with centralized error handling.
         /// </summary>
+        /// <param name="action">The asynchronous function to execute.</param>
+        /// <returns>IActionResult, either the original result or a formatted error response.</returns>
         protected async Task<IActionResult> Handle(Func<Task<IActionResult>> action)
         {
             try
@@ -48,8 +58,11 @@ namespace APIZEBRA.Controllers
         }
 
         /// <summary>
-        /// Manejo centralizado de métodos síncronos
+        /// Handles synchronous operations with return value, wrapped in ApiResponse and with centralized error handling.
         /// </summary>
+        /// <typeparam name="T">The type of data returned by the action.</typeparam>
+        /// <param name="action">The synchronous function to execute.</param>
+        /// <returns>Standardized ApiResponse wrapped in IActionResult.</returns>
         protected IActionResult HandleSync<T>(Func<T> action)
         {
             try
@@ -68,4 +81,5 @@ namespace APIZEBRA.Controllers
             }
         }
     }
+
 }

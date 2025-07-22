@@ -1,4 +1,5 @@
 ﻿using APIZEBRA.Utils.Logging;
+using APIZEBRA.Utils.Responses;
 using Serilog;
 using System.Net;
 using System.Text.Json;
@@ -25,9 +26,8 @@ namespace APIZEBRA.Utils.Middlewares
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "🔥 [MIDDLEWARE] Unhandled exception: {Message}", ex.Message);
+                Log.Error(ex, "[MIDDLEWARE] Unhandled exception: {Message}", ex.Message);
 
-                // Crear un scope (tipo de servicio que dura solo lo que dura la peticion HTTP) para resolver LogHelper
                 using var scope = _scopeFactory.CreateScope();
                 var logHelper = scope.ServiceProvider.GetRequiredService<LogHelper>();
 
@@ -41,14 +41,9 @@ namespace APIZEBRA.Utils.Middlewares
                 context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/json";
 
-                var response = new
-                {
-                    mensaje = "❌ Internal server error",
-                    error = ex.GetBaseException().Message.Split('\n')[0].Trim(),
-                    data = (object)null,
-                    fechaProceso = DateTime.UtcNow,
-                    statusCode = 500
-                };
+                var response = ApiResponseFactory.InternalError<object>(
+                    ex.GetBaseException().Message.Split('\n')[0].Trim()
+                );
 
                 await context.Response.WriteAsync(JsonSerializer.Serialize(response));
             }

@@ -11,12 +11,10 @@ namespace APIZEBRA.Controllers.Masters
     /// <summary>
     /// Controller to manage consignment call type operations (CRUD).
     /// </summary>
-
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    
-    public class ConsignmentCallTypeController : ControllerBase
+    public class ConsignmentCallTypeController : BaseController
     {
         private readonly IMasterService<TzebB2bConsignmentCallsType> _service;
 
@@ -35,9 +33,9 @@ namespace APIZEBRA.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<TzebB2bConsignmentCallsType>>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetAll")]
-        public async Task<ApiResponse<IEnumerable<TzebB2bConsignmentCallsType>>> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-            return await _service.GetAllAsync();
+            return await Handle(() => _service.GetAllAsync());
         }
 
         /// <summary>
@@ -47,9 +45,15 @@ namespace APIZEBRA.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetById/{id}")]
-        public async Task<ApiResponse<TzebB2bConsignmentCallsType>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            return await _service.GetByIdAsync(id);
+            return await Handle(async () =>
+            {
+                var item = await _service.GetByIdAsync(id);
+                if (item == null)
+                    return NotFound(ApiResponseFactory.NotFound<object>("Item not found"));
+                return Ok(ApiResponseFactory.Ok(item));
+            });
         }
 
         /// <summary>
@@ -59,9 +63,9 @@ namespace APIZEBRA.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<ApiResponse<TzebB2bConsignmentCallsType>> Create([FromBody] TzebB2bConsignmentCallsType item)
+        public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsType item)
         {
-            return await _service.AddAsync(item);
+            return await Handle(() => _service.AddAsync(item));
         }
 
         /// <summary>
@@ -71,9 +75,9 @@ namespace APIZEBRA.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<ApiResponse<TzebB2bConsignmentCallsType>> Update([FromBody] TzebB2bConsignmentCallsType item)
+        public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsType item)
         {
-            return await _service.UpdateAsync(item);
+            return await Handle(() => _service.UpdateAsync(item));
         }
 
         /// <summary>
@@ -83,10 +87,9 @@ namespace APIZEBRA.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpDelete("Delete/{id}")]
-        public async Task<ApiResponse<bool>> Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return await _service.DeleteByIdAsync(id);
+            return await Handle(() => _service.DeleteByIdAsync(id));
         }
-
     }
-    }
+}
