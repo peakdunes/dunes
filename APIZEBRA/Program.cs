@@ -30,11 +30,15 @@ Log.Logger = new LoggerConfiguration()
 builder.Host.UseSerilog();
 
 
-//dbcontext
-
+//DBK database conection
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+//DBKWMS database conecton
+builder.Services.AddDbContext<appWmsDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
+
+//User administration with Identity
 builder.Services.AddDbContext<IdentityDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
