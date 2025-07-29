@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace APIZEBRA.DTOs.B2B
 {
@@ -6,6 +7,7 @@ namespace APIZEBRA.DTOs.B2B
     /// <summary>
     /// Reapair order ready to receive
     /// </summary>
+   
     public class RepairReadyToReceiveDto
     {
 

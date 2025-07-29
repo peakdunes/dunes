@@ -47,5 +47,12 @@ namespace APIZEBRA.Repositories.B2B.Common.Queries
         /// <returns></returns>
         Task<List<RepairReadyToReceiveDto>> GetRepairReadyToReceive(string serialnumber);
 
+        /// <summary>
+        /// Gell all date fields for a Reference Number
+        /// </summary>
+        /// <param name="refNumber"></param>
+        /// <returns></returns>
+        Task<TorderRepairHdrDatesDto> GetAllDateFieldsRepair(int refNumber);
+
     }
 }

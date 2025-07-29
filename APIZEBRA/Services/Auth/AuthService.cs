@@ -7,17 +7,30 @@ using System.Text;
 
 namespace APIZEBRA.Services.Auth
 {
+    /// <summary>
+    /// Authentication services
+    /// </summary>
     public class AuthService: IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
 
+        /// <summary>
+        /// dependency injection
+        /// </summary>
+        /// <param name="userManager"></param>
+        /// <param name="configuration"></param>
         public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration)
         {
             _userManager = userManager;
             _configuration = configuration;
         }
-
+        /// <summary>
+        /// login validation access
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        /// <exception cref="UnauthorizedAccessException"></exception>
         public async Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model)
         {
             var user = await _userManager.FindByNameAsync(model.Username);

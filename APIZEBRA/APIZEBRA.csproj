@@ -30,9 +30,9 @@
     <Folder Include="Models\B2B\" />
     <Folder Include="Models\Masters\" />
     <Folder Include="Models\Inventory\" />
+    <Folder Include="Repositories\B2B\Process\Receiving\" />
     <Folder Include="Repositories\Inventory\" />
-    <Folder Include="Repositories\Auth\" />
-    <Folder Include="Services\B2B\Process\Receiving\Queries\" />
+    <Folder Include="Services\B2B\Process\Receiving\" />
     <Folder Include="Services\Inventory\" />
   </ItemGroup>
 

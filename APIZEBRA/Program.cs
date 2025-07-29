@@ -1,6 +1,7 @@
 ﻿
 
 using APIZEBRA.Data;
+using APIZEBRA.Repositories.Auth;
 using APIZEBRA.Repositories.B2B.Common.Queries;
 using APIZEBRA.Repositories.Masters;
 using APIZEBRA.Services.Auth;
@@ -50,6 +51,7 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
+
 
 
 builder.Services.AddAuthentication(options =>
@@ -134,13 +136,19 @@ builder.Services.AddSwaggerGen(c =>
 
 //SERVICES
 
-builder.Services.AddScoped<LogHelper>();
+
+//AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<IMenuService, MenuService>();
+
 
 //save error exception log in database table dbk_mvc_logs_api
 builder.Services.AddScoped<LogHelper>();
 
-//B2B Query services and repository
+//B2B SERVICES
+//Query services and repository
 builder.Services.AddScoped<ICommonQueryRepository, CommonQueryRepository>();
 builder.Services.AddScoped<ICommonQueryService, CommonQueryService>();
 

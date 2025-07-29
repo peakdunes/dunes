@@ -29,6 +29,37 @@ namespace APIZEBRA.Repositories.B2B.Common.Queries
             _wmscontext = wmscontext;
         }
         /// <summary>
+        /// get all date fields for a Reference Number
+        /// </summary>
+        /// <param name="refNumber"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<TorderRepairHdrDatesDto> GetAllDateFieldsRepair(int refNumber)
+        {
+
+            TorderRepairHdrDatesDto objdto = new TorderRepairHdrDatesDto();
+
+            var data = await _context.TorderRepairHdr.FirstOrDefaultAsync(x => x.RefNo == refNumber);
+
+            if (data != null)
+            {
+                objdto.RefNo = data.RefNo;
+                objdto.DateCreated = data.DateCreated;
+                objdto.CanceledDate = data.CanceledDate;
+                objdto.StopDate = data.StopDate;
+                objdto.CloseDate = data.CloseDate;
+                objdto.DateSaved = data.DateSaved;
+                objdto.EmailResponseDateTime = data.EmailResponseDateTime;
+                objdto.DateInserted = data.DateInserted;
+                objdto.ReceivingStartDate = data.ReceivingStartDate;
+                objdto.ReceivingEndDate = data.ReceivingEndDate;
+
+            }
+
+            return objdto;
+        }
+
+        /// <summary>
         /// check in the RMA have all records in our database (4 tables)
         /// </summary>
         /// <param name="refNo"></param>
@@ -263,6 +294,10 @@ namespace APIZEBRA.Repositories.B2B.Common.Queries
         /// <exception cref="NotImplementedException"></exception>
         public async Task<List<RepairReadyToReceiveDto>> GetRepairReadyToReceive(string serialnumber)
         {
+
+
+
+
             var repairStatuses = await (from enc in _context.TiewRepairStatusZebraBldgReceiving.Where(x => x.SerialInbound.Contains(serialnumber.Trim()))
                                         join det in _context.TorderRepairItemsSerialsReceiving.Where(x => x.DateReceived == null)
                                         on Convert.ToInt32(enc.RepairNo) equals det.RepairNo
@@ -297,7 +332,11 @@ namespace APIZEBRA.Repositories.B2B.Common.Queries
 
             return listcalls;
         }
-
+        /// <summary>
+        /// Get info about one repair when it's ready for receive
+        /// </summary>
+        /// <param name="serialNumber"></param>
+        /// <returns></returns>
         public async Task<List<TzebInBoundRequestsFile>> GetRMAReceivingInfo(string serialNumber)
         {
             return await _context.TzebInBoundRequestsFile

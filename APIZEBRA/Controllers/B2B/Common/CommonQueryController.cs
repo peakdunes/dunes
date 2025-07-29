@@ -1,4 +1,6 @@
-﻿using APIZEBRA.Services.B2B.Common.Queries;
+﻿using APIZEBRA.DTOs.B2B;
+using APIZEBRA.Services.B2B.Common.Queries;
+using APIZEBRA.Utils.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -73,19 +75,23 @@ public class CommonQueryController : ControllerBase
             return StatusCode(response.StatusCode, response);
         }
 
-
         /// <summary>
         /// Get info about one repair when it's ready for receive
         /// </summary>
         /// <param name="serialNumber"></param>
         /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<List<RepairReadyToReceiveDto>>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)] // no hay datos
+        [ProducesResponseType(StatusCodes.Status409Conflict)] // repair cancel, stopped o closed
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)] // error inesperado
         [HttpGet("repair-RepairReadyToReceive/{serialNumber}")]
-        public async Task<IActionResult> GetAreaByFunction(string serialNumber)
+        public async Task<IActionResult> GetRepairReadyToReceive(string serialNumber)
         {
             var response = await _service.GetRepairReadyToReceive(serialNumber);
 
             // devuelves el ApiResponse tal cual viene del servicio
             return StatusCode(response.StatusCode, response);
         }
+
     }
 }

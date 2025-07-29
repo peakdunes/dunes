@@ -1,5 +1,7 @@
-﻿using APIZEBRA.DTOs.B2B;
+﻿using APIZEBRA.DTOs.Auth;
+using APIZEBRA.DTOs.B2B;
 using APIZEBRA.Models;
+using APIZEBRA.Models.Auth;
 using APIZEBRA.Models.B2b;
 using APIZEBRA.Models.B2B;
 using APIZEBRA.Models.Masters;
@@ -36,6 +38,18 @@ namespace APIZEBRA.Data
         /// Basic information about repair number ready to be received
         /// </summary>
         public DbSet<RepairReadyToReceiveDto> repairReadyToReceiveDto { get; set; }
+
+        /// <summary>
+        /// Get all date fiels about repair number
+        /// </summary>
+        public DbSet<TorderRepairHdrDatesDto> torderRepairHdrDatesDto { get; set; }
+
+        /// <summary>
+        /// Represents a menu item returned by the API for authenticated users.
+        /// It supports up to 5 hierarchical levels and nested children.
+        /// </summary>
+        public DbSet<MenuItemDto> menuItemDto { get; set; }
+        
 
         ///############################
         ///End DTO Definition
@@ -162,6 +176,11 @@ namespace APIZEBRA.Data
         /// List to Rapair ready for receive and pending for receive
         /// </summary>
         public virtual DbSet<TiewRepairStatusZebraBldgReceiving> TiewRepairStatusZebraBldgReceiving { get; set; }
+
+        /// <summary>
+        /// aplication UI menu options for user authenticated and rol associated
+        /// </summary>
+        public virtual DbSet<MvcPartRunnerMenu> MvcPartRunnerMenu { get; set; }
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
@@ -172,8 +191,51 @@ namespace APIZEBRA.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+            modelBuilder.Entity<RepairReadyToReceiveDto>().HasNoKey();
+
+            modelBuilder.Entity<TorderRepairHdrDatesDto>().HasNoKey();
+
+            modelBuilder.Entity<MenuItemDto>().HasNoKey();
+            
             modelBuilder.Entity<DbkMvcLogApi>()
                 .ToTable("dbk_mvc_logs_api");
+
+            modelBuilder.Entity<MvcPartRunnerMenu>(entity =>
+            {
+                entity.ToTable("mvcPartRunnerMenu");
+
+                entity.Property(e => e.Action)
+                    .HasMaxLength(100)
+                    .HasColumnName("action");
+                entity.Property(e => e.Active).HasColumnName("active");
+                entity.Property(e => e.Code)
+                    .HasMaxLength(10)
+                    .HasColumnName("code");
+                entity.Property(e => e.Controller)
+                    .HasMaxLength(100)
+                    .HasColumnName("controller");
+                entity.Property(e => e.Level1)
+                    .HasMaxLength(100)
+                    .HasColumnName("level1");
+                entity.Property(e => e.Level2)
+                    .HasMaxLength(100)
+                    .HasColumnName("level2");
+                entity.Property(e => e.Level3)
+                    .HasMaxLength(100)
+                    .HasColumnName("level3");
+                entity.Property(e => e.Level4)
+                    .HasMaxLength(100)
+                    .HasColumnName("level4");
+                entity.Property(e => e.Level5)
+                    .HasMaxLength(100)
+                    .HasColumnName("level5");
+                entity.Property(e => e.Order).HasColumnName("order");
+                entity.Property(e => e.Roles)
+                    .HasMaxLength(500)
+                    .HasColumnName("roles");
+                entity.Property(e => e.Utility).HasMaxLength(500);
+            });
 
             modelBuilder.Entity<TzebInBoundRequestsFile>(entity =>
             {

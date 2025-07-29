@@ -9,7 +9,7 @@ namespace APIZEBRA.Services.B2B.Common.Queries
     /// ALl queries in B2B
     /// </summary>
     public interface ICommonQueryService
-    {   
+    {
         /// <summary>
         /// Display all information related to a repair
         /// </summary>
@@ -46,5 +46,14 @@ namespace APIZEBRA.Services.B2B.Common.Queries
         /// <param name="serialnumber"></param>
         /// <returns></returns>
         Task<ApiResponse<List<RepairReadyToReceiveDto>>> GetRepairReadyToReceive(string serialnumber);
+
+        /// <summary>
+        /// get all date fields for a Repair Number
+        /// </summary>
+        /// <param name="refNumber"></param>
+        /// <returns></returns>
+        Task<ApiResponse<TorderRepairHdrDatesDto>> GetAllDateFieldsRepair(int refNumber);
+
+
     }
 }
