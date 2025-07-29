@@ -1,5 +1,8 @@
 ﻿namespace APIZEBRA.Models
 {
+    /// <summary>
+    /// Log exception error
+    /// </summary>
     public class DbkMvcLogApi
     {
         public int Id { get; set; }

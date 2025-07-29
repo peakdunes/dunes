@@ -1,4 +1,5 @@
-﻿using APIZEBRA.Models;
+﻿using APIZEBRA.DTOs.B2B;
+using APIZEBRA.Models;
 using APIZEBRA.Models.B2b;
 using APIZEBRA.Models.B2B;
 using APIZEBRA.Models.Masters;
@@ -21,6 +22,26 @@ namespace APIZEBRA.Data
         {
             
         }
+        ///############################
+        ///DTO Definition
+        ///############################
+        ///
+
+        /// <summary>
+        /// Show Area from a Repair Order.
+        /// </summary>
+        public DbSet<AreaNameDto> areaNamesDto { get; set; }
+
+        /// <summary>
+        /// Basic information about repair number ready to be received
+        /// </summary>
+        public DbSet<RepairReadyToReceiveDto> repairReadyToReceiveDto { get; set; }
+
+        ///############################
+        ///End DTO Definition
+        ///############################
+        ///
+
         /// <summary>
         /// Stores API error logs captured by Serilog.
         /// </summary>
@@ -113,6 +134,34 @@ namespace APIZEBRA.Data
         /// </summary>
         public virtual DbSet<UserMvcReceiving> UserMvcReceiving { get; set; }
 
+        /// <summary>
+        /// Repair calls type
+        /// </summary>
+        public virtual DbSet<TzebB2bOutBoundRequestsTypeOfCalls> TzebB2bOutBoundRequestsTypeOfCalls { get; set; }
+        /// <summary>
+        /// Codes action repair
+        /// </summary>
+        public virtual DbSet<TzebWorkCodesActions> TzebWorkCodesActions { get; set; }
+
+        /// <summary>
+        /// ZEBRA hold release
+        /// </summary>
+        public virtual DbSet<TzebInBoundRequestsFileHoldsLog> TzebInBoundRequestsFileHoldsLog { get; set; }
+
+        /// <summary>
+        /// Technician information
+        /// </summary>
+        public virtual DbSet<Ttech> Ttech { get; set; }
+
+        /// <summary>
+        /// DBK Users
+        /// </summary>
+        public virtual DbSet<Tdbkusers> Tdbkusers { get; set; }
+
+        /// <summary>
+        /// List to Rapair ready for receive and pending for receive
+        /// </summary>
+        public virtual DbSet<TiewRepairStatusZebraBldgReceiving> TiewRepairStatusZebraBldgReceiving { get; set; }
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
@@ -1300,6 +1349,371 @@ namespace APIZEBRA.Data
                     .HasMaxLength(100)
                     .HasColumnName("userprocess");
             });
+
+            modelBuilder.Entity<TzebInBoundRequestsFileHoldsLog>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__TZEB_InBound_Requests_File_Holds_Log_1");
+
+                entity.ToTable("_TZEB_InBound_Requests_File_Holds_Log");
+
+                entity.HasIndex(e => e.HoldType, "NonClusteredIndex-20191017-113506");
+
+                entity.HasIndex(e => e.RowId, "NonClusteredIndex-20191017-113642");
+
+                entity.HasIndex(e => e.DateReleased, "_TZEB_InBound_Requests_File_Holds_Log_Index");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.DateOnHold)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_On_Hold");
+                entity.Property(e => e.DateReleased)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Released");
+                entity.Property(e => e.HoldId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Hold_Id");
+                entity.Property(e => e.HoldName)
+                    .HasMaxLength(255)
+                    .HasColumnName("Hold_Name");
+                entity.Property(e => e.HoldType)
+                    .HasMaxLength(255)
+                    .HasColumnName("Hold_Type");
+                entity.Property(e => e.RowId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("ROW_ID");
+            });
+
+            modelBuilder.Entity<Ttech>(entity =>
+            {
+                entity.HasKey(e => e.TtechNo)
+                    .IsClustered(false)
+                    .HasFillFactor(90);
+
+                entity.ToTable("_TTech");
+
+                entity.HasIndex(e => e.TtechName, "IX__TTech");
+
+                entity.HasIndex(e => e.Password, "IX__TTech_1");
+
+                entity.HasIndex(e => e.Login, "IX__TTech_2");
+
+                entity.HasIndex(e => e.IsTech, "IX__TTech_3");
+
+                entity.Property(e => e.TtechNo)
+                    .ValueGeneratedNever()
+                    .HasColumnName("TTech_No");
+                entity.Property(e => e.Active).HasDefaultValue(true);
+                entity.Property(e => e.AdditionalTimeFromCurrDate)
+                    .HasDefaultValue(0.0)
+                    .HasColumnName("Additional_time_from _curr_date");
+                entity.Property(e => e.Admin).HasDefaultValue(false);
+                entity.Property(e => e.Email)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+                entity.Property(e => e.EmployeeCode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+                entity.Property(e => e.Engineer).HasDefaultValue(false);
+                entity.Property(e => e.IsTech).HasColumnName("Is_Tech");
+                entity.Property(e => e.Login)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Password)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.RepParts).HasComment("Boolean: if Tec repairs parts (radio, cpu, etc) = 1; only Devices = 0 ");
+                entity.Property(e => e.Shift)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .IsFixedLength()
+                    .HasComment("D: Day, N:Night");
+                entity.Property(e => e.Supervisor).HasDefaultValue(false);
+                entity.Property(e => e.TtechName)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("TTech_Name");
+            });
+
+            modelBuilder.Entity<Tdbkusers>(entity =>
+            {
+                entity.HasKey(e => e.Login)
+                    .IsClustered(false)
+                    .HasFillFactor(90);
+
+                entity.ToTable("TDBKUsers");
+
+                entity.Property(e => e.Login)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+                entity.Property(e => e.Email).HasMaxLength(250);
+                entity.Property(e => e.Id)
+                    .ValueGeneratedOnAdd()
+                    .HasColumnName("ID");
+                entity.Property(e => e.IsCustomerService)
+                    .HasDefaultValue(false)
+                    .HasColumnName("Is_Customer_Service");
+                entity.Property(e => e.IsTechnicalSupport)
+                    .HasDefaultValue(false)
+                    .HasColumnName("Is_Technical_Support");
+                entity.Property(e => e.IsZebraPartRunner).HasColumnName("Is_Zebra_PartRunner");
+                entity.Property(e => e.Name)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+                entity.Property(e => e.Password)
+                    .HasMaxLength(25)
+                    .IsUnicode(false);
+                entity.Property(e => e.SupervisorPin)
+                    .HasMaxLength(10)
+                    .IsUnicode(false);
+                entity.Property(e => e.WorkingForCompany)
+                    .HasMaxLength(100)
+                    .HasDefaultValue("DBK")
+                    .HasColumnName("Working_for_company");
+            });
+
+            modelBuilder.Entity<TzebWorkCodesActions>(entity =>
+            {
+                entity.HasKey(e => e.WorkCodeAction);
+
+                entity.ToTable("_TZEB_WORK_CODES_ACTIONS");
+
+                entity.Property(e => e.WorkCodeAction)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Work_Code_Action");
+                entity.Property(e => e.RepairCodeDefinition)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Repair_Code_Definition");
+                entity.Property(e => e.RequiresAssemblingArea)
+                    .HasDefaultValue(true)
+                    .HasColumnName("Requires_Assembling_Area");
+                entity.Property(e => e.RequiresPartsReplaced).HasColumnName("Requires_Parts_Replaced");
+                entity.Property(e => e.Show).HasDefaultValue(true);
+                entity.Property(e => e.WorkDescAction)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Work_Desc_Action");
+            });
+
+            modelBuilder.Entity<TzebB2bOutBoundRequestsTypeOfCalls>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__TZEB_B2B_OutBound_Request_Type_Of_Calls");
+
+                entity.ToTable("_TZEB_B2B_OutBound_Requests_Type_Of_Calls");
+
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Code).HasMaxLength(5);
+                entity.Property(e => e.Description).HasMaxLength(255);
+                entity.Property(e => e.Name).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<TiewRepairStatusZebraBldgReceiving>(entity =>
+            {
+                entity.ToTable("_TIEW_Repair_Status_Zebra_Bldg_Receiving");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.Allrepairstate).HasColumnName("ALLREPAIRSTATE");
+                entity.Property(e => e.AttHdr)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("Att_HDR");
+                entity.Property(e => e.BinLocation)
+                    .HasMaxLength(8)
+                    .IsUnicode(false);
+                entity.Property(e => e.CanceledDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Canceled_Date");
+                entity.Property(e => e.Chd).HasColumnName("CHD");
+                entity.Property(e => e.CloseDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Close_Date");
+                entity.Property(e => e.CompanyDsc)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("Company_DSC");
+                entity.Property(e => e.CompanyPartNo)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("Company_PartNo");
+                entity.Property(e => e.CourierDsc)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Courier_Dsc");
+                entity.Property(e => e.CourierId).HasColumnName("Courier_ID");
+                entity.Property(e => e.CurrInstructions)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Curr_instructions");
+                entity.Property(e => e.CustName)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("Cust_Name");
+                entity.Property(e => e.CustRef)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("Cust_Ref");
+                entity.Property(e => e.DateCreated)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Created");
+                entity.Property(e => e.DateInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.DateLoading)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Loading");
+                entity.Property(e => e.DateReceived)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Received");
+                entity.Property(e => e.DateRepaired)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Repaired");
+                entity.Property(e => e.DateShip)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Ship");
+                entity.Property(e => e.DateTech)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Tech");
+                entity.Property(e => e.DaysLeftToArrive).HasColumnName("DaysLeft_To_Arrive");
+                entity.Property(e => e.DbkPartDsc)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("DBK_Part_DSC");
+                entity.Property(e => e.Division)
+                    .HasMaxLength(30)
+                    .IsUnicode(false);
+                entity.Property(e => e.EstimatedAgree).HasColumnName("Estimated_Agree");
+                entity.Property(e => e.InBoundpt)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.InboundTracking)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("Inbound_Tracking");
+                entity.Property(e => e.InboundTrackingNumber)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Model)
+                    .HasMaxLength(2)
+                    .IsUnicode(false);
+                entity.Property(e => e.NeedRepair).HasColumnName("Need_Repair");
+                entity.Property(e => e.NeedSerialNo).HasColumnName("Need_SerialNo");
+                entity.Property(e => e.OrderOnHoldDateAdded).HasColumnName("OrderOnHold_DateAdded");
+                entity.Property(e => e.OrderOnHoldReason)
+                    .HasMaxLength(1)
+                    .IsUnicode(false)
+                    .HasColumnName("OrderOnHold_Reason");
+                entity.Property(e => e.OrderStateId)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("Order_State_ID");
+                entity.Property(e => e.OrderZipCode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("Order_ZipCode");
+                entity.Property(e => e.OutBoundpt)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.PartDsc)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("Part_DSC");
+                entity.Property(e => e.PartNo)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("Part_No");
+                entity.Property(e => e.PickupStatus).HasColumnName("Pickup_Status");
+                entity.Property(e => e.QtyReceived).HasColumnName("Qty_Received");
+                entity.Property(e => e.QtyToOrder).HasColumnName("Qty_To_Order");
+                entity.Property(e => e.QtyToReceive).HasColumnName("Qty_To_Receive");
+                entity.Property(e => e.QtyToShip).HasColumnName("Qty_To_Ship");
+                entity.Property(e => e.RefNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("Ref_No");
+                entity.Property(e => e.RepairDateClose)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Repair_Date_Close");
+                entity.Property(e => e.RepairNo)
+                    .HasMaxLength(20)
+                    .IsUnicode(false)
+                    .HasColumnName("Repair_No");
+                entity.Property(e => e.RepairNoTrepair).HasColumnName("Repair_No_TRepair");
+                entity.Property(e => e.SerialInbound)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("SerialINBOUND");
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Serial_No");
+                entity.Property(e => e.SerialReceived)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("SerialRECEIVED");
+                entity.Property(e => e.SerialShip)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("SerialSHIP");
+                entity.Property(e => e.ShipToAddr)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("Ship_To_Addr");
+                entity.Property(e => e.ShipToAddr1)
+                    .HasMaxLength(250)
+                    .IsUnicode(false)
+                    .HasColumnName("Ship_To_Addr1");
+                entity.Property(e => e.ShippSwap)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("SHIPP_SWAP");
+                entity.Property(e => e.SparePoolId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Spare_Pool_id");
+                entity.Property(e => e.StatusForCompany)
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.StopDate)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Stop_Date");
+                entity.Property(e => e.TcityDsc)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("TCity_Dsc");
+                entity.Property(e => e.TcustNo)
+                    .HasMaxLength(30)
+                    .IsUnicode(false)
+                    .HasColumnName("TCust_No");
+                entity.Property(e => e.TrackingNumber)
+                    .HasMaxLength(500)
+                    .IsUnicode(false);
+                entity.Property(e => e.TrepairStateDsc)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("TRepairState_DSC");
+                entity.Property(e => e.TrepairStateId).HasColumnName("TRepairState_ID");
+                entity.Property(e => e.TstateId)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("TState_ID");
+                entity.Property(e => e.TstatusId)
+                    .HasMaxLength(25)
+                    .IsUnicode(false)
+                    .HasColumnName("TStatusID");
+                entity.Property(e => e.UnitId)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("UnitID");
+                entity.Property(e => e.ZipCode)
+                    .HasMaxLength(10)
+                    .IsUnicode(false)
+                    .HasColumnName("ZIP_Code");
+            });
+
         }
     }
 }

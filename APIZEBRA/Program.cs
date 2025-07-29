@@ -1,13 +1,16 @@
 ﻿
 
 using APIZEBRA.Data;
+using APIZEBRA.Repositories.B2B.Common.Queries;
 using APIZEBRA.Repositories.Masters;
 using APIZEBRA.Services.Auth;
+using APIZEBRA.Services.B2B.Common.Queries;
 using APIZEBRA.Services.Masters;
 using APIZEBRA.Utils.Logging;
 using APIZEBRA.Utils.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -133,11 +136,21 @@ builder.Services.AddSwaggerGen(c =>
 
 builder.Services.AddScoped<LogHelper>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+
+//save error exception log in database table dbk_mvc_logs_api
+builder.Services.AddScoped<LogHelper>();
+
+//B2B Query services and repository
+builder.Services.AddScoped<ICommonQueryRepository, CommonQueryRepository>();
+builder.Services.AddScoped<ICommonQueryService, CommonQueryService>();
+
 //generic service for master tables
 builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<>));
 
 //para usar en el CRUD de las tablas maestras
 builder.Services.AddScoped(typeof(IMasterService<>), typeof(MasterService<>));
+
+
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

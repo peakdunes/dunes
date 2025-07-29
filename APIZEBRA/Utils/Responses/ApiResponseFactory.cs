@@ -112,7 +112,7 @@ namespace APIZEBRA.Utils.Responses
         }
 
         // ----------------- SHORTHAND FAIL ALIASES -----------------
-
+        
         /// <summary>
         /// Returns a 400 Bad Request response.
         /// </summary>
@@ -154,6 +154,25 @@ namespace APIZEBRA.Utils.Responses
         /// </summary>
         public static ApiResponse<T> InternalError<T>(string error = "Unexpected server error") =>
             Fail<T>(error, "Internal Server Error", 500);
+        /// <summary>
+        /// for save error from Global exeptions (in database dbk_mvc_logs_api, and txt file
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="message"></param>
+        /// <param name="traceId"></param>
+        /// <returns></returns>
+        public static ApiResponse<T> InternalError<T>(string message, string? traceId = null)
+        {
+            return new ApiResponse<T>
+            {
+                Message = message,
+                Error = "Internal Server Error",
+                StatusCode = 500,
+                Success = false,
+                TraceId = traceId
+            };
+        }
+
     }
 
 

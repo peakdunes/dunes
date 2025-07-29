@@ -1,42 +1,46 @@
 ﻿using APIZEBRA.Data;
 using APIZEBRA.Models;
+using Microsoft.Data.SqlClient;
 
 namespace APIZEBRA.Utils.Logging
 {
     public class LogHelper
     {
-        private readonly AppDbContext _context;
+        private readonly IConfiguration _config;
 
-        public LogHelper(AppDbContext context)
+        public LogHelper(IConfiguration config)
         {
-            _context = context;
+            _config = config;
         }
 
-        public async Task LogErrorAsync(Exception ex, string origen, string ruta, string usuario = "system", string nivel = "Error")
+        public async Task SaveLogAsync(
+            string traceId,
+            string message,
+            string exception,
+            string level,
+            string usuario,
+            string origen,
+            string ruta)
         {
-            try
-            {
-                var mensajeLimpio = ex.GetBaseException().Message.Split('\n')[0].Trim();
+            var connectionString = _config.GetConnectionString("DefaultConnection");
 
-                var log = new DbkMvcLogApi
-                {
-                    Message = $"❌ {mensajeLimpio}",
-                    Exception = mensajeLimpio,
-                    Level = nivel,
-                    TimeStamp = DateTime.Now,
-                    Usuario = usuario,
-                    Origen = origen,
-                    Ruta = ruta
-                };
+            using var conn = new SqlConnection(connectionString);
+            await conn.OpenAsync();
 
-                _context.Add(log);
-                await _context.SaveChangesAsync();
-            }
-            catch
-            {
+            var query = @"
+            INSERT INTO dbk_mvc_logs_api (Message, Exception, Level, Usuario, Origen, Ruta, TimeStamp, TraceId)
+            VALUES (@Message, @Exception, @Level, @Usuario, @Origen, @Ruta, GETDATE(), @TraceId)";
 
-            }
+            using var cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TraceId", Guid.Parse(traceId));
+            cmd.Parameters.AddWithValue("@Message", message);
+            cmd.Parameters.AddWithValue("@Exception", (object?)exception ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Level", level);
+            cmd.Parameters.AddWithValue("@Usuario", (object?)usuario ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@Origen", origen);
+            cmd.Parameters.AddWithValue("@Ruta", (object?)ruta ?? DBNull.Value);
+
+            await cmd.ExecuteNonQueryAsync();
         }
-
     }
 }
