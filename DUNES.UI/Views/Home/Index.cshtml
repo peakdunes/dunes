@@ -1,0 +1,41 @@
+﻿@model List<DUNES.Shared.DTOs.Auth.MenuItemDto>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">DUNES</h1>
+    <p><h3>System Information</h3></p>
+</div>
+<div class="container mt-4">
+    <h2 class="mb-4">📋 Main Menu</h2>
+
+    <div class="row g-3 align-items-stretch">
+        @foreach (var item in Model.Where(m => m.Code.Length == 2))
+        {
+            <div class="col-md-4">
+                <div class="card shadow-sm h-100 card-hover"
+                     style="cursor:pointer;"
+                     onclick="window.location.href='/Menu/Level/@item.Code'">
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Title</h5>
+                        <p class="card-text text-muted">
+                            @(!string.IsNullOrEmpty(item.Utility) ? item.Utility : "No description")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+
+
+<style>
+    /* 🎨 Efecto hover para que parezca clickeable */
+    .card-hover:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        transition: all 0.2s ease-in-out;
+    }
+</style>

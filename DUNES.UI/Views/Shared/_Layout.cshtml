@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - DUNES</title>
+    <script type="importmap"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DUNES.styles.css" asp-append-version="true" />
+
+
+<style>
+            .custom-footer {
+            background-color: #f8f9fa;   /* Gris claro */
+            padding: 20px 0;            /* Lo hace más alto */
+            border-top: 1px solid #ddd; /* Línea superior sutil */
+            font-size: 15px;
+            color: #555;                /* Texto gris oscuro */
+        }
+
+        .custom-footer a {
+            color: #007bff;             /* Azul Bootstrap */
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .custom-footer a:hover {
+            color: #0056b3;             /* Azul más oscuro al pasar mouse */
+            text-decoration: underline;
+        }
+
+</style>
+
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <div class="flex-grow-1">
+        <header>
+            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+                <div class="container-fluid">
+
+
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DUNES</a>
+
+
+
+                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            </li>
+                        </ul>
+                        <!-- Zona de Login/Logout -->
+                        <ul class="navbar-nav">
+                            @if (Context.Session.GetString("JWToken") == null)
+                            {
+                                <!--  Si NO hay token → mostrar Login -->
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <!--  Si hay token → mostrar Logout -->
+                                <li class="nav-item">
+                                    <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-link nav-link text-dark">Logout</button>
+                                    </form>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+
+
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+    <footer class="custom-footer mt-auto">
+        <div class="container text-center">
+            &copy; 2025 - DUNES - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
