@@ -29,7 +29,7 @@ namespace DUNES.API.Services.Auth
         public async Task<List<MenuItemDto>> GetMenuHierarchyAsync(IEnumerable<string> userRoles)
         {
             // 1 Get flat menu list from repository
-            var flatMenu = await _repository.GetAllActiveMenusAsync();
+            var flatMenu = await _repository.GetAllActiveMenusAsync(userRoles);
 
             return (flatMenu);
 

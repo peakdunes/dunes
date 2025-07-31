@@ -11,6 +11,6 @@ namespace DUNES.API.Repositories.Auth
         /// Retrieves all active menu items from the database.
         /// </summary>
         /// <returns>List of MenuItemDto with flat structure (not hierarchical yet).</returns>
-        Task<List<MenuItemDto>> GetAllActiveMenusAsync();
+        Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles);
     }
 }

@@ -16,6 +16,7 @@ namespace DUNES.API.Controllers.Auth
     [Route("api/[controller]")]
     public class MenuController : ControllerBase
     {
+        private readonly IAuthService _authService;
         private readonly IMenuService _menuService;
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -24,10 +25,13 @@ namespace DUNES.API.Controllers.Auth
         /// dependency injection
         /// </summary>
         /// <param name="menuService"></param>
-        public MenuController(IMenuService menuService, UserManager<IdentityUser> userManager)
+        /// <param name="userManager"></param>
+        /// <param name="authService"></param>
+        public MenuController(IMenuService menuService, UserManager<IdentityUser> userManager, IAuthService authService )
         {
             _menuService = menuService;
             _userManager = userManager;
+            _authService = authService;
         }
 
         /// <summary>
@@ -45,9 +49,14 @@ namespace DUNES.API.Controllers.Auth
             var user = await _userManager.GetUserAsync(User);
 
             //Y ahora sacamos todos los roles del usuario con Identity
-           // var roles = await _userManager.GetRolesAsync(user);
+            // var roles = await _userManager.GetRolesAsync(user);
 
-            List<string> roles = new List<string>();
+            var roles = await _authService.GetRolesFromClaims(User);
+
+           // if (roles == null || !roles.Any())
+                if (roles != null)
+                return Forbid("User has no roles assigned.");
+
 
             // Llamamos al service con la lista de roles que Identity nos da
             var menuItems = await _menuService.GetMenuHierarchyAsync(roles);
@@ -55,23 +64,23 @@ namespace DUNES.API.Controllers.Auth
             return Ok(menuItems);
         }
 
-        [HttpGet("debug-claims")]
-        public IActionResult GetClaimsDebug()
-        {
-            var claimsList = User.Claims
-                .Select(c => new
-                {
-                    Type = c.Type,
-                    Value = c.Value
-                })
-                .ToList();
+        //[HttpGet("debug-claims")]
+        //public IActionResult GetClaimsDebug()
+        //{
+        //    var claimsList = User.Claims
+        //        .Select(c => new
+        //        {
+        //            Type = c.Type,
+        //            Value = c.Value
+        //        })
+        //        .ToList();
 
-            return Ok(new
-            {
-                IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
-                AuthenticationType = User.Identity?.AuthenticationType,
-                Claims = claimsList
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
+        //        AuthenticationType = User.Identity?.AuthenticationType,
+        //        Claims = claimsList
+        //    });
+        //}
     }
 }

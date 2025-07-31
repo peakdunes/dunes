@@ -25,7 +25,7 @@ namespace DUNES.API.Repositories.Auth
         /// <summary>
         /// Gets all active menu items from the mvcPartRunnerMenu table.
         /// </summary>
-        public async Task<List<MenuItemDto>> GetAllActiveMenusAsync()
+        public async Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles)
         {
             return await _context.MvcPartRunnerMenu
                 .Where(m => m.Active == true && m.Code.Length ==2)
