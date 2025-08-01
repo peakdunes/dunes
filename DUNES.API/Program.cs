@@ -104,7 +104,19 @@ builder.Services.AddSwaggerGen(c =>
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
-    c.SwaggerDoc("v1", new() { Title = "API Zebra", Version = "v1" });
+
+
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "DUNES.API",
+        Version = "v1",
+        Description = "API to repair process and inventory administration",
+        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        {
+            Name = "Soporte DUNES",
+            Email = "herledy.lopez@peaktech.com"
+        }
+    });
 
     // JWT Authentication
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -165,6 +177,19 @@ builder.Services.AddScoped(typeof(IMasterService<>), typeof(MasterService<>));
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "DUNES.API v1");
+        c.RoutePrefix = "docs"; // 👉 la doc estará en /docs
+        c.DocumentTitle = "DUNES.API Docs";
+        c.InjectStylesheet("/swagger-ui/custom.css"); // CSS custom (lo haremos ahora)
+    });
+}
+
 
 app.UseSwagger();
 app.UseSwaggerUI();

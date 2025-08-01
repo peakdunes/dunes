@@ -28,10 +28,43 @@ namespace DUNES.API.Controllers.Auth
             _userManager = userManager;
         }
         /// <summary>
-        /// Login access
+        /// User authentication for DUNES.API.
         /// </summary>
-        /// <param name="model"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// This endpoint validates the user credentials and returns a **JWT token** if the login is successful.
+        ///
+        /// **Example request:**  
+        /// ```json
+        /// {
+        ///   "username": "admin@dunes.com",
+        ///   "password": "123456"
+        /// }
+        /// ```
+        ///
+        /// **Example response (200 OK):**  
+        /// ```json
+        /// {
+        ///   "success": true,
+        ///   "message": "Login successful",
+        ///   "data": {
+        ///       "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+        ///       "expiration": "2025-08-01T18:30:00Z"
+        ///   }
+        /// }
+        /// ```
+        ///
+        /// **Example response (401 Unauthorized):**  
+        /// ```json
+        /// {
+        ///   "success": false,
+        ///   "message": "Invalid credentials"
+        /// }
+        /// ```
+        /// </remarks>
+        /// <param name="model">The login credentials (email and password).</param>
+        /// <response code="200">Login successful, returns a JWT token.</response>
+        /// <response code="400">Bad request if required fields are missing.</response>
+        /// <response code="401">Unauthorized if the credentials are invalid.</response>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
@@ -69,43 +102,6 @@ namespace DUNES.API.Controllers.Auth
                 user = username
             });
         }
-        /// <summary>
-        /// 🔒 Gets all roles assigned to the authenticated user.
-        /// </summary>
-        /// <remarks>
-        /// Requires a valid JWT token.  
-        /// Returns a JSON array with the roles associated to the logged-in user.
-        ///
-        /// **Example Response**
-        /// ```json
-        /// {
-        ///   "user": "user@domain.com",
-        ///   "roles": ["Admin", "Receiving"]
-        /// }
-        /// ```
-        /// </remarks>
-        //[Authorize]
-        //[HttpGet("roles")]
-        //public async Task<IActionResult> GetUserRoles()
-        //{
-        //    var username = User.Identity?.Name;
 
-        //    if (string.IsNullOrEmpty(username))
-        //        return Unauthorized(new { message = "Token does not contain a valid username." });
-
-        //    var user = await _userManager.FindByNameAsync(username);
-
-        //    if (user == null)
-        //        return NotFound(new { message = $"User '{username}' not found." });
-
-
-        //    var roles = await _userManager.GetRolesAsync(user);
-
-        //    return Ok(new { 
-        //        user = username,
-        //        roles = roles
-            
-        //    });
-        //}
     }
 }

@@ -2,18 +2,41 @@
 @{
     ViewData["Title"] = "Home Page";
 }
+<style>
+    .breadcrumb-item.active {
+        color: #ffc107; /* amarillo tenue */
+        font-weight: 300;
+    }
+
+    .breadcrumb a {
+        text-decoration: none;
+    }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+</style>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="/">Home</a>
+        </li>
+        <li class="breadcrumb-item">
+            <a href="/Inventory">Inventory</a>
+        </li>
+        <li class="breadcrumb-item active text-warning fw-light" aria-current="page">
+            Unprocessed List Transactions
+        </li>
+    </ol>
+</nav>
 
 
-
-<div class="text-center">
-    <h1 class="display-4">DUNES</h1>
-    <p><h3>System Information</h3></p>
-</div>
 <div class="container mt-4">
-    <h2 class="mb-4"> Main Menu</h2>
+   
 
     <div class="row g-3 align-items-stretch">
-        @foreach (var item in Model.Where(m => m.Code.Length == 2))
+        @foreach (var item in Model.Where(m => m.Code.Length == 4))
         {
             <div class="col-12 col-sm-6 col-md-4">
                 <div class="card shadow-sm h-100 card-hover"

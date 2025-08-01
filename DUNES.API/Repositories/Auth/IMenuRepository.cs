@@ -1,4 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.Models;
+using System.Collections.Generic;
 
 namespace DUNES.API.Repositories.Auth
 {
@@ -12,5 +14,12 @@ namespace DUNES.API.Repositories.Auth
         /// </summary>
         /// <returns>List of MenuItemDto with flat structure (not hierarchical yet).</returns>
         Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles);
+
+        /// <summary>
+        /// Gets the level 2 menus associated with level 1 passed as parameter
+        /// </summary>
+        /// <param name="level1"></param>
+        /// <returns></returns>
+        Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles);
     }
 }

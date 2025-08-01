@@ -52,7 +52,7 @@ namespace DUNES.UI.Controllers
             var menuItems = apiResponse.Data;
 
 
-            ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
+           // ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
 
             return View(menuItems);
 
