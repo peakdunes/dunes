@@ -1,5 +1,6 @@
-﻿using DUNES.Shared.DTOs.Auth;
+﻿using Azure;
 using DUNES.API.Services.Auth;
+using DUNES.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -45,42 +46,27 @@ namespace DUNES.API.Controllers.Auth
             if (!User.Identity?.IsAuthenticated ?? false)
                 return Unauthorized();
 
-            //Aquí pedimos el usuario actual a Identity
+            //obtain user information 
             var user = await _userManager.GetUserAsync(User);
 
-            //Y ahora sacamos todos los roles del usuario con Identity
-            // var roles = await _userManager.GetRolesAsync(user);
-
+            //obtain roles by user
+          
             var roles = await _authService.GetRolesFromClaims(User);
 
-           // if (roles == null || !roles.Any())
-                if (roles != null)
+            if (roles == null)
+           
                 return Forbid("User has no roles assigned.");
 
 
             // Llamamos al service con la lista de roles que Identity nos da
-            var menuItems = await _menuService.GetMenuHierarchyAsync(roles);
+            var menuItems = await _menuService.GetMenuHierarchyAsync(roles.Data);
+
 
             return Ok(menuItems);
+
+           
         }
 
-        //[HttpGet("debug-claims")]
-        //public IActionResult GetClaimsDebug()
-        //{
-        //    var claimsList = User.Claims
-        //        .Select(c => new
-        //        {
-        //            Type = c.Type,
-        //            Value = c.Value
-        //        })
-        //        .ToList();
-
-        //    return Ok(new
-        //    {
-        //        IsAuthenticated = User.Identity?.IsAuthenticated ?? false,
-        //        AuthenticationType = User.Identity?.AuthenticationType,
-        //        Claims = claimsList
-        //    });
-        //}
+     
     }
 }

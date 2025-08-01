@@ -1,6 +1,7 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.B2b;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.Models;
 
 namespace DUNES.API.Services.B2B.Common.Queries
 {

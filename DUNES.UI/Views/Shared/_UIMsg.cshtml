@@ -1,0 +1,29 @@
+﻿@using System.Text.Json
+@{
+    var json = TempData["UIMsg"] as string;
+    UIMsg msg = null;
+
+    if (!string.IsNullOrEmpty(json))
+    {
+        msg = JsonSerializer.Deserialize<UIMsg>(json);
+    }
+}
+
+@if (msg != null)
+{
+    <div id="globalMessage" class="alert alert-@msg.Type.ToLower() mt-2" role="alert">
+        @msg.Message
+    </div>
+
+    <script>
+        // Hace que el mensaje desaparezca después de 5 segundos
+        setTimeout(() => {
+            const msgDiv = document.getElementById('globalMessage');
+            if (msgDiv) {
+                msgDiv.style.transition = "opacity 0.8s ease";
+                msgDiv.style.opacity = "0";
+                setTimeout(() => msgDiv.remove(), 800);
+            }
+        }, 5000);
+    </script>
+}

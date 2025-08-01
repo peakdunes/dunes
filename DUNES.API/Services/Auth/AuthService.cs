@@ -1,8 +1,12 @@
-﻿using DUNES.API.Models.Auth;
+﻿using DUNES.API.DTOs.B2B;
+using DUNES.API.Models.Auth;
+using DUNES.API.Utils.Responses;
+using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace DUNES.API.Services.Auth
@@ -31,27 +35,43 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="userPrincipal">The ClaimsPrincipal object injected by ASP.NET (User)</param>
         /// <returns>List of role names (or empty list if no roles)</returns>
-        public async Task<List<string>> GetRolesFromClaims(ClaimsPrincipal userPrincipal)
+        public async Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal)
         {
+
+            List<string> roleslist = new List<string>();
+
             // 1. Verifica que hay un usuario autenticado
             if (userPrincipal?.Identity == null || !userPrincipal.Identity.IsAuthenticated)
-                return new List<string>();
+                return  ApiResponseFactory.NotFound<List<string>>(
+                    $"This user is not authenticate.");
 
             // 2. Obtiene el username (normalmente el email) desde el claim `name`
             var username = userPrincipal.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return new List<string>();
+                return ApiResponseFactory.NotFound<List<string>>(
+                    $"This user is not authenticate.");
 
             // 3. Busca el usuario en la base de datos de Identity
             var user = await _userManager.FindByNameAsync(username);
             if (user == null)
-                return new List<string>();
+                return ApiResponseFactory.NotFound<List<string>>(
+                    $"This user is not authenticate.");
 
             // 4. Obtiene los roles desde Identity
             var roles = await _userManager.GetRolesAsync(user);
 
-            // 5. Devuelve la lista de roles como List<string>
-            return roles.ToList();
+            if (roles == null)
+            {
+                return ApiResponseFactory.NotFound<List<string>>(
+                   $"Roles list for this user not found.");
+            }
+            else
+            {
+                roleslist = roles.ToList();
+            }
+
+                // 5. Devuelve la lista de roles como List<string>
+                return ApiResponseFactory.Ok(roleslist, "Roles availables for this user");
         }
 
         /// <summary>

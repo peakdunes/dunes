@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Models.Auth;
+using DUNES.Shared.Models;
 using System.Security.Claims;
 
 namespace DUNES.API.Services.Auth
@@ -8,8 +9,17 @@ namespace DUNES.API.Services.Auth
     /// </summary>
     public interface IAuthService
     {
+        /// <summary>
+        /// User Login
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model);
-
-        Task<List<string>> GetRolesFromClaims(ClaimsPrincipal userPrincipal);
+        /// <summary>
+        /// Obtain all roles assigned for this user
+        /// </summary>
+        /// <param name="userPrincipal"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal);
     }
 }

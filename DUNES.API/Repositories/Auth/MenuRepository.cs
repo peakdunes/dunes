@@ -27,21 +27,26 @@ namespace DUNES.API.Repositories.Auth
         /// </summary>
         public async Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles)
         {
-            return await _context.MvcPartRunnerMenu
-                .Where(m => m.Active == true && m.Code.Length ==2)
+            var roleList = userRoles.ToList();
+            var menus = await _context.MvcPartRunnerMenu
+                .Where(m => m.Active == true && m.Code.Length == 2)
                 .OrderBy(m => m.Order)
+                .ToListAsync(); // ejecuta la query en SQL
+
+            return menus
+                .Where(m => roleList.Any(role => m.Roles.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code,
                     Title = m.Level1,
-                    Utility = m.Utility, 
+                    Utility = m.Utility,
                     Controller = m.Controller,
                     Action = m.Action,
                     Roles = m.Roles,
                     Active = m.Active,
                     Order = m.Order
                 })
-                .ToListAsync();
+                .ToList();
         }
     }
 }

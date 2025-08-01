@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DUNES.Shared.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace DUNES.API.Utils.Responses
 {

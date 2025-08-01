@@ -11,7 +11,7 @@
             <div class="alert alert-danger">@ViewBag.Error</div>
         }
 
-        <form asp-action="Login" method="post">
+        <form asp-action="Login" method="post" onsubmit="return handleLoginSubmit(this)">
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" required />
@@ -22,7 +22,23 @@
                 <input type="password" class="form-control" id="password" name="password" required />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100">Login</button>
+            <button type="submit" id="loginBtn" class="btn btn-primary w-100">Login</button>
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function handleLoginSubmit(form) {
+            // 🔵 Mostramos el spinner global
+            showSpinner();
+
+            // 🔵 Desactivamos el botón de login
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerText = "Logging in...";
+
+            return true; 
+        }
+    </script>
+}

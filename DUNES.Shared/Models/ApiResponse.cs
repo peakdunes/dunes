@@ -1,4 +1,10 @@
-﻿namespace DUNES.API.Utils.Responses
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DUNES.Shared.Models
 {
     /// <summary>
     /// Standard response for all API end poits.

@@ -1,5 +1,8 @@
-﻿using DUNES.Shared.DTOs.Auth;
+﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Repositories.Auth;
+using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.Models;
 
 
 namespace DUNES.API.Services.Auth
@@ -26,15 +29,25 @@ namespace DUNES.API.Services.Auth
         /// <summary>
         /// Builds the menu hierarchy for the given user roles.
         /// </summary>
-        public async Task<List<MenuItemDto>> GetMenuHierarchyAsync(IEnumerable<string> userRoles)
+        //public async Task<List<MenuItemDto>> GetMenuHierarchyAsync(IEnumerable<string> userRoles)
+        //{
+        //    // 1 Get flat menu list from repository
+        //    var flatMenu = await _repository.GetAllActiveMenusAsync(userRoles);
+
+        //    return (flatMenu);
+
+        //}
+
+        public async Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles)
         {
             // 1 Get flat menu list from repository
             var flatMenu = await _repository.GetAllActiveMenusAsync(userRoles);
 
-            return (flatMenu);
+            return ApiResponseFactory.Ok(flatMenu, "Menu options availables for this user");
 
         }
 
-       
+     
+
     }
 }

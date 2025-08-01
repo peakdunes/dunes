@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Repositories.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.Models;
 
 namespace DUNES.API.Services.Masters
 {

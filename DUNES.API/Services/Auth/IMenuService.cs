@@ -1,4 +1,5 @@
 ﻿using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.Models;
 
 namespace DUNES.API.Services.Auth
 {
@@ -12,6 +13,6 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="userRoles">Roles of the logged-in user</param>
         /// <returns>Hierarchical list of MenuItemDto</returns>
-        Task<List<MenuItemDto>> GetMenuHierarchyAsync(IEnumerable<string> userRoles);
+        Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles);
     }
 }

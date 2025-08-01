@@ -84,28 +84,28 @@ namespace DUNES.API.Controllers.Auth
         /// }
         /// ```
         /// </remarks>
-        [Authorize]
-        [HttpGet("roles")]
-        public async Task<IActionResult> GetUserRoles()
-        {
-            var username = User.Identity?.Name;
+        //[Authorize]
+        //[HttpGet("roles")]
+        //public async Task<IActionResult> GetUserRoles()
+        //{
+        //    var username = User.Identity?.Name;
 
-            if (string.IsNullOrEmpty(username))
-                return Unauthorized(new { message = "Token does not contain a valid username." });
+        //    if (string.IsNullOrEmpty(username))
+        //        return Unauthorized(new { message = "Token does not contain a valid username." });
 
-            var user = await _userManager.FindByNameAsync(username);
+        //    var user = await _userManager.FindByNameAsync(username);
 
-            if (user == null)
-                return NotFound(new { message = $"User '{username}' not found." });
+        //    if (user == null)
+        //        return NotFound(new { message = $"User '{username}' not found." });
 
 
-            var roles = await _userManager.GetRolesAsync(user);
+        //    var roles = await _userManager.GetRolesAsync(user);
 
-            return Ok(new { 
-                user = username,
-                roles = roles
+        //    return Ok(new { 
+        //        user = username,
+        //        roles = roles
             
-            });
-        }
+        //    });
+        //}
     }
 }

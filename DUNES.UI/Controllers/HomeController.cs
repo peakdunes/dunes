@@ -1,4 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.Models;
+using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -39,11 +41,22 @@ namespace DUNES.UI.Controllers
                 return View(new List<MenuItemDto>());
             }
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var menuItems = JsonSerializer.Deserialize<List<MenuItemDto>>(jsonResponse);
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<MenuItemDto>>>();
 
-            // Mandamos el menú completo a la vista
+            if (apiResponse == null || apiResponse.Data == null || !apiResponse.Success)
+            {
+                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "No menu data received.");
+                return View(new List<MenuItemDto>());
+            }
+
+            var menuItems = apiResponse.Data;
+
+
+            ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
+
             return View(menuItems);
+
+         
         }
 
         public IActionResult Privacy()
