@@ -2,7 +2,9 @@
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.Eventing.Reader;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text.Json;
 
 namespace DUNES.UI.Controllers
@@ -32,7 +34,7 @@ namespace DUNES.UI.Controllers
         //        return Json(new { });
 
         //    var jsonResponse = await response.Content.ReadAsStringAsync();
-            
+
         //    var menu = JsonSerializer.Deserialize<object>(jsonResponse);
 
         //    return Json(menu);
@@ -44,11 +46,25 @@ namespace DUNES.UI.Controllers
         {
 
             if (string.IsNullOrEmpty(level1))
-                return BadRequest("Level1 parameter is required.");
+            {
+                ViewBag.ApiType = "warning";
+                ViewBag.ApiMessage = "Level 1 invalid.";
+                return View(); // regresar a la misma vista
+
+
+            }
 
             var token = HttpContext.Session.GetString("JWToken");
+            
             if (token == null)
-                return Json(new { });  // ⚠️ Puedes devolver Unauthorized() si prefieres
+            {
+
+                MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
+
+                return RedirectToAction("Index","Home"); // regresar a la misma vista
+            }
+
+
 
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri("http://localhost:5251");
@@ -63,7 +79,7 @@ namespace DUNES.UI.Controllers
 
             if (apiResponse == null || apiResponse.Data == null || !apiResponse.Success)
             {
-                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "Menu level2 not found.");
+                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "Menu level2 not found.", MessageDisplay.Inline);
                 return View(new List<MenuItemDto>());
             }
 
@@ -73,6 +89,8 @@ namespace DUNES.UI.Controllers
             // ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
 
             return View(menuItems);
+
+
         }
     }
 }

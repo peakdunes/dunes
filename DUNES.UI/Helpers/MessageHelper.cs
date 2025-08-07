@@ -1,4 +1,5 @@
-﻿using DUNES.UI.Models;
+﻿using DUNES.Shared.Models;
+using DUNES.UI.Models;
 
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +15,19 @@ namespace DUNES.UI.Helpers
         /// <param name="controller"></param>
         /// <param name="type"></param>
         /// <param name="message"></param>
-        public static void SetMessage(Controller controller, string type, string message)
+        public static void SetMessage(Controller controller, string type, string message, MessageDisplay display)
         {
-            controller.TempData["UIMsg"] = System.Text.Json.JsonSerializer.Serialize(
-                new UIMsg { Type = type, Message = message });
+            if (display == MessageDisplay.Toast)
+            {
+                controller.TempData["ApiMessage"] = message;
+                controller.TempData["ApiType"] = type.ToString().ToLower(); // e.g. "success"
+            }
+            else
+            {
+
+                controller.TempData["UIMsg"] = System.Text.Json.JsonSerializer.Serialize(
+                    new UIMsg { Type = type, Message = message });
+            }
         }
 
     }

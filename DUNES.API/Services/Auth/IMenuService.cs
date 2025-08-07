@@ -21,6 +21,15 @@ namespace DUNES.API.Services.Auth
         /// <param name="level1"></param>
         /// <returns></returns>
         Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles);
-        
+
+
+
+        /// <summary>
+        /// get all menu option for a specific code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles);
     }
 }

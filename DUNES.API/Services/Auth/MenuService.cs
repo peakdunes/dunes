@@ -3,6 +3,7 @@ using DUNES.API.Repositories.Auth;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
+using System.Data;
 
 
 namespace DUNES.API.Services.Auth
@@ -52,7 +53,43 @@ namespace DUNES.API.Services.Auth
 
         }
 
-     
+        /// <summary>
+        /// get all menu option for a specific code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        public async Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles)
+        {
+            if (string.IsNullOrWhiteSpace(code))
+            {
+                return new List<MenuItemDto>
+                    {
+                        new MenuItemDto
+                        {
+                            Code = "root",
+                            Title = "Menú General"
+                        }
+                    };
+            }
+
+            var allMenus = await _repository.GetAllMenusByRolesAsync(roles);
+
+            var breadcrumb = new List<MenuItemDto>();
+
+            for (int i = 2; i <= code.Length; i += 2)
+            {
+                var partialCode = code.Substring(0, i);
+                var match = allMenus.FirstOrDefault(m => m.Code == partialCode);
+                if (match != null)
+                {
+                    breadcrumb.Add(match);
+                }
+            }
+
+            return breadcrumb;
+        }
+
 
     }
 }

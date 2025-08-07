@@ -22,7 +22,7 @@ namespace DUNES.API.Controllers
             try
             {
                 var result = await action();
-                return StatusCode(200, ApiResponseFactory.Success(result, "✅ Successful transaction", 200, HttpContext.TraceIdentifier));
+                return StatusCode(200, ApiResponseFactory.Success(result, "Successful transaction", 200, HttpContext.TraceIdentifier));
             }
             catch (Exception ex)
             {
@@ -68,7 +68,7 @@ namespace DUNES.API.Controllers
             try
             {
                 var result = action();
-                return StatusCode(200, ApiResponseFactory.Success(result, "✅ Successful transaction", 200, HttpContext.TraceIdentifier));
+                return StatusCode(200, ApiResponseFactory.Success(result, "Successful transaction", 200, HttpContext.TraceIdentifier));
             }
             catch (Exception ex)
             {

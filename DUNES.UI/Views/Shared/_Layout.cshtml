@@ -77,11 +77,12 @@
             </nav>
         </header>
 
-
+       
 
         <div class="container">
             <main role="main" class="pb-3">
                 @await Html.PartialAsync("_UIMsg")   <!-- UI Mensajes globales aquí -->
+                @await Html.PartialAsync("_BreadcrumbPartial", ViewData["Breadcrumb"])
                 @RenderBody()
             </main>
         </div>
@@ -191,25 +192,28 @@
 
 
     <!--######################################################################################## -->
-    <!--Función global para mostrar toasts, si ViewBag.ApiMessage no es vacia muestra el mensaje -->
+    <!--Función global para mostrar toasts, si TempData["ApiMessage"] no es vacia muestra el mensaje -->
     <!--######################################################################################## -->
     <!-- 📌 Toast Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">
     </div>
 
 
-    @if (ViewBag.ApiMessage != null)
+    @if (TempData["ApiMessage"] != null)
     {
+        var type = TempData["ApiType"]?.ToString() ?? "info";
+        var message = Html.Raw(Json.Serialize(TempData["ApiMessage"]));
+
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                showToast("@ViewBag.ApiType", "@ViewBag.ApiMessage");
+                showToast("@type", @message);
             });
         </script>
     }
     <script>
         //Pegar esto donde se quiera mostrar el mensaje
-           // ViewBag.ApiMessage = "mensaje que se quiere mostrar";
-           //  ViewBag.ApiType = tipo de mensaje para el color ejemplo "success" o "danger";
+           // TempData["ApiMessage"] = "mensaje que se quiere mostrar";
+           // TempData["ApiType"] = tipo de mensaje para el color ejemplo "success" o "danger";
 
         function showToast(type, message) {
             // Mapear colores Bootstrap según el tipo de mensaje

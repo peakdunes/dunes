@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.Models.Auth;
 
@@ -30,4 +31,7 @@ public partial class MvcPartRunnerMenu
     public string? Controller { get; set; }
 
     public int Order { get; set; }
+
+    [MaxLength(200)]
+    public string? Title { get; set; }
 }

@@ -67,8 +67,8 @@ builder.Services.AddAuthentication(options =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "apizebra",
-            ValidAudience = "apizebra",
+            ValidIssuer = "DUNES.API",
+            ValidAudience = "DUNES.API",
             IssuerSigningKey = new SymmetricSecurityKey(
            Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
         };

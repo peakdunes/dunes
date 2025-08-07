@@ -21,5 +21,12 @@ namespace DUNES.API.Repositories.Auth
         /// <param name="level1"></param>
         /// <returns></returns>
         Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles);
+
+        /// <summary>
+        /// get all menu options for role
+        /// </summary>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles);
     }
 }

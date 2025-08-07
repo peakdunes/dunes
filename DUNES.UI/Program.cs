@@ -1,46 +1,59 @@
+锘縰sing DUNES.UI.Filters;
+using DUNES.UI.Middleware;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
+// Registro del filtro personalizado (usado en controladores)
+builder.Services.AddScoped<TransferMiddlewareMessagesFilter>();
 
+// MVC con filtros globales
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<TransferMiddlewareMessagesFilter>();
+});
+
+// Cliente HTTP
 builder.Services.AddHttpClient();
 
+// Sesi贸n
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(60); // tiempo de expiraci髇 de la sesi髇
+    options.IdleTimeout = TimeSpan.FromMinutes(60); // tiempo de expiraci贸n de la sesi贸n
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
-
-
-
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Manejo de errores
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+// Middlewares fundamentales
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseAuthorization();
-
-app.MapStaticAssets();
-
+// Asegura que la sesi贸n est茅 lista antes del middleware
 app.UseSession();
 
+// Middleware para validar el token (se ejecuta antes de Authorization)
+app.UseMiddleware<TokenValidationMiddleware>();
+
+// Autorizaci贸n despu茅s del middleware personalizado
+app.UseAuthorization();
+
+// Rutas est谩ticas personalizadas (si usas .WithStaticAssets())
+app.MapStaticAssets();
+
+// Rutas MVC
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

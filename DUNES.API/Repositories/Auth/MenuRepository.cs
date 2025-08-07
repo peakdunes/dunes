@@ -80,5 +80,34 @@ namespace DUNES.API.Repositories.Auth
                 .ToList();
         }
 
+        /// <summary>
+        /// get all menu option for role
+        /// </summary>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        public async Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles)
+        {
+            var roleList = roles.ToList();
+            var menus = await _context.MvcPartRunnerMenu
+                .Where(m => m.Active == true)
+                .OrderBy(m => m.Order)
+                .ToListAsync(); // ejecuta la query en SQL
+
+            return menus
+                .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
+                .Select(m => new MenuItemDto
+                {
+                    Code = m.Code,
+                    Title = m.Level2,
+                    Utility = m.Utility,
+                    Controller = m.Controller,
+                    Action = m.Action,
+                    Roles = m.Roles,
+                    Active = m.Active,
+                    Order = m.Order
+                })
+                .ToList();
+        }
+
     }
 }

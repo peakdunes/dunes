@@ -45,7 +45,7 @@ namespace DUNES.UI.Controllers
 
             if (apiResponse == null || apiResponse.Data == null || !apiResponse.Success)
             {
-                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "No menu data received.");
+                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "No menu data received.", MessageDisplay.Inline);
                 return View(new List<MenuItemDto>());
             }
 

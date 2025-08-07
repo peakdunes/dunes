@@ -108,5 +108,32 @@ namespace DUNES.API.Controllers.Auth
 
             return Ok(menulevel2);
         }
+
+        /// <summary>
+        /// get all menu options for a level code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        [HttpGet("api/menu/breadcrumb/{code}")]
+        [ProducesResponseType(typeof(List<MenuItemDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetBreadcrumb(string code)
+        {
+            // 1. Obtener los roles desde los claims
+            var roleResponse = await _authService.GetRolesFromClaims(User);
+
+            if (roleResponse == null || !roleResponse.Success || roleResponse.Data == null || !roleResponse.Data.Any())
+                return Unauthorized(ApiResponseFactory.NotFound<List<MenuItemDto>>("User does not have any valid roles."));
+
+            // 2. Generar el breadcrumb usando los roles
+            var breadcrumb = await _menuService.BuildBreadcrumbAsync(code, roleResponse.Data);
+
+            if (breadcrumb == null || !breadcrumb.Any())
+                return NotFound(ApiResponseFactory.NotFound<List<MenuItemDto>>($"No breadcrumb found for menu code '{code}'"));
+
+            // 3. Devolver la respuesta envuelta como ApiResponse
+            return Ok(ApiResponseFactory.Ok(breadcrumb));
+        }
     }
 }

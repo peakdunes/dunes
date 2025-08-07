@@ -1,4 +1,5 @@
-﻿using DUNES.UI.Helpers;
+﻿using DUNES.Shared.Models;
+using DUNES.UI.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using System.Text;
@@ -20,6 +21,8 @@ namespace DUNES.UI.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+
+           
             return View();
         }
 
@@ -28,6 +31,7 @@ namespace DUNES.UI.Controllers
 
         public async Task<IActionResult> Login(string email, string password)
         {
+          
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
             {
 
@@ -57,7 +61,7 @@ namespace DUNES.UI.Controllers
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    MessageHelper.SetMessage(this, "danger", "Invalid login. Please try again.");
+                    MessageHelper.SetMessage(this, "danger", "Invalid login. Please try again.", MessageDisplay.Inline);
                                        
                     return View();
                 }
@@ -78,7 +82,7 @@ namespace DUNES.UI.Controllers
             }
             catch (Exception ex)
             {
-                MessageHelper.SetMessage(this, "danger", $"Error connecting to API: {ex.Message}");
+                MessageHelper.SetMessage(this, "danger", $"Error connecting to API: {ex.Message}", MessageDisplay.Inline);
 
                 return View();
             }
