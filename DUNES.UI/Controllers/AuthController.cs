@@ -12,9 +12,12 @@ namespace DUNES.UI.Controllers
 
         private readonly IHttpClientFactory _httpClientFactory;
 
-        public AuthController(IHttpClientFactory httpClientFactory)
+        private readonly IConfiguration _config;
+
+        public AuthController(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
+            _config = config;
 
         }
 
@@ -40,8 +43,10 @@ namespace DUNES.UI.Controllers
             }
             try
             {
+                var baseUrl = _config["ApiSettings:BaseUrl"];
+
                 var client = _httpClientFactory.CreateClient();
-                client.BaseAddress = new Uri("http://localhost:5251"); 
+                client.BaseAddress = new Uri(baseUrl!); 
 
                 var loginData = new
                 {

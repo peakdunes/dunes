@@ -2,6 +2,7 @@
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
+using DUNES.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -12,14 +13,22 @@ namespace DUNES.UI.Controllers
     public class HomeController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
+        public readonly IConfiguration _config;
+        private readonly IMenuClientService _menuClientService;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IConfiguration config, IMenuClientService menuClientService)
         {
             _httpClientFactory = httpClientFactory;
+            _config = config;
+            _menuClientService = menuClientService;
         }
 
         public async Task<IActionResult> Index()
         {
+
+           
+           
+
             var token = HttpContext.Session.GetString("JWToken");
 
             // Si no hay login, redirigimos
@@ -28,10 +37,15 @@ namespace DUNES.UI.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
+            var baseUrl = _config["ApiSettings:BaseUrl"];
+
             // Llamamos a la API de APIZEBRA
             var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri("http://localhost:5251");
+            client.BaseAddress = new Uri(baseUrl!);
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+
+
 
             var response = await client.GetAsync("/api/Menu/options");
 

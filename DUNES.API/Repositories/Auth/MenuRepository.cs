@@ -39,7 +39,7 @@ namespace DUNES.API.Repositories.Auth
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code,
-                    Title = m.Level1,
+                    Title = m.Title,
                     Utility = m.Utility,
                     Controller = m.Controller,
                     Action = m.Action,
@@ -69,7 +69,7 @@ namespace DUNES.API.Repositories.Auth
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code,
-                    Title = m.Level2,
+                    Title = m.Title,
                     Utility = m.Utility,
                     Controller = m.Controller,
                     Action = m.Action,
@@ -98,7 +98,7 @@ namespace DUNES.API.Repositories.Auth
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code,
-                    Title = m.Level2,
+                    Title = m.Title,
                     Utility = m.Utility,
                     Controller = m.Controller,
                     Action = m.Action,

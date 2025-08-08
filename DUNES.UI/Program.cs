@@ -1,10 +1,13 @@
 ﻿using DUNES.UI.Filters;
 using DUNES.UI.Middleware;
+using DUNES.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Registro del filtro personalizado (usado en controladores)
 builder.Services.AddScoped<TransferMiddlewareMessagesFilter>();
+
+builder.Services.AddScoped<IMenuClientService, MenuClientService>();
 
 // MVC con filtros globales
 builder.Services.AddControllersWithViews(options =>

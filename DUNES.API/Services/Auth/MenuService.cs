@@ -77,6 +77,16 @@ namespace DUNES.API.Services.Auth
 
             var breadcrumb = new List<MenuItemDto>();
 
+            breadcrumb.Add(new MenuItemDto
+            {
+                Code = "00", // Este código será el que el UI use para mostrar el menú raíz
+                Title = "Home",
+                Controller = "Home",
+                Action = "Index",
+                Utility = null
+            });
+
+
             for (int i = 2; i <= code.Length; i += 2)
             {
                 var partialCode = code.Substring(0, i);
