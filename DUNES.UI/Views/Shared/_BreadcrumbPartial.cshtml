@@ -5,6 +5,7 @@
 {
     <nav aria-label="breadcrumb" class="mt-2 mb-3">
         <ol class="breadcrumb bg-white rounded px-3 py-2 fs-5 shadow-sm" style="--bs-breadcrumb-divider: '>';">
+           
             @for (int i = 0; i < Model.Count; i++)
             {
                 var item = Model[i];
@@ -12,7 +13,7 @@
 
                 if (isLast)
                 {
-                    <li class="breadcrumb-item active fw-semibold navegacion text-primary" aria-current="page">
+                    <li class="breadcrumb-item active navegacion text-warning" aria-current="page">
                         @item.Title
                     </li>
                 }
@@ -21,18 +22,19 @@
                     <li class="breadcrumb-item">
                         @if (!string.IsNullOrEmpty(item.Controller) && !string.IsNullOrEmpty(item.Action))
                         {
-                            <a asp-controller="@item.Controller" asp-action="@item.Action" 
+                            <a asp-controller="@item.Controller" asp-action="@item.Action"
+                               asp-route-level1="@item.previousmenu"
                                class="text-decoration-none text-primary navegacion">
                                 @item.Title
                             </a>
                         }
-                        else
+                       @*  else
                         {
-                            <a href="javascript:void(0);" onclick="loadMenuLevel('@item.Code')" 
+                            <a href="javascript:void(0);" onclick="loadMenuLevel('@item.previousmenu')" 
                                class="text-decoration-none text-primary navegacion">
                                 @item.Title
                             </a>
-                        }
+                        } *@
                     </li>
                 }
             }

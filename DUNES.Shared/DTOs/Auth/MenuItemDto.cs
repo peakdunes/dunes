@@ -56,6 +56,8 @@ namespace DUNES.Shared.DTOs.Auth
         [JsonPropertyName("order")]
         public int Order { get; set; }
 
+        [JsonPropertyName("previousmenu")]
+        public string previousmenu { get;set; }
         ///// <summary>
         ///// Children menu items (submenus).
         ///// </summary>

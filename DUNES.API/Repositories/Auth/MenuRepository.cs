@@ -45,7 +45,8 @@ namespace DUNES.API.Repositories.Auth
                     Action = m.Action,
                     Roles = m.Roles,
                     Active = m.Active,
-                    Order = m.Order
+                    Order = m.Order,
+                    previousmenu = ""
                 })
                 .ToList();
         }
@@ -57,11 +58,16 @@ namespace DUNES.API.Repositories.Auth
         /// <returns></returns>
         public async Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles)
         {
+            string previoumenu = string.Empty;
+
+            var large = level1.Length;
+
+            previoumenu = level1.ToString().Substring(0, large - 2);
 
             var roleList = roles.ToList();
             var menus = await _context.MvcPartRunnerMenu
                 .Where(m => m.Active == true && m.Code.Length == 4 && m.Code.StartsWith(level1.Trim()))
-                .OrderBy(m => m.Order)
+                  .OrderBy(m => m.Order)
                 .ToListAsync(); // ejecuta la query en SQL
 
             return menus
@@ -75,7 +81,8 @@ namespace DUNES.API.Repositories.Auth
                     Action = m.Action,
                     Roles = m.Roles,
                     Active = m.Active,
-                    Order = m.Order
+                    Order = m.Order,
+                    previousmenu = previoumenu
                 })
                 .ToList();
         }
@@ -104,7 +111,8 @@ namespace DUNES.API.Repositories.Auth
                     Action = m.Action,
                     Roles = m.Roles,
                     Active = m.Active,
-                    Order = m.Order
+                    Order = m.Order,
+                    previousmenu = m.Code.ToString().Substring(0,2)
                 })
                 .ToList();
         }
