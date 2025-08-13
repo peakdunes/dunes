@@ -1,0 +1,217 @@
+﻿/* ============================================
+   DUNES DESIGN SYSTEM
+   Archivo: dunes-design-system.css
+   Descripción: Tokens, estilos base y componentes
+   reutilizables para toda la app.
+   ============================================ */
+
+/* =========================
+   Tokens (estilo Figma)
+   ========================= */
+:root {
+    --fig-bg: #F6F7FB; /* fondo gris claro global */
+    --fig-surface: #FFFFFF; /* superficie (cards) */
+    --fig-border: #E6E8EF;
+    --fig-muted: #6B7280;
+    --fig-primary: #1F4AA8;
+    --fig-primary-600: #123A8A;
+    /* Alturas dinámicas (si las usas desde JS) */
+    --nav-h: 56px;
+    --foot-h: 0px;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* ===== Base global ===== */
+html, body {
+    height: 100%;
+    margin: 0;
+    overflow-y: auto; /* scroll por defecto en el sitio */
+}
+
+body {
+    background: var(--fig-bg) !important;
+    font-family: 'Segoe UI','Helvetica Neue',Arial,sans-serif;
+}
+
+/* ===== Navbar ===== */
+.navbar-brand img {
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.navbar-brand:hover img {
+    transform: scale(1.05);
+    filter: brightness(1.15);
+}
+
+.navbar-nav .nav-link {
+    color: #1F4AA8; /* Azul del logo */
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+    .navbar-nav .nav-link:hover {
+        color: #123A8A;
+    }
+
+/* ===== Tipografía / Títulos ===== */
+.brand-title {
+    font-weight: 700;
+    color: #1F4AA8;
+    letter-spacing: 1px;
+}
+
+.brand-subtitle {
+    font-weight: 400;
+    color: #6B7280;
+}
+
+.page-section-title {
+    font-weight: 700;
+    color: #1F4AA8; /* azul DUNES */
+    letter-spacing: .3px;
+}
+
+/* ===== Forms (inputs + labels) ===== */
+.form-label,
+.text-muted {
+    color: var(--fig-muted) !important;
+}
+
+.form-control {
+    height: 44px;
+    border: 1px solid var(--fig-border);
+    border-radius: 10px;
+    padding: 0 12px;
+    box-shadow: none !important;
+}
+
+    .form-control:focus {
+        border-color: var(--fig-primary);
+        outline: 0;
+        box-shadow: 0 0 0 2px rgba(31,74,168,.15) !important; /* anillo suave */
+    }
+
+/* ===== Botón primario (Bootstrap override) ===== */
+.btn-primary {
+    background-color: var(--fig-primary) !important;
+    border-color: var(--fig-primary) !important;
+    border-radius: 10px;
+    height: 48px;
+    font-weight: 600;
+}
+
+    .btn-primary:hover,
+    .btn-primary:active {
+        background-color: var(--fig-primary-600) !important;
+        border-color: var(--fig-primary-600) !important;
+    }
+
+/* ===== Cards de menú reutilizables ===== */
+.dunes-card {
+    position: relative; /* para .stretched-link */
+    background: #fff;
+    border: 1px solid rgba(31,74,168,0.4); /* borde fino azul DUNES */
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    cursor: pointer;
+    will-change: transform;
+}
+
+    .dunes-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 28px rgba(0,0,0,.10);
+        border-color: #1F4AA8; /* azul sólido en hover */
+    }
+
+    .dunes-card .card-title {
+        color: #0f172a; /* casi negro para contraste */
+        font-weight: 700;
+        margin-bottom: .25rem;
+    }
+
+    .dunes-card .card-text {
+        color: #6B7280; /* gris DUNES */
+        margin-bottom: 0;
+    }
+
+    .dunes-card:hover .card-title {
+        color: #1F4AA8;
+    }
+
+    .dunes-card .stretched-link {
+        position: absolute;
+        inset: 0;
+        border-radius: 14px;
+    }
+
+    .dunes-card:focus-within {
+        outline: 2px solid rgba(31,74,168,.25);
+        outline-offset: 2px;
+    }
+
+/* ===== Breadcrumb DUNES ===== */
+.breadcrumb-wrap {
+    background: #fff;
+    border: 1px solid #E6E8EF;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.06);
+    padding: .6rem .9rem;
+}
+
+ol.dunes-breadcrumb {
+    --bs-breadcrumb-divider: '›';
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    font-size: 1.05rem; /* ~fs-5 */
+}
+
+.dunes-breadcrumb .breadcrumb-item a.navegacion {
+    color: #1F4AA8; /* azul DUNES */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color .15s ease;
+}
+
+    .dunes-breadcrumb .breadcrumb-item a.navegacion:hover {
+        color: #123A8A;
+        text-decoration: underline;
+    }
+
+.dunes-breadcrumb .breadcrumb-item.active.navegacion {
+    color: #F59E0B; /* amarillo actual */
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.dunes-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: #9aa3b2;
+    margin: 0 .35rem;
+}
+
+.dunes-breadcrumb .breadcrumb-item {
+    max-width: 28ch; /* evita romper el layout */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===== Utilidades ===== */
+img, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .navbar-brand img,
+    .navbar-nav .nav-link,
+    .dunes-card {
+        transition: none !important;
+    }
+}

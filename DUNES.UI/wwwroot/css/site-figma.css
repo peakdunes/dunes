@@ -1,0 +1,59 @@
+﻿/* ============================================
+   ESTILOS ESPECÍFICOS DE LA APP DUNES
+   Archivo: site-figma.css
+   Descripción: Reglas por página (Login, etc.)
+   Basado en dunes-design-system.css
+   ============================================ */
+
+/* ---------- LOGIN ---------- */
+/* Centrado seguro del login (resta navbar/footer si usas variables vía JS) */
+.login-wrapper {
+    min-height: calc(100svh - var(--nav-h) - var(--foot-h));
+    display: grid;
+    place-items: center;
+    padding: 24px; /* respiro en móviles */
+    overflow-y: auto; /* si el contenido crece, scroll interno */
+}
+    /* Fuerza a la fila a ocupar el ancho completo (evita que se encoja) */
+    .login-wrapper > .row {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+/* Card y título del login (si no usas .card-dunes aquí) */
+.login-card {
+    background: var(--fig-surface);
+    border: 1px solid var(--fig-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.06);
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* Bloquear scroll global SOLO en login (opcional):
+   En Login.cshtml: @{ ViewBag.BodyClass = "login-route"; }
+   En _Layout: <body class="@ViewBag.BodyClass"> */
+body.login-route {
+    overflow-y: hidden;
+}
+
+/* Responsive pequeño del login */
+@media (max-width: 576px) {
+    .login-card {
+        border-radius: 12px;
+    }
+
+    .login-title {
+        font-size: 26px;
+    }
+}
+
+/* ---------- LUGARES PARA FUTUROS AJUSTES POR PÁGINA ---------- */
+/* INDEX: ajustes de grillas o márgenes específicos */
+/* LEVEL 2: overrides puntuales si los necesitas */
+/* OTROS: pequeños fixes locales sin tocar el Design System */

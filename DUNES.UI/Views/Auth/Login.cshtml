@@ -1,47 +1,77 @@
 ﻿@{
     ViewData["Title"] = "Login";
-}
-@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row justify-content-center">
-    <div class="col-md-4">
-        <h2 class="text-center mb-4">Login</h2>
+<div class="login-wrapper">
+    <div class="row justify-content-center">
+       
+        <div class="col-12 col-sm-8 col-md-5 col-lg-4">
+            <div class="card login-card shadow-sm">
+                <div class="card-body p-4">
+                    <h2 class="text-center mb-3 login-title">Sign In</h2>
 
-        @if (ViewBag.Error != null)
-        {
-            <div class="alert alert-danger">@ViewBag.Error</div>
-        }
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
+                    }
 
-        <form asp-action="Login" method="post" onsubmit="return handleLoginSubmit(this)">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required />
+                    <form asp-action="Login" method="post" onsubmit="return handleLoginSubmit(this)">
+                        @Html.AntiForgeryToken()
+
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email address</label>
+                            <input type="email"
+                                   class="form-control"
+                                   id="email"
+                                   name="email"
+                                   placeholder="user@example.com"
+                                   autocomplete="username"
+                                   required />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password"
+                                   class="form-control"
+                                   id="password"
+                                   name="password"
+                                   autocomplete="current-password"
+                                   required />
+                        </div>
+
+                        <button type="submit" id="loginBtn" class="btn btn-primary w-100">Sign In</button>
+                    </form>
+                </div>
             </div>
-
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required />
-            </div>
-
-            <button type="submit" id="loginBtn" class="btn btn-primary w-100">Login</button>
-        </form>
+        </div>
     </div>
 </div>
 
 @section Scripts {
     <script>
+        // Adjust CSS variables with real navbar and footer heights
+        (function () {
+            function setVars() {
+                const nav = document.querySelector('.navbar');
+                const foot = document.querySelector('footer');
+                const navH = nav ? nav.offsetHeight : 0;
+                const footH = foot ? foot.offsetHeight : 0;
+                document.documentElement.style.setProperty('--nav-h', navH + 'px');
+                document.documentElement.style.setProperty('--foot-h', footH + 'px');
+            }
+            setVars();
+            window.addEventListener('resize', setVars);
+        })();
+
         function handleLoginSubmit(form) {
-            // 🔵 Mostramos el spinner global
-            showSpinner();
-
-            // 🔵 Desactivamos el botón de login
+            if (typeof showSpinner === 'function') showSpinner();
             const btn = document.getElementById('loginBtn');
-            btn.disabled = true;
-            btn.innerText = "Logging in...";
-
-            return true; 
+            if (btn) {
+                btn.disabled = true;
+                btn.innerText = "Signing in...";
+            }
+            return true;
         }
     </script>
 }
