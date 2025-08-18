@@ -64,9 +64,11 @@ namespace DUNES.API.Repositories.Auth
 
             previoumenu = level1.ToString().Substring(0, large - 2);
 
+            int nextlevel = large + 2;
+
             var roleList = roles.ToList();
             var menus = await _context.MvcPartRunnerMenu
-                .Where(m => m.Active == true && m.Code.Length == 4 && m.Code.StartsWith(level1.Trim()))
+                .Where(m => m.Active == true && m.Code.Length == nextlevel && m.Code.StartsWith(level1.Trim()))
                   .OrderBy(m => m.Order)
                 .ToListAsync(); // ejecuta la query en SQL
 

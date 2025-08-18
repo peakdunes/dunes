@@ -31,10 +31,6 @@ namespace DUNES.UI.Controllers
             string menuCode = level1;
 
 
-
-
-            //fin barra de navegacion
-
             if (string.IsNullOrEmpty(level1))
             {
                 ViewBag.ApiType = "warning";

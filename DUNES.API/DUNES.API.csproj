@@ -24,17 +24,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\Inventory\" />
-    <Folder Include="DTOs\Auth\" />
+   
+  
     <Folder Include="Logs\" />
     <Folder Include="ModelsWMS\" />
     <Folder Include="Models\B2B\" />
     <Folder Include="Models\Masters\" />
     <Folder Include="Models\Inventory\" />
-    <Folder Include="Repositories\B2B\Process\Receiving\" />
-    <Folder Include="Repositories\Inventory\" />
-    <Folder Include="Services\B2B\Process\Receiving\" />
-    <Folder Include="Services\Inventory\" />
+   
+   
   </ItemGroup>
 
   <ItemGroup>

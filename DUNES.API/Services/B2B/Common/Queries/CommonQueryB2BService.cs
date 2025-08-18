@@ -11,16 +11,16 @@ namespace DUNES.API.Services.B2B.Common.Queries
     /// Provides query-related services for retrieving business data such as repair information.
     /// This layer handles any business logic and validation before returning results.
     /// </summary>
-    public class CommonQueryService : ICommonQueryService
+    public class CommonQueryB2BService : ICommonQueryB2BService
     {
 
-        private readonly ICommonQueryRepository _repository;
+        private readonly ICommonQueryB2BRepository _repository;
 
         /// <summary>
         /// instance iqueryrepository interface
         /// </summary>
         /// <param name="repository"></param>
-        public CommonQueryService(ICommonQueryRepository repository)
+        public CommonQueryB2BService(ICommonQueryB2BRepository repository)
         {
             _repository = repository;
         }
@@ -123,7 +123,7 @@ namespace DUNES.API.Services.B2B.Common.Queries
             return ApiResponseFactory.Ok(data, "OK");
         }
 
-        async Task<ApiResponse<bool>> ICommonQueryService.GetAllRMATablesCreatedAsync(int refNo)
+        async Task<ApiResponse<bool>> ICommonQueryB2BService.GetAllRMATablesCreatedAsync(int refNo)
         {
             // Llamas al repository (que devuelve true o false)
             var exists = await _repository.GetAllRMATablesCreatedAsync(refNo);

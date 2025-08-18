@@ -14,13 +14,13 @@ namespace DUNES.API.Controllers.B2B.Process.Receiving
     public class ReceivingController : ControllerBase
     {
 
-        readonly ICommonQueryService _commonQueryService;
+        readonly ICommonQueryB2BService _commonQueryService;
 
         /// <summary>
         /// new instance
         /// </summary>
         /// <param name="commonQueryService"></param>
-        public ReceivingController(ICommonQueryService commonQueryService)
+        public ReceivingController(ICommonQueryB2BService commonQueryService)
         {
             _commonQueryService = commonQueryService;
 

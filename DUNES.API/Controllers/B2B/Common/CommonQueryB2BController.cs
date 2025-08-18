@@ -13,16 +13,16 @@ namespace DUNES.API.Controllers.B2B.Queries
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-public class CommonQueryController : ControllerBase
+public class CommonQueryB2BController : ControllerBase
     {
 
-        private readonly ICommonQueryService _service;
+        private readonly ICommonQueryB2BService _service;
 
         /// <summary>
         /// new controller instance
         /// </summary>
         /// <param name="service"></param>
-        public CommonQueryController(ICommonQueryService service)
+        public CommonQueryB2BController(ICommonQueryB2BService service)
         {
             _service = service;
         }

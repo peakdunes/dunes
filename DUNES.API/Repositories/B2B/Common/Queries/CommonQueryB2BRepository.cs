@@ -12,7 +12,7 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
     /// <summary>
     /// all B2B queries
     /// </summary>
-    public class CommonQueryRepository : ICommonQueryRepository
+    public class CommonQueryB2BRepository : ICommonQueryB2BRepository
     {
 
         private readonly AppDbContext _context;
@@ -23,7 +23,7 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
         /// </summary>
         /// <param name="context"></param>
         /// <param name="wmscontext"></param>
-        public CommonQueryRepository(AppDbContext context, appWmsDbContext wmscontext)
+        public CommonQueryB2BRepository(AppDbContext context, appWmsDbContext wmscontext)
         {
             _context = context;
             _wmscontext = wmscontext;
@@ -66,17 +66,17 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
         /// <returns></returns>
         public async Task<bool> GetAllRMATablesCreatedAsync(int refNo)
         {
-            return await (
-        from encOrder in _context.TorderRepairHdr
-        join recOrder in _context.TorderRepairItemsSerialsReceiving
-            on encOrder.RefNo equals recOrder.RefNo
-        join shpOrder in _context.TorderRepairItemsSerialsShipping
-            on encOrder.RefNo equals shpOrder.RefNo
-        join itemOrder in _context.TorderRepairItems
-            on encOrder.RefNo equals itemOrder.RefNo
-        where encOrder.RefNo == refNo
-        select encOrder.RefNo
-    ).AnyAsync();
+                    return await (
+                from encOrder in _context.TorderRepairHdr
+                join recOrder in _context.TorderRepairItemsSerialsReceiving
+                    on encOrder.RefNo equals recOrder.RefNo
+                join shpOrder in _context.TorderRepairItemsSerialsShipping
+                    on encOrder.RefNo equals shpOrder.RefNo
+                join itemOrder in _context.TorderRepairItems
+                    on encOrder.RefNo equals itemOrder.RefNo
+                where encOrder.RefNo == refNo
+                select encOrder.RefNo
+            ).AnyAsync();
 
 
         }

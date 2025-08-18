@@ -6,7 +6,8 @@
 
 <div class="container mt-4">
     <div class="row g-3 align-items-stretch mt-4">
-        @foreach (var item in Model.Where(m => m.Code.Length == 4))
+        @foreach (var item in Model)
+       @*  @foreach (var item in Model.Where(m => m.Code.Length == 4)) *@
         {
             <div class="col-12 col-sm-6 col-md-4">
                 <div class="card dunes-card h-100">

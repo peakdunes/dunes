@@ -3,9 +3,11 @@
 using DUNES.API.Data;
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
+using DUNES.API.Repositories.Inventory.Common.Queries;
 using DUNES.API.Repositories.Masters;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
+using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
@@ -161,8 +163,13 @@ builder.Services.AddScoped<LogHelper>();
 
 //B2B SERVICES
 //Query services and repository
-builder.Services.AddScoped<ICommonQueryRepository, CommonQueryRepository>();
-builder.Services.AddScoped<ICommonQueryService, CommonQueryService>();
+builder.Services.AddScoped<ICommonQueryB2BRepository, CommonQueryB2BRepository>();
+builder.Services.AddScoped<ICommonQueryB2BService, CommonQueryB2BService>();
+
+//INV SERVICES
+
+builder.Services.AddScoped<ICommonQueryINVRepository, CommonQueryINVRepository>();
+builder.Services.AddScoped<ICommonQueryINVService, CommonQueryINVService>();
 
 //generic service for master tables
 builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<>));
