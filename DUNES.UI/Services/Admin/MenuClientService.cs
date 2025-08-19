@@ -2,7 +2,7 @@
 using DUNES.Shared.Models;
 using System.Net.Http.Headers;
 
-namespace DUNES.UI.Services
+namespace DUNES.UI.Services.Admin
 {
     /// <summary>
     /// Navegation menu
@@ -52,5 +52,7 @@ namespace DUNES.UI.Services
                 return new List<MenuItemDto>(); // Si falla, devuelve vacío
             }
         }
+
+
     }
 }

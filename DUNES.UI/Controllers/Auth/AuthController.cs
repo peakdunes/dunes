@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
-namespace DUNES.UI.Controllers
+namespace DUNES.UI.Controllers.Auth
 {
     public class AuthController : Controller
     {
@@ -51,7 +51,7 @@ namespace DUNES.UI.Controllers
                 var loginData = new
                 {
                     username = email,
-                    password = password
+                    password
                 };
 
                 var json = JsonSerializer.Serialize(loginData);

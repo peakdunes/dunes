@@ -3,21 +3,61 @@
     ViewData["Title"] = "Home Page";
 }
 
+<style>
+    .menu-card {
+    border-left: 5px solid #6c757d; /* gris para menús */
+}
 
+.process-card {
+    border-left: 5px solid #0d6efd; /* azul para procesos */
+}
+
+.card-title i {
+    font-size: 1.2rem;
+}
+</style>
 <div class="container mt-4">
     <div class="row g-3 align-items-stretch mt-4">
         @foreach (var item in Model)
-       @*  @foreach (var item in Model.Where(m => m.Code.Length == 4)) *@
         {
+            var isMenu = string.Equals(item.Action, "level", StringComparison.OrdinalIgnoreCase);
+
             <div class="col-12 col-sm-6 col-md-4">
-                <div class="card dunes-card h-100">
+                <div class="card dunes-card h-100 @(isMenu ? "menu-card" : "process-card")">
                     <div class="card-body">
-                        <h5 class="card-title mb-1">@item.Title</h5>
+                        <h5 class="card-title mb-1 d-flex align-items-center">
+                            @if (isMenu)
+                            {
+                                <i class="bi bi-folder-fill text-secondary me-2"></i> <!-- Menú -->
+                            }
+                            else
+                            {
+                                <i class="bi bi-play-circle-fill text-primary me-2"></i> <!-- Proceso -->
+                            }
+                            @item.Title
+                        </h5>
                         <p class="card-text">
-                            @(!string.IsNullOrEmpty(item.Utility) ? item.Utility : "No description")
+                            @(!string.IsNullOrWhiteSpace(item.Utility) ? item.Utility : "No description")
                         </p>
-                        <!-- Hace clickeable toda la card -->
-                        <a href="/Menu/Level/@item.Code" class="stretched-link" aria-label="@item.Title"></a>
+
+                        @* Link de navegación según tipo *@
+                        @if (isMenu)
+                        {
+                            <!-- Nodo de menú: va a los hijos -->
+                            <a asp-controller="Menu"
+                               asp-action="Level"
+                               asp-route-level1="@item.Code"
+                               class="stretched-link"
+                               aria-label="@item.Title"></a>
+                        }
+                        else
+                        {
+                            <!-- Hoja/proceso: abre la vista del controlador/acción -->
+                            <a asp-controller="@(string.IsNullOrWhiteSpace(item.Controller) ? "Menu" : item.Controller)"
+                               asp-action="@(string.IsNullOrWhiteSpace(item.Action) ? "Level" : item.Action)"
+                               class="stretched-link"
+                               aria-label="@item.Title"></a>
+                        }
                     </div>
                 </div>
             </div>

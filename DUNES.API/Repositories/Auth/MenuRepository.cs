@@ -114,7 +114,8 @@ namespace DUNES.API.Repositories.Auth
                     Roles = m.Roles,
                     Active = m.Active,
                     Order = m.Order,
-                    previousmenu = m.Code.ToString().Substring(0,2)
+                    // previousmenu = m.Code.ToString().Substring(0, (m.Code.Length - 2))
+                    previousmenu = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
                 })
                 .ToList();
         }

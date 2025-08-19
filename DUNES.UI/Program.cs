@@ -1,6 +1,6 @@
 ﻿using DUNES.UI.Filters;
 using DUNES.UI.Middleware;
-using DUNES.UI.Services;
+using DUNES.UI.Services.Admin;
 
 var builder = WebApplication.CreateBuilder(args);
 

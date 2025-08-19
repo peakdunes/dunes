@@ -2,13 +2,13 @@
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
-using DUNES.UI.Services;
+using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace DUNES.UI.Controllers
+namespace DUNES.UI.Controllers.Admin
 {
     public class HomeController : Controller
     {
