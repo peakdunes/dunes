@@ -73,6 +73,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
                 objdet.ItemDescription = item.ItemDescription;
                 objdet.QuantityReceived = Convert.ToInt32(item.QuantityReceived);
                 objdet.DateTimeInserted = item.DateTimeInserted;
+                objdet.Attributte2 = item.Attribute2;
 
                 listDetail.Add(objdet);
 

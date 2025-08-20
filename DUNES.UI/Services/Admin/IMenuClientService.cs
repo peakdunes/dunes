@@ -7,6 +7,6 @@ namespace DUNES.UI.Services.Admin
 
         Task<List<MenuItemDto>> GetBreadcrumbAsync(string menuCode, string token);
 
-       
+        Task<string?> GetCodeByControllerActionAsync(string controller, string action, string token);
     }
 }

@@ -96,6 +96,7 @@ namespace DUNES.UI.Controllers.Auth
         [HttpPost]
         public IActionResult Logout()
         {
+            HttpContext.Session.Remove("LAST_LEVEL1");
             HttpContext.Session.Remove("JWToken");
             return RedirectToAction("Index", "Home");
         }

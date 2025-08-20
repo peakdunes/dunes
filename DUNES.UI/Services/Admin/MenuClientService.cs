@@ -53,6 +53,22 @@ namespace DUNES.UI.Services.Admin
             }
         }
 
+        public async Task<string?> GetCodeByControllerActionAsync(string controller, string action, string token)
+        {
 
+          
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            // endpoint que devuelva un menú por controller/action
+            var response = await _httpClient.GetAsync($"/api/Menu/codeByControllerAction?controller={controller}&action={action}");
+
+            if (!response.IsSuccessStatusCode)
+                return null;
+
+            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<MenuItemDto>>();
+
+            return apiResponse?.Success == true ? apiResponse.Data?.Code : null;
+        }
     }
 }

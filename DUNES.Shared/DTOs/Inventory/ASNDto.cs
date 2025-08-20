@@ -53,6 +53,9 @@ namespace DUNES.Shared.DTOs.Inventory
         [MaxLength(200)]
         public string? ItemDescription { get; set; }
 
+        [MaxLength(50)]
+        public string? Attributte2 { get; set; }
+
 
         public int QuantityReceived { get; set; }
 

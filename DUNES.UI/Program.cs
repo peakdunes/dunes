@@ -1,19 +1,41 @@
 ﻿using DUNES.UI.Filters;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Inventory;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Registro del filtro personalizado (usado en controladores)
-builder.Services.AddScoped<TransferMiddlewareMessagesFilter>();
 
-builder.Services.AddScoped<IMenuClientService, MenuClientService>();
+//#####################
+//FILTROS
+//######################
+
+//Filtro para mostrar los avisos informations
+//builder.Services.AddScoped<TransferMiddlewareMessagesFilter>();
+
+//filtro para cargar el menu de navegacion
+builder.Services.AddScoped<BreadcrumbFilter>();
 
 // MVC con filtros globales
 builder.Services.AddControllersWithViews(options =>
 {
-    options.Filters.Add<TransferMiddlewareMessagesFilter>();
+   // options.Filters.Add<TransferMiddlewareMessagesFilter>();
+    options.Filters.AddService<BreadcrumbFilter>();
 });
+
+//#####################
+//FIN FILTROS
+//######################
+
+
+
+
+builder.Services.AddScoped<IMenuClientService, MenuClientService>();
+builder.Services.AddScoped<IASNService, ASNService>();
+
+
+
 
 // Cliente HTTP
 builder.Services.AddHttpClient();

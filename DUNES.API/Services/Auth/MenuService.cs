@@ -2,6 +2,7 @@
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using System.Data;
 
@@ -77,14 +78,14 @@ namespace DUNES.API.Services.Auth
 
             var breadcrumb = new List<MenuItemDto>();
 
-            breadcrumb.Add(new MenuItemDto
-            {
-                Code = "00", // Este código será el que el UI use para mostrar el menú raíz
-                Title = "Home",
-                Controller = "Home",
-                Action = "Index",
-                Utility = null
-            });
+            //breadcrumb.Add(new MenuItemDto
+            //{
+            //    Code = "00", // Este código será el que el UI use para mostrar el menú raíz
+            //    Title = "Home",
+            //    Controller = "Home",
+            //    Action = "Index",
+            //    Utility = null
+            //});
 
 
             for (int i = 2; i <= code.Length; i += 2)
@@ -100,6 +101,25 @@ namespace DUNES.API.Services.Auth
             return breadcrumb;
         }
 
+        public async Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action)
+        {
+            var MenuInfo = await _repository.GetCodeByControllerAction(controller, action);
+
+
+            if (MenuInfo == null)
+            {
+
+                return ApiResponseFactory.NotFound<MenuItemDto>("Information Not found");
+               
+
+            }
+            else
+            {
+
+                return ApiResponseFactory.Ok(MenuInfo, "OK");
+            }
+        
+        }
 
     }
 }

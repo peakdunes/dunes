@@ -62,7 +62,7 @@ namespace DUNES.API.Repositories.Auth
 
             var large = level1.Length;
 
-            previoumenu = level1.ToString().Substring(0, large - 2);
+            //previoumenu = level1.ToString().Substring(0, large - 2);
 
             int nextlevel = large + 2;
 
@@ -72,7 +72,7 @@ namespace DUNES.API.Repositories.Auth
                   .OrderBy(m => m.Order)
                 .ToListAsync(); // ejecuta la query en SQL
 
-            return menus
+           var menu2 = menus
                 .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
@@ -84,9 +84,13 @@ namespace DUNES.API.Repositories.Auth
                     Roles = m.Roles,
                     Active = m.Active,
                     Order = m.Order,
-                    previousmenu = previoumenu
+                    previousmenu = level1
+                    //previousmenu = large > 2 ? level1.Substring(0, level1.Length - 2) : level1
+                    // previousmenu  = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
                 })
                 .ToList();
+
+            return menu2;
         }
 
         /// <summary>
@@ -102,7 +106,7 @@ namespace DUNES.API.Repositories.Auth
                 .OrderBy(m => m.Order)
                 .ToListAsync(); // ejecuta la query en SQL
 
-            return menus
+           var menu2 = menus
                 .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
@@ -114,11 +118,46 @@ namespace DUNES.API.Repositories.Auth
                     Roles = m.Roles,
                     Active = m.Active,
                     Order = m.Order,
-                    // previousmenu = m.Code.ToString().Substring(0, (m.Code.Length - 2))
                     previousmenu = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
+
                 })
                 .ToList();
+
+            return menu2;
         }
 
+        /// <summary>
+        /// get all menu information for a controller/action
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        public async Task<MenuItemDto> GetCodeByControllerAction(string controller, string action)
+        {
+
+            var m = await _context.MvcPartRunnerMenu
+                .FirstOrDefaultAsync(m => m.Active == true
+                    && m.Controller.ToLower() == controller.ToLower()
+                    && m.Action.ToLower() == action.ToLower()
+                );
+
+            if (m == null) return null;
+
+            return  new MenuItemDto
+                {
+                    Code = m.Code,
+                    Title = m.Title,
+                    Utility = m.Utility,
+                    Controller = m.Controller,
+                    Action = m.Action,
+                    Roles = m.Roles,
+                    Active = m.Active,
+                    Order = m.Order,
+                    // previousmenu = m.Code.ToString().Substring(0, (m.Code.Length - 2))
+                    previousmenu = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
+                };
+        }
+
+      
     }
 }

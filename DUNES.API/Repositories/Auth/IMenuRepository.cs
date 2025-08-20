@@ -28,5 +28,13 @@ namespace DUNES.API.Repositories.Auth
         /// <param name="roles"></param>
         /// <returns></returns>
         Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles);
+
+        /// <summary>
+        /// get all menu information for a controller/action
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        Task<MenuItemDto> GetCodeByControllerAction(string controller, string action);
     }
 }

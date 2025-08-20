@@ -1,22 +1,43 @@
-﻿@{
+﻿@using DUNES.Shared.DTOs.Inventory
+@model ASNDto
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="card dunes-form">
-    <div class="card-body">
-        <h5 class="card-title">Nuevo Proceso</h5>
 
-        <form id="processForm">
-            <!-- Input -->
-            <div class="mb-3">
-                <label for="processInput" class="form-label">Código de Proceso</label>
-                <input type="text" class="form-control dunes-input" id="processInput" placeholder="Ingrese código...">
+
+
+<div class="container compact mt-4">
+    <form id="asn-form"
+         
+          method="get"
+          autocomplete="off">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+                <label for="asnnumber" class="form-label">ASN number</label>
+                <input type="text"
+                       id="asnnumber"
+                       name="asnnumber"
+                class="form-control"
+                placeholder="Scan or type your ASN..."
+                required
+                autofocus />
             </div>
 
-            <!-- Botón -->
-            <button type="submit" class="btn dunes-btn-primary w-100">
-                Guardar
-            </button>
-        </form>
+            <div class="col-12 col-md-auto d-grid">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+
+    <div class="row">
+        <table>
+
+        </table>
+
+
     </div>
 </div>
+
+

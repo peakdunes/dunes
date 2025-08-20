@@ -5,6 +5,19 @@
    reutilizables para toda la app.
    ============================================ */
 
+/* =========================================================
+   🔔 AVISO IMPORTANTE — TIPOGRAFÍA Y TAMAÑOS (2025-08-19)
+   Se aplicó un modo COMPACTO a toda la app:
+   - Se redujo el tamaño base de fuente y las alturas
+     de inputs/botones para una UI más densa.
+   - Ajusta estos tokens globales para cambiar tamaños:
+       --font-base
+       --ctl-font-size
+       --btn-font-size
+       --ctl-height
+       --btn-height
+   ========================================================= */
+
 /* =========================
    Tokens (estilo Figma)
    ========================= */
@@ -18,6 +31,14 @@
     /* Alturas dinámicas (si las usas desde JS) */
     --nav-h: 56px;
     --foot-h: 0px;
+    /* ====== TOKENS GLOBALES DE DENSIDAD / TIPOGRAFÍA (COMPACT) ====== */
+    --font-base: .92rem; /* tamaño base de letra global */
+    --ctl-font-size: .9rem; /* fuente para inputs */
+    --btn-font-size: .9rem; /* fuente para botones */
+    --ctl-height: 38px; /* altura de inputs (compact) */
+    --btn-height: 38px; /* altura de botones (compact) */
+    --ctl-radius: 10px; /* radio por defecto (inputs/botones) */
+    --ctl-pad-x: 12px; /* padding horizontal inputs */
 }
 
 * {
@@ -34,6 +55,7 @@ html, body {
 body {
     background: var(--fig-bg) !important;
     font-family: 'Segoe UI','Helvetica Neue',Arial,sans-serif;
+    font-size: var(--font-base); /* tamaño base global */
 }
 
 /* ===== Navbar ===== */
@@ -80,11 +102,17 @@ body {
     color: var(--fig-muted) !important;
 }
 
+.form-label {
+    font-size: calc(var(--ctl-font-size) - .05rem);
+}
+/* un pelín menor */
+
 .form-control {
-    height: 44px;
+    height: var(--ctl-height);
+    font-size: var(--ctl-font-size);
     border: 1px solid var(--fig-border);
-    border-radius: 10px;
-    padding: 0 12px;
+    border-radius: var(--ctl-radius);
+    padding: 0 var(--ctl-pad-x);
     box-shadow: none !important;
 }
 
@@ -94,12 +122,26 @@ body {
         box-shadow: 0 0 0 2px rgba(31,74,168,.15) !important; /* anillo suave */
     }
 
-/* ===== Botón primario (Bootstrap override) ===== */
+/* Alinea alturas dentro de input-group */
+.input-group > .form-control,
+.input-group > .btn {
+    height: var(--btn-height);
+}
+
+/* ===== Botones ===== */
+.btn {
+    font-size: var(--btn-font-size);
+    height: var(--btn-height);
+    border-radius: var(--ctl-radius);
+    padding: 0 .9rem;
+    line-height: 1.25;
+}
+
 .btn-primary {
     background-color: var(--fig-primary) !important;
     border-color: var(--fig-primary) !important;
-    border-radius: 10px;
-    height: 48px;
+    border-radius: var(--ctl-radius);
+    height: var(--btn-height);
     font-weight: 600;
 }
 
@@ -217,15 +259,27 @@ img, iframe {
 }
 
 /* ===== Las card de menu son azules y las card que llaman un action son Azules ===== */
-.menu-card {
-    border-left: 5px solid #6c757d; /* gris para menús */
-}
+/*.menu-card {
+    border-left: 5px solid #6c757d;*/ /* gris para menús */
+/*}
 
 .process-card {
-    border-left: 5px solid #0d6efd; /* azul para procesos */
-}
+    border-left: 5px solid #0d6efd;*/ /* azul para procesos */
+/*}
 
 .card-title i {
     font-size: 1.2rem;
-}
+}*/
 /* ===== FIN Las card de menu son azules y las card que llaman un action son Azules ===== */
+
+
+/*para los select*/
+.form-select {
+    height: var(--ctl-height);
+    font-size: var(--ctl-font-size);
+    border-radius: var(--ctl-radius);
+}
+
+textarea.form-control {
+    min-height: calc(var(--ctl-height) * 2);
+}

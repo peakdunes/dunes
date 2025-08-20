@@ -2,10 +2,12 @@
 using DUNES.API.Services.Auth;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace DUNES.API.Controllers.Auth
@@ -134,6 +136,30 @@ namespace DUNES.API.Controllers.Auth
 
             // 3. Devolver la respuesta envuelta como ApiResponse
             return Ok(ApiResponseFactory.Ok(breadcrumb));
+        }
+
+        /// <summary>
+        /// get all menu information for a controller/action
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(MenuItemDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+       
+        [HttpGet("codeByControllerAction")]
+       // [HttpGet("codeByControllerAction")]
+        public async Task<ActionResult<ApiResponse<MenuItemDto>>> GetCodeByControllerAction(string controller, string action)
+        {
+            var menu = await _menuService.GetCodeByControllerAction(controller, action);
+
+            if (menu == null)
+
+                return NotFound(ApiResponseFactory.NotFound<List<MenuItemDto>>($"No breadcrumb found for this controller/action"));
+
+
+            return Ok(ApiResponseFactory.Ok(menu));
         }
     }
 }
