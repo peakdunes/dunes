@@ -145,11 +145,20 @@ body {
     font-weight: 600;
 }
 
+
     .btn-primary:hover,
     .btn-primary:active {
         background-color: var(--fig-primary-600) !important;
         border-color: var(--fig-primary-600) !important;
     }
+
+.subtitleDunes {
+    color: var(--fig-primary) !important;
+   
+}
+
+
+
 
 /* ===== Cards de menú reutilizables ===== */
 .dunes-card {

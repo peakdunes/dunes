@@ -1,27 +1,22 @@
 ﻿@using DUNES.Shared.DTOs.Inventory
 @model ASNDto
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Receiving";
 }
 
 
-
-
-<div class="container compact mt-4">
-    <form id="asn-form"
-         
-          method="get"
-          autocomplete="off">
+<div class="container mt-4">
+    <form id="asn-form" method="get" autocomplete="off" class="mb-3">
         <div class="row g-3 align-items-end">
             <div class="col-12 col-md-6">
                 <label for="asnnumber" class="form-label">ASN number</label>
                 <input type="text"
                        id="asnnumber"
                        name="asnnumber"
-                class="form-control"
-                placeholder="Scan or type your ASN..."
-                required
-                autofocus />
+                       class="form-control"
+                       placeholder="Scan or type your ASN..."
+                       required
+                       autofocus />
             </div>
 
             <div class="col-12 col-md-auto d-grid">
@@ -30,14 +25,90 @@
         </div>
     </form>
 
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
+        </div>
 
-    <div class="row">
-        <table>
-
-        </table>
-
-
+        <div class="card-body p-2">
+            <div class="table-responsive">
+                <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Id</th>
+                            <th>Header Id</th>
+                            <th>Part Number</th>
+                            <th>Line Id</th>
+                            <th class="text-end">Quantity Shipped</th>
+                            <th>Part Number Description</th>
+                            <th>Attributte 2</th>
+                            <th class="text-end">Quantity Received</th>
+                            <th>DateTime Inserted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.itemDetail != null)
+                        {
+                            foreach (var item in Model.itemDetail)
+                            {
+                                <tr>
+                                    <td>@item.Id</td>
+                                    <td>@item.ADNHdrId</td>
+                                    <td>@item.ItemNumber</td>
+                                    <td>@item.LineId</td>
+                                    <td class="text-end">@item.QuantityShipped.ToString("N0")</td>
+                                    <td>@item.ItemDescription</td>
+                                    <td>@item.Attributte2</td>
+                                    <td class="text-end">@item.QuantityReceived.ToString("N0")</td>
+                                    <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
+@section Scripts {
+    <script>
+        $(function () {
+          $('#tableuser').DataTable({
+            processing: true,
+            deferRender: true,
+            responsive: true,
+            stateSave: true,
+            autoWidth: false,
+            pageLength: 25,
 
+            // Orden inicial por fecha descendente (columna 8 = 0-based)
+            order: [[8, 'desc']],
+
+            // Clases por columna
+            columnDefs: [
+              { targets: [4, 7], className: 'text-end' },
+              { targets: '_all', className: 'align-middle' }
+            ],
+
+            // Layout de controles en estilo Bootstrap
+            dom:
+              "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+              "<'row'<'col-12'tr>>" +
+              "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+
+            // Inglés (placeholder bonito)
+            language: {
+              search: "",
+              searchPlaceholder: "Search...",
+              lengthMenu: "_MENU_ entries per page",
+              info: "Showing _START_ to _END_ of _TOTAL_ entries",
+              infoEmpty: "Showing 0 to 0 of 0 entries",
+              infoFiltered: "(filtered from _MAX_ total entries)",
+              zeroRecords: "No data available in table",
+              paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+            }
+          });
+        });
+    </script>
+}

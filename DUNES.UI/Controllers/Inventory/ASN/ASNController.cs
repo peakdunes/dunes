@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DUNES.UI.Controllers.Inventory.ASN
 {
-    public class AsnController : Controller
+    public class AsnController : BaseController
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
@@ -33,39 +33,31 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return View();
         }
 
-        public async Task<IActionResult> Receiving(string? asnnumber)
-        {
-            ASNHdr objenc = new ASNHdr();
-            List<ASNItemDetail> objdet = new List<ASNItemDetail>();
+        public async Task<IActionResult> Receiving(string? asnnumber, CancellationToken ct)
+        {            
 
-            ASNDto objdto = new ASNDto { asnHdr = objenc, itemDetail = objdet };
-
-
-            if (string.IsNullOrWhiteSpace(asnnumber))
-                return View(objdto);
-
-            var token = HttpContext.Session.GetString("JWToken");
-
-            if (token == null)
+            return await HandleAsync(async ct =>
             {
+                ASNDto objdto = new ASNDto { asnHdr = new ASNHdr(), itemDetail = new List<ASNItemDetail>() };
 
-                MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
+                if (string.IsNullOrWhiteSpace(asnnumber))
+                    return View(objdto);
 
-                return RedirectToAction("Index", "Home"); // regresar a la misma vista
-            }
+                var token = GetToken();
+                if (token == null)
+                    return RedirectToLogin();
 
-            var infoasn = await _ASNService.GetAsnInfo(asnnumber, token);
-          
+                var infoasn = await _ASNService.GetAsnInfo(asnnumber, token, ct);
 
-            if (infoasn.Error != null)
-            {
-                MessageHelper.SetMessage(this, "danger", infoasn.Error, MessageDisplay.Inline);
-                return View(objdto);
-            }
-            else
-            {
+                if (infoasn.Error != null)
+                {
+                    MessageHelper.SetMessage(this, "danger", infoasn.Error, MessageDisplay.Inline);
+                    return View(objdto);
+                }
+
                 return View(infoasn.Data);
-            }
+
+            }, ct);
         }
       
     }
