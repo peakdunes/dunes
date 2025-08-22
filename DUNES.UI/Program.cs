@@ -1,7 +1,9 @@
 ﻿using DUNES.UI.Filters;
+using DUNES.UI.Infrastructure;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Inventory;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,8 @@ builder.Services.AddControllersWithViews(options =>
 {
    // options.Filters.Add<TransferMiddlewareMessagesFilter>();
     options.Filters.AddService<BreadcrumbFilter>();
+
+    options.Filters.Add<UiExceptionFilter>(); // ← registro global de exepciones
 });
 
 //#####################
@@ -34,8 +38,8 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddScoped<IMenuClientService, MenuClientService>();
 builder.Services.AddScoped<IASNService, ASNService>();
 
-
-
+// Necesario para el fallback de TempData si no hay Controller
+builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
 // Cliente HTTP
 builder.Services.AddHttpClient();

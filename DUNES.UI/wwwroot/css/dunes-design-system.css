@@ -292,3 +292,52 @@ img, iframe {
 textarea.form-control {
     min-height: calc(var(--ctl-height) * 2);
 }
+/*pie de pagina food*/
+.custom-footer {
+    background-color: #f8f9fa; /* Gris claro */
+    padding: 20px 0; /* Lo hace más alto */
+    border-top: 1px solid #ddd; /* Línea superior sutil */
+    font-size: 15px;
+    color: #555; /* Texto gris oscuro */
+}
+
+    .custom-footer a {
+        color: #007bff; /* Azul Bootstrap */
+        text-decoration: none;
+        transition: color 0.2s ease;
+    }
+
+        .custom-footer a:hover {
+            color: #0056b3; /* Azul más oscuro al pasar mouse */
+            text-decoration: underline;
+        }
+
+/*fin pie de pagina foot*/
+
+/*tamano de la fuentes en todas las vistas*/
+
+
+
+#font-size-buttons {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+    #font-size-buttons button {
+        font-size: 0.85rem;
+        padding: 2px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+
+        #font-size-buttons button:hover {
+            background-color: #e2e6ea;
+        }
+
+
+/*fin tamano de la fuentes en todas las vistas*/

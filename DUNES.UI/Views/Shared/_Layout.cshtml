@@ -7,45 +7,23 @@
     <script type="importmap"></script>
   
 
+    <!-- Estilos personalizados -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-
     <link rel="stylesheet" href="~/css/dunes-design-system.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site-figma.css" asp-append-version="true" />
-   
     <link rel="stylesheet" href="~/DUNES.styles.css" asp-append-version="true" />
 
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap 5.3.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- DataTables + Bootstrap 5 (CSS) -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.bootstrap5.min.css">
-    <!-- Responsive (CSS) -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.6/css/responsive.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.3/css/dataTables.bootstrap5.min.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/responsive/3.0.6/css/responsive.bootstrap5.min.css" />
 
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet" />
 
-
-    <style>
-        .custom-footer {
-            background-color: #f8f9fa; /* Gris claro */
-            padding: 20px 0; /* Lo hace más alto */
-            border-top: 1px solid #ddd; /* Línea superior sutil */
-            font-size: 15px;
-            color: #555; /* Texto gris oscuro */
-        }
-
-            .custom-footer a {
-                color: #007bff; /* Azul Bootstrap */
-                text-decoration: none;
-                transition: color 0.2s ease;
-            }
-
-                .custom-footer a:hover {
-                    color: #0056b3; /* Azul más oscuro al pasar mouse */
-                    text-decoration: underline;
-                }
-
-    </style>
-
+   
 </head>
 <body class="d-flex flex-column min-vh-100">
     <div class="flex-grow-1">
@@ -69,6 +47,12 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                             </li>
                         </ul>
+
+                        <div id="font-size-buttons" class="me-3">
+                            <button type="button" id="btnFontDecrease" title="Reduce font size">A−</button>
+                            <button type="button" id="btnFontIncrease" title="Increase font size">A+</button>
+                        </div>
+
                         <!-- Zona de Login/Logout -->
                         <ul class="navbar-nav">
                             @if (Context.Session.GetString("JWToken") == null)
@@ -88,6 +72,9 @@
                                 </li>
                             }
                         </ul>
+
+                       
+
                     </div>
                 </div>
             </nav>
@@ -114,31 +101,29 @@
     <!--######################################################################################## -->
 
 
-  @*   <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script> *@
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- jQuery (requerido por DataTables) -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <!-- Bootstrap 5 JS (bundle) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- DataTables core + integración Bootstrap 5 -->
-    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.bootstrap5.min.js"></script>
-
-    <!-- Responsive -->
-    <script src="https://cdn.datatables.net/responsive/3.0.6/js/dataTables.responsive.min.js"></script>
-    <script src="https://cdn.datatables.net/responsive/3.0.6/js/responsive.bootstrap5.min.js"></script>
 
 
     <!--######################################################################################## -->
     <!--fin scripts section                                                                      -->
     <!--######################################################################################## -->
 
+    <!-- jQuery (requerido por DataTables) -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
+    <!-- Bootstrap Bundle (INCLUYE Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.3/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.6/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.6/js/responsive.bootstrap5.min.js"></script>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!--botones para manejar el tamano de la letra en la barra superior-->
+    <script src="~/js/dunes.accessibility.js" asp-append-version="true"></script>
+    <script src="~/js/dunes.accessibility.buttons.js" asp-append-version="true"></script>
 
     <!--######################################################################################## -->
     <!--alerta global muestra un modal con una informacion importante para todos                 -->

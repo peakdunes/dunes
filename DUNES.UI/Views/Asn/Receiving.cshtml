@@ -1,5 +1,6 @@
 ﻿@using DUNES.Shared.DTOs.Inventory
-@model ASNDto
+@using DUNES.UI.WiewModels
+@model AsnDtoCompanyClients
 @{
     ViewData["Title"] = "Receiving";
 }
@@ -25,6 +26,92 @@
         </div>
     </form>
 
+
+    <div class="card shadow-sm mb-2">
+        <div class="card-header bg-white">
+            <h6 class="mb-0 subtitleDunes">ASN Header</h6>
+        </div>
+
+
+
+        <div class="row gx-3 gy-2 px-3 mt-2 mb-2">
+            <div class="col-12 col-md-2">
+                <label asp-for="asdDto.asnHdr.Id" class="form-label"></label>
+                <input asp-for="asdDto.asnHdr.Id" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label asp-for="asdDto.asnHdr.ShipmentNum" class="form-label"></label>
+                <input asp-for="asdDto.asnHdr.ShipmentNum" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label asp-for="asdDto.asnHdr.ConsignRequestID" class="form-label"></label>
+                <input asp-for="asdDto.asnHdr.ConsignRequestID" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label asp-for="asdDto.asnHdr.BatchId" class="form-label"></label>
+                <input asp-for="asdDto.asnHdr.BatchId" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label asp-for="asdDto.asnHdr.DateTimeInserted" class="form-label"></label>
+                <input type="datetime-local" asp-for="asdDto.asnHdr.DateTimeInserted" readonly class="form-control" />
+            </div>
+        </div>
+
+
+        <div class="row gx-3 gy-2 px-3 mb-3">
+            <div class="col-12 col-md-3">
+                <label asp-for="asdDto.asnHdr.ShipToLocationId" class="form-label"></label>
+                <input asp-for="asdDto.asnHdr.ShipToLocationId" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-1 d-flex align-items-center">
+                <div class="form-check mt-4">
+                    <input type="checkbox" asp-for="asdDto.asnHdr.Processed" class="form-check-input" disabled />
+                    <label asp-for="asdDto.asnHdr.Processed" class="form-check-label ms-2"></label>
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    <div class="card shadow-sm mb-2">
+        <div class="card-header bg-white">
+            <h6 class="mb-0 subtitleDunes">Process ASN information</h6>
+        </div>
+
+        <div class="row gx-3 gy-2 px-3 mb-3">
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="companyid" class="form-control" asp-items="@ViewBag.companies">
+                    <option selected disabled>Select Client Company</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Concept</label>
+                <select id="companyid" class="form-control">
+                    <option selected disabled>Select Concept</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Transaction Type</label>
+                <select id="companyid" class="form-control">
+                    <option selected disabled>Select Transaction Type</option>
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
@@ -32,34 +119,60 @@
 
         <div class="card-body p-2">
             <div class="table-responsive">
-                <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100">
+                <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap;">
+
                     <thead class="table-light">
                         <tr>
+                            <th>Actions</th>
                             <th>Id</th>
                             <th>Header Id</th>
                             <th>Part Number</th>
                             <th>Line Id</th>
                             <th class="text-end">Quantity Shipped</th>
+                            <th class="text-end">Quantity Received</th>
+                            <th class="text-end">Quantity Pending</th>
                             <th>Part Number Description</th>
                             <th>Attributte 2</th>
-                            <th class="text-end">Quantity Received</th>
+
                             <th>DateTime Inserted</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model?.itemDetail != null)
+                        @if (Model?.asdDto.itemDetail != null)
                         {
-                            foreach (var item in Model.itemDetail)
+                            foreach (var item in Model.asdDto.itemDetail)
                             {
                                 <tr>
+                                    <td class="text-center">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Actions
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">✏️ Edit</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">👁️ Details</a>
+                                                </li>
+
+
+                                                <li>
+                                                    <a class="dropdown-item" asp-action="Delete" asp-route-id="@item.Id"> 📦 Bins</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
                                     <td>@item.Id</td>
                                     <td>@item.ADNHdrId</td>
                                     <td>@item.ItemNumber</td>
                                     <td>@item.LineId</td>
                                     <td class="text-end">@item.QuantityShipped.ToString("N0")</td>
+                                    <td class="text-end">@item.QuantityReceived.ToString("N0")</td>
+                                    <td class="text-end">@item.QuantityPending.ToString("N0")</td>
                                     <td>@item.ItemDescription</td>
                                     <td>@item.Attributte2</td>
-                                    <td class="text-end">@item.QuantityReceived.ToString("N0")</td>
+
                                     <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
                                 </tr>
                             }
@@ -73,42 +186,44 @@
 
 @section Scripts {
     <script>
-        $(function () {
-          $('#tableuser').DataTable({
-            processing: true,
-            deferRender: true,
-            responsive: true,
-            stateSave: true,
-            autoWidth: false,
-            pageLength: 25,
+        $(document).ready(function ()
+        {
+            $('#tableuser').DataTable
+            ({
+                  processing: true,
+                  deferRender: true,
+                  stateSave: true,
+                  autoWidth: false,
+                  scrollX: true, // ✅ Habilita scroll horizontal
+                  responsive: false, // ✅ Evita que se escondan columnas
+                  pageLength: 25,
 
-            // Orden inicial por fecha descendente (columna 8 = 0-based)
-            order: [[8, 'desc']],
+                  order: [[10, 'desc']],
 
-            // Clases por columna
-            columnDefs: [
-              { targets: [4, 7], className: 'text-end' },
-              { targets: '_all', className: 'align-middle' }
-            ],
+                  columnDefs: [
+                    { targets: [5, 6,7], className: 'text-end' },
+                    { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                    { targets: '_all', className: 'align-middle' }
+                  ],
 
-            // Layout de controles en estilo Bootstrap
-            dom:
-              "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
-              "<'row'<'col-12'tr>>" +
-              "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+                  dom:
+                    "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                    "<'row'<'col-12'tr>>" +
+                    "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
 
-            // Inglés (placeholder bonito)
-            language: {
-              search: "",
-              searchPlaceholder: "Search...",
-              lengthMenu: "_MENU_ entries per page",
-              info: "Showing _START_ to _END_ of _TOTAL_ entries",
-              infoEmpty: "Showing 0 to 0 of 0 entries",
-              infoFiltered: "(filtered from _MAX_ total entries)",
-              zeroRecords: "No data available in table",
-              paginate: { first: "«", previous: "‹", next: "›", last: "»" }
-            }
-          });
+                  language: {
+                    search: "",
+                    searchPlaceholder: "Search...",
+                    lengthMenu: "_MENU_ entries per page",
+                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                    infoEmpty: "Showing 0 to 0 of 0 entries",
+                    infoFiltered: "(filtered from _MAX_ total entries)",
+                    zeroRecords: "No data available in table",
+                    paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                  }
+            });
+
         });
+
     </script>
 }

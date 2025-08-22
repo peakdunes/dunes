@@ -150,6 +150,11 @@ namespace DUNES.API.Data
         public virtual DbSet<UserMvcReceiving> UserMvcReceiving { get; set; }
 
         /// <summary>
+        /// Administration WMS Client Companies
+        /// </summary>
+        public virtual DbSet<WmsCompanyclient> WmsCompanyclient { get; set; }
+
+        /// <summary>
         /// Repair calls type
         /// </summary>
         public virtual DbSet<TzebB2bOutBoundRequestsTypeOfCalls> TzebB2bOutBoundRequestsTypeOfCalls { get; set; }
@@ -215,6 +220,19 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<WmsCompanyclient>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__wms_comp__3213E83FCFA8AF88");
+
+                entity.ToTable("wms_companyclient");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.CompanyId)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("company_id");
+            });
 
 
             modelBuilder.Entity<RepairReadyToReceiveDto>().HasNoKey();

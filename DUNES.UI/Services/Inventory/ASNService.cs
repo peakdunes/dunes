@@ -24,55 +24,47 @@ namespace DUNES.UI.Services.Inventory
                 BaseAddress = new Uri(_baseUrl)
             };
         }
-        
+
 
         public async Task<ApiResponse<ASNDto>> GetAsnInfo(string asnNumber, string token, CancellationToken ct)
         {
 
-            bool usedExtensionMethod = true;
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
 
 
-            if (usedExtensionMethod)
-            {
+            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/asn-info/{asnNumber}");
 
-                //#################################################################################
-                //CON METODO DE EXTENSION valida si la respuesta esta bien formada (apiResponse)
-                //#################################################################################
-
-                //si el usuario cierra el navegador
-                //CancellationToken ct = default
-
-                //enviar esto al metodo de EXTENSION hace que que este metodo de extension valide si la 
-                //respuesta esta bien formada es decir viene en forma de apiResponse si no es asi lanza una exception
-
-                return await _httpClient.GetApiResponseAsync<ASNDto>($"/api/CommonQueryINV/asn-info/{asnNumber}",
-                        bearerToken: token, ct: ct);
+            return await resp.ReadAsApiResponseAsync<ASNDto>(ct);
 
 
-            }
-            else
-            {
-                //#################################################################################
-                //SIN METODO DE EXTENSION no valida si la respuesta esta bien formada (apiResponse)
-                //#################################################################################
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            ////se obtiene el string de la respuesta
+            //var RespJsonString = await resp.Content.ReadAsStringAsync();
 
-                HttpResponseMessage resp;
+            //var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+
+            ////se deserializa la respuesta al objeto tipo ApiReponse
+            //ApiResponse<ASNDto>? result = JsonSerializer.Deserialize<ApiResponse<ASNDto>>(RespJsonString, opts);
 
 
-                resp = await _httpClient.GetAsync($"/api/CommonQueryINV/asn-info/{asnNumber}");
+            //return result!;
 
-                //se obtiene el string de la respuesta
-                var RespJsonString = await resp.Content.ReadAsStringAsync();
+        }
 
-                var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+        public async Task<ApiResponse<List<WMSClientCompanies>>> GetClientCompanies(string token, CancellationToken ct)
+        {
 
-                //se deserializa la respuesta al objeto tipo ApiReponse
-                ApiResponse<ASNDto>? result = JsonSerializer.Deserialize<ApiResponse<ASNDto>>(RespJsonString, opts);
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
 
 
-                return result!;
-            }
+            resp = await _httpClient.GetAsync($"/api/WmsCompanyclient/GetAll");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSClientCompanies>>(ct);
+
         }
     }
 }

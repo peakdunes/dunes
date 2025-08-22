@@ -50,9 +50,7 @@ namespace DUNES.UI.Controllers
         protected async Task<IActionResult> HandleAsync(Func<CancellationToken, Task<IActionResult>> action, CancellationToken ct)
         {
             if (ct.IsCancellationRequested)
-            {
-                return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest); // Cliente canceló (browser cerrado)
-            }
+                return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest); // cliente canceló
 
             try
             {
@@ -62,10 +60,10 @@ namespace DUNES.UI.Controllers
             {
                 return new StatusCodeResult(StatusCodes.Status499ClientClosedRequest);
             }
-            catch (Exception ex)
+            catch
             {
-                MessageHelper.SetMessage(this, "danger", $"Ocurrió un error inesperado: {ex.Message}", MessageDisplay.Inline);
-                return View("Error"); // O una vista genérica que tú definas
+               
+                throw;
             }
         }
     }

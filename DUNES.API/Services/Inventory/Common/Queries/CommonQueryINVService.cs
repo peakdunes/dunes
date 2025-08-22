@@ -60,10 +60,12 @@ namespace DUNES.API.Services.Inventory.Common.Queries
             objenc.Processed = info.asnheader.Processed;
 
             List<ASNItemDetail> listDetail = new List<ASNItemDetail>();
-            ASNItemDetail objdet = new ASNItemDetail();
+            
 
             foreach (var item in info.asnlistdetail)
             {
+
+                ASNItemDetail objdet = new ASNItemDetail();
 
                 objdet.Id = item.Id;
                 objdet.ADNHdrId = Convert.ToInt32(item.AsnOutHdrDetItemId);
@@ -74,6 +76,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
                 objdet.QuantityReceived = Convert.ToInt32(item.QuantityReceived);
                 objdet.DateTimeInserted = item.DateTimeInserted;
                 objdet.Attributte2 = item.Attribute2;
+                objdet.QuantityPending = objdet.QuantityShipped - objdet.QuantityReceived;
 
                 listDetail.Add(objdet);
 

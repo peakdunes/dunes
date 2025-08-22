@@ -1,27 +1,39 @@
 ﻿using DUNES.API.Utils.Responses;
+using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.Controllers
 {
-
     /// <summary>
     /// Base controller that provides centralized error handling and standardized API responses.
     /// </summary>
-    /// 
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
         /// <summary>
-        /// Handles asynchronous operations that return a data result, with automatic error handling and ApiResponse wrapping.
+        /// PASSTHROUGH: Usa este método cuando el servicio YA devuelve ApiResponse<T>
+        /// No re-empaqueta; reenvía el ApiResponse y su HTTP status.
         /// </summary>
-        /// <typeparam name="T">The type of data returned by the action.</typeparam>
-        /// <param name="action">The asynchronous function to execute.</param>
-        /// <returns>Standardized ApiResponse wrapped in IActionResult.</returns>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        protected async Task<IActionResult> HandleApi<T>(Func<Task<ApiResponse<T>>> action)
+        {
+            var resp = await action();
+            var status = resp.StatusCode == 0 ? 200 : resp.StatusCode;
+            return StatusCode(status, resp);
+        }
+
+        /// <summary>
+        /// Handles async operations that return a raw data result (T) and wraps it once into ApiResponse.
+        /// Usa este método cuando el servicio devuelve T "puro" (no ApiResponse).
+        /// </summary>
         protected async Task<IActionResult> Handle<T>(Func<Task<T>> action)
         {
             try
             {
                 var result = await action();
+
                 return StatusCode(200, ApiResponseFactory.Success(result, "Successful transaction", 200, HttpContext.TraceIdentifier));
             }
             catch (Exception ex)
@@ -34,12 +46,20 @@ namespace DUNES.API.Controllers
                 ));
             }
         }
+        /// <summary>
+        /// Handles async operations that return a raw data result (T) and wraps it once into ApiResponse.
+        /// Usa este método cuando el servicio devuelve T "puro" (no ApiResponse).
+        /// </summary>
+        protected async Task<IActionResult> Handle<T>(Func<Task<ApiResponse<T>>> action)
+        {
+            var resp = await action();
+            var status = resp.StatusCode == 0 ? 200 : resp.StatusCode;
+            return StatusCode(status, resp); // no re-empaques
+        }
 
         /// <summary>
-        /// Handles asynchronous operations that return an IActionResult directly, with centralized error handling.
+        /// Handles async operations that already build an IActionResult.
         /// </summary>
-        /// <param name="action">The asynchronous function to execute.</param>
-        /// <returns>IActionResult, either the original result or a formatted error response.</returns>
         protected async Task<IActionResult> Handle(Func<Task<IActionResult>> action)
         {
             try
@@ -58,11 +78,9 @@ namespace DUNES.API.Controllers
         }
 
         /// <summary>
-        /// Handles synchronous operations with return value, wrapped in ApiResponse and with centralized error handling.
+        /// Handles synchronous operations with return value; wraps once into ApiResponse.
+        /// Usa este método cuando el servicio devuelve T "puro".
         /// </summary>
-        /// <typeparam name="T">The type of data returned by the action.</typeparam>
-        /// <param name="action">The synchronous function to execute.</param>
-        /// <returns>Standardized ApiResponse wrapped in IActionResult.</returns>
         protected IActionResult HandleSync<T>(Func<T> action)
         {
             try
@@ -81,5 +99,4 @@ namespace DUNES.API.Controllers
             }
         }
     }
-
 }
