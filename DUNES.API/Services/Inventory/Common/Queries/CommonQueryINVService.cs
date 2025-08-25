@@ -17,7 +17,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
     public class CommonQueryINVService : ICommonQueryINVService
     {
 
-
+       
         private readonly ICommonQueryINVRepository _repository;
 
         /// <summary>

@@ -87,7 +87,7 @@
         <div class="row gx-3 gy-2 px-3 mb-3">
             <div class="col-12 col-md-3">
                 <label class="form-label">Company Client</label>
-                <select id="companyid" class="form-control" asp-items="@ViewBag.companies">
+                <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
                     <option selected disabled>Select Client Company</option>
                 </select>
             </div>
@@ -107,8 +107,23 @@
                     <option selected disabled>Select Transaction Type</option>
                 </select>
             </div>
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Inventory Type</label>
+                <select id="companyid" class="form-control">
+                    <option selected disabled>Select Inventory Type</option>
+                </select>
+            </div>
         </div>
 
+        <div class="row gx-3 gy-2 px-3 mb-3">
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="binid" class="form-control">
+                    <option selected disabled>-- Select bin --</option>
+                </select>
+            </div>
+        </div>
     </div>
 
 
@@ -182,6 +197,11 @@
             </div>
         </div>
     </div>
+
+     <form id="af" style="display:none">
+        @Html.AntiForgeryToken()
+    </form> 
+
 </div>
 
 @section Scripts {
@@ -223,7 +243,64 @@
                   }
             });
 
+            $(function () {
+                  const $form = $('#asn-form');
+                  $form.on('submit', function (e) {
+                    showSpinner();
+                  });
+            });
+
+
+
         });
+
+       
+
+        $('#companyclient').change(function()
+        {
+
+                            
+            var companyClient = $(this).val();    
+            var $bin = $('#binid');
+
+            // reset select
+            $bin.empty()
+            .append($('<option>', { value: '', text: '-- Select bin --' }))
+            .prop('disabled', true);
+
+            if (!companyClient) return;
+
+            // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            showSpinner();
+
+            $.ajax({url: '@Url.Action("getClientBins", "ASN")',type: 'POST', 
+                    data: { __RequestVerificationToken: token,  companyclient: companyClient }})
+            .done(function (res) 
+            {
+                var list = (res && res.data) ? res.data : [];
+                if (Array.isArray(list) && list.length) 
+                {
+                    $.each(list, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.tagName !== undefined) ? it.tagName : it.TagName;
+                    $bin.append($('<option>', { value: id, text: name }));
+                    });
+                    $bin.prop('disabled', false);
+                }
+            })
+            .fail(function (xhr) {
+                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                alert('Could not load bins.');
+            }).always(function(){
+
+                hideSpinner();
+            });
+        })
+
+       
+
 
     </script>
 }

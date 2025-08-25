@@ -5,10 +5,12 @@ using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.Common.Queries;
 using DUNES.API.Repositories.Masters;
+using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Masters;
+using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -177,6 +179,10 @@ builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<
 //para usar en el CRUD de las tablas maestras
 builder.Services.AddScoped(typeof(IMasterService<>), typeof(MasterService<>));
 
+//WMS INV SERVICES
+
+builder.Services.AddScoped<ICommonQueryWMSINVRepository, CommonQueryWMSINVRepository>();
+builder.Services.AddScoped<ICommonQueryWMSINVService, CommonQueryWMSINVService>();
 
 
 

@@ -25,6 +25,18 @@ namespace DUNES.UI.Services.Inventory
             };
         }
 
+        public async Task<ApiResponse<List<WMSBins>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+           
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/wms-act-bins/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSBins>>(ct);
+        }
 
         public async Task<ApiResponse<ASNDto>> GetAsnInfo(string asnNumber, string token, CancellationToken ct)
         {
@@ -40,16 +52,7 @@ namespace DUNES.UI.Services.Inventory
             return await resp.ReadAsApiResponseAsync<ASNDto>(ct);
 
 
-            ////se obtiene el string de la respuesta
-            //var RespJsonString = await resp.Content.ReadAsStringAsync();
-
-            //var opts = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
-            ////se deserializa la respuesta al objeto tipo ApiReponse
-            //ApiResponse<ASNDto>? result = JsonSerializer.Deserialize<ApiResponse<ASNDto>>(RespJsonString, opts);
-
-
-            //return result!;
+         
 
         }
 

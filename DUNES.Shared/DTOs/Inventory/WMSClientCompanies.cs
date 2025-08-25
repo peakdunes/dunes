@@ -9,7 +9,7 @@ namespace DUNES.Shared.DTOs.Inventory
 {
     public class WMSClientCompanies
     {
-        public int Id { get; set; }           // ← antes era string
+        public int Id { get; set; }           
         [MaxLength(200)]
         public string CompanyId { get; set; } = "";
 

@@ -9,5 +9,7 @@ namespace DUNES.UI.Services.Inventory
         Task<ApiResponse<ASNDto>> GetAsnInfo(string asnNumber, string token,CancellationToken ct);
 
         Task<ApiResponse<List<WMSClientCompanies>>> GetClientCompanies(string token, CancellationToken ct);
+
+        Task<ApiResponse<List<WMSBins>>> GetAllActiveBinsByCompanyClient (int companyid, string companyClient, string token, CancellationToken ct);
     }
 }
