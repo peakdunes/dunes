@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.Inventory
 {
-    public class WMSClientCompanies
+    public class WMSClientCompaniesDto
     {
         public int Id { get; set; }           
         [MaxLength(200)]

@@ -1,11 +1,168 @@
 ﻿@using DUNES.Shared.DTOs.Inventory
 @using DUNES.UI.WiewModels
-@model AsnDtoCompanyClients
+@model AsnCompanyClientsWm 
 @{
     ViewData["Title"] = "Receiving";
 }
 
+<div class="modal fade" id="modalBinsDistribution" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-xl">
+        <div class="modal-content">
 
+            <div class="modal-header">
+                <h5 class="brand-subtitle" id="miModalLabel">WMS Warehouse Distribution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3" style="display:display">
+                        <div class="form-group">
+                            <label class="control-label">Part Number</label>
+                            <input id="partnoid" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">WMS Bins</label>
+                            <select id="binselid" class="form-control">
+                               
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">WMS Inv Type</label>
+                            <select id="typeid" class="form-control">
+                                <option selected disabled>Select Type</option>
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">WMS Inv Status</label>
+                            <select id="statusid" class="form-control">
+                                <option selected disabled>Select Status</option>
+                            </select>
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">Qty</label>
+                            <input type="number" style="text-align:right" id="qtyreceive" class="form-control" />
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-1 mt-4">
+                        <div class="form-group">
+
+                            <input type="button" onclick="addqtybin()" class="btn btn-outline-primary" value="Add" />
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label class="control-label">Line</label>
+                            <input id="lineid" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label class="control-label">Pending</label>
+                            <input style="text-align:right" id="qtypending" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <div class="form-group">
+                            <label class="control-label">Qty Bin</label>
+                            <input style="text-align:right" id="qtybintotal" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="row mt-2">
+                    <div class="col-md-7">
+                        <h4 class="brand-subtitle">Bins List</h4>
+                        <table id="tableuserbines" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
+
+                            <thead>
+                                <tr>
+                                    <th>Select</th>
+                                    <th>
+                                        Line Id
+                                    </th>
+                                    <th>
+                                        Part Number
+                                    </th>
+                                    <th style="display:none">
+                                        Type Id
+                                    </th>
+                                    <th>
+                                        Inventory Type
+                                    </th>
+                                    <th>
+                                        Bin Number
+                                    </th>
+                                    <th>
+                                        Qty
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+
+                    <div class="col-md-5">
+                        <h4 class="brand-subtitle">Part Number Qty in WMS Bin</h4>
+                        <table id="tableuserbinitems" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Part Number
+                                    </th>
+                                    <th style="text-align:right">
+                                        Qty
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="container mt-4">
     <form id="asn-form" method="get" autocomplete="off" class="mb-3">
         <div class="row g-3 align-items-end">
@@ -95,35 +252,28 @@
 
             <div class="col-12 col-md-3">
                 <label class="form-label">Concept</label>
-                <select id="companyid" class="form-control">
-                    <option selected disabled>Select Concept</option>
+                <select id="conceptid" disabled class="form-control">
+                   
                 </select>
             </div>
 
 
             <div class="col-12 col-md-3">
                 <label class="form-label">Transaction Type</label>
-                <select id="companyid" class="form-control">
-                    <option selected disabled>Select Transaction Type</option>
+                <select id="transactionid" disabled class="form-control">
+                   
                 </select>
             </div>
 
             <div class="col-12 col-md-3">
-                <label class="form-label">Inventory Type</label>
-                <select id="companyid" class="form-control">
-                    <option selected disabled>Select Inventory Type</option>
+                <label class="form-label">Inventory Type Dest</label>
+                <select id="inventorytypeid" disabled class="form-control">
+                    
                 </select>
             </div>
         </div>
 
-        <div class="row gx-3 gy-2 px-3 mb-3">
-            <div class="col-12 col-md-3">
-                <label class="form-label">Company Client</label>
-                <select id="binid" class="form-control">
-                    <option selected disabled>-- Select bin --</option>
-                </select>
-            </div>
-        </div>
+      
     </div>
 
 
@@ -171,9 +321,8 @@
                                                     <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">👁️ Details</a>
                                                 </li>
 
-
                                                 <li>
-                                                    <a class="dropdown-item" asp-action="Delete" asp-route-id="@item.Id"> 📦 Bins</a>
+                                                    <a class="dropdown-item" onclick="openmodal(@item.Id,@item.QuantityPending,'@item.ItemNumber' )"> 📦 Bins</a>
                                                 </li>
                                             </ul>
                                         </div>
@@ -208,6 +357,42 @@
     <script>
         $(document).ready(function ()
         {
+            
+            $('#tableuserbinitems').DataTable({
+
+                 processing: true,
+                  deferRender: true,
+                  stateSave: true,
+                  autoWidth: false,
+                  responsive: false, 
+                  pageLength: 10,
+                  "bPaginate": false,
+                  "bLengthChange": false,
+                  "bFilter": true,
+                  "bInfo": false,
+                  "bAutoWidth": false,
+                  "searching": false
+
+            
+            });
+
+            $('#tableuserbines').DataTable({
+
+                 processing: true,
+                  deferRender: true,
+                  stateSave: true,
+                  autoWidth: false,
+                  responsive: false,
+                  pageLength: 10,
+                  "bPaginate": false,
+                  "bLengthChange": false,
+                  "bFilter": true,
+                  "bInfo": false,
+                  "bAutoWidth": false,
+                  "searching": false,
+
+            });
+
             $('#tableuser').DataTable
             ({
                   processing: true,
@@ -260,12 +445,43 @@
         {
 
                             
-            var companyClient = $(this).val();    
-            var $bin = $('#binid');
+            var companyClient = $(this).val();
 
-            // reset select
+            var $bin = $('#binselid');
+            var $concepts = $('#conceptid');
+            var $transactions = $('#transactionid');
+            var $inventorytypes = $('#inventorytypeid');
+            var $itemstatus = $('#statusid');
+            var $wmsinventorytypes = $('#typeid');
+            
+
+            // reset select bins
             $bin.empty()
             .append($('<option>', { value: '', text: '-- Select bin --' }))
+            .prop('disabled', true);
+
+            // reset select concepts
+            $concepts.empty()
+            .append($('<option>', { value: '', text: '-- Select Concept --' }))
+            .prop('disabled', true);
+
+            // reset select transactions
+            $transactions.empty()
+            .append($('<option>', { value: '', text: '-- Select Transaction --' }))
+            .prop('disabled', true);
+
+            // reset select inventorytypes
+            $inventorytypes.empty()
+            .append($('<option>', { value: '', text: '-- Select Type --' }))
+            .prop('disabled', true);
+
+
+              $itemstatus.empty()
+            .append($('<option>', { value: '', text: '-- Select Type --' }))
+            .prop('disabled', true);
+
+            $wmsinventorytypes.empty()
+            .append($('<option>', { value: '', text: '-- Select Type --' }))
             .prop('disabled', true);
 
             if (!companyClient) return;
@@ -275,20 +491,83 @@
 
             showSpinner();
 
-            $.ajax({url: '@Url.Action("getClientBins", "ASN")',type: 'POST', 
+            $.ajax({url: '@Url.Action("getAllAditionalInformation", "ASN")',type: 'POST',
                     data: { __RequestVerificationToken: token,  companyclient: companyClient }})
             .done(function (res) 
             {
-                var list = (res && res.data) ? res.data : [];
+                var list = (res && res.data.listbines) ? res.data.listbines : [];
                 if (Array.isArray(list) && list.length) 
                 {
                     $.each(list, function (_, it) {
                     var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.tagName !== undefined) ? it.tagName : it.TagName;
+                    var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
                     $bin.append($('<option>', { value: id, text: name }));
                     });
                     $bin.prop('disabled', false);
                 }
+
+                var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
+                if (Array.isArray(listc) && list.length)
+                {
+                    $.each(listc, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $concepts.append($('<option>', { value: id, text: name }));
+                    });
+                    $concepts.prop('disabled', false);
+                }
+
+
+                  var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
+                if (Array.isArray(listt) && list.length)
+                {
+                    $.each(listt, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $transactions.append($('<option>', { value: id, text: name }));
+                    });
+                    $transactions.prop('disabled', false);
+                }
+
+
+
+
+                   var listi = (res && res.data.listinventorytype) ? res.data.listinventorytype : [];
+                if (Array.isArray(listi) && list.length)
+                {
+                    $.each(listi, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $inventorytypes.append($('<option>', { value: id, text: name }));
+                    });
+                    $inventorytypes.prop('disabled', false);
+                }
+
+                var lists = (res && res.data.listitemstatus) ? res.data.listitemstatus : [];
+                if (Array.isArray(lists) && list.length)
+                {
+                    $.each(lists, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $itemstatus.append($('<option>', { value: id, text: name }));
+                    });
+                    $itemstatus.prop('disabled', false);
+                }
+
+                  var listw = (res && res.data.listwmsinventorytype) ? res.data.listwmsinventorytype : [];
+                if (Array.isArray(listw) && list.length)
+                {
+                    $.each(listw, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $wmsinventorytypes.append($('<option>', { value: id, text: name }));
+                    });
+                    $wmsinventorytypes.prop('disabled', false);
+                }
+
+                
+
+
             })
             .fail(function (xhr) {
                 console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
@@ -300,7 +579,301 @@
         })
 
        
+        function openmodal(id, qtypending, partnumber)
+        {
 
+            $('#lineid').val(id);
+            $('#qtyreceive').val(qtypending);
+            $('#qtypending').val(qtypending);
+            $('#partnoid').val(partnumber);
+            
+
+            // Mostrar el modal 
+            const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+            modal.show();
+
+        }
+
+
+          async function addqtybin() {
+
+
+                 const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
+
+         if (!ok) return; 
+
+
+             var binid = $('#binselid option:selected').val();
+
+              //$('#divprocess').hide();
+
+             if (binid == 'Select Bin') {
+
+                 alert('Bin is required');
+                 return false;
+             }
+
+
+
+             var typeid = $('#typeid option:selected').val();
+
+
+             if (typeid == 'Select Type') {
+
+                 alert('Inventory Type is required');
+                 return false;
+             }
+
+             var statusid = $('#statusid option:selected').val();
+
+             var qtybin = $('#qtyreceive').val();
+
+             var lineid = $('#lineid').val();
+
+             var totalacum = $('#qtybintotal').val();
+
+             var totalpending = $('#qtypending').val();
+
+             if (qtybin <= 0) {
+                 alert('Qty must be greater than zero');
+                 return false;
+
+             }
+
+             var tagname = $('#binselid option:selected').text();
+
+             var typename = $('#typeid option:selected').text();
+
+             if (parseInt(totalpending) < (parseInt(totalacum) + parseInt(qtybin))) {
+
+                 alert('amount received is greater than the amount pending');
+                 $('#qtyreceive').focus();
+                 $('#qtyreceive').select();
+                 return false;
+
+             }
+
+             var partno = $('#partnoid').val();
+
+
+
+             $.ajax({
+                 url: "@Url.Action("addqtybin", "ASN")",
+                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid }, type: "post"
+             })
+                 .done(function (data) {
+
+                     if (data.status == "OK") {
+
+                         if (data.thereisdata)
+                         {
+                             $('#divprocess').show();
+                         }
+
+                         $('#qtyreceive').val("0");
+
+                         //se reinician los select de bines y tipos de inventario
+
+                         $('#binselid option').prop('selected', function () {
+                             return this.defaultSelected;
+                         });
+
+                         $('#typeid option').prop('selected', function () {
+                             return this.defaultSelected;
+                         });
+
+
+
+                         $('#qtybintotal').val(data.totalqty);
+
+                         var lineid = $('#lineid').val();
+
+
+                         $('#lab-' + lineid).text(data.totalqty);
+
+
+                         if (data.listbines != null) {
+
+                             var JsonArrayBines = [];
+
+                             for (var i = 0; i < data.listbines.length; i++) {
+
+                                 var f = data.listbines[i];
+
+
+
+                                 JsonArrayBines.push({
+                                     actions: '<a href="#"onclick="deletedetailAsnReceiving(\'' + f.id + '\',\'' + f.partnumber + '\',' + f.inventorytype + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+
+                                     id: f.id,
+                                     partno: f.partnumber,
+                                     type: f.inventorytype,
+                                     binname: f.tagname,
+                                     typename: f.typename,
+                                     qty: f.qty
+
+                                 });
+                             }
+
+
+                             $('#tableuserbines').DataTable({
+
+                                 data: JsonArrayBines,
+                                 destroy: true,
+                                 //scrollX: true,
+                                 columns: [
+                                     { "data": "actions" },
+                                     { "data": "id" },
+                                     { "data": "partno" },
+                                     { "data": "type","class":"ocultar"},
+                                     { "data": "typename" },
+                                     { "data": "binname" },
+                                     { "data": "qty", "class":"derecha" },
+                                 ],
+                                 "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                     $(nRow).attr('id', "ln-" + aData.id);
+                                 }
+
+                             });
+                         }
+
+
+                         if (data.listapartnumber != null) {
+
+                             var JsonArrayShipList = [];
+
+                             for (var i = 0; i < data.listapartnumber.length; i++) {
+
+                                 var f = data.listapartnumber[i];
+
+                                var textaction = '';
+
+                                if (!f.processed)
+                                {
+                                    showbuttonprocess = true;
+                                    //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                }
+
+
+
+
+                                 JsonArrayShipList.push({
+                                     actions: textaction,
+                                      line: f.lineNum,
+                                     itemid: f.inventoryItemId,
+                                     itemnumber: f.itemNumber,
+                                     itemdescription: f.itemDescription,
+                                     qtyshipped: f.quantityShipped,
+                                     qtyreceived: f.quantityReceived,//'<input type="number" class="alinearderecha" id="rec-' + f.lineNum + '"  value="' + f.quantityReceived + '"/>',
+                                     qtypending: f.qtypending,
+                                     thereisdistribution: f.thereisdistribution
+                                    // qtyinprocess: '<label id="lab-' + f.lineNum + '">0</label>'
+
+                                 });
+                             }
+
+
+                             showbindetail(JsonArrayShipList);
+
+                         }
+                         ///////////////
+
+                     }
+                     else {
+
+                         swal({
+                             title: "Warning!",
+                             text: data.status,
+                             icon: "warning",
+                             button: "OK",
+                         }).then((value) => {
+
+                             $("#spinner").fadeOut();
+                             $("#contenedor").removeClass("disabledbutton");
+
+
+                             $("#asnidusps").focus();
+
+                         });
+                     }
+
+                 }).fail(function () { }).always(function () { });
+
+         }
+
+           function showbindetail(jsondata)
+        {
+
+             $('#tableuserzebraasndet').DataTable({
+
+                data: jsondata,
+                destroy: true,
+                scrollX: true,
+                columns: [
+                    { "data": "actions" },
+                    { "data": "line" },
+                    { "data": "itemid" ,"class":"ocultar"},
+                    { "data": "itemnumber" },
+                    { "data": "qtyshipped", "class":"derecha" },
+                    { "data": "qtyreceived", "class":"derecha" },
+                    { "data": "qtypending", "class":"derecha" },
+                   // { "data": "qtyinprocess" , "class":"derecha"},
+                    { "data": "itemdescription" },
+
+                ],
+
+                    createdRow: function (row, data, dataIndex) {
+                    if (data.qtyshipped !== undefined && data.qtyreceived !== undefined) {
+                        // Seleccionamos las celdas de qtyshipped y qtyreceived
+                        let $qtyShippedCell = $('td', row).eq(4);
+                        let $qtyReceivedCell = $('td', row).eq(5);
+                        let $qtyPendingCell = $('td', row).eq(6);
+
+                        // Primero limpiamos clases previas por si la fila se vuelve a redibujar
+                        $qtyShippedCell.removeClass('text-success text-danger fw-bold');
+                        $qtyReceivedCell.removeClass('text-success text-danger fw-bold');
+                        $qtyPendingCell.removeClass('text-success text-danger fw-bold');
+
+
+                        if (data.qtypending == 0)
+                        {
+                             $qtyPendingCell.addClass('text-dark fw-bold')
+                        }
+                       else
+                       {
+                            if (data.thereisdistribution)
+                            {
+                                // Igual → Verde
+                                $qtyPendingCell.addClass('text-success fw-bold');
+                            }
+                            else
+                            {
+                                 //  Cualquier otro caso → Rojo
+                                $qtyPendingCell.addClass('text-danger fw-bold');
+                            }
+                        }
+                        // Asignamos color dependiendo de la condición
+                        if (data.qtyshipped == data.qtyreceived) {
+                            // Igual → Verde
+                            $qtyShippedCell.addClass('text-success fw-bold');
+                            $qtyReceivedCell.addClass('text-success fw-bold');
+                        }
+                        else if (data.qtyshipped > 0 && data.qtyreceived > 0 && data.qtyreceived < data.qtyshipped) {
+                            //  Ambos > 0 y qtyreceived < qtyshipped → Azul
+                            $qtyShippedCell.addClass('text-primary fw-bold');
+                            $qtyReceivedCell.addClass('text-primary fw-bold');
+                        }
+                        else {
+                            //  Cualquier otro caso → Rojo
+                            $qtyShippedCell.addClass('text-danger fw-bold');
+                            $qtyReceivedCell.addClass('text-danger fw-bold');
+                        }
+                    }
+                }
+            });
+
+        }
 
     </script>
 }

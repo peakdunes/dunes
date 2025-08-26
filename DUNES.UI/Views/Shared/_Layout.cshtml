@@ -125,7 +125,10 @@
     <script src="~/js/dunes.accessibility.js" asp-append-version="true"></script>
     <script src="~/js/dunes.accessibility.buttons.js" asp-append-version="true"></script>
 
-   
+    <script src="~/js/utils.js"></script>
+
+    <!-- librería SweetAlert2 (si no está en tu layout) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!--######################################################################################## -->
     <!--alerta global muestra un modal con una informacion importante para todos                 -->
@@ -209,7 +212,7 @@
 
 
     <!--######################################################################################## -->
-    <!--Función global para mostrar toasts, si TempData["ApiMessage"] no es vacia muestra el mensaje -->
+    <!--Función global para mostrar MENSAJES toasts, si TempData["ApiMessage"] no es vacia muestra el mensaje -->
     <!--######################################################################################## -->
     <!-- 📌 Toast Container -->
     <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100;">

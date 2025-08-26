@@ -3,6 +3,7 @@ using DUNES.API.Repositories.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.WiewModels.Inventory;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -37,14 +38,14 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// <exception cref="NotImplementedException"></exception>
         /// 
 
-        public async Task<ApiResponse<ASNDto>> GetASNAllInfo(string ShipmentNum)
+        public async Task<ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum)
         {
 
             var info = await _repository.GetASNAllInfo(ShipmentNum);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<ASNDto>(
+                return ApiResponseFactory.NotFound<ASNWm>(
                     $"This ASN number ({ShipmentNum}) doesn't exist in our system.");
             }
 
@@ -82,7 +83,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
 
             }
 
-            ASNDto objreturn = new ASNDto
+            ASNWm objreturn = new ASNWm
             {
                 asnHdr = objenc,
                 itemDetail = listDetail

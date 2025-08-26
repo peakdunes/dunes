@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.WiewModels.Inventory;
 
 namespace DUNES.API.Services.Inventory.Common.Queries
 {
@@ -14,7 +15,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// </summary>
         /// <param name="ShipmentNum"></param>
         /// <returns></returns>
-        Task <ApiResponse<ASNDto>> GetASNAllInfo(string ShipmentNum);
+        Task <ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum);
 
 
 

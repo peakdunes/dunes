@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
+using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
@@ -38,6 +39,8 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return listbines;
         }
+        
+
         /// <summary>
         /// Get all the bins associated with a client company 
         /// </summary>
@@ -50,5 +53,171 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return listbines;
         }
+
+        /// <summary>
+        /// Get all active transactions concepts
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactionconcepts>> GetAllActiveTransactionsConcept(int companyid, string companyClient)
+        {
+            var listconcepts = await _wmscontext.Transactionconcepts
+               .Where(x => x.Idcompany == companyid
+               && x.Idcompanyclient == companyClient
+               && x.Active == true).ToListAsync();
+
+            return listconcepts ;
+        }
+
+        /// <summary>
+        /// Get all transactions concepts
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactionconcepts>> GetAllTransactionsConcept(int companyid, string companyClient)
+        {
+            var listconcepts = await _wmscontext.Transactionconcepts
+               .Where(x => x.Idcompany == companyid
+               && x.Idcompanyclient == companyClient
+               ).ToListAsync();
+
+            return listconcepts;
+        }
+        /// <summary>
+        /// Get all input transactions type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+              .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Isinput == true
+              ).ToListAsync();
+
+            return listtransactions;
+        }
+        /// <summary>
+        /// Get all active input transactions type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactiontypes>> GetAllActiveTransactionsInputType(int companyid, string companyClient)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+             .Where(x => x.Idcompany == companyid
+             && x.Idcompanyclient == companyClient
+             && x.Isinput == true && x.Active == true
+             ).ToListAsync();
+
+            return listtransactions;
+        }
+
+        /// <summary>
+        /// Get all output transactions type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactiontypes>> GetAllTransactionsOutputType(int companyid, string companyClient)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+            .Where(x => x.Idcompany == companyid
+            && x.Idcompanyclient == companyClient
+            && x.Isoutput == true
+            ).ToListAsync();
+
+            return listtransactions;
+        }
+        /// <summary>
+        /// Get all active output transactions type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Transactiontypes>> GetAllActiveTransactionsOutputType(int companyid, string companyClient)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+            .Where(x => x.Idcompany == companyid
+            && x.Idcompanyclient == companyClient
+            && x.Isoutput == true && x.Active == true
+            ).ToListAsync();
+
+            return listtransactions;
+        }
+        /// <summary>
+        /// Get all active Inventory Types for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<InventoryTypes>> GetAllActiveInventoryType(int companyid, string companyClient)
+        {
+            var listinventorytype = await _wmscontext.InventoryTypes
+          .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Active == true
+          ).ToListAsync();
+
+            return listinventorytype;
+        }
+        /// <summary>
+        /// Get all Inventory Types for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<InventoryTypes>> GetAllInventoryType(int companyid, string companyClient)
+        {
+            var listinventorytype = await _wmscontext.InventoryTypes
+               .Where(x => x.Idcompany == companyid
+                   && x.Idcompanyclient == companyClient
+                   
+               ).ToListAsync();
+
+                    return listinventorytype;
+        }
+
+
+        /// <summary>
+        /// Get all active item status for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Itemstatus>> GetAllActiveItemStatus(int companyid, string companyClient)
+        {
+            var listitemstatus = await _wmscontext.Itemstatus
+               .Where(x => x.Idcompany == companyid
+                   && x.Idcompanyclient == companyClient
+                   && x.Active == true
+               ).ToListAsync();
+
+            return listitemstatus;
+        }
+
+
+        /// <summary>
+        /// Get all item stauts for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<Itemstatus>> GetAllItemStatus(int companyid, string companyClient)
+        {
+            var listitemstatus = await _wmscontext.Itemstatus
+               .Where(x => x.Idcompany == companyid
+                   && x.Idcompanyclient == companyClient
+
+               ).ToListAsync();
+
+            return listitemstatus;
+        }
+
     }
 }

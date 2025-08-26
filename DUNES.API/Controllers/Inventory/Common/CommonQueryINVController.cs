@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,7 +38,7 @@ namespace DUNES.API.Controllers.Inventory.Common
         /// An <see cref="ActionResult{T}"/> containing an <see cref="ApiResponse{ASNDto}"/> 
         /// with the pick order header and details.
         /// </returns>
-        [ProducesResponseType(typeof(ApiResponse<ASNDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<ASNWm>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
 
         [HttpGet("asn-info/{ShipmentNum}")]

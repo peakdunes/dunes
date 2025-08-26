@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.Inventory
 {
-    public class WMSBins
+    public class WMSInputTransactionsDto
     {
+        public int Id { get; set; }
 
-        public int Id { get;set; }
-
-        public string TagName { get;set; }
+        public string Name { get; set; }
     }
 }
