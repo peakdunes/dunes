@@ -69,7 +69,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
                 ASNItemDetail objdet = new ASNItemDetail();
 
                 objdet.Id = item.Id;
-                objdet.ADNHdrId = Convert.ToInt32(item.AsnOutHdrDetItemId);
+                objdet.ItemId = Convert.ToInt32(item.InventoryItemId);
                 objdet.ItemNumber = item.ItemNumber;
                 objdet.LineId = Convert.ToInt32(item.LineNum);
                 objdet.QuantityShipped = Convert.ToInt32(item.QuantityShipped);
@@ -78,6 +78,9 @@ namespace DUNES.API.Services.Inventory.Common.Queries
                 objdet.DateTimeInserted = item.DateTimeInserted;
                 objdet.Attributte2 = item.Attribute2;
                 objdet.QuantityPending = objdet.QuantityShipped - objdet.QuantityReceived;
+                objdet.thereisdistribution = false;
+                objdet.processed = item.Processed;
+             
 
                 listDetail.Add(objdet);
 

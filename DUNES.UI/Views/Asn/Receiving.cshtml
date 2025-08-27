@@ -5,6 +5,16 @@
     ViewData["Title"] = "Receiving";
 }
 
+<style>
+    .ocultar {
+        display: none;
+    }
+
+    .derecha {
+        text-align: right;
+    }
+</style>
+
 <div class="modal fade" id="modalBinsDistribution" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
     <div class="modal-dialog  modal-xl">
         <div class="modal-content">
@@ -113,17 +123,27 @@
                                     <th>
                                         Part Number
                                     </th>
+                                    <th>
+                                        Qty
+                                    </th>
+
                                     <th style="display:none">
                                         Type Id
                                     </th>
                                     <th>
                                         Inventory Type
                                     </th>
-                                    <th>
+                                    <th style="display:none">
                                         Bin Number
                                     </th>
                                     <th>
-                                        Qty
+                                        Bin Name
+                                    </th>
+                                    <th style="display:none">
+                                        Status Id
+                                    </th>
+                                    <th>
+                                        Status Name
                                     </th>
 
                                 </tr>
@@ -139,8 +159,17 @@
                             <thead>
                                 <tr>
                                     <th>
-                                        Part Number
+                                        Bin Name
                                     </th>
+
+                                    <th>
+                                        Inventory Type
+                                    </th>
+
+                                    <th>
+                                        Status Type
+                                    </th>
+
                                     <th style="text-align:right">
                                         Qty
                                     </th>
@@ -192,6 +221,7 @@
 
 
         <div class="row gx-3 gy-2 px-3 mt-2 mb-2">
+
             <div class="col-12 col-md-2">
                 <label asp-for="asdDto.asnHdr.Id" class="form-label"></label>
                 <input asp-for="asdDto.asnHdr.Id" readonly class="form-control" />
@@ -238,7 +268,7 @@
     </div>
     <div class="card shadow-sm mb-2">
         <div class="card-header bg-white">
-            <h6 class="mb-0 subtitleDunes">Process ASN information</h6>
+            <h6 class="mb-0 subtitleDunes">Information to process in WMS</h6>
         </div>
 
         <div class="row gx-3 gy-2 px-3 mb-3">
@@ -272,8 +302,13 @@
                 </select>
             </div>
         </div>
-
-      
+        <div class="row gx-3 gy-2 px-3 mb-3">
+            <div class="col-12 col-md-3">
+                <label class="form-label">Detault Item Status</label>
+                <select id="itemstatusdefault" disabled class="form-control">
+                </select>
+            </div>
+        </div>
     </div>
 
 
@@ -290,16 +325,16 @@
                         <tr>
                             <th>Actions</th>
                             <th>Id</th>
-                            <th>Header Id</th>
+                            <th>Item Id</th>
                             <th>Part Number</th>
                             <th>Line Id</th>
                             <th class="text-end">Quantity Shipped</th>
                             <th class="text-end">Quantity Received</th>
-                            <th class="text-end">Quantity Pending</th>
+                            <th class="text-end">Quantity Proccess</th>
                             <th>Part Number Description</th>
                             <th>Attributte 2</th>
-
                             <th>DateTime Inserted</th>
+                            <th>Processed</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -322,13 +357,13 @@
                                                 </li>
 
                                                 <li>
-                                                    <a class="dropdown-item" onclick="openmodal(@item.Id,@item.QuantityPending,'@item.ItemNumber' )"> 📦 Bins</a>
+                                                    <a class="dropdown-item" onclick="openmodal(@item.LineId,@item.QuantityPending,'@item.ItemNumber' )"> 📦 Bins</a>
                                                 </li>
                                             </ul>
                                         </div>
                                     </td>
                                     <td>@item.Id</td>
-                                    <td>@item.ADNHdrId</td>
+                                    <td>@item.ItemId</td>
                                     <td>@item.ItemNumber</td>
                                     <td>@item.LineId</td>
                                     <td class="text-end">@item.QuantityShipped.ToString("N0")</td>
@@ -336,8 +371,8 @@
                                     <td class="text-end">@item.QuantityPending.ToString("N0")</td>
                                     <td>@item.ItemDescription</td>
                                     <td>@item.Attributte2</td>
-
                                     <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.processed</td>
                                 </tr>
                             }
                         }
@@ -403,7 +438,7 @@
                   responsive: false, // ✅ Evita que se escondan columnas
                   pageLength: 25,
 
-                  order: [[10, 'desc']],
+                  order: [[11, 'desc']],
 
                   columnDefs: [
                     { targets: [5, 6,7], className: 'text-end' },
@@ -434,9 +469,6 @@
                     showSpinner();
                   });
             });
-
-
-
         });
 
        
@@ -453,35 +485,42 @@
             var $inventorytypes = $('#inventorytypeid');
             var $itemstatus = $('#statusid');
             var $wmsinventorytypes = $('#typeid');
-            
+            var $itemstatusdefault = $('#itemstatusdefault');
+
+            itemstatusdefault
 
             // reset select bins
             $bin.empty()
-            .append($('<option>', { value: '', text: '-- Select bin --' }))
+            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
             .prop('disabled', true);
 
             // reset select concepts
             $concepts.empty()
-            .append($('<option>', { value: '', text: '-- Select Concept --' }))
+            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
             .prop('disabled', true);
 
             // reset select transactions
             $transactions.empty()
-            .append($('<option>', { value: '', text: '-- Select Transaction --' }))
+            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
             .prop('disabled', true);
 
             // reset select inventorytypes
             $inventorytypes.empty()
-            .append($('<option>', { value: '', text: '-- Select Type --' }))
+            .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true}))
             .prop('disabled', true);
 
 
               $itemstatus.empty()
-            .append($('<option>', { value: '', text: '-- Select Type --' }))
+            .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
             .prop('disabled', true);
 
+            $itemstatusdefault.empty()
+            .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+
             $wmsinventorytypes.empty()
-            .append($('<option>', { value: '', text: '-- Select Type --' }))
+            .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
             .prop('disabled', true);
 
             if (!companyClient) return;
@@ -538,7 +577,7 @@
                     $.each(listi, function (_, it) {
                     var id = (it.id !== undefined) ? it.id : it.Id;
                     var name = (it.Name !== undefined) ? it.name : it.name;
-                    $inventorytypes.append($('<option>', { value: id, text: name }));
+                    $inventorytypes.append($('<option>', { value: id, text: name.trim() }));
                     });
                     $inventorytypes.prop('disabled', false);
                 }
@@ -552,6 +591,15 @@
                     $itemstatus.append($('<option>', { value: id, text: name }));
                     });
                     $itemstatus.prop('disabled', false);
+
+
+                     $.each(lists, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $itemstatusdefault.append($('<option>', { value: id, text: name }));
+                    });
+                    $itemstatusdefault.prop('disabled', false);
+
                 }
 
                   var listw = (res && res.data.listwmsinventorytype) ? res.data.listwmsinventorytype : [];
@@ -560,7 +608,7 @@
                     $.each(listw, function (_, it) {
                     var id = (it.id !== undefined) ? it.id : it.Id;
                     var name = (it.Name !== undefined) ? it.name : it.name;
-                    $wmsinventorytypes.append($('<option>', { value: id, text: name }));
+                    $wmsinventorytypes.append($('<option>', { value: id, text: name.trim() }));
                     });
                     $wmsinventorytypes.prop('disabled', false);
                 }
@@ -578,6 +626,17 @@
             });
         })
 
+        $('#inventorytypeid').change(function(){
+
+                const selectedText = $(this).find('option:selected').text();
+
+                    $('#typeid option').filter(function () {
+                        return $(this).text().trim() === selectedText;
+                    }).prop('selected', true);
+        
+        });
+           
+
        
         function openmodal(id, qtypending, partnumber)
         {
@@ -586,8 +645,78 @@
             $('#qtyreceive').val(qtypending);
             $('#qtypending').val(qtypending);
             $('#partnoid').val(partnumber);
+
+
+
+            var companyclient = $('#companyclient option:selected').val();
+
             
 
+            //we search all inventory cuantity for this companyclient and part number
+             showSpinner();
+
+            $.ajax({url:"@Url.Action("checkInventoryByPartNumber", "ASN")",data:{companyclient:companyclient, partnumber:partnumber},type:"post"})
+            .done(function(data){
+            
+                if (data != null)
+                {
+
+                    if (data.status == null)
+                    {
+                        if (data.listinventory != null)
+                        {
+                           
+                            JsonArrayInventory = [];
+
+                            for (var i = 0; i < data.listinventory.length; i++) 
+                            {
+
+                                var f = data.listinventory[i];
+
+                                JsonArrayInventory.push({
+                                        binname: f.binname,
+                                        typename: f.inventoryname,
+                                        statusname :f.statusname,
+                                        qty: f.qty
+                                });
+                             }
+
+                             $('#tableuserbinitems').DataTable({
+                                 data: JsonArrayInventory,
+                                 destroy: true,
+                                 //scrollX: true,
+                                 processing: true,
+                                 deferRender: true,
+                                 stateSave: true,
+                                 autoWidth: false,
+                                 responsive: false,
+                                 pageLength: 10,
+                                 "bPaginate": false,
+                                 "bLengthChange": false,
+                                 "bFilter": true,
+                                 "bInfo": false,
+                                 "bAutoWidth": false,
+                                 "searching": false,
+                                 columns: [
+                                     { "data": "binname" },
+                                     { "data": "typename" },
+                                     { "data": "statusname" },
+                                     { "data": "qty", "class":"derecha" },
+                                 ]
+                             });
+                        }
+                    }
+                    else
+                    {
+                         showToast("info", data.status);
+                    }
+                }
+            
+            })
+            .fail(function(){})
+            .always(function(){
+             hideSpinner();
+            });
             // Mostrar el modal 
             const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
             modal.show();
@@ -598,12 +727,12 @@
           async function addqtybin() {
 
 
-                 const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
+           const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
 
-         if (!ok) return; 
+           if (!ok) return; 
 
 
-             var binid = $('#binselid option:selected').val();
+           var binid = $('#binselid option:selected').val();
 
               //$('#divprocess').hide();
 
@@ -644,6 +773,8 @@
 
              var typename = $('#typeid option:selected').text();
 
+              var statusname = $('#statusid option:selected').text();
+
              if (parseInt(totalpending) < (parseInt(totalacum) + parseInt(qtybin))) {
 
                  alert('amount received is greater than the amount pending');
@@ -655,11 +786,11 @@
 
              var partno = $('#partnoid').val();
 
-
+              showSpinner();
 
              $.ajax({
                  url: "@Url.Action("addqtybin", "ASN")",
-                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid }, type: "post"
+                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid, statusname : statusname }, type: "post"
              })
                  .done(function (data) {
 
@@ -682,8 +813,6 @@
                              return this.defaultSelected;
                          });
 
-
-
                          $('#qtybintotal').val(data.totalqty);
 
                          var lineid = $('#lineid').val();
@@ -699,36 +828,48 @@
                              for (var i = 0; i < data.listbines.length; i++) {
 
                                  var f = data.listbines[i];
-
-
-
+                                 
                                  JsonArrayBines.push({
                                      actions: '<a href="#"onclick="deletedetailAsnReceiving(\'' + f.id + '\',\'' + f.partnumber + '\',' + f.inventorytype + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-
                                      id: f.id,
                                      partno: f.partnumber,
+                                     qty: f.qty,
                                      type: f.inventorytype,
-                                     binname: f.tagname,
                                      typename: f.typename,
-                                     qty: f.qty
-
+                                     binid : f.binid,
+                                     binname: f.tagname,
+                                     statusid : f.statusid,
+                                     statusname :f.statusname
                                  });
                              }
 
-
                              $('#tableuserbines').DataTable({
-
                                  data: JsonArrayBines,
                                  destroy: true,
                                  //scrollX: true,
+                                 processing: true,
+                                 deferRender: true,
+                                 stateSave: true,
+                                 autoWidth: false,
+                                 responsive: false,
+                                 pageLength: 10,
+                                 "bPaginate": false,
+                                 "bLengthChange": false,
+                                 "bFilter": true,
+                                 "bInfo": false,
+                                 "bAutoWidth": false,
+                                 "searching": false,
                                  columns: [
                                      { "data": "actions" },
                                      { "data": "id" },
                                      { "data": "partno" },
+                                     { "data": "qty", "class":"derecha" },
                                      { "data": "type","class":"ocultar"},
                                      { "data": "typename" },
+                                     { "data": "binid","class":"ocultar"},
                                      { "data": "binname" },
-                                     { "data": "qty", "class":"derecha" },
+                                     { "data": "statusid","class":"ocultar"},
+                                     { "data": "statusname" },
                                  ],
                                  "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
                                      $(nRow).attr('id', "ln-" + aData.id);
@@ -754,26 +895,26 @@
                                     //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
                                     textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
                                 }
-
-
-
-
-                                 JsonArrayShipList.push({
+                            
+                                JsonArrayShipList.push({
                                      actions: textaction,
-                                      line: f.lineNum,
-                                     itemid: f.inventoryItemId,
-                                     itemnumber: f.itemNumber,
-                                     itemdescription: f.itemDescription,
+                                     id : f.id,
+                                     itemid : f.itemId,
+                                     partnumber : f.itemNumber,
+                                     line: f.lineId,
                                      qtyshipped: f.quantityShipped,
-                                     qtyreceived: f.quantityReceived,//'<input type="number" class="alinearderecha" id="rec-' + f.lineNum + '"  value="' + f.quantityReceived + '"/>',
-                                     qtypending: f.qtypending,
-                                     thereisdistribution: f.thereisdistribution
-                                    // qtyinprocess: '<label id="lab-' + f.lineNum + '">0</label>'
-
+                                     qtyreceived: f.quantityReceived,
+                                     qtypending: f.quantityPending,
+                                     itemdescription: f.itemDescription,
+                                     attribute2 : f.attributte2,
+                                     datetimeinserted : f.dateTimeInserted,
+                                     processed : f.processed
+                                     //,
+                                    // thereisdistribution : f.thereisdistribution
                                  });
                              }
 
-
+                            
                              showbindetail(JsonArrayShipList);
 
                          }
@@ -781,6 +922,8 @@
 
                      }
                      else {
+
+
 
                          swal({
                              title: "Warning!",
@@ -798,37 +941,44 @@
                          });
                      }
 
-                 }).fail(function () { }).always(function () { });
+                 }).fail(function () { }).always(function () { hideSpinner(); });
 
          }
 
            function showbindetail(jsondata)
         {
 
-             $('#tableuserzebraasndet').DataTable({
+             $('#tableuser').DataTable({
 
                 data: jsondata,
                 destroy: true,
                 scrollX: true,
                 columns: [
-                    { "data": "actions" },
+                   {
+                    data: null,
+                        render: function (data, type, row) {
+                            return buildDropdown(row);
+                        }
+                    },
+                    { "data": "id" },
+                    { "data": "itemid"},
+                    { "data": "partnumber" },
                     { "data": "line" },
-                    { "data": "itemid" ,"class":"ocultar"},
-                    { "data": "itemnumber" },
                     { "data": "qtyshipped", "class":"derecha" },
                     { "data": "qtyreceived", "class":"derecha" },
                     { "data": "qtypending", "class":"derecha" },
-                   // { "data": "qtyinprocess" , "class":"derecha"},
                     { "data": "itemdescription" },
-
+                    { "data": "attribute2" },
+                    { "data": "datetimeinserted" },
+                    { "data": "processed" },
                 ],
 
                     createdRow: function (row, data, dataIndex) {
                     if (data.qtyshipped !== undefined && data.qtyreceived !== undefined) {
                         // Seleccionamos las celdas de qtyshipped y qtyreceived
-                        let $qtyShippedCell = $('td', row).eq(4);
-                        let $qtyReceivedCell = $('td', row).eq(5);
-                        let $qtyPendingCell = $('td', row).eq(6);
+                        let $qtyShippedCell = $('td', row).eq(5);
+                        let $qtyReceivedCell = $('td', row).eq(6);
+                        let $qtyPendingCell = $('td', row).eq(7);
 
                         // Primero limpiamos clases previas por si la fila se vuelve a redibujar
                         $qtyShippedCell.removeClass('text-success text-danger fw-bold');
@@ -873,6 +1023,26 @@
                 }
             });
 
+        }
+
+        function buildDropdown(item) {
+            return `
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a class="dropdown-item" href="/TuController/Edit/${item.id}">✏️ Edit</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/TuController/Details/${item.id}">👁️ Details</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" onclick="openmodal(${item.lineId}, ${item.quantityPending}, '${item.itemNumber}')"> 📦 Bins</a>
+                    </li>
+                </ul>
+            </div>`;
         }
 
     </script>

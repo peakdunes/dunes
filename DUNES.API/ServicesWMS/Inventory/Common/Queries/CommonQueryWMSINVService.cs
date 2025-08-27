@@ -1,7 +1,11 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.API.DTOs.B2B;
+using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelsWMS.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 
 namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
@@ -251,6 +255,68 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(info, "OK");
         }
+        /// <summary>
+        /// get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        {
 
+            List<WMSInventoryDetailByPartNumberDto> objlist = new List<WMSInventoryDetailByPartNumberDto>();
+
+            var info = await _repository.GetInventoryByItem(companyid, companyClient, partnumber);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<List<WMSInventoryDetailByPartNumberDto>>($"there is not inventory for this company client {companyClient} and this part number {partnumber}");
+            }
+
+            foreach (var item in info)
+            {
+                WMSInventoryDetailByPartNumberDto objdet = new WMSInventoryDetailByPartNumberDto();
+
+                objdet.Idcompany = item.Idcompany;
+                objdet.companyclientid = item.Idcompanyclient!;
+                objdet.locationid = item.Idlocation;
+                objdet.locationname = item.IdlocationNavigation.Name!;
+                objdet.qty = item.TotalQty;
+                objdet.binid = item.Idbin;
+                objdet.binname = item.IdbinNavigation.TagName!;
+                objdet.inventorytypeid = item.Idtype;
+                objdet.inventoryname = item.IdtypeNavigation.Name!;
+                objdet.statusid = item.Idstatus;
+                objdet.statusname = item.IdstatusNavigation.Name!;
+                objdet.rackid = item.Idrack;
+                objdet.rackname = item.IdrackNavigation.Name!;
+
+                objlist.Add(objdet);
+
+            }
+
+
+            return ApiResponseFactory.Ok(objlist, "OK");
+        }
+        /// <summary>
+        /// Gell Item Bins distribution
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        {
+     
+            var info = await _repository.GetItemBinsDistribution(companyid, companyClient, partnumber);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<List<Itemsbybin>>($"there is not distribution for this company client {companyClient} and this part number {partnumber}");
+            }
+            
+            return ApiResponseFactory.Ok(info, "OK");
+        }
     }
 }

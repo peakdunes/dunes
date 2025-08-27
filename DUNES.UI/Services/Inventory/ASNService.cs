@@ -133,5 +133,30 @@ namespace DUNES.UI.Services.Inventory
             return await resp.ReadAsApiResponseAsync<List<itemstatusDto>>(ct);
         }
 
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string parnumber, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/inventoryByPartNumber/{companyid}/{companyClient}/{parnumber}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSInventoryDetailByPartNumberDto>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSItemByBinsDto>>> GetItemBinsDistribution(int companyid, string companyClient, string parnumber, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/itemBinDistribution/{companyid}/{companyClient}/{parnumber}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSItemByBinsDto>>(ct);
+        }
+
+        
     }
 }

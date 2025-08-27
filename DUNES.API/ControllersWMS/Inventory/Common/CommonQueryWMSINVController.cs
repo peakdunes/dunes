@@ -1,7 +1,9 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelsWMS.Transactions;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -285,11 +287,49 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         }
 
+        /// <summary>
+        /// Get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<WMSInventoryDetailByPartNumberDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("inventoryByPartNumber/{companyid}/{companyClient}/{partnumber}")]
+
+        public async Task<IActionResult> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        {
+
+            var response = await _service.GetInventoryByItem(companyid, companyClient, partnumber);
+
+            return StatusCode(response.StatusCode, response);
+
+        }
 
 
+        /// <summary>
+        /// Get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<Itemsbybin>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("itemBinDistribution/{companyid}/{companyClient}/{partnumber}")]
 
+        public async Task<IActionResult> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        {
 
+            var response = await _service.GetItemBinsDistribution(companyid, companyClient, partnumber);
 
+            return StatusCode(response.StatusCode, response);
 
+        }
+
+        
     }
 }

@@ -10,6 +10,8 @@ using DUNES.UI.WiewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -45,7 +47,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             //we create a session variable to load all bins item distribution
 
             List<BinsToLoadTm> listbinespartno = new List<BinsToLoadTm>();
-            
+
             HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(listbinespartno));
 
 
@@ -94,6 +96,16 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     return View(objresult);
                 }
 
+                if (infoasn.Data.itemDetail.Count() <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "there is not part number detail for this ASN", MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+
+                HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(infoasn.Data.itemDetail));
+
+
                 ViewData["companies"] = new SelectList(listclients.Data, "CompanyId", "CompanyId");
 
                 objresult.asdDto = infoasn.Data!;
@@ -104,7 +116,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             }, ct);
         }
 
-      
+
 
 
         [HttpPost]
@@ -115,8 +127,6 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
 
             ASNProcessInformationDto objinformation = new ASNProcessInformationDto();
-
-            int companyid = _companyDefault;
 
             List<WMSBinsDto> listbinesresult = new List<WMSBinsDto>();
 
@@ -130,7 +140,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             List<WMSInventoryTypeDto> listwmsinventorytypesresult = new List<WMSInventoryTypeDto>();
 
-            if (companyid <= 0 || string.IsNullOrWhiteSpace(companyclient))
+            if (_companyDefault <= 0 || string.IsNullOrWhiteSpace(companyclient))
                 return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
 
             // 2) Token (estándar de tu BaseController)
@@ -142,7 +152,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             {
                 //load bins
 
-                var listbines = await _ASNService.GetAllActiveBinsByCompanyClient(companyid, companyclient, token, ct);
+                var listbines = await _ASNService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listbines.Data.Count <= 0)
                 {
@@ -164,7 +174,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load concepts
 
-                var listconcepts = await _ASNService.GetAllActiveConceptsByCompanyClient(companyid, companyclient, token, ct);
+                var listconcepts = await _ASNService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listconcepts.Data.Count <= 0)
                 {
@@ -186,7 +196,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load input transactions
 
-                var listtransactions = await _ASNService.GetAllActiveInputTransactionsByCompanyClient(companyid, companyclient, token, ct);
+                var listtransactions = await _ASNService.GetAllActiveInputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listtransactions.Data.Count <= 0)
                 {
@@ -231,7 +241,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load WMS inventory types
 
-                var listwmsinventorytypes = await _ASNService.GetAllActiveWmsInventoryTypes(companyid, companyclient, token, ct);
+                var listwmsinventorytypes = await _ASNService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient, token, ct);
 
                 if (listwmsinventorytypes.Data.Count <= 0)
                 {
@@ -254,7 +264,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load WMS item status
 
-                var listitemstatus = await _ASNService.GetAllActiveItemStatus(companyid, companyclient, token, ct);
+                var listitemstatus = await _ASNService.GetAllActiveItemStatus(_companyDefault, companyclient, token, ct);
 
                 if (listitemstatus.Data.Count <= 0)
                 {
@@ -275,6 +285,71 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 objinformation.listitemstatus = listitemstatusresult;
 
 
+                //we check if the items list have a assigned bin in WMS system
+
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+
+
+                var listItemsBinsByProcess = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+
+                if (listaPartNumber!.Count > 0)
+                {
+
+                    List<BinsToLoadTm> listbintoload = new List<BinsToLoadTm>();
+
+
+
+                    foreach (var item in listaPartNumber!)
+                    {
+                        string itemname = string.Empty;
+
+                        if (!item.ItemNumber!.ToString().Contains("ZEBRA"))
+                        {
+                            itemname = "ZEBRA-" + item.ItemNumber.ToString();
+                        }
+                        else
+                        {
+                            itemname = item.ItemNumber.ToString();
+                        }
+                        var listdistribution = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, itemname, token, ct);
+
+                        if (listdistribution.Data.Count > 0)
+                        {
+                            foreach (var info in listdistribution.Data)
+                            {
+
+
+                                //BinsToLoadTm objdet = new BinsToLoadTm();
+
+                                //objdet.Id = info.binid;
+
+                                //objdet.inventorytype = info.binid;
+
+                                //objdet.partnumber = info.binid;
+
+                                //objdet.tagname = info.binid;
+
+                                //objdet.typename = info.binid;
+
+                                //objdet.qty = info.binid;
+
+                                //objdet.lineid = item.LineId;
+
+                                //objdet.statusid = info.binid;
+
+                                //objdet.binid = info.binid;
+
+                                //objdet.statusname { get; set; }
+
+                            }
+
+
+                        }
+
+
+                    }
+                }
+
                 return Ok(new
                 {
                     message = "OK",
@@ -292,7 +367,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
 
         [HttpPost]
-        public IActionResult addqtybin(int binid, int typeid, int qtybin, string partno, string tagname, string typename, int lineid, int statusid)
+        public IActionResult addqtybin(int binid, int typeid, int qtybin, string partno, string tagname, string typename, int lineid, int statusid, string statusname)
 
 
         {
@@ -316,8 +391,10 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     objdet.partnumber = partno;
                     objdet.typename = typename;
                     objdet.qty = qtybin;
-                    objdet.lineasnid = lineid;
+                    objdet.lineid = lineid;
                     objdet.statusid = statusid;
+                    objdet.binid = binid;
+                    objdet.statusname = statusname;
 
                     totalqty += objdet.qty;
 
@@ -349,7 +426,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         objdet.partnumber = partno.Trim();
                         objdet.typename = typename.Trim();
                         objdet.qty = qtybin;
-                        objdet.lineasnid = lineid;
+                        objdet.lineid = lineid;
                         objdet.statusid = statusid;
 
                         lista.Add(objdet);
@@ -377,30 +454,28 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 }
 
 
-                var listaPartNumber = "";
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
-                //var listaPartNumber = JsonConvert.DeserializeObject<List< els.TzebB2bAsnLineItemTblItemInbConsReq>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                foreach (var detail in listaPartNumber)
+                {
+                    foreach (var item in lista)
+                    {
+                        if (item.lineid == detail.LineId)
+                        {
 
-                //foreach (var detail in listaPartNumber)
-                //{
-                //    foreach (var item in lista)
-                //    {
-                //        if (item.lineasnid == detail.LineNum)
-                //        {
+                            detail.QuantityPending = item.qty;
+                            detail.thereisdistribution = true;
+                            break;
+                        }
 
-                //            detail.qtypending = item.qty;
-                //            detail.thereisdistribution = true;
-                //            break;
-                //        }
+                    }
+                }
 
-                //    }
-                //}
-
-                // HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
+                HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
 
                 HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(lista));
 
-                return new ObjectResult(new { status = errormessage, listbines = lista.Where(x => x.lineasnid == lineid), totalqty = totalqty, thereisdata = thereisdata, listapartnumber = listaPartNumber });
+                return new ObjectResult(new { status = errormessage, listbines = lista.Where(x => x.lineid == lineid), totalqty = totalqty, thereisdata = thereisdata, listapartnumber = listaPartNumber });
 
 
 
@@ -409,6 +484,39 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             {
                 return new ObjectResult(new { status = errormessage });
             }
+        }
+
+
+        /// <summary>
+        /// Get current inventory for a client company and part number
+        /// </summary>
+        /// <param name="companyclient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+
+        [HttpPost]
+
+        public async Task<IActionResult> checkInventoryByPartNumber(string companyclient, string partnumber, CancellationToken ct)
+        {
+
+            var token = GetToken();
+
+            partnumber = "ZEBRA-16H.062SC.0004";
+
+
+            if (token == null)
+                return RedirectToLogin();
+
+            return await HandleAsync(async ct =>
+            {
+
+                var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumber, token, ct);
+
+                return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data });
+
+            }, ct);
+
+
         }
 
     }

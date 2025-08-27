@@ -16,7 +16,7 @@ namespace DUNES.API.ReadModels.Inventory
         /// <summary>
         /// this brings ASN item detail
         /// </summary>
-        public required List<TzebB2bAsnLineItemTblItemInbConsReqsLog> asnlistdetail { get; set; }    
+        public required List<TzebB2bAsnLineItemTblItemInbConsReqs> asnlistdetail { get; set; }    
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelsWMS.Transactions;
 
 namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 {
@@ -127,6 +128,25 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         Task<List<Itemstatus>> GetAllItemStatus(int companyid, string companyClient);
 
+
+        /// <summary>
+        /// get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        Task<List<Inventorydetail>> GetInventoryByItem(int companyid, string companyClient, string partnumber);
+        
+
+        /// <summary>
+        /// get actual item bin distribution 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber);
 
 
     }

@@ -1,4 +1,7 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.API.DTOs.B2B;
+using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelsWMS.Transactions;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
@@ -125,6 +128,28 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Itemstatus>>> GetAllItemStatus(int companyid, string companyClient);
+
+
+        /// <summary>
+        /// get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string partnumber);
+
+
+        /// <summary>
+        /// Get Item Bins Distribution
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber);
+
+
 
     }
 }

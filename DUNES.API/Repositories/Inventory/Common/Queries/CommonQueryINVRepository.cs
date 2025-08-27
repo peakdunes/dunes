@@ -41,7 +41,7 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
                 return null;
             }
 
-            var infodetail = await _context.TzebB2bAsnLineItemTblItemInbConsReqsLog.Where(x => x.AsnOutHdrDetItemId == infoHdr.Id).ToListAsync();
+            var infodetail = await _context.TzebB2bAsnLineItemTblItemInbConsReqs.Where(x => x.AsnOutHdrDetItemId == infoHdr.Id).ToListAsync();
 
             if (infodetail.Count() <= 0)
             {

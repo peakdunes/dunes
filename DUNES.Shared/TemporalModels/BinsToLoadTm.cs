@@ -25,8 +25,13 @@ namespace DUNES.Shared.TemporalModels
 
         public int qty { get; set; }
 
-        public int lineasnid { get; set; }
+        public int lineid { get; set; }
 
         public int statusid { get; set; }
+
+        public int binid { get; set; }
+
+        [MaxLength(100)]
+        public string statusname { get; set; }
     }
 }

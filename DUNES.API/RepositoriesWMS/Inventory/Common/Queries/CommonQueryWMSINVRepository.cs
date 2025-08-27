@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelsWMS.Transactions;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
 
@@ -218,6 +219,47 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return listitemstatus;
         }
+        /// <summary>
+        /// get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        public async Task<List<Inventorydetail>> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        {
+            var listinventory = await _wmscontext.Inventorydetail
+               .Include(x => x.IdbinNavigation)
+               .Include(x => x.IdstatusNavigation)
+               .Include(x => x.IdtypeNavigation)
+               .Include(x => x.IdlocationNavigation)
+               .Include(x => x.IdrackNavigation)
+               .Include(x => x.IdlocationNavigation)
+              .Where(x => x.Idcompany == companyid
+                  && x.Idcompanyclient == companyClient
+                  && x.Iditem == partnumber
 
+              ).ToListAsync();
+
+            return listinventory;
+        }
+        /// <summary>
+        /// Items bin distribution
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        public async Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        {
+            var listdistribution = await _wmscontext.Itemsbybin
+             .Where(x => x.CompanyId == companyid
+                 && x.Idcompanyclient == companyClient
+                 && x.Itemid == partnumber
+
+             ).ToListAsync();
+
+            return listdistribution;
+        }
     }
 }

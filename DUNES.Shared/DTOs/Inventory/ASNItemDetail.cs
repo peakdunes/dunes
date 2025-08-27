@@ -13,8 +13,8 @@ namespace DUNES.Shared.DTOs.Inventory
         [Display(Name = "Id")]
         public int Id { get; set; }
 
-        [Display(Name = "Header Number")]
-        public int ADNHdrId { get; set; }
+        [Display(Name = "Item Id")]
+        public int ItemId { get; set; }
 
         [MaxLength(50)]
         [Display(Name = "Part Number")]
@@ -44,5 +44,11 @@ namespace DUNES.Shared.DTOs.Inventory
 
         [Display(Name = "Date Time Inserted")]
         public DateTime DateTimeInserted { get; set; }
+
+        [Display(Name = "There is Distribution")]
+        public bool thereisdistribution { get; set; }
+
+        [Display(Name = "Processed")]
+        public bool processed { get; set; }
     }
 }
