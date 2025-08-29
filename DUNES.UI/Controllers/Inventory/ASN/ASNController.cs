@@ -10,10 +10,12 @@ using DUNES.UI.WiewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata;
 using System.Threading.Tasks;
 
 namespace DUNES.UI.Controllers.Inventory.ASN
@@ -428,9 +430,10 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         objdet.qty = qtybin;
                         objdet.lineid = lineid;
                         objdet.statusid = statusid;
+                        objdet.binid = binid;
+                        objdet.statusname = statusname;
 
                         lista.Add(objdet);
-
                     }
                 }
 
@@ -458,18 +461,29 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 foreach (var detail in listaPartNumber)
                 {
+                    detail.QuantityPending = 0;
+                    detail.thereisdistribution = false;
+
                     foreach (var item in lista)
                     {
                         if (item.lineid == detail.LineId)
                         {
 
-                            detail.QuantityPending = item.qty;
+                            detail.QuantityPending += item.qty;
                             detail.thereisdistribution = true;
                             break;
                         }
 
                     }
                 }
+
+                int contador = 1;
+                foreach (var info in lista)
+                {
+                    info.Id = contador++;
+
+                }
+
 
                 HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
 
@@ -487,6 +501,73 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> deleteqtybin(int id, CancellationToken ct)
+
+
+        {
+            string errormessage = "OK";
+
+
+            return await HandleAsync(async ct =>
+            {
+
+                List<BinsToLoadTm> objlist = new List<BinsToLoadTm>();
+
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+
+                int totalqty = 0;
+
+                foreach (var item in lista)
+                {
+                    if (item.Id != id)
+                    {
+                        objlist.Add(item);
+                    }
+                }
+
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+
+                foreach (var detail in listaPartNumber)
+                {
+                    detail.QuantityPending = 0;
+                    detail.thereisdistribution = false;
+
+                    foreach (var item in objlist)
+                    {
+                        if (item.lineid == detail.LineId)
+                        {
+                            detail.QuantityPending += item.qty;
+                            detail.thereisdistribution = true;
+                            break;
+                        }
+                    }
+                }
+
+
+
+
+                int contador = 1;
+                foreach (var info in lista)
+                {
+                    info.Id = contador++;
+
+                }
+
+                HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
+
+                HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(objlist));
+
+                return new ObjectResult(new { status = errormessage, listbines = lista.Where(x => x.lineid == id), totalqty = totalqty, listapartnumber = listaPartNumber });
+
+            }, ct);
+
+
+        }
+
+
+
+
         /// <summary>
         /// Get current inventory for a client company and part number
         /// </summary>
@@ -496,12 +577,12 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
         [HttpPost]
 
-        public async Task<IActionResult> checkInventoryByPartNumber(string companyclient, string partnumber, CancellationToken ct)
+        public async Task<IActionResult> checkInventoryByPartNumber(string companyclient, string partnumber, int lineid, CancellationToken ct)
         {
 
             var token = GetToken();
 
-            partnumber = "ZEBRA-16H.062SC.0004";
+            // partnumber = "ZEBRA-16H.062SC.0004";
 
 
             if (token == null)
@@ -510,14 +591,104 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return await HandleAsync(async ct =>
             {
 
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+
+
                 var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumber, token, ct);
 
-                return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data });
+                return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, listbines = lista.Where(x => x.lineid == lineid) });
 
             }, ct);
 
 
         }
 
+
+        [HttpPost]
+
+        public async Task<IActionResult> BinDistributionDefault(string companyclientid, int typeid, string typename, int statusid, string statusname, CancellationToken ct)
+        {
+
+            List<BinsToLoadTm> newListDistribution = new List<BinsToLoadTm>();
+
+            string errormessage = string.Empty;
+
+            var token = GetToken();
+
+            if (token == null)
+                return RedirectToLogin();
+            return await HandleAsync(async ct =>
+            {
+
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+
+                foreach (var detail in listaPartNumber!)
+                {
+
+                    detail.QuantityPending = 0;
+
+                    string itemsel = string.Empty;
+
+                    if (!itemsel.ToString().Contains("ZEBRA"))
+                    {
+                        itemsel = "ZEBRA-" + detail.ItemNumber!.Trim();
+                    }
+
+                    var listdist = await _ASNService.GetItemBinsDistribution(_companyDefault, companyclientid, itemsel, token, ct);
+
+                    errormessage = listdist.Message.Trim();
+
+                    if (listdist.Data.Count > 0)
+                    {
+
+                        foreach (var item in listdist.Data)
+                        {
+
+                            BinsToLoadTm objdet = new BinsToLoadTm();
+
+                            objdet.Id = detail.Id;
+                            objdet.tagname = item.TagName;
+                            objdet.inventorytype = typeid;
+                            objdet.partnumber = item.Itemid;
+                            objdet.typename = typename;
+                            objdet.qty = detail.QuantityShipped;
+                            objdet.lineid = detail.LineId;
+                            objdet.statusid = statusid;
+                            objdet.binid = item.BinesId;
+                            objdet.statusname = statusname;
+
+                            newListDistribution.Add(objdet);
+
+                            detail.thereisdistribution = true;
+
+
+                        }
+
+                        detail.QuantityPending = detail.QuantityShipped;
+                    }
+
+                }
+
+                int contador = 1;
+                foreach (var info in newListDistribution)
+                {
+                    info.Id = contador++;
+
+                }
+
+                HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(newListDistribution));
+
+                HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
+
+                return new ObjectResult(new { status = errormessage, listapartnumber = listaPartNumber });
+
+            }, ct);
+            //HttpContext.Session.SetString("listPartNumberDetail", JsonConvert.SerializeObject(listaPartNumber));
+
+
+
+            //   return new ObjectResult(new { status = errormessage, listbines = lista.Where(x => x.lineid == lineid), totalqty = totalqty, thereisdata = thereisdata, listapartnumber = listaPartNumber });
+
+        }
     }
 }

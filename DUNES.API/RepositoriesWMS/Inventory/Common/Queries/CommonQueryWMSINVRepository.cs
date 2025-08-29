@@ -3,6 +3,7 @@ using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 {
@@ -252,12 +253,19 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
         {
-            var listdistribution = await _wmscontext.Itemsbybin
-             .Where(x => x.CompanyId == companyid
+            var listdistribution = await (from enc in _wmscontext.Itemsbybin.Where(x => x.CompanyId == companyid
                  && x.Idcompanyclient == companyClient
-                 && x.Itemid == partnumber
-
-             ).ToListAsync();
+                 && x.Itemid == partnumber)
+                join det in _wmscontext.Bines on enc.BinesId equals det.Id
+                select new Itemsbybin
+                {
+                   Id = enc.Id,
+                   CompanyId = companyid,
+                   Idcompanyclient = companyClient,
+                   BinesId = enc.BinesId,
+                   Itemid = enc.Itemid,
+                   tagName = det.TagName!
+                }).ToListAsync();
 
             return listdistribution;
         }

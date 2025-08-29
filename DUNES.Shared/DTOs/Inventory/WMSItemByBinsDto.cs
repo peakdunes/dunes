@@ -17,5 +17,7 @@ namespace DUNES.Shared.DTOs.Inventory
         public int BinesId { get; set; }
 
         public string Itemid { get; set; } = null!;
+
+        public string TagName { get; set; } = null!;
     }
 }
