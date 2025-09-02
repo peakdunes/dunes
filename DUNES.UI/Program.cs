@@ -2,7 +2,8 @@
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
-using DUNES.UI.Services.Inventory;
+using DUNES.UI.Services.Inventory.ASN;
+using DUNES.UI.Services.Inventory.PickProcess;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,6 +38,9 @@ builder.Services.AddControllersWithViews(options =>
 
 builder.Services.AddScoped<IMenuClientService, MenuClientService>();
 builder.Services.AddScoped<IASNService, ASNService>();
+builder.Services.AddScoped<IPickProcessService, PickProcessService>();
+
+
 
 // Necesario para el fallback de TempData si no hay Controller
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();

@@ -2,13 +2,13 @@
 using DUNES.Shared.Models;
 using DUNES.Shared.WiewModels.Inventory;
 
-namespace DUNES.API.Services.Inventory.Common.Queries
+namespace DUNES.API.Services.Inventory.ASN.Queries
 {
 
     /// <summary>
     /// All common Inventory queries (ASN - PickProcess
     /// </summary>
-    public interface ICommonQueryINVService
+    public interface ICommonQueryASNINVService
     {
         /// <summary>
         /// Get all information about a ASN
@@ -20,12 +20,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
 
 
 
-        /// <summary>
-        /// Get all information about a Pick Process
-        /// </summary>
-        /// <param name="DeliveryId"></param>
-        /// <returns></returns>
-        Task<ApiResponse<PickProcessDto>> GetPickProcessAllInfo(string DeliveryId);
+     
     }
 
 }

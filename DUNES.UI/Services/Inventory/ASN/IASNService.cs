@@ -3,7 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DUNES.UI.Services.Inventory
+namespace DUNES.UI.Services.Inventory.ASN
 {
     public interface IASNService
     {

@@ -6,7 +6,7 @@ using DUNES.UI.Infrastructure;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace DUNES.UI.Services.Inventory
+namespace DUNES.UI.Services.Inventory.ASN
 {
     public class ASNService : IASNService
     {

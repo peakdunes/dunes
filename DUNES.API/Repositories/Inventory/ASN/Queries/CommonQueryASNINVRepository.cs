@@ -3,12 +3,12 @@ using DUNES.API.ReadModels.Inventory;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
 
-namespace DUNES.API.Repositories.Inventory.Common.Queries
+namespace DUNES.API.Repositories.Inventory.ASN.Queries
 {
     /// <summary>
     /// Common Inventory Queries
     /// </summary>
-    public class CommonQueryINVRepository : ICommonQueryINVRepository
+    public class CommonQueryASNINVRepository : ICommonQueryASNINVRepository
     {
 
         private readonly AppDbContext _context;
@@ -19,7 +19,7 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// </summary>
         /// <param name="context"></param>
         /// <param name="wmscontext"></param>
-        public CommonQueryINVRepository(AppDbContext context, appWmsDbContext wmscontext)
+        public CommonQueryASNINVRepository(AppDbContext context, appWmsDbContext wmscontext)
         {
             _context = context;
             _wmscontext = wmscontext;
@@ -60,37 +60,6 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
 
            
         }
-        /// <summary>
-        /// Get ALl information about Pick Process
-        /// </summary>
-        /// <param name="DeliveryId"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<PickProcessRead> GetPickProcessAllInfo(string DeliveryId)
-        {
-            var infoHdr = _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.FirstOrDefault(x => x.DeliveryId == DeliveryId);
-
-            if (infoHdr == null)
-            {
-                return null;
-            }
-
-            var infodetail = await _context.TzebB2bPSoLineItemTblItemInbConsReqsLog.Where(x => x.PSoWoHdrTblItemId == infoHdr.Id).ToListAsync();
-
-            if (infodetail.Count() <= 0)
-            {
-                return null;
-            }
-
-            PickProcessRead objdet = new PickProcessRead
-            {
-                pickHdr = infoHdr,
-                pickdetails = infodetail
-
-            };
-
-
-            return objdet;
-        }
+      
     }
 }

@@ -659,8 +659,7 @@
         function openmodal(id, qtypending, partnumber)
         {
 
-            alert(qtypending);
-
+          
             $('#lineid').val(id);
             $('#qtyreceive').val(qtypending);
             $('#qtypending').val(qtypending);
@@ -773,33 +772,41 @@
           async function addqtybin() {
 
 
-           const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
+            const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
 
-           if (!ok) return;
+            if (!ok) return;
 
 
-           var binid = $('#binselid option:selected').val();
+            var binid = $('#binselid option:selected').val();
 
-              //$('#divprocess').hide();
+         
 
-             if (binid == 'Select Bin') {
+             if (binid == '-- Select bin --' || binid == null || binid == '') 
+             {
 
                  alert('Bin is required');
                  return false;
              }
-
-
-
+                        
              var typeid = $('#typeid option:selected').val();
-
-
-             if (typeid == 'Select Type') {
+                         
+             if (typeid == '-- Select Type --' || typeid == null || typeid == '') 
+             {
 
                  alert('Inventory Type is required');
                  return false;
              }
 
              var statusid = $('#statusid option:selected').val();
+
+           
+             if (statusid == '-- Select Status --' || statusid == null || statusid == '') 
+             {
+
+                 alert('Item status is required');
+                 return false;
+             }
+
 
              var qtybin = $('#qtyreceive').val();
 
@@ -819,9 +826,11 @@
 
              var typename = $('#typeid option:selected').text();
 
-              var statusname = $('#statusid option:selected').text();
+             var statusname = $('#statusid option:selected').text();
 
-             if (parseInt(totalpending) < (parseInt(totalacum) + parseInt(qtybin))) {
+           
+
+             if (parseInt(totalpending) < parseInt(qtybin)) {
 
                  alert('amount received is greater than the amount pending');
                  $('#qtyreceive').focus();
@@ -847,7 +856,12 @@
                              $('#divprocess').show();
                          }
 
-                         $('#qtyreceive').val("0");
+                        // $('#qtyreceive').val("0");
+
+                           $('#qtyreceive').val(data.totalpendind);
+
+                           $('#qtypending').val(data.totalpendind);
+                           
 
                          //se reinician los select de bines y tipos de inventario
 
@@ -1113,11 +1127,9 @@
                     Actions
                 </button>
                 <ul class="dropdown-menu">
+                   
                     <li>
-                        <a class="dropdown-item" href="/TuController/Edit/${item.id}">✏️ Edit</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="/TuController/Details/${item.id}">👁️ Details</a>
+                        <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
                     </li>
                     <li>
                         <a class="dropdown-item" onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')"> 📦 Bins</a>
@@ -1251,6 +1263,11 @@
                              return this.defaultSelected;
                          });
 
+
+                         $('#qtyreceive').val(data.totalinbins);
+                         
+                         $('#qtypending').val(data.totalinbins);
+
                          $('#qtybintotal').val(data.totalqty);
 
                          var lineid = $('#lineid').val();
@@ -1335,6 +1352,133 @@
 
                  }).fail(function () { }).always(function () { hideSpinner(); });
         }
+
+
+
+        async function deleteAllBinsDistribution(lineid)
+        {
+
+                 const ok = await confirmAction('Do you want to delete all bins  distribution for this line : ' + lineid + ' ?')
+
+                 if(!ok) return;
+
+
+                  showSpinner();
+
+                   $.ajax({
+                       url: "@Url.Action("deleteAllBinsDistribution", "ASN")",
+                       data: { lineid:lineid }, type: "post"
+                   })
+                       .done(function (data) {
+
+                           if (data.status == "OK") {
+
+                               if (data.thereisdata)
+                               {
+                                   $('#divprocess').show();
+                               }
+
+                               $('#qtyreceive').val("0");
+
+                               //se reinician los select de bines y tipos de inventario
+
+                               $('#binselid option').prop('selected', function () {
+                                   return this.defaultSelected;
+                               });
+
+                               $('#typeid option').prop('selected', function () {
+                                   return this.defaultSelected;
+                               });
+
+
+                               $('#qtyreceive').val(data.totalinbins);
+
+                               $('#qtypending').val(data.totalinbins);
+
+                               $('#qtybintotal').val(data.totalqty);
+
+                               var lineid = $('#lineid').val();
+
+
+                               $('#lab-' + lineid).text(data.totalqty);
+
+
+                               if (data.listbines != null) {
+
+                                   var JsonArrayBines = [];
+
+                                   for (var i = 0; i < data.listbines.length; i++) {
+
+                                       var f = data.listbines[i];
+
+                                       JsonArrayBines.push({
+                                           actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                           id: f.id,
+                                           partno: f.partnumber,
+                                           qty: f.qty,
+                                           type: f.inventorytype,
+                                           typename: f.typename,
+                                           binid : f.binid,
+                                           binname: f.tagname,
+                                           statusid : f.statusid,
+                                           statusname :f.statusname
+                                       });
+                                   }
+
+                                   showbinDistribution(JsonArrayBines);
+                               }
+
+
+                               if (data.listapartnumber != null) {
+
+                                   var JsonArrayShipList = [];
+
+                                   for (var i = 0; i < data.listapartnumber.length; i++) {
+
+                                       var f = data.listapartnumber[i];
+
+                                      var textaction = '';
+
+                                      if (!f.processed)
+                                      {
+                                          showbuttonprocess = true;
+                                          //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                          textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                      }
+
+                                      JsonArrayShipList.push({
+                                           actions: textaction,
+                                           id : f.id,
+                                           itemid : f.itemId,
+                                           partnumber : f.itemNumber,
+                                           line: f.lineId,
+                                           qtyshipped: f.quantityShipped,
+                                           qtyreceived: f.quantityReceived,
+                                           qtypending: f.quantityPending,
+                                           itemdescription: f.itemDescription,
+                                           attribute2 : f.attributte2,
+                                           datetimeinserted : f.dateTimeInserted,
+                                           processed : f.processed,
+                                           thereisdistribution : f.thereisdistribution
+                                       });
+                                   }
+
+
+                                   showbindetail(JsonArrayShipList);
+
+                               }
+                               ///////////////
+
+                           }
+                           else {
+
+                               errorAction(data.status);
+
+
+                           }
+
+                       }).fail(function () { }).always(function () { hideSpinner(); });
+              }
 
     </script>
 }

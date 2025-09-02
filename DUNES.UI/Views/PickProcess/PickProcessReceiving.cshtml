@@ -1,0 +1,96 @@
+﻿@using DUNES.Shared.DTOs.Inventory
+@using DUNES.UI.WiewModels
+@model PickProcessDto
+@{
+    ViewData["Title"] = "Receiving";
+}
+
+<style>
+    .ocultar {
+        display: none;
+    }
+
+    .derecha {
+        text-align: right;
+    }
+</style>
+
+<div class="container mt-4">
+    <form id="asn-form" method="get" autocomplete="off" class="mb-3">
+        <div class="row g-3 align-items-end">
+            <div class="col-12 col-md-6">
+                <label for="pickprocessnumber" class="form-label">Pick Process Number</label>
+                <input type="text"
+                       id="pickprocessnumber"
+                       name="pickprocessnumber"
+                       class="form-control"
+                       placeholder="Scan or type your Pick Process..."
+                       required
+                       autofocus />
+            </div>
+
+            <div class="col-12 col-md-auto d-grid">
+                <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </div>
+    </form>
+
+
+
+    <form id="af" style="display:none">
+        @Html.AntiForgeryToken()
+    </form>
+
+</div>
+
+<div class="card shadow-sm mb-2">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 subtitleDunes">Pick Process Header</h6>
+    </div>
+
+
+
+    <div class="row gx-3 gy-2 px-3 mt-2 mb-2">
+
+        <div class="col-12 col-md-2">
+            <label asp-for="PickProcessHdr.Id" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Id" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-2">
+            <label asp-for="PickProcessHdr.DeliveryId" class="form-label"></label>
+            <input asp-for="PickProcessHdr.DeliveryId" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-2">
+            <label asp-for="PickProcessHdr.ConsignRequestID" class="form-label"></label>
+            <input asp-for="PickProcessHdr.ConsignRequestID" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-3">
+            <label asp-for="PickProcessHdr.Batchid" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Batchid" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-3">
+            <label asp-for="PickProcessHdr.DateCreated" class="form-label"></label>
+            <input type="datetime-local" asp-for="PickProcessHdr.DateCreated" readonly class="form-control" />
+        </div>
+    </div>
+
+
+    <div class="row gx-3 gy-2 px-3 mb-3">
+        <div class="col-12 col-md-6">
+            <label asp-for="PickProcessHdr.Address1" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Address1" readonly class="form-control" />
+        </div>
+
+
+        <div class="col-12 col-md-6">
+            <label asp-for="PickProcessHdr.Address2" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Address2" readonly class="form-control" />
+        </div>
+
+    </div>
+
+</div>
