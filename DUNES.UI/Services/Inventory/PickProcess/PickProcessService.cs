@@ -30,7 +30,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
 
             HttpResponseMessage resp;
 
-            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/pickprocess-info/{DeliveryId}");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryPickProcessINV/pickprocess-info/{DeliveryId}");
 
             return await resp.ReadAsApiResponseAsync<PickProcessDto>(ct);
 

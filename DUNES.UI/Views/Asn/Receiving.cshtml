@@ -186,7 +186,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                <button type="button" class="btn btn-primary">Guardar</button>
+                @* <button type="button" class="btn btn-primary">Guardar</button> *@
             </div>
 
         </div>
@@ -269,55 +269,7 @@
 
 
 
-    <div class="card shadow-sm mb-2">
-        <div class="card-header bg-white">
-            <h6 class="mb-0 subtitleDunes">Information to process in WMS</h6>
-        </div>
-
-        <div class="row gx-3 gy-2 px-3 mb-3">
-            <div class="col-12 col-md-3">
-                <label class="form-label">Company Client</label>
-                <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
-                    <option selected disabled>Select Client Company</option>
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Concept</label>
-                <select id="conceptid" disabled class="form-control">
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Transaction Type</label>
-                <select id="transactionid" disabled class="form-control">
-                </select>
-            </div>
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Inventory Type Dest</label>
-                <select id="inventorytypeid" disabled class="form-control">
-                </select>
-            </div>
-        </div>
-        <div class="row gx-3 gy-2 px-3 mb-3  align-items-end">
-            <div class="col-12 col-md-3">
-                <label class="form-label">Detault WMS Item Status</label>
-                <select id="itemstatusdefault" disabled class="form-control">
-                </select>
-            </div>
-
-            <div class="col-12 col-md-auto d-grid d-none" id="divdist">
-                <button type="button" onclick="distributionByDefault()" class="btn btn-outline-primary">Distribution by Default</button>
-            </div>
-
-
-        </div>
-    </div>
-
-
+   
     <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
@@ -355,11 +307,9 @@
                                                 Actions
                                             </button>
                                             <ul class="dropdown-menu">
+                                              
                                                 <li>
-                                                    <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">✏️ Edit</a>
-                                                </li>
-                                                <li>
-                                                    <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">👁️ Details</a>
+                                                    <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LineId)">🗑 Delete</a>
                                                 </li>
 
                                                 <li>

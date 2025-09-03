@@ -74,17 +74,19 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
             objenc.ShipDateTimeError = Convert.ToDateTime(info.pickHdr.ShipDateTimeError);
 
             List<PickProcessItemDetail> listDetail = new List<PickProcessItemDetail>();
-            PickProcessItemDetail objdet = new PickProcessItemDetail();
+          
 
             foreach (var item in info.pickdetails)
             {
+                PickProcessItemDetail objdet = new PickProcessItemDetail();
 
                 objdet.Id = item.Id;
                 objdet.idPickProcessHdr = item.Id;
                 objdet.LindId = item.LineId;
                 objdet.ItemNumber = item.ItemNumber;
                 objdet.ItemDescription = item.ItemDescription;
-                objdet.RequestQuantity = item.RequestedQuantity;
+                objdet.RequestQuantity =  Convert.ToInt32(item.RequestedQuantity);
+                objdet.QuantityProcess = 0;
                 objdet.Frm3plLocatorStatus = item.Frm3plLocatorStatus;
                 objdet.PickLPN = item.PickLpn;
                 objdet.DateTimeInserted = item.DateTimeInserted;

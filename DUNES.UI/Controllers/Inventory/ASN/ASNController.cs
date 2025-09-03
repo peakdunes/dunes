@@ -702,8 +702,10 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
+                string partnumberzeb = partnumber.Contains("ZEBRA") ? "ZEBRA-" + partnumber.Trim() : partnumber.Trim();
 
-                var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumber, token, ct);
+
+                var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);
 
                 return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, listbines = lista.Where(x => x.lineid == lineid) });
 

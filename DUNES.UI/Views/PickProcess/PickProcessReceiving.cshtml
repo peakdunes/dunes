@@ -5,18 +5,110 @@
     ViewData["Title"] = "Receiving";
 }
 
-<style>
-    .ocultar {
-        display: none;
-    }
 
-    .derecha {
-        text-align: right;
-    }
-</style>
+
+<div class="modal fade" id="modalBinsDistribution" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="brand-subtitle" id="miModalLabel">WMS Warehouse Distribution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3" style="display:display">
+                        <div class="form-group">
+                            <label class="control-label">Part Number</label>
+                            <input id="partnoid" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">Line</label>
+                            <input id="lineid" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">Qty</label>
+                            <input type="number" readonly="readonly" style="text-align:right" id="qtyreceive" class="form-control" />
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label class="control-label">WMS Reserve Bin</label>
+                            <select id="binselid" class="form-control">
+                            </select>
+
+                        </div>
+                    </div>
+
+                   
+
+                </div>
+
+
+
+                <div class="row mt-2">
+
+
+                    <div class="col-md-8">
+                        <h4 class="brand-subtitle">Part Number Qty in WMS Bins</h4>
+                        <table id="tableuserbinitems" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Bin Id
+                                    </th>
+                                    <th>
+                                        Bin Name
+                                    </th>
+
+                                    <th>
+                                        Inventory Type
+                                    </th>
+
+                                    <th>
+                                        Status Type
+                                    </th>
+
+                                    <th style="text-align:right">
+                                        Qty
+                                    </th>
+                                    <th style="text-align:right">
+                                        Qty Pick Process
+                                    </th>
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <input type="button" onclick="addqtybinPickProcess()" class="btn btn-outline-primary" value="Save" />
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                @* <button type="button" class="btn btn-primary">Guardar</button> *@
+            </div>
+
+        </div>
+    </div>
+</div>
 
 <div class="container mt-4">
-    <form id="asn-form" method="get" autocomplete="off" class="mb-3">
+    <form id="pick-form" method="get" autocomplete="off" class="mb-3">
         <div class="row g-3 align-items-end">
             <div class="col-12 col-md-6">
                 <label for="pickprocessnumber" class="form-label">Pick Process Number</label>
@@ -77,20 +169,657 @@
             <input type="datetime-local" asp-for="PickProcessHdr.DateCreated" readonly class="form-control" />
         </div>
     </div>
-
-
     <div class="row gx-3 gy-2 px-3 mb-3">
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <label asp-for="PickProcessHdr.Address1" class="form-label"></label>
             <input asp-for="PickProcessHdr.Address1" readonly class="form-control" />
         </div>
 
 
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <label asp-for="PickProcessHdr.Address2" class="form-label"></label>
             <input asp-for="PickProcessHdr.Address2" readonly class="form-control" />
         </div>
 
+        <div class="col-12 col-md-3">
+            <label asp-for="PickProcessHdr.City" class="form-label"></label>
+            <input asp-for="PickProcessHdr.City" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-1">
+            <label asp-for="PickProcessHdr.State" class="form-label"></label>
+            <input asp-for="PickProcessHdr.State" readonly class="form-control" />
+        </div>
+
+    </div>
+    <div class="row gx-3 gy-2 px-3 mb-3">
+
+        <div class="col-12 col-md-1">
+            <label asp-for="PickProcessHdr.ZipCode" class="form-label"></label>
+            <input asp-for="PickProcessHdr.ZipCode" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-1">
+            <label asp-for="PickProcessHdr.Country" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Country" readonly class="form-control" />
+        </div>
+
+        <div class="col-12 col-md-2">
+            <label asp-for="PickProcessHdr.Carrier" class="form-label"></label>
+            <input asp-for="PickProcessHdr.Carrier" readonly class="form-control" />
+        </div>
+
+
+        <div class="col-12 col-md-3">
+            <label asp-for="PickProcessHdr.ShipMethod" class="form-label"></label>
+            <input asp-for="PickProcessHdr.ShipMethod" readonly class="form-control" />
+        </div>
+
+
+
+     
+    </div>
+</div>
+
+<div class="card shadow-sm mb-2">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 subtitleDunes">Information to process in WMS</h6>
     </div>
 
+    <div class="row gx-3 gy-2 px-3 mb-3">
+        <div class="col-12 col-md-3">
+            <label class="form-label">Company Client</label>
+            <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
+                <option value="0" selected disabled>Select Client Company</option>
+            </select>
+        </div>
+
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Concept</label>
+            <select id="conceptid" disabled class="form-control">
+            </select>
+        </div>
+
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Transaction Type</label>
+            <select id="transactionid" disabled class="form-control">
+            </select>
+        </div>
+
+        <div class="col-12 col-md-2">
+            <label class="form-label">LPN</label>
+            <input ID="lpnid" class="form-control" />
+        </div>
+
+      
+    </div>
+   
 </div>
+
+
+
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
+    </div>
+
+    <div class="card-body p-2">
+        <div class="table-responsive">
+            <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap;">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>Pick Process Head Id</th>
+                        <th>Line Id</th>
+                        <th>Part Number</th>
+                        <th class="text-end">Request Quantity</th>
+                        <th class="text-end">Quantity Process</th>
+                        <th>3PL Locator</th>
+                        <th>Pick LPN</th>
+                        <th>Qty on Hand</th>
+                        <th>Part Number Description</th>
+                        <th>DateTime Inserted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.ListItems != null)
+                    {
+                        foreach (var item in Model.ListItems)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LindId)">🗑 Delete</a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity)"> 📦 Bins</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>@item.Id</td>
+                                <td>@item.idPickProcessHdr</td>
+                                <td>@item.LindId</td>
+                                <td>@item.ItemNumber</td>
+                                <td>@item.RequestQuantity</td>
+                                <td>@item.QuantityProcess</td>
+                                <td>@item.Frm3plLocatorStatus</td>
+                                <td>@item.PickLPN</td>
+                                <td>@item.QtyOnHand</td>
+                                <td>@item.ItemDescription</td>
+                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+
+                        }
+
+                        foreach (var item in Model.ListItems)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LindId)">🗑 Delete</a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity)"> 📦 Bins</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>@item.Id</td>
+                                <td>@item.idPickProcessHdr</td>
+                                <td>@item.LindId</td>
+                                <td>@item.ItemNumber</td>
+                                <td>@item.RequestQuantity</td>
+                                <td>@item.QuantityProcess</td>
+                                <td>@item.Frm3plLocatorStatus</td>
+                                <td>@item.PickLPN</td>
+                                <td>@item.QtyOnHand</td>
+                                <td>@item.ItemDescription</td>
+                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+
+                        }
+                    }
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</div>
+
+<form id="af" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
+
+
+@section Scripts {
+
+
+
+
+    <script>
+
+
+          $(document).ready(function(){
+
+            $('#tableuserbinitems').DataTable({
+
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
+
+
+              });
+
+
+                     $('#tableuser').DataTable
+          ({
+                processing: true,
+                deferRender: true,
+                stateSave: true,
+                autoWidth: false,
+                scrollX: true, // ✅ Habilita scroll horizontal
+                responsive: false, // ✅ Evita que se escondan columnas
+                pageLength: 10,
+
+                order: [[9, 'desc']],
+
+                columnDefs: [
+                  { targets: [6], className: 'text-end' },
+                  { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                  { targets: '_all', className: 'align-middle' }
+                ],
+
+                dom:
+                  "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                  "<'row'<'col-12'tr>>" +
+                  "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+
+                language: {
+                  search: "",
+                  searchPlaceholder: "Search...",
+                  lengthMenu: "_MENU_ entries per page",
+                  info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                  infoEmpty: "Showing 0 to 0 of 0 entries",
+                  infoFiltered: "(filtered from _MAX_ total entries)",
+                  zeroRecords: "No data available in table",
+                  paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                }
+              });
+
+
+                 $(function () {
+                  const $form = $('#pick-form');
+                  $form.on('submit', function (e) {
+                    showSpinner();
+                  });
+            });
+
+          })
+
+
+
+
+        async  function openmodal(lineid, partnumber, qty)
+          {
+
+              $('#partnoid').val(partnumber);
+              $('#lineid').val(lineid);
+              $('#qtyreceive').val(qty);
+
+
+              var lineid = lineid;
+
+              const valsel = $('#companyclient').val();
+
+              if (valsel == 0 || valsel == null)
+              {
+                   errorAction("Company client is required");
+                   return;
+              }
+
+              var companyclient = $('#companyclient option:selected').val();
+
+              //we search all inventory cuantity for this companyclient and part number
+               showSpinner();
+
+              $.ajax({url:"@Url.Action("checkInventoryByPartNumber", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid},type:"post"})
+              .done(function(data){
+
+                  if (data != null)
+                  {
+
+                      if (data.status == null)
+                      {
+                          if (data.listinventory != null)
+                          {
+
+                              JsonArrayInventory = [];
+
+                              for (var i = 0; i < data.listinventory.length; i++)
+                              {
+
+                                  var f = data.listinventory[i];
+
+                                  JsonArrayInventory.push({
+                                          binid: f.binid,
+                                          binname: f.binname,
+                                          typename: f.inventoryname,
+                                          statusname :f.statusname,
+                                          qty: f.qty,
+                                          qtypick : `<input type="number"
+                                             class="form-control form-control-sm qty-input"
+                                             value="0"
+                                             min="0" step="1"
+                                             data-binid="${f.binid}">`
+                                  });
+                               }
+
+                               $('#tableuserbinitems').DataTable({
+                                   data: JsonArrayInventory,
+                                   destroy: true,
+                                   //scrollX: true,
+                                   processing: true,
+                                   deferRender: true,
+                                   stateSave: true,
+                                   autoWidth: false,
+                                   responsive: false,
+                                   pageLength: 10,
+                                   "bPaginate": false,
+                                   "bLengthChange": false,
+                                   "bFilter": true,
+                                   "bInfo": false,
+                                   "bAutoWidth": false,
+                                   "searching": false,
+                                   columns: [
+                                       { "data": "binid" },
+                                       { "data": "binname" },
+                                       { "data": "typename" },
+                                       { "data": "statusname" },
+                                       { "data": "qty", "class":"derecha" },
+                                       { "data": "qtypick", "class":"derecha" },
+                                   ]
+                               });
+                          }
+
+                          if (data.listbines != null) {
+
+                               var JsonArrayBines = [];
+
+                               for (var i = 0; i < data.listbines.length; i++) {
+
+                                   var f = data.listbines[i];
+
+                                   JsonArrayBines.push({
+                                       actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                       id: f.id,
+                                       partno: f.partnumber,
+                                       qty: f.qty,
+                                       type: f.inventorytype,
+                                       typename: f.typename,
+                                       binid : f.binid,
+                                       binname: f.tagname,
+                                       statusid : f.statusid,
+                                       statusname :f.statusname
+                                   });
+                               }
+
+                               showbinDistribution(JsonArrayBines);
+                           }
+
+
+
+                      }
+                      else
+                      {
+                           showToast("info", data.status);
+                      }
+                  }
+
+              })
+              .fail(function(){})
+              .always(function(){
+               hideSpinner();
+              });
+
+
+                const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+              modal.show();
+
+          }
+
+
+
+           $('#companyclient').change(function()
+        {
+
+
+            var companyClient = $(this).val();
+
+            var $bin = $('#binselid');
+            var $concepts = $('#conceptid');
+            var $transactions = $('#transactionid');
+        
+            // reset select bins
+            $bin.empty()
+            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+            // reset select concepts
+            $concepts.empty()
+            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+            // reset select transactions
+            $transactions.empty()
+            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+         
+
+            if (!companyClient) return;
+
+            // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            showSpinner();
+
+            $.ajax({url: '@Url.Action("getAllAditionalInformation", "PickProcess")',type: 'POST',
+                    data: { __RequestVerificationToken: token,  companyclient: companyClient }})
+            .done(function (res)
+            {
+                var list = (res && res.data.listbines) ? res.data.listbines : [];
+                if (Array.isArray(list) && list.length)
+                {
+                    $.each(list, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
+                    $bin.append($('<option>', { value: id, text: name }));
+                    });
+                    $bin.prop('disabled', false);
+                }
+
+                var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
+                if (Array.isArray(listc) && list.length)
+                {
+                    $.each(listc, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $concepts.append($('<option>', { value: id, text: name }));
+                    });
+                    $concepts.prop('disabled', false);
+                }
+
+
+                  var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
+                if (Array.isArray(listt) && list.length)
+                {
+                    $.each(listt, function (_, it) {
+                    var id = (it.id !== undefined) ? it.id : it.Id;
+                    var name = (it.Name !== undefined) ? it.name : it.name;
+                    $transactions.append($('<option>', { value: id, text: name }));
+                    });
+                    $transactions.prop('disabled', false);
+                }
+            })
+            .fail(function (xhr) {
+                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                alert('Could not load bins.');
+            }).always(function(){
+
+                hideSpinner();
+            });
+        })
+
+
+        function buildDropdown(item) {
+
+
+            var qtypendind = item.qtyshipped - item.qtypending;
+
+
+            return `
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+
+                    <li>
+                        <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" onclick="openmodal(${item.lineid}, '${item.partnubmer}', ${item.requestquantity})"> 📦 Bins</a>
+                    </li>
+                </ul>
+            </div>`;
+        }
+
+        function addqtybinPickProcess()
+        {
+              const binReserve = $('#binselid').val();
+
+              const token = $('input[name="__RequestVerificationToken"]').val();
+
+              alert(token);
+
+              var lineid = $('#lineid').val();
+
+              if (binReserve == 0 || binReserve == null)
+              {
+                   errorAction("Bin reserve is required");
+                   return;
+              }
+
+              const valsel = $('#companyclient').val();
+
+
+              if (valsel == 0 || valsel == null)
+              {
+                   errorAction("Company client is required");
+                   return;
+              }
+
+
+              var companyclient = $('#companyclient option:selected').val();
+
+
+                const table = $('#tableuserbinitems').DataTable();
+
+               
+                const res = [];
+
+                table.$('.qty-input', { page: 'all' }).each(function () {
+                const binid = Number($(this).data('binid'));
+                const qty   = Number($(this).val() || 0);
+
+               
+
+                if (qty > 0)
+                    {
+                    res.push({lineid, binid, qty });
+                    }
+                });
+
+                const payload = {
+                    companyclient: companyclient,
+                    lineid: lineid,
+                    itemslist: res                    
+                };
+
+                showSpinner();
+
+                $.ajax({
+                      url: '@Url.Action("UpdateQuantityPickProcess", "PickProcess")',
+                      type: 'POST',
+                      contentType: 'application/json; charset=utf-8',
+                      data: JSON.stringify(payload),
+                      headers: { 'RequestVerificationToken': token } // Anti-forgery en header
+                    })
+            .done(function (data)
+            {
+               if (data.status == "OK")
+               {
+                    if (data.lista != null) {
+
+                               var JsonArrayBines = [];
+
+                               for (var i = 0; i < data.lista.length; i++) {
+                                                                     
+                                   var f = data.lista[i];
+
+                                   JsonArrayBines.push({
+                                        action:'',
+                                        id:f.id,
+                                        headid:f.idPickProcessHdr,
+                                        lineid:f.lindId,
+                                        partnubmer:f.itemNumber,
+                                        requestquantity:f.requestQuantity,
+                                        quantityprocess:f.quantityProcess,
+                                        locator:f.frm3plLocatorStatus,
+                                        picklpn:f.pickLPN,
+                                        qtyonhand:f.qtyOnHand,
+                                        partdesc:f.itemDescription,
+                                        dateinserted:f.dateTimeInserted
+                                   });
+                               }
+
+                                $('#tableuser').DataTable({
+                                   data: JsonArrayBines,
+                                   destroy: true,
+                                   //scrollX: true,
+                                   processing: true,
+                                   deferRender: true,
+                                   stateSave: true,
+                                   autoWidth: false,
+                                   responsive: false,
+                                   pageLength: 10,
+                                   "bPaginate": false,
+                                   "bLengthChange": false,
+                                   "bFilter": true,
+                                   "bInfo": false,
+                                   "bAutoWidth": false,
+                                   "searching": false,
+                                   columns: [
+                                       {
+                                          data: null,
+                                            render: function (data, type, row) {
+                                                return buildDropdown(row);
+                                            }
+                                        },
+                                        { "data": "id" },
+                                        { "data": "headid" },
+                                        { "data": "lineid" },
+                                        { "data": "partnubmer" },
+                                        { "data": "requestquantity" },
+                                        { "data": "quantityprocess" },
+                                        { "data": "locator" },
+                                        { "data": "picklpn" },
+                                        { "data": "qtyonhand" },
+                                        { "data": "partdesc" },
+                                        { "data": "dateinserted" },
+                                   ]
+                               });
+                           }
+               }
+               else
+               {
+                    errorAction(data.status);
+               }
+            })
+            .fail(function (xhr) {
+                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                alert('Could not load bins.');
+            }).always(function(){
+
+                hideSpinner();
+            });
+        }
+    </script>
+}

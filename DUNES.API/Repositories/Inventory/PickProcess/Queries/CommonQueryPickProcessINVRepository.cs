@@ -53,7 +53,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
             };
 
 
-            return objdet;
+            return  objdet;
         }
     }
 }

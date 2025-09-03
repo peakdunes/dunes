@@ -112,8 +112,10 @@ namespace DUNES.Shared.DTOs.Inventory
         public string? ItemDescription { get; set; }
 
         [MaxLength(50)]
-        public string RequestQuantity { get; set; }
+        public int RequestQuantity { get; set; }
 
+        [MaxLength(50)]
+        public int QuantityProcess { get; set; }
 
         [MaxLength(200)]
         public string? Frm3plLocatorStatus { get; set; }

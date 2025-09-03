@@ -48,8 +48,8 @@ namespace DUNES.UI.Services.Inventory.ASN
 
             HttpResponseMessage resp;
 
-
-            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/asn-info/{asnNumber}");
+                                                    
+            resp = await _httpClient.GetAsync($"/api/CommonQueryASNINV/asn-info/{asnNumber}");
 
             return await resp.ReadAsApiResponseAsync<ASNWm>(ct);
 
