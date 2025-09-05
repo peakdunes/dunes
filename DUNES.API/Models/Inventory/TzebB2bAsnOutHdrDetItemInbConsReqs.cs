@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DUNES.API.Models.Inventory;
 
+
+/// <summary>
+/// ASN Head process
+/// </summary>
 public partial class TzebB2bAsnOutHdrDetItemInbConsReqs
 {
     public int Id { get; set; }

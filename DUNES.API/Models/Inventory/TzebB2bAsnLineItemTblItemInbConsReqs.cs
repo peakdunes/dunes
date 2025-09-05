@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 
 namespace DUNES.API.Models.Inventory;
-
+/// <summary>
+/// ASN Process items detail
+/// </summary>
 public partial class TzebB2bAsnLineItemTblItemInbConsReqs
 {
     public int Id { get; set; }

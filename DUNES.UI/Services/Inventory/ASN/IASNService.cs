@@ -55,6 +55,18 @@ namespace DUNES.UI.Services.Inventory.ASN
         /// <returns></returns>
         Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
+
+        /// <summary>
+        /// All active output Transaction Inventory for a company client
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+
+
         /// <summary>
         /// All active item status for a company client
         /// </summary>

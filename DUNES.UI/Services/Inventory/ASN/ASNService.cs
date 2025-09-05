@@ -157,6 +157,16 @@ namespace DUNES.UI.Services.Inventory.ASN
             return await resp.ReadAsApiResponseAsync<List<WMSItemByBinsDto>>(ct);
         }
 
-        
+        public async Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-output-transaction/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSInputTransactionsDto>>(ct);
+        }
     }
 }

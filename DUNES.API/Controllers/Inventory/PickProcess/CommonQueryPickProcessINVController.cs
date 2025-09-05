@@ -49,6 +49,22 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
 
 
         }
+        /// <summary>
+        /// Get all (input, output) pick process calls
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<PickProcessDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpGet("pickprocess-all-calls/{DeliveryId}")]
+        public async Task<IActionResult> GetPickProcessAllCalls(string DeliveryId)
+        {
+            var response = await _service.GetPickProcessAllCalls(DeliveryId);
 
+            return StatusCode(response.StatusCode, response);
+
+
+        }
+        
     }
 }

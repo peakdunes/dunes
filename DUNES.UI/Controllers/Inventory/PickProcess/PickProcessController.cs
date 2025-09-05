@@ -197,11 +197,11 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //load input transactions
 
-                var listtransactions = await _ASNService.GetAllActiveInputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listtransactions = await _ASNService.GetAllActiveOutputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listtransactions.Data.Count <= 0)
                 {
-                    MessageHelper.SetMessage(this, "danger", "there is not WMS input transactions created for this  company", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", "there is not WMS output transactions created for this  company", MessageDisplay.Inline);
                     return View(listbines);
                 }
 

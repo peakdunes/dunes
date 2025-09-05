@@ -1,6 +1,10 @@
 ﻿using DUNES.API.Data;
+using DUNES.API.DTOs.Inventory;
+using DUNES.API.Models.Inventory;
 using DUNES.API.ReadModels.Inventory;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
 
 namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
 {
@@ -23,6 +27,61 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
             _context = context;
             _wmscontext = wmscontext;
         }
+        /// <summary>
+        /// Gell all (input, output) calls for an pick process
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        public async Task<PickProcessCallsRead> GetPickProcessAllCalls(string DeliveryId)
+        {
+
+            PickProcessCallsRead pickcalls = new PickProcessCallsRead();
+
+            var infodelivery = await _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.FirstOrDefaultAsync(x => x.DeliveryId == DeliveryId);
+
+            if (infodelivery == null)
+            {
+                return null;
+            }
+
+            List<TzebB2bInbConsReqs> listInputCalls = new List<TzebB2bInbConsReqs>();
+
+            List<TzebB2bOutConsReqs> listOutputCalls = new List<TzebB2bOutConsReqs>();
+
+            var listcallsIn = await _context.TzebB2bInbConsReqs.Where(x => x.Id == infodelivery.ConsignRequestId).ToListAsync();
+
+            if (listcallsIn.Any())
+            {
+                listInputCalls = listcallsIn;
+            }
+
+            var listcallsOut = await _context.TzebB2bOutConsReqs
+               .Where(x => x.Id == infodelivery.OutConsReqsId || x.Id == infodelivery.ShipOutConsReqsId).ToListAsync();
+
+            if (listcallsOut.Any())
+            {
+                listOutputCalls = listcallsOut;
+            }
+
+            foreach (var info in listOutputCalls)
+            {
+
+                var infcalldet = await _context.TzebB2bConsignmentCallsType.FirstOrDefaultAsync(x => x.Id == info.TypeOfCallId);
+                if (infcalldet != null)
+                {
+                    info.callName = infcalldet.Name;
+                }
+
+
+
+            }
+
+            pickcalls.inputCalls = listInputCalls;
+            pickcalls.outputCalls = listOutputCalls;
+
+            return pickcalls;
+        }
+
         /// <summary>
         /// Get ALl information about Pick Process
         /// </summary>
@@ -53,7 +112,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
             };
 
 
-            return  objdet;
+            return objdet;
         }
     }
 }

@@ -214,7 +214,17 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<TzebB2bPSoLineItemTblItemInbConsReqsLog> TzebB2bPSoLineItemTblItemInbConsReqsLog { get; set; }
 
-      
+
+        /// <summary>
+        /// Inventory calls ZEBRA to PeakTech
+        /// </summary>
+        public virtual DbSet<TzebB2bInbConsReqs> TzebB2bInbConsReqs { get; set; }
+
+        /// <summary>
+        /// Inventory calls PeakTech to ZEBRA 
+        /// </summary>
+        public virtual DbSet<TzebB2bOutConsReqs> TzebB2bOutConsReqs { get; set; }
+
 
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
@@ -225,6 +235,72 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TzebB2bInbConsReqs>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__TZEB_B2B_Inbound_Consignment_Requests");
+
+                entity.ToTable("_TZEB_B2B_Inb_Cons_Reqs");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.DateTimeInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime")
+                    .HasColumnName("DateTime_Inserted");
+                entity.Property(e => e.Edistandard)
+                    .HasMaxLength(10)
+                    .HasColumnName("EDIStandard");
+                entity.Property(e => e.FileType).HasMaxLength(100);
+                entity.Property(e => e.FullXml).HasColumnName("fullXML");
+                entity.Property(e => e.PErrorEmail)
+                    .HasMaxLength(500)
+                    .HasColumnName("P_ERROR_EMAIL");
+                entity.Property(e => e.PSuccessEmail)
+                    .HasMaxLength(500)
+                    .HasColumnName("P_SUCCESS_EMAIL");
+                entity.Property(e => e.ReceiverCode).HasMaxLength(10);
+                entity.Property(e => e.ResponseLevel).HasMaxLength(500);
+                entity.Property(e => e.SenderCode).HasMaxLength(10);
+                entity.Property(e => e.SentTimestamp).HasColumnType("datetime");
+                entity.Property(e => e.TransactionCode).HasMaxLength(100);
+                entity.Property(e => e.UniqueMessageIdentifier).HasMaxLength(500);
+            });
+
+            modelBuilder.Entity<TzebB2bOutConsReqs>(entity =>
+            {
+                entity.ToTable("_TZEB_B2B_Out_Cons_Reqs");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.AckReceived)
+                    .HasDefaultValue(false)
+                    .HasColumnName("Ack_Received");
+                entity.Property(e => e.Additional).HasMaxLength(100);
+                entity.Property(e => e.AdditionalInfo).HasColumnName("Additional_info");
+                entity.Property(e => e.DateTimeInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Time_Inserted");
+                entity.Property(e => e.DateTimeSent)
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Time_Sent");
+                entity.Property(e => e.Edistandard)
+                    .HasMaxLength(10)
+                    .HasColumnName("EDIStandard");
+                entity.Property(e => e.FileType).HasMaxLength(100);
+                entity.Property(e => e.FullXmlsent).HasColumnName("fullXMLsent");
+                entity.Property(e => e.InProcess)
+                    .HasDefaultValue(true)
+                    .HasColumnName("In_Process");
+                entity.Property(e => e.ReceiverCode).HasMaxLength(10);
+                entity.Property(e => e.ResponseLevel).HasMaxLength(500);
+                entity.Property(e => e.ResponseXml).HasColumnName("ResponseXML");
+                entity.Property(e => e.SenderCode).HasMaxLength(10);
+                entity.Property(e => e.SentTimestamp).HasColumnType("datetime");
+                entity.Property(e => e.TransactionCode).HasMaxLength(100);
+                entity.Property(e => e.TypeOfCallId).HasColumnName("Type_Of_Call_id");
+                entity.Property(e => e.UniqueMessageIdentifier).HasMaxLength(500);
+            });
+
 
             modelBuilder.Entity<TzebB2bAsnLineItemTblItemInbConsReqs>(entity =>
             {
@@ -356,7 +432,6 @@ namespace DUNES.API.Data
                     .HasMaxLength(240)
                     .HasColumnName("WIP_JOB_NAME");
             });
-
 
             modelBuilder.Entity<WmsCompanyclient>(entity =>
             {

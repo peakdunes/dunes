@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DUNES.API.Models.Inventory;
 
+/// <summary>
+/// ASN Logs Process items detail
+/// </summary>
+
 public partial class TzebB2bAsnLineItemTblItemInbConsReqsLog
 {
     public int Id { get; set; }
