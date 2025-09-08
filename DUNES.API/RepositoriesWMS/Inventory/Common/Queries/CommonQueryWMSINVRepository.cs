@@ -168,6 +168,26 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return listinventorytype;
         }
+
+        /// <summary>
+        /// Get all active Inventory Types for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<List<InventoryTypes>> GetAllOnHandActiveInventoryType(int companyid, string companyClient)
+        {
+            var listinventorytype = await _wmscontext.InventoryTypes
+          .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Active == true
+              && x.IsOnHand == true
+          ).ToListAsync();
+
+            return listinventorytype;
+        }
+
+
         /// <summary>
         /// Get all Inventory Types for a client company 
         /// </summary>
@@ -227,23 +247,115 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<List<Inventorydetail>> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<List<Inventorydetail>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
         {
-            var listinventory = await _wmscontext.Inventorydetail
-               .Include(x => x.IdbinNavigation)
-               .Include(x => x.IdstatusNavigation)
-               .Include(x => x.IdtypeNavigation)
-               .Include(x => x.IdlocationNavigation)
-               .Include(x => x.IdrackNavigation)
-               .Include(x => x.IdlocationNavigation)
-              .Where(x => x.Idcompany == companyid
-                  && x.Idcompanyclient == companyClient
-                  && x.Iditem == partnumber
+            //var listinventory = await _wmscontext.Inventorydetail
+            //   .Include(x => x.IdbinNavigation)
+            //   .Include(x => x.IdstatusNavigation)
+            //   .Include(x => x.IdtypeNavigation)
+            //   .Include(x => x.IdlocationNavigation)
+            //   .Include(x => x.IdrackNavigation)
+            //   .Include(x => x.IdlocationNavigation)
+            //  .Where(x => x.Idcompany == companyid
+            //      && x.Idcompanyclient == companyClient
+            //      && x.Iditem == partnumber
 
-              ).ToListAsync();
+            //  ).ToListAsync();
+
+
+            //var listinventory = await (from enc in _wmscontext.Inventorydetail
+            // .Include(x => x.IdbinNavigation)
+            // .Include(x => x.IdstatusNavigation)
+            // .Include(x => x.IdtypeNavigation)
+            // .Include(x => x.IdlocationNavigation)
+            // .Include(x => x.IdrackNavigation)
+            // .Include(x => x.IdlocationNavigation)
+            //.Where(x => x.Idcompany == companyid
+            //    && x.Idcompanyclient == companyClient
+            //    && x.Iditem == partnumber
+            //)
+            //join det in _wmscontext.InventoryTypes.Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
+            //select (new Inventorydetail {
+            //        Id = enc.Id,
+            //        Idcompany = enc.Idcompany,
+            //        Idlocation = enc.Idlocation,
+            //        Idtype = enc.Idtype,
+            //        Idrack = enc.Idrack,
+            //        Level = enc.Level,
+            //        Iditem = enc.Iditem,
+            //        TotalQty = enc.TotalQty,
+            //        Idbin = enc.Idbin,
+            //        Idcompanyclient = enc.Idcompanyclient,
+            //        Serialid = enc.Serialid,
+            //        Idstatus = enc.Idstatus
+            //})).ToListAsync();
+
+
+            var listinventory = await (from enc in _wmscontext.Inventorydetail
+            .Include(x => x.IdbinNavigation)
+            .Include(x => x.IdstatusNavigation)
+            .Include(x => x.IdtypeNavigation)
+            .Include(x => x.IdlocationNavigation)
+            .Include(x => x.IdrackNavigation)
+            .Include(x => x.IdlocationNavigation)
+           .Where(x => x.Idcompany == companyid
+               && x.Idcompanyclient == companyClient
+               && x.Iditem == partnumber
+           )
+                                       join det in _wmscontext.InventoryTypes.Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
+                                       select (enc)).ToListAsync();
+
 
             return listinventory;
         }
+
+        /// <summary>
+        /// get current inventory for a client company part number inventory type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
+
+        public async Task<List<Inventorydetail>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        {
+            //var listinventory = await _wmscontext.Inventorydetail
+            // .Include(x => x.IdbinNavigation)
+            // .Include(x => x.IdstatusNavigation)
+            // .Include(x => x.IdtypeNavigation)
+            // .Include(x => x.IdlocationNavigation)
+            // .Include(x => x.IdrackNavigation)
+            // .Include(x => x.IdlocationNavigation)
+            //.Where(x => x.Idcompany == companyid
+            //    && x.Idcompanyclient == companyClient
+            //    && x.Iditem == partnumber
+            //    && x.Idtype == typeid
+
+            //).ToListAsync();
+
+            var listinventory = await (from enc in _wmscontext.Inventorydetail
+           .Include(x => x.IdbinNavigation)
+           .Include(x => x.IdstatusNavigation)
+           .Include(x => x.IdtypeNavigation)
+           .Include(x => x.IdlocationNavigation)
+           .Include(x => x.IdrackNavigation)
+           .Include(x => x.IdlocationNavigation)
+          .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Iditem == partnumber
+              && x.Idtype == typeid
+          )
+            join det in _wmscontext.InventoryTypes
+            .Where(x => x.IsOnHand == true ) on enc.Idtype equals det.Id
+            select (enc)).ToListAsync();
+
+
+
+
+            return listinventory;
+        }
+
         /// <summary>
         /// Items bin distribution
         /// </summary>
@@ -269,5 +381,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return listdistribution;
         }
+
+     
     }
 }

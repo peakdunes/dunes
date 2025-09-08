@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.UI.Helpers;
 using DUNES.UI.Services.Inventory.ASN;
+using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,19 +17,19 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IPickProcessService _service;
-        private readonly IASNService _ASNService;
+        private readonly ICommonINVService _CommonINVService;
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
 
 
         public PickProcessController(IHttpClientFactory httpClientFactory, IConfiguration config,
-            IPickProcessService service, IASNService ASNService)
+            IPickProcessService service, ICommonINVService CommonINVService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
             _service = service;
             _companyDefault = _config.GetValue<int>("companyDefault", 1);
-            _ASNService = ASNService;
+            _CommonINVService = CommonINVService;
 
         }
 
@@ -61,7 +62,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 if (token == null)
                     return RedirectToLogin();
 
-                var listclients = await _ASNService.GetClientCompanies(token, ct);
+                var listclients = await _CommonINVService.GetClientCompanies(token, ct);
 
 
                 if (listclients.Error != null)
@@ -116,7 +117,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 string partnumberzeb = partnumber.Contains("ZEBRA") ? partnumber.Trim() : "ZEBRA-" + partnumber.Trim();
 
-                var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);
+                var listinventory = await _CommonINVService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);
 
                 return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, });
 
@@ -124,6 +125,74 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
 
         }
+
+
+        [HttpPost]
+
+        public async Task<IActionResult> checkInventoryByPartNumberInvType(string companyclient, string partnumber, int lineid, string typeidst, CancellationToken ct)
+        {
+
+            int typeid = 0;
+
+            var token = GetToken();
+
+
+            if (token == null)
+                return RedirectToLogin();
+
+            return await HandleAsync(async ct =>
+            {
+
+                var infotype = await _CommonINVService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient,token, ct);
+
+               
+                if (infotype == null)
+                {
+
+                    return new ObjectResult(new { status = "Inventory types not found", continueprocess = false });
+                }
+                else
+                {
+                    foreach (var info in infotype.Data)
+                    {
+                        if (info.Name.ToUpper() == typeidst.ToUpper())
+                        {
+                            typeid = info.Id;
+                        }
+                    }
+                }
+
+              
+                string partnumberzeb = partnumber.Contains("ZEBRA") ? partnumber.Trim() : "ZEBRA-" + partnumber.Trim();
+
+                var listinventory = await _CommonINVService.GetInventoryByItemInventoryType(_companyDefault, companyclient, partnumberzeb, typeid, token, ct);
+
+                if (listinventory.Success && typeid != 0)
+                {
+                    return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, continueprocess = false });
+
+                }
+                else
+                {
+                    if (!listinventory.Success)
+                    {
+                        return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data , continueprocess = false });
+
+                    }
+                    else
+                    {
+                        return new ObjectResult(new { status = "There is not inventory type for this type :" + typeidst, listinventory = listinventory.Data , continueprocess = true });
+                    }
+                }
+
+
+            }, ct);
+
+
+        }
+
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
 
@@ -153,7 +222,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             {
                 //load bins
 
-                var listbines = await _ASNService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listbines = await _CommonINVService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listbines.Data.Count <= 0)
                 {
@@ -175,7 +244,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //load concepts
 
-                var listconcepts = await _ASNService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listconcepts = await _CommonINVService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listconcepts.Data.Count <= 0)
                 {
@@ -197,7 +266,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //load input transactions
 
-                var listtransactions = await _ASNService.GetAllActiveOutputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listtransactions = await _CommonINVService.GetAllActiveOutputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listtransactions.Data.Count <= 0)
                 {
@@ -253,7 +322,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(lista));
 
-                 return Ok(new { status = "OK", lista = lista });
+                return Ok(new { status = "OK", lista = lista });
             }, ct);
         }
     }

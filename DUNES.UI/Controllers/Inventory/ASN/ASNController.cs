@@ -6,6 +6,7 @@ using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Helpers;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Inventory.ASN;
+using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.WiewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -25,15 +26,18 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IASNService _ASNService;
+        private readonly ICommonINVService _CommonINVService;
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
 
 
-        public AsnController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService)
+        public AsnController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService,
+            ICommonINVService CommonINVService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
             _ASNService = ASNService;
+            _CommonINVService = CommonINVService;
             _companyDefault = _config.GetValue<int>("companyDefault", 1);
 
         }
@@ -84,7 +88,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 //var infobines = await _ASNService.GetAllActiveBinsByCompanyClient(1, "ZEBRA PAR1", token, ct);
 
 
-                var listclients = await _ASNService.GetClientCompanies(token, ct);
+                var listclients = await _CommonINVService.GetClientCompanies(token, ct);
 
                 if (listclients.Error != null)
                 {
@@ -154,7 +158,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             {
                 //load bins
 
-                var listbines = await _ASNService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listbines = await _CommonINVService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listbines.Data.Count <= 0)
                 {
@@ -176,7 +180,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load concepts
 
-                var listconcepts = await _ASNService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listconcepts = await _CommonINVService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listconcepts.Data.Count <= 0)
                 {
@@ -198,7 +202,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load input transactions
 
-                var listtransactions = await _ASNService.GetAllActiveInputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listtransactions = await _CommonINVService.GetAllActiveInputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
 
                 if (listtransactions.Data.Count <= 0)
                 {
@@ -221,7 +225,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load ZEBRA inventory types
 
-                var listinventorytypes = await _ASNService.GetAllActiveInventoryTypes(token, ct);
+                var listinventorytypes = await _CommonINVService.GetAllActiveInventoryTypes(token, ct);
 
                 if (listinventorytypes.Data.Count <= 0)
                 {
@@ -243,7 +247,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load WMS inventory types
 
-                var listwmsinventorytypes = await _ASNService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient, token, ct);
+                var listwmsinventorytypes = await _CommonINVService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient, token, ct);
 
                 if (listwmsinventorytypes.Data.Count <= 0)
                 {
@@ -266,7 +270,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //load WMS item status
 
-                var listitemstatus = await _ASNService.GetAllActiveItemStatus(_companyDefault, companyclient, token, ct);
+                var listitemstatus = await _CommonINVService.GetAllActiveItemStatus(_companyDefault, companyclient, token, ct);
 
                 if (listitemstatus.Data.Count <= 0)
                 {
@@ -313,41 +317,8 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         {
                             itemname = item.ItemNumber.ToString();
                         }
-                        var listdistribution = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, itemname, token, ct);
-
-                        if (listdistribution.Data.Count > 0)
-                        {
-                            foreach (var info in listdistribution.Data)
-                            {
-
-
-                                //BinsToLoadTm objdet = new BinsToLoadTm();
-
-                                //objdet.Id = info.binid;
-
-                                //objdet.inventorytype = info.binid;
-
-                                //objdet.partnumber = info.binid;
-
-                                //objdet.tagname = info.binid;
-
-                                //objdet.typename = info.binid;
-
-                                //objdet.qty = info.binid;
-
-                                //objdet.lineid = item.LineId;
-
-                                //objdet.statusid = info.binid;
-
-                                //objdet.binid = info.binid;
-
-                                //objdet.statusname { get; set; }
-
-                            }
-
-
-                        }
-
+                        var listdistribution = await _CommonINVService.GetInventoryByItem(_companyDefault, companyclient, itemname, token, ct);
+                                          
 
                     }
                 }
@@ -705,7 +676,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 string partnumberzeb = partnumber.Contains("ZEBRA") ? "ZEBRA-" + partnumber.Trim() : partnumber.Trim();
 
 
-                var listinventory = await _ASNService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);
+                var listinventory = await _CommonINVService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);
 
                 return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, listbines = lista.Where(x => x.lineid == lineid) });
 
@@ -745,7 +716,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         itemsel = "ZEBRA-" + detail.ItemNumber!.Trim();
                     }
 
-                    var listdist = await _ASNService.GetItemBinsDistribution(_companyDefault, companyclientid, itemsel, token, ct);
+                    var listdist = await _CommonINVService.GetItemBinsDistribution(_companyDefault, companyclientid, itemsel, token, ct);
 
                     errormessage = listdist.Message.Trim();
 

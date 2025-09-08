@@ -69,6 +69,14 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
 
 
+        /// <summary>
+        /// Get all active Inventory Types for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<List<InventoryTypes>> GetAllOnHandActiveInventoryType(int companyid, string companyClient);
+
 
         /// <summary>
         /// Get all active Transactions input transactions for a client company 
@@ -136,8 +144,19 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        Task<List<Inventorydetail>> GetInventoryByItem(int companyid, string companyClient, string partnumber);
-        
+        Task<List<Inventorydetail>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber);
+
+
+        /// <summary>
+        /// get current inventory for a client company part number
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <returns></returns>
+        Task<List<Inventorydetail>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid);
+
+
 
         /// <summary>
         /// get actual item bin distribution 

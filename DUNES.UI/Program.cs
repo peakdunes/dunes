@@ -3,6 +3,7 @@ using DUNES.UI.Infrastructure;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Inventory.ASN;
+using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
@@ -39,7 +40,7 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddScoped<IMenuClientService, MenuClientService>();
 builder.Services.AddScoped<IASNService, ASNService>();
 builder.Services.AddScoped<IPickProcessService, PickProcessService>();
-
+builder.Services.AddScoped<ICommonINVService, CommonINVService>();
 
 
 // Necesario para el fallback de TempData si no hay Controller

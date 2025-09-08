@@ -289,39 +289,7 @@
                 <tbody>
                     @if (Model?.ListItems != null)
                     {
-                        foreach (var item in Model.ListItems)
-                        {
-                            <tr>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Actions
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LindId)">🗑 Delete</a>
-                                            </li>
-
-                                            <li>
-                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity)"> 📦 Bins</a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                                <td>@item.Id</td>
-                                <td>@item.idPickProcessHdr</td>
-                                <td>@item.LindId</td>
-                                <td>@item.ItemNumber</td>
-                                <td>@item.RequestQuantity</td>
-                                <td>@item.QuantityProcess</td>
-                                <td>@item.Frm3plLocatorStatus</td>
-                                <td>@item.PickLPN</td>
-                                <td>@item.QtyOnHand</td>
-                                <td>@item.ItemDescription</td>
-                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
-                            </tr>
-
-                        }
+                       
 
                         foreach (var item in Model.ListItems)
                         {
@@ -337,7 +305,7 @@
                                             </li>
 
                                             <li>
-                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity)"> 📦 Bins</a>
+                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity,'@item.Frm3plLocatorStatus')"> 📦 Bins</a>
                                             </li>
                                         </ul>
                                     </div>
@@ -446,8 +414,10 @@
 
 
 
-        async  function openmodal(lineid, partnumber, qty)
+        async  function openmodal(lineid, partnumber, qty, typeidst)
           {
+
+             
 
               $('#partnoid').val(partnumber);
               $('#lineid').val(lineid);
@@ -469,13 +439,12 @@
               //we search all inventory cuantity for this companyclient and part number
                showSpinner();
 
-              $.ajax({url:"@Url.Action("checkInventoryByPartNumber", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid},type:"post"})
+              $.ajax({url:"@Url.Action("checkInventoryByPartNumberInvType", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid, typeidst:typeidst},type:"post"})
               .done(function(data){
 
-                  if (data != null)
-                  {
 
-                      if (data.status == null)
+
+                      if (data.status == null || data.status == "OK")
                       {
                           if (data.listinventory != null)
                           {
@@ -527,6 +496,12 @@
                                    ]
                                });
                           }
+                          else
+                          {
+
+                              showToast("info", "There is not inventory available for this type  : " + typeid);
+
+                          }
 
                           if (data.listbines != null) {
 
@@ -553,14 +528,27 @@
                                showbinDistribution(JsonArrayBines);
                            }
 
-
+                               const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+                            modal.show();
 
                       }
                       else
                       {
-                           showToast("info", data.status);
+                          if (data.continueprocess)
+                          {
+                              //if continueprocess is true, the processing can to continue
+                                showToast("info",data.status);
+
+                                const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+                                modal.show();
+                          }
+                          else
+                          {
+                           errorAction(data.status);
+                          }
+                          
                       }
-                  }
+               
 
               })
               .fail(function(){})
@@ -569,8 +557,7 @@
               });
 
 
-                const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
-              modal.show();
+            
 
           }
 

@@ -288,7 +288,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         }
 
         /// <summary>
-        /// Get current inventory for a client company part number
+        /// Get current inventory On-hand for a client company part number
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
@@ -297,12 +297,31 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(typeof(List<WMSInventoryDetailByPartNumberDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [HttpGet("inventoryByPartNumber/{companyid}/{companyClient}/{partnumber}")]
+        [HttpGet("onHand-InvByPartNumber/{companyid}/{companyClient}/{partnumber}")]
 
-        public async Task<IActionResult> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<IActionResult> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
         {
 
-            var response = await _service.GetInventoryByItem(companyid, companyClient, partnumber);
+            var response = await _service.GetOnHandInventoryByItem(companyid, companyClient, partnumber);
+
+            return StatusCode(response.StatusCode, response);
+
+        }
+        /// <summary>
+        /// Get current inventory On-hand for a client company, part number, inventory type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<WMSInventoryDetailByPartNumberDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("onHand-InvByPartNumber-Type/{companyid}/{companyClient}/{partnumber}/{typeid}")]
+        public async Task<IActionResult> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        {
+            var response = await _service.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid);
 
             return StatusCode(response.StatusCode, response);
 

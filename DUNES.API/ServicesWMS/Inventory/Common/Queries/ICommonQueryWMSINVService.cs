@@ -110,6 +110,28 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryType(int companyid, string companyClient);
 
 
+        /// <summary>
+        /// Get all Inventory Types for a client company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Get all active item status for a client company 
@@ -137,7 +159,22 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string partnumber);
+        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber);
+
+
+
+
+        /// <summary>
+        /// get current inventory for a client company part number inventory type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid);
+
+
 
 
         /// <summary>

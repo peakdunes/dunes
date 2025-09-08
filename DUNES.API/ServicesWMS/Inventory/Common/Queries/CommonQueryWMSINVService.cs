@@ -198,6 +198,26 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(info, "OK");
         }
+
+
+        /// <summary>
+        /// Get all On-hand active Inventory Types for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient)
+        {
+            var info = await _repository.GetAllOnHandActiveInventoryType(companyid, companyClient);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<List<InventoryTypes>>($"there is not active inventory types for this company client {companyClient}");
+            }
+
+            return ApiResponseFactory.Ok(info, "OK");
+        }
+
         /// <summary>
         /// Get all Inventory Types for a client company 
         /// </summary>
@@ -215,6 +235,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(info, "OK");
         }
+
+
+      
 
 
 
@@ -262,12 +285,12 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
         {
 
             List<WMSInventoryDetailByPartNumberDto> objlist = new List<WMSInventoryDetailByPartNumberDto>();
 
-            var info = await _repository.GetInventoryByItem(companyid, companyClient, partnumber);
+            var info = await _repository.GetOnHandInventoryByItem(companyid, companyClient, partnumber);
 
             if (info == null)
             {
@@ -299,6 +322,54 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(objlist, "OK");
         }
+
+        /// <summary>
+        /// get current inventory for a client company, part number, inventoy type
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="partnumber"></param>
+        /// <param name="typeid"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        {
+
+            List<WMSInventoryDetailByPartNumberDto> objlist = new List<WMSInventoryDetailByPartNumberDto>();
+
+            var info = await _repository.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<List<WMSInventoryDetailByPartNumberDto>>($"there is not inventory for this company client {companyClient} and this part number {partnumber}");
+            }
+
+            foreach (var item in info)
+            {
+                WMSInventoryDetailByPartNumberDto objdet = new WMSInventoryDetailByPartNumberDto();
+
+                objdet.Idcompany = item.Idcompany;
+                objdet.companyclientid = item.Idcompanyclient!;
+                objdet.locationid = item.Idlocation;
+                objdet.locationname = item.IdlocationNavigation.Name!;
+                objdet.qty = item.TotalQty;
+                objdet.binid = item.Idbin;
+                objdet.binname = item.IdbinNavigation.TagName!;
+                objdet.inventorytypeid = item.Idtype;
+                objdet.inventoryname = item.IdtypeNavigation.Name!;
+                objdet.statusid = item.Idstatus;
+                objdet.statusname = item.IdstatusNavigation.Name!;
+                objdet.rackid = item.Idrack;
+                objdet.rackname = item.IdrackNavigation.Name!;
+
+                objlist.Add(objdet);
+
+            }
+
+
+            return ApiResponseFactory.Ok(objlist, "OK");
+        }
+
+
         /// <summary>
         /// Gell Item Bins distribution
         /// </summary>

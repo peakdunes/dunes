@@ -9,4 +9,6 @@ namespace DUNES.UI.Services.Inventory.PickProcess
       
         Task<ApiResponse<PickProcessDto>>  GetPickProcessAllInfo(string DeliveryId, string token, CancellationToken ct);
     }
+
+
 }
