@@ -32,10 +32,20 @@
 
                         </div>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <div class="form-group">
                             <label class="control-label">Qty</label>
                             <input type="number" readonly="readonly" style="text-align:right" id="qtyreceive" class="form-control" />
+
+                        </div>
+                    </div>
+
+
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label class="control-label">WMS Reserve Inv Type</label>
+                            <select id="typereserveid" class="form-control">
+                            </select>
 
                         </div>
                     </div>
@@ -48,16 +58,11 @@
 
                         </div>
                     </div>
-
-                   
-
                 </div>
 
 
 
                 <div class="row mt-2">
-
-
                     <div class="col-md-8">
                         <h4 class="brand-subtitle">Part Number Qty in WMS Bins</h4>
                         <table id="tableuserbinitems" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
@@ -74,9 +79,12 @@
                                     <th>
                                         Inventory Type
                                     </th>
+                                    <th>
+                                        Status Id
+                                    </th>
 
                                     <th>
-                                        Status Type
+                                        Status Name
                                     </th>
 
                                     <th style="text-align:right">
@@ -136,13 +144,18 @@
 </div>
 
 <div class="card shadow-sm mb-2">
-    <div class="card-header bg-white">
-        <h6 class="mb-0 subtitleDunes">Pick Process Header</h6>
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 subtitleDunes ms2">Pick Process Header &nbsp; @Model.PickProcessHdr.DeliveryId </h6>
+        <a href="#" class="text-decoration-none" onclick="hideheader()">
+            <i id="ocultarHdr" class="fa-solid fa-eye"></i>
+        </a>
     </div>
 
 
 
-    <div class="row gx-3 gy-2 px-3 mt-2 mb-2">
+
+
+    <div class="row gx-3 gy-2 px-3 mt-2 mb-2" id="header1">
 
         <div class="col-12 col-md-2">
             <label asp-for="PickProcessHdr.Id" class="form-label"></label>
@@ -169,7 +182,7 @@
             <input type="datetime-local" asp-for="PickProcessHdr.DateCreated" readonly class="form-control" />
         </div>
     </div>
-    <div class="row gx-3 gy-2 px-3 mb-3">
+    <div class="row gx-3 gy-2 px-3 mb-3" id="header2">
         <div class="col-12 col-md-4">
             <label asp-for="PickProcessHdr.Address1" class="form-label"></label>
             <input asp-for="PickProcessHdr.Address1" readonly class="form-control" />
@@ -192,7 +205,7 @@
         </div>
 
     </div>
-    <div class="row gx-3 gy-2 px-3 mb-3">
+    <div class="row gx-3 gy-2 px-3 mb-3" id="header3">
 
         <div class="col-12 col-md-1">
             <label asp-for="PickProcessHdr.ZipCode" class="form-label"></label>
@@ -217,16 +230,22 @@
 
 
 
-     
+
     </div>
 </div>
 
 <div class="card shadow-sm mb-2">
-    <div class="card-header bg-white">
-        <h6 class="mb-0 subtitleDunes">Information to process in WMS</h6>
+
+
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 subtitleDunes ms2">Information to process in WMS </h6>
+        <a href="#" class="text-decoration-none" onclick="hidedetail()">
+            <i id="ocultarDetail" class="fa-solid fa-eye"></i>
+        </a>
     </div>
 
-    <div class="row gx-3 gy-2 px-3 mb-3">
+
+    <div class="row gx-3 gy-2 px-3 mb-3" id="detail1">
         <div class="col-12 col-md-3">
             <label class="form-label">Company Client</label>
             <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
@@ -253,9 +272,9 @@
             <input ID="lpnid" class="form-control" />
         </div>
 
-      
+
     </div>
-   
+
 </div>
 
 
@@ -266,10 +285,9 @@
         <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
     </div>
 
-    <div class="card-body p-2">
-        <div class="table-responsive">
-            <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap;">
-
+    <div class="card-body">
+        <div class="row">
+            <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
                 <thead class="table-light">
                     <tr>
                         <th>Actions</th>
@@ -289,33 +307,24 @@
                 <tbody>
                     @if (Model?.ListItems != null)
                     {
-                       
+
 
                         foreach (var item in Model.ListItems)
                         {
                             <tr>
-                                <td class="text-center">
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Actions
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LindId)">🗑 Delete</a>
-                                            </li>
+                                <td>
 
-                                            <li>
-                                                <a class="dropdown-item" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity,'@item.Frm3plLocatorStatus')"> 📦 Bins</a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                                    <a href="#" onclick="openmodal(@item.LindId,'@item.ItemNumber',@item.RequestQuantity,'@item.Frm3plLocatorStatus')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(@item.LindId)"><i class="fa-solid fa-eraser"></i></a>
+
+                                            
+                                   
                                 </td>
                                 <td>@item.Id</td>
                                 <td>@item.idPickProcessHdr</td>
                                 <td>@item.LindId</td>
                                 <td>@item.ItemNumber</td>
                                 <td>@item.RequestQuantity</td>
-                                <td>@item.QuantityProcess</td>
+                                <td style="color:red">@item.QuantityProcess</td>
                                 <td>@item.Frm3plLocatorStatus</td>
                                 <td>@item.PickLPN</td>
                                 <td>@item.QtyOnHand</td>
@@ -328,6 +337,12 @@
                 </tbody>
             </table>
 
+         
+        </div>
+        <div class="row justify-content-end">
+            <div class="col-3 col-md-auto d-grid">
+                <button type="button" class="btn btn-primary">Process</button>
+            </div>
         </div>
     </div>
 </div>
@@ -353,7 +368,7 @@
                     deferRender: true,
                     stateSave: true,
                     autoWidth: false,
-                    responsive: false,
+                    responsive: true,
                     pageLength: 10,
                     "bPaginate": false,
                     "bLengthChange": false,
@@ -366,40 +381,40 @@
               });
 
 
-                     $('#tableuser').DataTable
-          ({
-                processing: true,
-                deferRender: true,
-                stateSave: true,
-                autoWidth: false,
-                scrollX: true, // ✅ Habilita scroll horizontal
-                responsive: false, // ✅ Evita que se escondan columnas
-                pageLength: 10,
+            $('#tableuser').DataTable
+            ({
+              processing: true,
+              deferRender: true,
+              stateSave: true,
+              autoWidth: false,
+              scrollX: true, // ✅ Habilita scroll horizontal
+              responsive: false, // ✅ Evita que se escondan columnas
+              pageLength: 10,
 
-                order: [[9, 'desc']],
+              order: [[9, 'desc']],
 
-                columnDefs: [
-                  { targets: [6], className: 'text-end' },
-                  { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
-                  { targets: '_all', className: 'align-middle' }
-                ],
+              columnDefs: [
+                { targets: [6], className: 'text-end' },
+                { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                { targets: '_all', className: 'align-middle' }
+              ],
 
-                dom:
-                  "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
-                  "<'row'<'col-12'tr>>" +
-                  "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+              dom:
+                "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                "<'row'<'col-12'tr>>" +
+                "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
 
-                language: {
-                  search: "",
-                  searchPlaceholder: "Search...",
-                  lengthMenu: "_MENU_ entries per page",
-                  info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                  infoEmpty: "Showing 0 to 0 of 0 entries",
-                  infoFiltered: "(filtered from _MAX_ total entries)",
-                  zeroRecords: "No data available in table",
-                  paginate: { first: "«", previous: "‹", next: "›", last: "»" }
-                }
-              });
+              language: {
+                search: "",
+                searchPlaceholder: "Search...",
+                lengthMenu: "_MENU_ entries per page",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                zeroRecords: "No data available in table",
+                paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+              }
+            });
 
 
                  $(function () {
@@ -417,7 +432,7 @@
         async  function openmodal(lineid, partnumber, qty, typeidst)
           {
 
-             
+
 
               $('#partnoid').val(partnumber);
               $('#lineid').val(lineid);
@@ -442,10 +457,32 @@
               $.ajax({url:"@Url.Action("checkInventoryByPartNumberInvType", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid, typeidst:typeidst},type:"post"})
               .done(function(data){
 
+                    var $typeNoHand = $('#typereserveid');
 
+                    $typeNoHand.empty()
+                        .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
+                        .prop('disabled', true);
 
                       if (data.status == null || data.status == "OK")
                       {
+
+                          if (data.listinvnohand != null)
+                          {
+
+                                var list = (data && data.listinvnohand) ? data.listinvnohand : [];
+                                if (Array.isArray(list) && list.length)
+                                {
+                                    $.each(list, function (_, it) {
+
+                                    var id = (it.id !== undefined) ? it.id : it.id;
+                                    var name = (it.name !== undefined) ? it.name : it.name;
+                                    $typeNoHand.append($('<option>', { value: id, text: name }));
+                                    });
+                                    $typeNoHand.prop('disabled', false);
+                                }
+
+                          }
+
                           if (data.listinventory != null)
                           {
 
@@ -460,25 +497,26 @@
                                           binid: f.binid,
                                           binname: f.binname,
                                           typename: f.inventoryname,
+                                          statusid: f.statusid,
                                           statusname :f.statusname,
                                           qty: f.qty,
                                           qtypick : `<input type="number"
                                              class="form-control form-control-sm qty-input"
                                              value="0"
                                              min="0" step="1"
-                                             data-binid="${f.binid}">`
+                                             data-binid="${f.binid}" data-statusname="${f.statusid}">`
                                   });
                                }
 
                                $('#tableuserbinitems').DataTable({
                                    data: JsonArrayInventory,
                                    destroy: true,
-                                   //scrollX: true,
+                                   scrollX: true,
                                    processing: true,
                                    deferRender: true,
                                    stateSave: true,
                                    autoWidth: false,
-                                   responsive: false,
+                                   responsive: true,
                                    pageLength: 10,
                                    "bPaginate": false,
                                    "bLengthChange": false,
@@ -490,6 +528,7 @@
                                        { "data": "binid" },
                                        { "data": "binname" },
                                        { "data": "typename" },
+                                       { "data": "statusid"},
                                        { "data": "statusname" },
                                        { "data": "qty", "class":"derecha" },
                                        { "data": "qtypick", "class":"derecha" },
@@ -546,9 +585,9 @@
                           {
                            errorAction(data.status);
                           }
-                          
+
                       }
-               
+
 
               })
               .fail(function(){})
@@ -557,11 +596,18 @@
               });
 
 
-            
+
 
           }
 
+          function closemodal()
+          {
+              alert('cerrando');
+                     const el = document.getElementById('modalBinsDistribution');
+        const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
+        inst.hide();
 
+          }
 
            $('#companyclient').change(function()
         {
@@ -572,7 +618,7 @@
             var $bin = $('#binselid');
             var $concepts = $('#conceptid');
             var $transactions = $('#transactionid');
-        
+
             // reset select bins
             $bin.empty()
             .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
@@ -588,7 +634,7 @@
             .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
             .prop('disabled', true);
 
-         
+
 
             if (!companyClient) return;
 
@@ -670,19 +716,31 @@
 
         function addqtybinPickProcess()
         {
-              const binReserve = $('#binselid').val();
+              const binidin = $('#binselid').val();
+
+              const typereserveid = $('#typereserveid').val();
+
+              alert(typereserveid);
 
               const token = $('input[name="__RequestVerificationToken"]').val();
 
-              alert(token);
+
 
               var lineid = $('#lineid').val();
 
-              if (binReserve == 0 || binReserve == null)
+              if (binidin == 0 || binidin == null)
               {
                    errorAction("Bin reserve is required");
                    return;
               }
+
+
+                if (typereserveid == 0 || typereserveid == null)
+              {
+                   errorAction("Reserve type inventory  is required");
+                   return;
+              }
+
 
               const valsel = $('#companyclient').val();
 
@@ -699,25 +757,27 @@
 
                 const table = $('#tableuserbinitems').DataTable();
 
-               
+
                 const res = [];
 
                 table.$('.qty-input', { page: 'all' }).each(function () {
-                const binid = Number($(this).data('binid'));
+                const binidout = Number($(this).data('binid'));
+                const statusid = $(this).data('statusname');
                 const qty   = Number($(this).val() || 0);
 
-               
+                
+
 
                 if (qty > 0)
                     {
-                    res.push({lineid, binid, qty });
+                    res.push({lineid, binidout, qty, typereserveid, binidin });
                     }
                 });
 
                 const payload = {
                     companyclient: companyclient,
                     lineid: lineid,
-                    itemslist: res                    
+                    itemslist: res
                 };
 
                 showSpinner();
@@ -729,84 +789,157 @@
                       data: JSON.stringify(payload),
                       headers: { 'RequestVerificationToken': token } // Anti-forgery en header
                     })
-            .done(function (data)
-            {
-               if (data.status == "OK")
-               {
-                    if (data.lista != null) {
+                    .done(function (data)
+                    {
+                       if (data.status == "OK")
+                       {
+                            if (data.lista != null) {
 
-                               var JsonArrayBines = [];
+                                       var JsonArrayBines = [];
 
-                               for (var i = 0; i < data.lista.length; i++) {
-                                                                     
-                                   var f = data.lista[i];
+                                       for (var i = 0; i < data.lista.length; i++) {
 
-                                   JsonArrayBines.push({
-                                        action:'',
-                                        id:f.id,
-                                        headid:f.idPickProcessHdr,
-                                        lineid:f.lindId,
-                                        partnubmer:f.itemNumber,
-                                        requestquantity:f.requestQuantity,
-                                        quantityprocess:f.quantityProcess,
-                                        locator:f.frm3plLocatorStatus,
-                                        picklpn:f.pickLPN,
-                                        qtyonhand:f.qtyOnHand,
-                                        partdesc:f.itemDescription,
-                                        dateinserted:f.dateTimeInserted
-                                   });
-                               }
+                                           var f = data.lista[i];
 
-                                $('#tableuser').DataTable({
-                                   data: JsonArrayBines,
-                                   destroy: true,
-                                   //scrollX: true,
-                                   processing: true,
-                                   deferRender: true,
-                                   stateSave: true,
-                                   autoWidth: false,
-                                   responsive: false,
-                                   pageLength: 10,
-                                   "bPaginate": false,
-                                   "bLengthChange": false,
-                                   "bFilter": true,
-                                   "bInfo": false,
-                                   "bAutoWidth": false,
-                                   "searching": false,
-                                   columns: [
-                                       {
-                                          data: null,
-                                            render: function (data, type, row) {
-                                                return buildDropdown(row);
+                                           JsonArrayBines.push({
+                                                action:'<a href="#" onclick="openmodal(' + f.lindId + ',\'' + f.itemNumber + '\',' + f.requestQuantity +',\'' + f.frm3plLocatorStatus + '\')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(' + f.lindId + ')"><i class="fa-solid fa-eraser"></i></a>',
+                                                id:f.id,
+                                                headid:f.idPickProcessHdr,
+                                                lineid:f.lindId,
+                                                partnubmer:f.itemNumber,
+                                                requestquantity:f.requestQuantity,
+                                                quantityprocess:f.quantityProcess,
+                                                locator:f.frm3plLocatorStatus,
+                                                picklpn:f.pickLPN,
+                                                qtyonhand:f.qtyOnHand,
+                                                partdesc:f.itemDescription,
+                                                dateinserted:f.dateTimeInserted
+                                           });
+                                       }
+
+                                        $('#tableuser').DataTable({
+                                           data: JsonArrayBines,
+                                           destroy: true,
+                                           scrollX: true,
+                                           processing: true,
+                                           deferRender: true,
+                                           stateSave: true,
+                                           autoWidth: false,
+                                           responsive: false,
+                                           pageLength: 10,
+                                           "bPaginate": false,
+                                           "bLengthChange": false,
+                                           "bFilter": true,
+                                           "bInfo": false,
+                                           "bAutoWidth": false,
+                                           "searching": false,
+                                           columns: [
+                                               // {
+                                               //    data: null,
+                                               //      render: function (data, type, row) {
+                                               //          return buildDropdown(row);
+                                               //      }
+                                               //  },
+                                                 { "data": "action" },
+                                                { "data": "id" },
+                                                { "data": "headid" },
+                                                { "data": "lineid" },
+                                                { "data": "partnubmer" },
+                                                { "data": "requestquantity" },
+                                                { "data": "quantityprocess" },
+                                                { "data": "locator" },
+                                                { "data": "picklpn" },
+                                                { "data": "qtyonhand" },
+                                                { "data": "partdesc" },
+                                                { "data": "dateinserted" },
+                                           ],
+                                           createdRow: function (row, data, dataIndex) {
+                                              // índices según tus columnas: requestquantity=4, quantityprocess=5
+                                              const $qtyProcessCell = $('td', row).eq(6);
+
+                                              // limpiar clases previas
+                                              $qtyProcessCell.removeClass('text-success text-danger text-primary fw-bold');
+
+                                              // tomar valores numéricos seguros
+                                              const req  = Number(data.requestquantity ?? 0);
+                                              const proc = Number(data.quantityprocess ?? 0);
+
+                                              if (Number.isNaN(req) || Number.isNaN(proc)) return; // nada que pintar si vienen malos
+
+                                              if (proc === 0) {
+                                                // rojo
+                                                $qtyProcessCell.addClass('text-danger fw-bold');
+                                              } else if (proc === req) {
+                                                // verde
+                                                $qtyProcessCell.addClass('text-success fw-bold');
+                                              } else if (proc > 0 && proc < req) {
+                                                // azul
+                                                $qtyProcessCell.addClass('text-primary fw-bold');
+                                              }
                                             }
-                                        },
-                                        { "data": "id" },
-                                        { "data": "headid" },
-                                        { "data": "lineid" },
-                                        { "data": "partnubmer" },
-                                        { "data": "requestquantity" },
-                                        { "data": "quantityprocess" },
-                                        { "data": "locator" },
-                                        { "data": "picklpn" },
-                                        { "data": "qtyonhand" },
-                                        { "data": "partdesc" },
-                                        { "data": "dateinserted" },
-                                   ]
-                               });
-                           }
-               }
-               else
-               {
-                    errorAction(data.status);
-               }
-            })
-            .fail(function (xhr) {
-                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
-                alert('Could not load bins.');
-            }).always(function(){
 
-                hideSpinner();
-            });
+
+
+                                           ////////////////////
+                                       });
+                                   }
+
+                                  
+                       }
+                       else
+                       {
+                            errorAction(data.status);
+                       }
+                    })
+                    .fail(function (xhr) {
+                        console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                        alert('Could not load bins.');
+                    }).always(function(){
+
+                        hideSpinner();
+
+                         closemodal();
+                    });
         }
+
+        function hideheader()
+        {
+
+           const icono = document.getElementById("ocultarHdr");
+
+            if (icono.classList.contains("fa-eye")) {
+                $('#ocultarHdr').removeClass("fa-eye");
+                $('#ocultarHdr').addClass("fa-eye-slash");
+                $('#header1').hide();
+                $('#header2').hide();
+                $('#header3').hide();
+            } else {
+                $('#ocultarHdr').addClass("fa-eye");
+                $('#ocultarHdr').removeClass("fa-eye-slash");
+                 $('#header1').show();
+                $('#header2').show();
+                $('#header3').show();
+            }
+
+        }
+
+
+        function hidedetail()
+        {
+
+           const icono = document.getElementById("ocultarDetail");
+
+            if (icono.classList.contains("fa-eye")) {
+                $('#ocultarDetail').removeClass("fa-eye");
+                $('#ocultarDetail').addClass("fa-eye-slash");
+                $('#detail1').hide();
+            } else {
+                $('#ocultarDetail').addClass("fa-eye");
+                $('#ocultarDetail').removeClass("fa-eye-slash");
+                 $('#detail1').show();
+            }
+
+        }
+
     </script>
 }

@@ -8,6 +8,7 @@ using DUNES.UI.Services.Inventory.PickProcess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace DUNES.UI.Controllers.Inventory.PickProcess
 {
@@ -44,6 +45,8 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
             return await HandleAsync(async ct =>
             {
+                List<BinPickTm> listdistribution = new List<BinPickTm>();
+
                 PickProcessHdr objhdr = new PickProcessHdr();
                 List<PickProcessItemDetail> objlist = new List<PickProcessItemDetail>();
 
@@ -95,6 +98,8 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(infopickProcess.Data.ListItems));
 
+                HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(listdistribution));
+
 
                 return View(objresult);
 
@@ -137,15 +142,17 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             var token = GetToken();
 
 
+            List<WMSInventoryTypeDto> listInvNoHand = new List<WMSInventoryTypeDto>();
+
             if (token == null)
                 return RedirectToLogin();
 
             return await HandleAsync(async ct =>
             {
 
-                var infotype = await _CommonINVService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient,token, ct);
+                var infotype = await _CommonINVService.GetAllActiveWmsInventoryTypes(_companyDefault, companyclient, token, ct);
 
-               
+
                 if (infotype == null)
                 {
 
@@ -159,29 +166,48 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                         {
                             typeid = info.Id;
                         }
+
+                        WMSInventoryTypeDto objdet = new WMSInventoryTypeDto();
+
+                        if (!info.isOnHand)
+                        {
+
+                            objdet.Id = info.Id;
+                            objdet.Name = info.Name;
+                            objdet.isOnHand = info.isOnHand;
+
+
+                            listInvNoHand.Add(objdet);
+                        }
                     }
                 }
 
-              
+
+                if (listInvNoHand.Count <= 0)
+                {
+                    return new ObjectResult(new { status = "There is not No on-Hand inventory type", continueprocess = false });
+                }
+
+
                 string partnumberzeb = partnumber.Contains("ZEBRA") ? partnumber.Trim() : "ZEBRA-" + partnumber.Trim();
 
                 var listinventory = await _CommonINVService.GetInventoryByItemInventoryType(_companyDefault, companyclient, partnumberzeb, typeid, token, ct);
 
                 if (listinventory.Success && typeid != 0)
                 {
-                    return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, continueprocess = false });
+                    return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, continueprocess = true, listinvnohand = listInvNoHand });
 
                 }
                 else
                 {
                     if (!listinventory.Success)
                     {
-                        return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data , continueprocess = false });
+                        return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, continueprocess = false });
 
                     }
                     else
                     {
-                        return new ObjectResult(new { status = "There is not inventory type for this type :" + typeidst, listinventory = listinventory.Data , continueprocess = true });
+                        return new ObjectResult(new { status = "There is not inventory type for this type :" + typeidst, listinventory = listinventory.Data, continueprocess = true });
                     }
                 }
 
@@ -320,7 +346,69 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     }
                 }
 
+                //se cargar a lista de distribucion
+
+                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+
+                List<BinPickTm> distributionlist = new List<BinPickTm>();
+
+                if (listdist.Count <= 0)
+                {
+                    foreach (var info in req!.itemslist)
+                    {
+                        BinPickTm objdet = new BinPickTm();
+
+                        objdet.lineid = info.lineid;
+                        objdet.qty = info.qty;
+                        objdet.binidout = info.binidout;
+                        objdet.binidin = info.binidin;
+                        objdet.statusid = info.statusid;
+
+                        distributionlist.Add(objdet);
+                    }
+
+                }
+                else
+                {
+
+                    foreach (var info2 in req!.itemslist)
+                    {  
+                        bool thereisdata = false;
+
+
+
+                        foreach (var info in listdist)
+                        {
+
+                            if (info.lineid == info2.lineid && info.binidout == info2.binidout
+                            && info.binidin == info2.binidin)
+                            {
+                                info.qty += info2.qty;
+
+                                thereisdata = true;
+
+                                distributionlist.Add(info);
+                            }
+                        }
+
+                        if (!thereisdata)
+                        {
+                            BinPickTm objdet = new BinPickTm();
+
+                            objdet.lineid = info2.lineid;
+                            objdet.qty = info2.qty;
+                            objdet.binidout = info2.binidout;
+                            objdet.binidin = info2.binidin;
+                            objdet.statusid = info2.statusid;
+
+                            distributionlist.Add(objdet);
+                        }
+                    }
+
+                }
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(lista));
+
+                HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(distributionlist));
 
                 return Ok(new { status = "OK", lista = lista });
             }, ct);

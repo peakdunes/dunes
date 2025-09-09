@@ -8,8 +8,12 @@ namespace DUNES.Shared.TemporalModels
 {
     public class BinPickTm
     {
-        public int lineid { get; set; }  // opcional si ya lo pasas arriba
-        public int binid { get; set; }
+        public int lineid { get; set; }  
+        public int binidout { get; set; }
         public int qty { get; set; }
+        public int typereserveid { get; set; }
+        public int binidin { get; set; }
+        public int statusid { get; set; }
+
     }
 }

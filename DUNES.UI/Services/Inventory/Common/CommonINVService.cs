@@ -96,7 +96,7 @@ namespace DUNES.UI.Services.Inventory.Common
             HttpResponseMessage resp;
 
 
-            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/inventorytype/{companyid}/{companyClient}");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-inventorytype/{companyid}/{companyClient}");
 
             return await resp.ReadAsApiResponseAsync<List<WMSInventoryTypeDto>>(ct);
         }
@@ -119,7 +119,7 @@ namespace DUNES.UI.Services.Inventory.Common
             HttpResponseMessage resp;
 
 
-            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/inventoryByPartNumber/{companyid}/{companyClient}/{parnumber}");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/onHand-InvByPartNumber/{companyid}/{companyClient}/{parnumber}");
 
             return await resp.ReadAsApiResponseAsync<List<WMSInventoryDetailByPartNumberDto>>(ct);
         }
@@ -132,7 +132,7 @@ namespace DUNES.UI.Services.Inventory.Common
             HttpResponseMessage resp;
 
 
-            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/inventoryByPartNumberInvType/{companyid}/{companyClient}/{parnumber}/{typeid}");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/onHand-InvByPartNumber-Type/{companyid}/{companyClient}/{parnumber}/{typeid}");
 
             return await resp.ReadAsApiResponseAsync<List<WMSInventoryDetailByPartNumberDto>>(ct);
         }
