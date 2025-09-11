@@ -3,7 +3,7 @@ using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
-using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;

@@ -76,6 +76,25 @@ public class CommonQueryB2BController : ControllerBase
             return StatusCode(response.StatusCode, response);
         }
 
+
+
+        /// <summary>
+        /// Displays the main 4 tables associated with an order in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <returns></returns>
+        [HttpGet("order-repair/info/{refNo}")]
+        public async Task<IActionResult> GetAllTablesOrderRepairCreatedAsync(int refNo)
+        {
+            var response = await _service.GetAllTablesOrderRepairCreatedAsync(refNo);
+            return StatusCode(response.StatusCode, response);
+        }
+
+
         /// <summary>
         /// Get info about one repair when it's ready for receive
         /// </summary>

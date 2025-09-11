@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.DTOs.Inventory
+namespace DUNES.Shared.DTOs.WMS
 {
     public class WMSInputTransactionsDto
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DUNES.Shared.DTOs.WMS;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

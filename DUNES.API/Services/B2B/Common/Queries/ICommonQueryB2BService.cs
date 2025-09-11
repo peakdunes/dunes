@@ -1,5 +1,6 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.B2b;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.Models;
 
@@ -32,6 +33,21 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// <param name="refNo"></param>
         /// <returns></returns>
         Task<ApiResponse<bool>> GetAllRMATablesCreatedAsync(int refNo);
+
+
+        /// <summary>
+        /// Displays the 4 tables associated with an order in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <returns></returns>
+        Task<ApiResponse<OrderRepairFourTablesRead>> GetAllTablesOrderRepairCreatedAsync(int refNo);
+
+        
+
 
         /// <summary>
         /// Get the current area from the sql

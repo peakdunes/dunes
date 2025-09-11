@@ -1,5 +1,6 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.B2b;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.Models;
@@ -24,7 +25,11 @@ namespace DUNES.API.Services.B2B.Common.Queries
         {
             _repository = repository;
         }
-
+        /// <summary>
+        /// get all date fields from a servtrack order 
+        /// </summary>
+        /// <param name="refNumber"></param>
+        /// <returns></returns>
         public async Task<ApiResponse<TorderRepairHdrDatesDto>> GetAllDateFieldsRepair(int refNumber)
         {
             var info = await _repository.GetAllDateFieldsRepair(refNumber);
@@ -53,6 +58,27 @@ namespace DUNES.API.Services.B2B.Common.Queries
             }
 
             return ApiResponseFactory.Ok(true, "Reference information retrieved successfully");
+        }
+
+        /// <summary>
+        /// Displays the 4 tables associated with an order in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<OrderRepairFourTablesRead>> GetAllTablesOrderRepairCreatedAsync(int refNo)
+        {
+            var info = await _repository.GetAllTablesOrderRepairCreatedAsync(refNo);
+
+            if (info.OrHdr == null)
+            {
+                return ApiResponseFactory.NotFound<OrderRepairFourTablesRead>($"The Reference Number {refNo} does not exist in our system.");
+            }
+
+            return ApiResponseFactory.Ok(info, "Reference information retrieved successfully");
         }
 
 

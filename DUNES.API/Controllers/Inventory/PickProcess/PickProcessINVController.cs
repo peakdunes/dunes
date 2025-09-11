@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Services.Inventory.PickProcess.Queries;
+using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
@@ -12,20 +13,22 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class CommonQueryPickProcessINVController : ControllerBase
+    public class PickProcessINVController : ControllerBase
     {
 
 
         private readonly ICommonQueryPickProcessINVService _service;
+        private readonly ITransactionsPickProcessINVService _transactionservice;
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="service"></param>
-        public CommonQueryPickProcessINVController(ICommonQueryPickProcessINVService service)
+        public PickProcessINVController(ICommonQueryPickProcessINVService service, ITransactionsPickProcessINVService transactionservice)
         {
             
             _service = service;
+            _transactionservice = transactionservice;
         }
 
 
@@ -65,6 +68,22 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
 
 
         }
-        
+
+        /// <summary>
+        /// Create a complete repair order servtrak order from a pick process number
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<PickProcessDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpPost("order-repair-create-from-delivery/{DeliveryId}")]
+        public async Task<IActionResult> CreateServTrackOrderFromPickProcess(string DeliveryId)
+        {
+            var response = await _transactionservice.CreateServTrackOrderFromPickProcess(DeliveryId);
+
+            return StatusCode(response.StatusCode, response);
+
+
+        }
     }
 }

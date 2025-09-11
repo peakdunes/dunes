@@ -63,9 +63,9 @@
 
 
                 <div class="row mt-2">
-                    <div class="col-md-8">
+                    <div class="col-md-12">
                         <h4 class="brand-subtitle">Part Number Qty in WMS Bins</h4>
-                        <table id="tableuserbinitems" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
+                        <table id="tableuserbinitems" class="table table-bordered no-wrap table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
 
                             <thead>
                                 <tr>
@@ -75,9 +75,11 @@
                                     <th>
                                         Bin Name
                                     </th>
-
                                     <th>
                                         Inventory Type
+                                    </th>
+                                    <th>
+                                        Inventory Name
                                     </th>
                                     <th>
                                         Status Id
@@ -115,7 +117,7 @@
     </div>
 </div>
 
-<div class="container mt-4">
+<div class="row mt-4">
     <form id="pick-form" method="get" autocomplete="off" class="mb-3">
         <div class="row g-3 align-items-end">
             <div class="col-12 col-md-6">
@@ -341,7 +343,7 @@
         </div>
         <div class="row justify-content-end">
             <div class="col-3 col-md-auto d-grid">
-                <button type="button" class="btn btn-primary">Process</button>
+                <button type="button" onclick="processPick()" class="btn btn-primary">Process</button>
             </div>
         </div>
     </div>
@@ -496,37 +498,38 @@
                                   JsonArrayInventory.push({
                                           binid: f.binid,
                                           binname: f.binname,
+                                          inventorytypeid : f.inventorytypeid,
                                           typename: f.inventoryname,
                                           statusid: f.statusid,
                                           statusname :f.statusname,
                                           qty: f.qty,
                                           qtypick : `<input type="number"
                                              class="form-control form-control-sm qty-input"
-                                             value="0"
+                                             value="${f.qtyreserved}"
                                              min="0" step="1"
-                                             data-binid="${f.binid}" data-statusname="${f.statusid}">`
+                                             data-binid="${f.binid}" data-invtype = "${f.inventorytypeid}" data-statusname="${f.statusid}">`
                                   });
                                }
 
                                $('#tableuserbinitems').DataTable({
                                    data: JsonArrayInventory,
                                    destroy: true,
-                                   scrollX: true,
                                    processing: true,
-                                   deferRender: true,
-                                   stateSave: true,
-                                   autoWidth: false,
-                                   responsive: true,
-                                   pageLength: 10,
-                                   "bPaginate": false,
-                                   "bLengthChange": false,
-                                   "bFilter": true,
-                                   "bInfo": false,
-                                   "bAutoWidth": false,
-                                   "searching": false,
+                                    deferRender: true,
+                                    stateSave: true,
+                                    autoWidth: false,
+                                    responsive: true,
+                                    pageLength: 10,
+                                    "bPaginate": false,
+                                    "bLengthChange": false,
+                                    "bFilter": true,
+                                    "bInfo": false,
+                                    "bAutoWidth": false,
+                                    "searching": false,
                                    columns: [
                                        { "data": "binid" },
                                        { "data": "binname" },
+                                       { "data": "inventorytypeid" },
                                        { "data": "typename" },
                                        { "data": "statusid"},
                                        { "data": "statusname" },
@@ -602,7 +605,7 @@
 
           function closemodal()
           {
-              alert('cerrando');
+              
                      const el = document.getElementById('modalBinsDistribution');
         const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
         inst.hide();
@@ -719,12 +722,8 @@
               const binidin = $('#binselid').val();
 
               const typereserveid = $('#typereserveid').val();
-
-              alert(typereserveid);
-
+                         
               const token = $('input[name="__RequestVerificationToken"]').val();
-
-
 
               var lineid = $('#lineid').val();
 
@@ -756,21 +755,21 @@
 
 
                 const table = $('#tableuserbinitems').DataTable();
-
-
+                
                 const res = [];
 
                 table.$('.qty-input', { page: 'all' }).each(function () {
                 const binidout = Number($(this).data('binid'));
                 const statusid = $(this).data('statusname');
+                const inventorytypeid = $(this).data('invtype');
                 const qty   = Number($(this).val() || 0);
 
-                
 
+             
 
                 if (qty > 0)
                     {
-                    res.push({lineid, binidout, qty, typereserveid, binidin });
+                    res.push({lineid, binidout, qty, typereserveid, binidin, statusid, inventorytypeid });
                     }
                 });
 
@@ -793,97 +792,7 @@
                     {
                        if (data.status == "OK")
                        {
-                            if (data.lista != null) {
-
-                                       var JsonArrayBines = [];
-
-                                       for (var i = 0; i < data.lista.length; i++) {
-
-                                           var f = data.lista[i];
-
-                                           JsonArrayBines.push({
-                                                action:'<a href="#" onclick="openmodal(' + f.lindId + ',\'' + f.itemNumber + '\',' + f.requestQuantity +',\'' + f.frm3plLocatorStatus + '\')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(' + f.lindId + ')"><i class="fa-solid fa-eraser"></i></a>',
-                                                id:f.id,
-                                                headid:f.idPickProcessHdr,
-                                                lineid:f.lindId,
-                                                partnubmer:f.itemNumber,
-                                                requestquantity:f.requestQuantity,
-                                                quantityprocess:f.quantityProcess,
-                                                locator:f.frm3plLocatorStatus,
-                                                picklpn:f.pickLPN,
-                                                qtyonhand:f.qtyOnHand,
-                                                partdesc:f.itemDescription,
-                                                dateinserted:f.dateTimeInserted
-                                           });
-                                       }
-
-                                        $('#tableuser').DataTable({
-                                           data: JsonArrayBines,
-                                           destroy: true,
-                                           scrollX: true,
-                                           processing: true,
-                                           deferRender: true,
-                                           stateSave: true,
-                                           autoWidth: false,
-                                           responsive: false,
-                                           pageLength: 10,
-                                           "bPaginate": false,
-                                           "bLengthChange": false,
-                                           "bFilter": true,
-                                           "bInfo": false,
-                                           "bAutoWidth": false,
-                                           "searching": false,
-                                           columns: [
-                                               // {
-                                               //    data: null,
-                                               //      render: function (data, type, row) {
-                                               //          return buildDropdown(row);
-                                               //      }
-                                               //  },
-                                                 { "data": "action" },
-                                                { "data": "id" },
-                                                { "data": "headid" },
-                                                { "data": "lineid" },
-                                                { "data": "partnubmer" },
-                                                { "data": "requestquantity" },
-                                                { "data": "quantityprocess" },
-                                                { "data": "locator" },
-                                                { "data": "picklpn" },
-                                                { "data": "qtyonhand" },
-                                                { "data": "partdesc" },
-                                                { "data": "dateinserted" },
-                                           ],
-                                           createdRow: function (row, data, dataIndex) {
-                                              // índices según tus columnas: requestquantity=4, quantityprocess=5
-                                              const $qtyProcessCell = $('td', row).eq(6);
-
-                                              // limpiar clases previas
-                                              $qtyProcessCell.removeClass('text-success text-danger text-primary fw-bold');
-
-                                              // tomar valores numéricos seguros
-                                              const req  = Number(data.requestquantity ?? 0);
-                                              const proc = Number(data.quantityprocess ?? 0);
-
-                                              if (Number.isNaN(req) || Number.isNaN(proc)) return; // nada que pintar si vienen malos
-
-                                              if (proc === 0) {
-                                                // rojo
-                                                $qtyProcessCell.addClass('text-danger fw-bold');
-                                              } else if (proc === req) {
-                                                // verde
-                                                $qtyProcessCell.addClass('text-success fw-bold');
-                                              } else if (proc > 0 && proc < req) {
-                                                // azul
-                                                $qtyProcessCell.addClass('text-primary fw-bold');
-                                              }
-                                            }
-
-
-
-                                           ////////////////////
-                                       });
-                                   }
-
+                           loadDataDetail(data.lista);
                                   
                        }
                        else
@@ -900,6 +809,97 @@
 
                          closemodal();
                     });
+        }
+
+
+        function loadDataDetail(data)
+        {
+            alert('load detail');
+
+             if (data != null) {
+
+                var JsonArrayBines = [];
+
+                for (var i = 0; i < data.length; i++) {
+
+                    var f = data[i];
+
+                    JsonArrayBines.push({
+                        action:'<a href="#" onclick="openmodal(' + f.lindId + ',\'' + f.itemNumber + '\',' + f.requestQuantity +',\'' + f.frm3plLocatorStatus + '\')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(' + f.lindId + ')"><i class="fa-solid fa-eraser"></i></a>',
+                        id:f.id,
+                        headid:f.idPickProcessHdr,
+                        lineid:f.lindId,
+                        partnubmer:f.itemNumber,
+                        requestquantity:f.requestQuantity,
+                        quantityprocess:f.quantityProcess,
+                        locator:f.frm3plLocatorStatus,
+                        picklpn:f.pickLPN,
+                        qtyonhand:f.qtyOnHand,
+                        partdesc:f.itemDescription,
+                        dateinserted:f.dateTimeInserted
+                    });
+                }
+
+                $('#tableuser').DataTable({
+                    data: JsonArrayBines,
+                    destroy: true,
+                    scrollX: true,
+                    processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false,
+                    columns: [
+                            { "data": "action" },
+                        { "data": "id" },
+                        { "data": "headid" },
+                        { "data": "lineid" },
+                        { "data": "partnubmer" },
+                        { "data": "requestquantity" },
+                        { "data": "quantityprocess" },
+                        { "data": "locator" },
+                        { "data": "picklpn" },
+                        { "data": "qtyonhand" },
+                        { "data": "partdesc" },
+                        { "data": "dateinserted" },
+                    ],
+                    createdRow: function (row, data, dataIndex) {
+                        // índices según tus columnas: requestquantity=4, quantityprocess=5
+                        const $qtyProcessCell = $('td', row).eq(6);
+
+                        // limpiar clases previas
+                        $qtyProcessCell.removeClass('text-success text-danger text-primary fw-bold');
+
+                        // tomar valores numéricos seguros
+                        const req  = Number(data.requestquantity ?? 0);
+                        const proc = Number(data.quantityprocess ?? 0);
+
+                        if (Number.isNaN(req) || Number.isNaN(proc)) return; // nada que pintar si vienen malos
+
+                        if (proc === 0) {
+                        // rojo
+                        $qtyProcessCell.addClass('text-danger fw-bold');
+                        } else if (proc === req) {
+                        // verde
+                        $qtyProcessCell.addClass('text-success fw-bold');
+                        } else if (proc > 0 && proc < req) {
+                        // azul
+                        $qtyProcessCell.addClass('text-primary fw-bold');
+                        }
+                    }
+
+                });
+            }
+
+
+
         }
 
         function hideheader()
@@ -941,5 +941,84 @@
 
         }
 
+
+        async function processPick()
+        {
+            const ok = await confirmAction("¿Do you want to proccess this delivery ?");
+
+            if (!ok) return;
+
+            let table = $('#tableuser').DataTable();
+
+            var continueP = true;
+
+            table.rows({ search: 'applied' }).every(function () {
+            let data = this.data();  // obtienes el objeto por fila
+
+            let val1 = Number(data.requestquantity);
+            let val2 = Number(data.quantityprocess);
+
+
+                if (val1 !== val2)
+                {
+
+                    continueP = false
+                
+                }
+            });
+
+            if (!continueP)
+            {
+              errorAction("You must receive all items");
+                  return;
+
+            }
+            showSpinner();
+
+            $.ajax({url:"@Url.Action("processPick", "PickProcess")", data:{}, type:"post"})
+            .done(function(){})
+            .fail(function(){})
+            .always(function()
+            {
+                hideSpinner();
+            });
+        }
+
+
+        async function deleteAllBinsDistribution(lineid)
+        {
+
+              const ok = await confirmAction("¿Do you want to delete all bins distribution for this line " + lineid + "?");
+
+            if (!ok) return;
+
+            showSpinner();
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+              
+            showSpinner();
+
+            
+            $.ajax({url:"@Url.Action("deleteAllBinsDistribution", "PickProcess")", data:{__RequestVerificationToken: token,lineid:lineid}, type:"post"})
+            .done(function(data)
+            {
+                if(data.status == "OK")
+                {
+                    successAction("Distribution deleted");
+
+                    loadDataDetail(data.lista);
+                }
+                else
+                {
+                     errorAction(data.status);
+                }
+            })
+            .fail(function(){})
+            .always(function()
+            {
+                hideSpinner();
+            });
+
+        }
     </script>
 }

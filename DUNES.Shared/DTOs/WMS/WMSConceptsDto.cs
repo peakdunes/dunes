@@ -4,13 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.DTOs.Inventory
+namespace DUNES.Shared.DTOs.WMS
 {
-    public class WMSBinsDto
+    public class WMSConceptsDto
     {
-
         public int Id { get; set; }
 
-        public string TagName { get; set; }
+        public string Name { get; set; }
     }
 }

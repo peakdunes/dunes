@@ -1,4 +1,5 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.UI.Helpers;
@@ -7,8 +8,10 @@ using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.UI.Controllers.Inventory.PickProcess
 {
@@ -193,6 +196,49 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 var listinventory = await _CommonINVService.GetInventoryByItemInventoryType(_companyDefault, companyclient, partnumberzeb, typeid, token, ct);
 
+                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+
+
+                //           Idcompany { get; set; }
+                //companyclientid { get; set; }
+                //locationid { get; set; }
+
+
+                //binid { get; set; }
+
+                //inventorytypeid { get; set; }
+
+                //statusid { get; set; }
+
+                //rackid { get; set; }
+                //rackname { get; set; }
+                //qtyreserved { get; set; } = 0;
+
+                foreach (var data in listinventory.Data)
+                {
+
+                    foreach (var item in listdist)
+                    {
+
+                        //binid { get; set; }
+
+                        //inventorytypeid { get; set; }
+
+                        //statusid { get; set; }
+
+
+                        if (item.lineid == lineid)
+                        {
+                            if (data.binid == item.binidout && data.statusid == item.statusid && data.inventorytypeid == item.inventorytypeid)
+                            {
+                                data.qtyreserved = item.qty;
+                            }
+
+                        }
+
+                    }
+                }
+
                 if (listinventory.Success && typeid != 0)
                 {
                     return new ObjectResult(new { status = listinventory.Error, listinventory = listinventory.Data, continueprocess = true, listinvnohand = listInvNoHand });
@@ -341,7 +387,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     {
                         if (Convert.ToInt32(list.LindId) == info.lineid)
                         {
-                            list.QuantityProcess += info.qty;
+                            list.QuantityProcess = 0;
                         }
                     }
                 }
@@ -350,68 +396,101 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
 
-                List<BinPickTm> distributionlist = new List<BinPickTm>();
+                List<BinPickTm> newlistdist = new List<BinPickTm>();
 
-                if (listdist.Count <= 0)
+                //elimina toda la distribucion para la linea que va ha adicionar
+                //para no duplicar valores
+
+                foreach (var list in listdist!)
                 {
-                    foreach (var info in req!.itemslist)
+                    if (list.lineid != req.lineid)
                     {
-                        BinPickTm objdet = new BinPickTm();
-
-                        objdet.lineid = info.lineid;
-                        objdet.qty = info.qty;
-                        objdet.binidout = info.binidout;
-                        objdet.binidin = info.binidin;
-                        objdet.statusid = info.statusid;
-
-                        distributionlist.Add(objdet);
+                        newlistdist.Add(list);
                     }
-
                 }
-                else
+
+                //se insertan las nuevas lineas
+                foreach (var info2 in req!.itemslist)
                 {
-
-                    foreach (var info2 in req!.itemslist)
-                    {  
-                        bool thereisdata = false;
-
-
-
-                        foreach (var info in listdist)
-                        {
-
-                            if (info.lineid == info2.lineid && info.binidout == info2.binidout
-                            && info.binidin == info2.binidin)
-                            {
-                                info.qty += info2.qty;
-
-                                thereisdata = true;
-
-                                distributionlist.Add(info);
-                            }
-                        }
-
-                        if (!thereisdata)
-                        {
-                            BinPickTm objdet = new BinPickTm();
-
-                            objdet.lineid = info2.lineid;
-                            objdet.qty = info2.qty;
-                            objdet.binidout = info2.binidout;
-                            objdet.binidin = info2.binidin;
-                            objdet.statusid = info2.statusid;
-
-                            distributionlist.Add(objdet);
-                        }
-                    }
+                    newlistdist.Add(info2);
 
                 }
+
+                //se actualiza la cantidad recibida
+
+                foreach (var info in lista)
+                {
+                    foreach (var info2 in req!.itemslist)
+                    {
+                        if (Convert.ToInt32(info.LindId) == info2.lineid)
+                        {
+                            info.QuantityProcess += info2.qty;
+                        }
+                    }
+                }
+
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(lista));
 
-                HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(distributionlist));
+                HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(newlistdist));
 
                 return Ok(new { status = "OK", lista = lista });
             }, ct);
         }
+
+        [HttpPost]
+        public IActionResult processPick(string DeliveryId)
+        {
+
+            //1.we need to create order repair (4 tables)
+            //2. we need to create WMS transfer to type reserved
+            //3. we need to update pickprocess tables
+            //4. we need to put call type 13
+
+
+
+            return new ObjectResult(new { status = "Ok" });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> deleteAllBinsDistribution(int lineid, CancellationToken ct)
+        {
+
+            return await HandleAsync(async ct =>
+            {
+
+                var lista = JsonConvert.DeserializeObject<List<PickProcessItemDetail>>(HttpContext.Session.GetString("pickProcessDetail"));
+
+                foreach (var list in lista!)
+                {
+                    if (Convert.ToInt32(list.LindId) == lineid)
+                    {
+                        list.QuantityProcess = 0;
+                    }
+                }
+
+                //se cargar a lista de distribucion
+
+                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+
+                List<BinPickTm> newlistdist = new List<BinPickTm>();
+
+                foreach (var list in listdist!)
+                {
+                    if (list.lineid != lineid)
+                    {
+                        newlistdist.Add(list);
+                    }
+                }
+
+                HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(lista));
+
+                HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(newlistdist));
+
+                return Ok(new { status = "OK", lista = lista });
+            }, ct);
+        }
+
     }
 }

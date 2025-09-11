@@ -1,7 +1,7 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
-using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Inventory.Common.Queries

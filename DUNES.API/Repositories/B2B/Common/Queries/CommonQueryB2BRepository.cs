@@ -2,6 +2,7 @@
 using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.Utils.Responses;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -66,20 +67,48 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
         /// <returns></returns>
         public async Task<bool> GetAllRMATablesCreatedAsync(int refNo)
         {
-                    return await (
-                from encOrder in _context.TorderRepairHdr
-                join recOrder in _context.TorderRepairItemsSerialsReceiving
-                    on encOrder.RefNo equals recOrder.RefNo
-                join shpOrder in _context.TorderRepairItemsSerialsShipping
-                    on encOrder.RefNo equals shpOrder.RefNo
-                join itemOrder in _context.TorderRepairItems
-                    on encOrder.RefNo equals itemOrder.RefNo
-                where encOrder.RefNo == refNo
-                select encOrder.RefNo
-            ).AnyAsync();
+            return await (
+                    from encOrder in _context.TorderRepairHdr
+                        join recOrder in _context.TorderRepairItemsSerialsReceiving
+                            on encOrder.RefNo equals recOrder.RefNo
+                        join shpOrder in _context.TorderRepairItemsSerialsShipping
+                            on encOrder.RefNo equals shpOrder.RefNo
+                        join itemOrder in _context.TorderRepairItems
+                            on encOrder.RefNo equals itemOrder.RefNo
+                        where encOrder.RefNo == refNo
+                        select encOrder.RefNo
+                    ).AnyAsync();
 
 
         }
+
+
+
+        /// <summary>
+        /// Displays the 4 tables associated with an order in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <returns></returns>
+        public async Task<OrderRepairFourTablesRead> GetAllTablesOrderRepairCreatedAsync(int refNo)
+        {
+
+            OrderRepairFourTablesRead objdto = new OrderRepairFourTablesRead();
+
+            objdto.OrHdr = await _context.TorderRepairHdr.FirstOrDefaultAsync(x => x.RefNo == refNo);
+            objdto.ItemList = await _context.TorderRepairItems.Where(x => x.RefNo == refNo).ToListAsync();
+            objdto.ReceivingList = await _context.TorderRepairItemsSerialsReceiving.Where(x => x.RefNo.Equals(refNo)).ToListAsync();
+            objdto.ShippingList = await _context.TorderRepairItemsSerialsShipping.Where(x => x.RefNo.Equals(refNo)).ToListAsync();
+
+
+            return objdto;
+
+        }
+
+
         /// <summary>
         /// Get the current area from the sql
         /// </summary>

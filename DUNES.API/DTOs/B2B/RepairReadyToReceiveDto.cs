@@ -5,7 +5,7 @@ namespace DUNES.API.DTOs.B2B
 {
 
     /// <summary>
-    /// Reapair order ready to receive
+    /// Reapair order ready to receive DTO table _Trepair
     /// </summary>
    
     public class RepairReadyToReceiveDto
@@ -20,13 +20,13 @@ namespace DUNES.API.DTOs.B2B
         public string SerialINBOUND { get; set; }
 
         /// <summary>
-        /// referenc number
+        /// reference number
         /// </summary>
         [MaxLength(50)]
         public string Ref_No { get; set; }
 
         /// <summary>
-        /// Repar number
+        /// Repair number
         /// </summary>
         [MaxLength(20)]
         public string Repair_No { get; set; }

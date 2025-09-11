@@ -1,6 +1,7 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.Utils.Responses;
 
 namespace DUNES.API.Repositories.B2B.Common.Queries
@@ -27,11 +28,30 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
 
 
         /// <summary>
-        /// Check if a RMA was created correcty in our database (records in 4 tables)
+        /// Check if a RMA was created correcty in our database 
+        /// records in 4 tables : 
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
         /// </summary>
         /// <param name="refNo"></param>
         /// <returns></returns>
         Task<bool> GetAllRMATablesCreatedAsync(int refNo);
+
+
+
+        /// <summary>
+        /// Displays the 4 tables associated with an order in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <returns></returns>
+        Task<OrderRepairFourTablesRead> GetAllTablesOrderRepairCreatedAsync(int refNo);
+
 
         /// <summary>
         /// Get the current area from the sql

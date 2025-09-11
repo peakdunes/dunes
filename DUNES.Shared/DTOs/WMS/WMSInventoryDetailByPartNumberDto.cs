@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.DTOs.Inventory
+namespace DUNES.Shared.DTOs.WMS
 {
     public class WMSInventoryDetailByPartNumberDto
     {
@@ -84,5 +84,10 @@ namespace DUNES.Shared.DTOs.Inventory
         /// </summary>
         [MaxLength(100)]
         public string rackname { get; set; }
+
+        /// <summary>
+        /// Quantity reserved 
+        /// </summary>
+        public int qtyreserved { get; set; } = 0;
     }
 }

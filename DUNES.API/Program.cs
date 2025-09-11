@@ -5,12 +5,14 @@ using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
+using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Queries;
+using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Logging;
@@ -177,6 +179,9 @@ builder.Services.AddScoped<ICommonQueryASNINVService, CommonQueryASNINVService>(
 
 builder.Services.AddScoped<ICommonQueryPickProcessINVRepository, CommonQueryPickProcessINVRepository>();
 builder.Services.AddScoped<ICommonQueryPickProcessINVService, CommonQueryPickProcessINVService>();
+
+builder.Services.AddScoped<ITransactionsPickProcessINVRepository, TransactionsPickProcessINVRepository>();
+builder.Services.AddScoped<ITransactionsPickProcessINVService, TransactionsPickProcessINVService>();
 
 
 

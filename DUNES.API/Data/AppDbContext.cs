@@ -1,4 +1,5 @@
 ﻿using DUNES.API.DTOs.B2B;
+using DUNES.API.DTOs.Inventory;
 using DUNES.API.Models;
 using DUNES.API.Models.Auth;
 using DUNES.API.Models.B2b;
@@ -6,6 +7,7 @@ using DUNES.API.Models.B2B;
 using DUNES.API.Models.Inventory;
 using DUNES.API.Models.Masters;
 using DUNES.Shared.DTOs.Auth;
+using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Data
@@ -50,7 +52,12 @@ namespace DUNES.API.Data
         /// It supports up to 5 hierarchical levels and nested children.
         /// </summary>
         public DbSet<MenuItemDto> menuItemDto { get; set; }
-        
+
+        /// <summary>
+        /// TO create a servtrack orders (return refnum and error message)
+        /// </summary>
+        public DbSet<ServTrackReferenceCreatedDto> ServTrackReferences { get; set; }
+
 
         ///############################
         ///End DTO Definition

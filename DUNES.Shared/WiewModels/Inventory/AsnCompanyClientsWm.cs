@@ -1,4 +1,4 @@
-﻿using DUNES.Shared.DTOs.Inventory;
+﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.WiewModels;
 namespace DUNES.UI.WiewModels
