@@ -39,5 +39,13 @@ namespace DUNES.API.Services.Masters
         /// <param name="id"></param>
         /// <returns></returns>
         Task<ApiResponse<bool>> DeleteByIdAsync(int id);
+
+        /// <summary>
+        /// Get all table records for a string field
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<T>>> SearchByFieldAsync(string fieldName, string value);
     }
 }

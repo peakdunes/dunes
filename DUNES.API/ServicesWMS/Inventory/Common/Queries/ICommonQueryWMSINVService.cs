@@ -12,6 +12,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
     /// </summary>
     public interface ICommonQueryWMSINVService
     {
+
+
+
         /// <summary>
         /// Get all the bins associated with a client company 
         /// </summary>

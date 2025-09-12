@@ -35,6 +35,8 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             _transactionRepository = transactionRepository;
         }
 
+       
+
         /// <summary>
         /// Create a servtrack order from delivery id
         /// </summary>
@@ -63,6 +65,44 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
 
             return ApiResponseFactory.Ok(result, "OK");
 
+        }
+
+        /// <summary>
+        /// Perform pick process processing
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        public Task<int> CreatePickProccessTransaction(string DeliveryId)
+        {
+            throw new NotImplementedException();
+
+            //await using var tx = await _context.Database.BeginTransactionAsync();
+
+            //try
+            //{
+            //    // 1. Order Repair (4 tablas)
+            //    var orderRepairId = await _orderRepairRepo.CreateOrderRepairAsync(dto.OrderRepair);
+
+            //    // 2. WMS Transaction (2 tablas)
+            //    var wmsId = await _wmsRepo.CreateWmsTransactionAsync(dto.Wms);
+
+            //    // 3. Call (1 tabla, tu SP)
+            //    var callId = await _callRepo.CreateCallAsync(dto.DeliveryId);
+
+            //    // 4. Update PickProcess master
+            //    await _pickProcessRepo.UpdatePickProcessAsync(dto.PickProcessId, orderRepairId, wmsId, callId);
+
+            //    // ✅ Commit
+            //    await tx.CommitAsync();
+
+            //    return ApiResponseFactory.Ok(orderRepairId, "Pick process completed successfully");
+            //}
+            //catch (Exception ex)
+            //{
+            //    // ❌ Rollback
+            //    await tx.RollbackAsync();
+            //    return ApiResponseFactory.Error<int>($"Pick process failed: {ex.Message}");
+            //}
         }
     }
 }

@@ -15,5 +15,18 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
         Task<ApiResponse<ServTrackReferenceCreatedDto>> CreateServTrackOrderFromPickProcess(string DeliveryId);
+
+
+
+        /// <summary>
+        /// Perform pick process processing
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        Task<int> CreatePickProccessTransaction(string DeliveryId);
+
     }
+
+
+
 }

@@ -8,6 +8,7 @@ using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
+using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
@@ -15,6 +16,7 @@ using DUNES.API.Services.Inventory.PickProcess.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
+using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -160,6 +162,9 @@ builder.Services.AddSwaggerGen(c =>
 //AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
 
+builder.Services.AddHttpContextAccessor();
+
+
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 
@@ -190,6 +195,14 @@ builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<
 
 //para usar en el CRUD de las tablas maestras
 builder.Services.AddScoped(typeof(IMasterService<>), typeof(MasterService<>));
+
+
+//WMS MASTER SERVICES
+
+builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
+builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterService>();
+
+
 
 //WMS INV SERVICES
 

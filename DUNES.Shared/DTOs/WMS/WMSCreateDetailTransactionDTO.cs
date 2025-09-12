@@ -19,7 +19,9 @@ namespace DUNES.Shared.DTOs.WMS
 
         public int Level { get; set; }
 
-        public string? Iditem { get; set; }
+        public string? Codeitem { get; set; }
+
+        public int Iditem { get; set; }
 
         public int TotalQty { get; set; }
 

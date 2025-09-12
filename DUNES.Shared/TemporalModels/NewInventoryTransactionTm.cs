@@ -19,11 +19,6 @@ namespace DUNES.Shared.TemporalModels
 
         public required List<WMSCreateDetailTransactionDTO> Listdetails { get; set; }
 
-        [MaxLength(100)]
-        public string? DocReference { get; set; }
-
-        [MaxLength(500)]
-
-        public string? Observations { get; set; }
+       
     }
 }

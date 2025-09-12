@@ -12,8 +12,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
     public class TransactionsWMSINVRepository : ITransactionsWMSINVRepository
     {
 
-
-
         private readonly appWmsDbContext _wmscontext;
 
         /// <summary>
@@ -43,10 +41,10 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
                 objhdr.Datecreated = DateTime.Now;
                 objhdr.Processed = false;
                 objhdr.IdUserprocess = null;
-                objhdr.Idcompanyclient = objdata.hdr.Idcompanyclient;
+                objhdr.Idcompanyclient = objdata.hdr.Codecompanyclient;
                 objhdr.Dateprocessed = DateTime.MinValue;
-                objhdr.Documentreference = string.IsNullOrEmpty(objdata.DocReference) ? "" : objdata.DocReference;
-                objhdr.Observations = string.IsNullOrEmpty(objdata.Observations) ? "" : objdata.Observations;
+                objhdr.Documentreference = string.IsNullOrEmpty(objdata.hdr.Documentreference) ? "" : objdata.hdr.Documentreference;
+                objhdr.Observations = string.IsNullOrEmpty(objdata.hdr.Observations) ? "" : objdata.hdr.Observations;
                 objhdr.Iddivision = objdata.hdr.Iddivision;
 
                 _wmscontext.InventorytransactionHdr.Add(objhdr);
@@ -62,7 +60,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
                     objdetail.Idtype = det.Idtype;
                     objdetail.Idrack = det.Idrack;
                     objdetail.Level = det.Level;
-                    objdetail.Iditem = det.Iditem;
+                    objdetail.Iditem = det.Codeitem;
                     objdetail.TotalQty = det.TotalQty;
                     objdetail.Idbin = det.Idbin;
                     objdetail.Idstatus = det.Idstatus;
@@ -76,7 +74,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
                     await _wmscontext.SaveChangesAsync();
                 }
 
-                await transaction.CommitAsync(); // ✅ si todo bien
+                await transaction.CommitAsync(); 
 
                 return objhdr.Id;
             }

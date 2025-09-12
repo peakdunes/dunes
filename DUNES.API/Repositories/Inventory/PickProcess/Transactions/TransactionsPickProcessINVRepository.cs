@@ -1,6 +1,7 @@
 ﻿
 using DUNES.API.Data;
 using DUNES.API.DTOs.Inventory;
+using DUNES.API.Models.Inventory;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -29,13 +30,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             _wmscontext = wmscontext;
         }
 
-
-
-
-
-
-
-
+      
         /// <summary>
         /// create ServTrack Order from pick process delivery
         /// </summary>
@@ -60,5 +55,31 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
 
             return result;
         }
+
+        /// <summary>
+        /// create a pick process call a return call id
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        public async Task<int> CreatePickProcessCall(string DeliveryId)
+        {
+
+            //we need to create this new SP en production database
+
+            using var command = _context.Database.GetDbConnection().CreateCommand();
+            command.CommandText = "_SPZEB_B2B_Insert_Stage_Call_For_DeliveryID_ReturnID";
+            command.CommandType = System.Data.CommandType.StoredProcedure;
+
+            var param = command.CreateParameter();
+            param.ParameterName = "@DELIVERYid";
+            param.Value = DeliveryId;
+            command.Parameters.Add(param);
+
+            await _context.Database.OpenConnectionAsync();
+
+            var result = await command.ExecuteScalarAsync();
+            return Convert.ToInt32(result);
+        }
+
     }
 }
