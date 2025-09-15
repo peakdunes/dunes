@@ -14,7 +14,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<ApiResponse<PickProcessDto>> GetPickProcessAllInfo(string DeliveryId);
+        Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId);
 
         /// <summary>
         /// Get all (input, output) calls for a delivery id

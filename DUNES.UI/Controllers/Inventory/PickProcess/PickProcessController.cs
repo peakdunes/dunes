@@ -53,7 +53,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 PickProcessHdr objhdr = new PickProcessHdr();
                 List<PickProcessItemDetail> objlist = new List<PickProcessItemDetail>();
 
-                PickProcessDto objresult = new PickProcessDto
+                PickProcessRequestDto objresult = new PickProcessRequestDto
                 {
                     PickProcessHdr = objhdr,
                     ListItems = objlist

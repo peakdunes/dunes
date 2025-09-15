@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.Inventory
 {
-    public class PickProcessDto
+    public class PickProcessRequestDto
     {
 
         public required PickProcessHdr PickProcessHdr { get; set; }

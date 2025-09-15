@@ -1,6 +1,7 @@
 ﻿
 
 using DUNES.API.Data;
+using DUNES.API.Models.Masters;
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
@@ -8,6 +9,7 @@ using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
+using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
@@ -16,6 +18,7 @@ using DUNES.API.Services.Inventory.PickProcess.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
+using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
@@ -153,6 +156,40 @@ builder.Services.AddSwaggerGen(c =>
             Array.Empty<string>()
         }
     });
+
+    c.TagActionsBy(api =>
+    {
+        var controllerName = api.GroupName ?? api.ActionDescriptor.RouteValues["controller"];
+
+        return controllerName switch
+        {
+            "PickProcessINV" => new[] { "Inventory - Pick Process" },
+            "CommonQueryASNINV" => new[] { "Inventory ASN - Common queries" },
+            "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
+            "ConsignmentCallType" => new[] { "Inventory Calls - CRUD" },
+            "TzebB2bInventoryType" => new[] { "Inventory Types - CRUD" },
+            "WmsCompanyclient" => new[] { "Company Clients - CRUD" },
+
+            
+
+            "TzebFaultCodes" => new[] { "B2B - Fault Codes CRUD" },
+            "TrepairActionsCodes" => new[] { "B2B - Action Codes CRUD" },
+            "TzebWorkCodesTargets" => new[] { "B2B - Work Target Codes CRUD" },
+            
+
+
+
+            "CommonQueryB2B" => new[] { "B2B - Common queries" },
+            "CommonQueryWMSMaster" => new[] { "WMS Master Tables - Common queries" },
+
+            
+
+
+            "CommonQueryWMSINV" => new[] { "WMS Inventory - Common queries" },
+            
+            _ => new[] { controllerName }
+        };
+    });
 });
 
 
@@ -208,7 +245,8 @@ builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterSer
 
 builder.Services.AddScoped<ICommonQueryWMSINVRepository, CommonQueryWMSINVRepository>();
 builder.Services.AddScoped<ICommonQueryWMSINVService, CommonQueryWMSINVService>();
-
+builder.Services.AddScoped<ITransactionsWMSINVService, TransactionsWMSINVService>();
+builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepository>();
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

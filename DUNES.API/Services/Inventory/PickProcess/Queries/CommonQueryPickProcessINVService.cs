@@ -102,13 +102,13 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<PickProcessDto>> GetPickProcessAllInfo(string DeliveryId)
+        public async Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId)
         {
             var info = await _repository.GetPickProcessAllInfo(DeliveryId);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<PickProcessDto>(
+                return ApiResponseFactory.NotFound<PickProcessRequestDto>(
                     $"This Pick Process number ({DeliveryId}) doesn't exist in our system.");
             }
 
@@ -167,7 +167,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
 
             }
 
-            PickProcessDto objreturn = new PickProcessDto
+            PickProcessRequestDto objreturn = new PickProcessRequestDto
             {
                 PickProcessHdr = objenc,
                 ListItems = listDetail

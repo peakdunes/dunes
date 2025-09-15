@@ -25,6 +25,16 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
         /// <returns></returns>
         Task<int> CreatePickProcessCall(string DeliveryId);
 
+        /// <summary>
+        /// Update pickprocess table for pick and confirm process 
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="call13id"></param>
+        /// <param name="LPNNumber"></param>
+        /// <returns></returns>
+        Task<int> UpdatePickProcessTables(string DeliveryId, int call13id, string LPNNumber);
+
+
        
     }
 }

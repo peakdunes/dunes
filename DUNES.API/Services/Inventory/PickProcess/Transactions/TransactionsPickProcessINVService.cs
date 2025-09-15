@@ -2,9 +2,11 @@
 using DUNES.API.DTOs.Inventory;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
+using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Services.Inventory.PickProcess.Transactions
@@ -19,20 +21,27 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         private readonly AppDbContext _context;
         private readonly appWmsDbContext _wmscontext;
 
-        private readonly ITransactionsPickProcessINVRepository _transactionRepository;
+        private readonly ITransactionsPickProcessINVRepository _transactionPickProcessINVRepository;
+        private readonly ITransactionsWMSINVService _transactionsWMSINVService;
+       
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="context"></param>
         /// <param name="wmscontext"></param>
-        /// <param name="transactionRepository"></param>
+        /// <param name="transactionPickProcessINVRepository"></param>
+        /// <param name="transactionsWMSINVService"></param>
+        
         public TransactionsPickProcessINVService(AppDbContext context, appWmsDbContext wmscontext,
-            ITransactionsPickProcessINVRepository transactionRepository)
+            ITransactionsPickProcessINVRepository transactionPickProcessINVRepository,
+            ITransactionsWMSINVService transactionsWMSINVService)
         {
             _context = context;
             _wmscontext = wmscontext;
-            _transactionRepository = transactionRepository;
+            _transactionPickProcessINVRepository = transactionPickProcessINVRepository;
+            _transactionsWMSINVService = transactionsWMSINVService;
+          
         }
 
        
@@ -61,7 +70,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             //     $"Pick Process {DeliveryId} already processed.");
             //}
 
-            var result = await _transactionRepository.CreateServTrackOrderFromPickProcess(DeliveryId);
+            var result = await _transactionPickProcessINVRepository.CreateServTrackOrderFromPickProcess(DeliveryId);
 
             return ApiResponseFactory.Ok(result, "OK");
 
@@ -71,38 +80,118 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// Perform pick process processing
         /// </summary>
         /// <param name="DeliveryId"></param>
+        /// <param name="objInvData"></param>
+        /// <param name="lpnid"></param>
         /// <returns></returns>
-        public Task<int> CreatePickProccessTransaction(string DeliveryId)
+        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData,string lpnid)
         {
-            throw new NotImplementedException();
+            // throw new NotImplementedException();
 
-            //await using var tx = await _context.Database.BeginTransactionAsync();
+            PickProcessResponseDto objresponse = new PickProcessResponseDto();
 
-            //try
-            //{
-            //    // 1. Order Repair (4 tablas)
-            //    var orderRepairId = await _orderRepairRepo.CreateOrderRepairAsync(dto.OrderRepair);
+            await using var tx = await _context.Database.BeginTransactionAsync();
 
-            //    // 2. WMS Transaction (2 tablas)
-            //    var wmsId = await _wmsRepo.CreateWmsTransactionAsync(dto.Wms);
+            try
+            {
+                // 1. Order Repair ServTrack (4 tablas)
+                var servTrackResult = await CreateServTrackOrderFromPickProcess(DeliveryId);
 
-            //    // 3. Call (1 tabla, tu SP)
-            //    var callId = await _callRepo.CreateCallAsync(dto.DeliveryId);
+                if (!servTrackResult.Success)
+                {
+                    await tx.RollbackAsync();
+                    return ApiResponseFactory.NotFound<PickProcessResponseDto>(
+                  $"Pick Process {DeliveryId} does not exist in the system .");
+                   
+                }
 
-            //    // 4. Update PickProcess master
-            //    await _pickProcessRepo.UpdatePickProcessAsync(dto.PickProcessId, orderRepairId, wmsId, callId);
+                objresponse.ServTrackOrder = servTrackResult.Data.RefNum;
 
-            //    // ✅ Commit
-            //    await tx.CommitAsync();
 
-            //    return ApiResponseFactory.Ok(orderRepairId, "Pick process completed successfully");
-            //}
-            //catch (Exception ex)
-            //{
-            //    // ❌ Rollback
-            //    await tx.RollbackAsync();
-            //    return ApiResponseFactory.Error<int>($"Pick process failed: {ex.Message}");
-            //}
+
+                //Create WMS Transaction
+
+                var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData);
+
+
+                if (!wmsTransaction.Success)
+                {
+                    await tx.RollbackAsync();
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                  $"Error creating WMS Inventory transaction. Error {wmsTransaction.Error} .");
+                }
+
+                objresponse.WMSTransactionNumber = wmsTransaction.Data;
+
+                var call13info = await CreatePickProcessCall(DeliveryId);
+
+                if (!call13info.Success)
+                {
+                    await tx.RollbackAsync();
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                  $"Error creating Pick Process call(10). Error {wmsTransaction.Message} .");
+                }
+
+
+                objresponse.Call13Number =  call13info.Data; 
+
+
+                //Update pick process tables
+
+                var UpdateTablesOk = await UpdatePickProcessTables(DeliveryId, objresponse.Call13Number, lpnid);
+
+               if (!UpdateTablesOk.Success)
+                {
+                    await tx.RollbackAsync();
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                $"Error updatein Pick Process tables. Error {wmsTransaction.Message} .");
+
+                }
+              
+
+                 return ApiResponseFactory.Ok(objresponse, "Pick process completed successfully");
+            }
+            catch (Exception ex)
+            {
+                // ❌ Rollback
+                await tx.RollbackAsync();
+                return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.Message}");
+            }
+        }
+        /// <summary>
+        /// create call (13) for pick process
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<int>> CreatePickProcessCall(string DeliveryId)
+        {
+            var callId = await _transactionPickProcessINVRepository.CreatePickProcessCall(DeliveryId);
+
+            if (callId <= 0)
+            {
+                return ApiResponseFactory.BadRequest<int>(
+                    $"[CALL] Failed: SP returned invalid Id for delivery {DeliveryId}");
+            }
+
+            return ApiResponseFactory.Ok(callId, "Call created successfully");
+        }
+        /// <summary>
+        /// Update pickprocess table for pick and confirm process 
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="call13id"></param>
+        /// <param name="LPNNumber"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<bool>> UpdatePickProcessTables(string DeliveryId, int call13id, string LPNNumber)
+        {
+            var result = await _transactionPickProcessINVRepository.UpdatePickProcessTables(DeliveryId, call13id, LPNNumber);
+
+            return result switch
+            {
+                -1 => ApiResponseFactory.NotFound<bool>($"[PICK_PROCESS] Header not found for delivery {LPNNumber}"),
+                -2 => ApiResponseFactory.NotFound<bool>($"[PICK_PROCESS] Details not found for delivery {LPNNumber}"),
+                1 => ApiResponseFactory.Ok(true, "Pick process updated successfully"),
+                _ => ApiResponseFactory.BadRequest<bool>($"[PICK_PROCESS] Unknown error updating delivery {LPNNumber}")
+            };
         }
     }
 }

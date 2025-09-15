@@ -23,7 +23,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
             };
         }
 
-        public async Task<ApiResponse<PickProcessDto>> GetPickProcessAllInfo(string DeliveryId, string token, CancellationToken ct)
+        public async Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, string token, CancellationToken ct)
         {
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -32,7 +32,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
 
             resp = await _httpClient.GetAsync($"/api/PickProcessINV/pickprocess-info/{DeliveryId}");
 
-            return await resp.ReadAsApiResponseAsync<PickProcessDto>(ct);
+            return await resp.ReadAsApiResponseAsync<PickProcessRequestDto>(ct);
 
             //throw new NotImplementedException();
         }

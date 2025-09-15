@@ -174,6 +174,11 @@ namespace DUNES.API.Utils.Responses
             };
         }
 
+        /// <summary>
+        /// Returns a 500 Internal Server Error response (alias Error).
+        /// </summary>
+        public static ApiResponse<T> Error<T>(string error) =>
+            Fail<T>(error, "Internal Server Error", 500);
     }
 
 

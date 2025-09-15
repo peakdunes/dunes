@@ -30,7 +30,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             _wmscontext = wmscontext;
         }
 
-      
+
         /// <summary>
         /// create ServTrack Order from pick process delivery
         /// </summary>
@@ -78,8 +78,47 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             await _context.Database.OpenConnectionAsync();
 
             var result = await command.ExecuteScalarAsync();
-            return Convert.ToInt32(result);
-        }
 
+            return result != null ? Convert.ToInt32(result) : -1;
+        }
+        /// <summary>
+        /// update pick process tables from pick or confirm process
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="call13id"></param>
+        /// <param name="LPNNumber"></param>
+        /// <returns></returns>
+        public async Task<int> UpdatePickProcessTables(string DeliveryId, int call13id, string LPNNumber)
+        {
+            var infoEncPickProcess = await _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog
+        .FirstOrDefaultAsync(x => x.DeliveryId == DeliveryId);
+
+            if (infoEncPickProcess == null)
+                return -1;
+
+            var infoDetPickProcess = await _context.TzebB2bPSoLineItemTblItemInbConsReqsLog
+                .Where(x => x.PSoWoHdrTblItemId == infoEncPickProcess.Id)
+                .ToListAsync();
+
+            if (infoDetPickProcess == null || !infoDetPickProcess.Any())
+                return -2;
+
+            infoEncPickProcess.DateTimeProcessed = DateTime.Now;
+            infoEncPickProcess.OutConsReqsId = call13id;
+            _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.Update(infoEncPickProcess);
+            await _context.SaveChangesAsync();
+
+            foreach (var infodet in infoDetPickProcess)
+            {
+                infodet.DateTimeProcessed = DateTime.Now;
+                infodet.PickLpn = LPNNumber.Trim();
+                infodet.QtyOnHand = Convert.ToInt32(infodet.RequestedQuantity);
+
+                _context.TzebB2bPSoLineItemTblItemInbConsReqsLog.Update(infodet);
+            }
+
+            await _context.SaveChangesAsync();
+            return 1; // éxito
+        }
     }
 }
