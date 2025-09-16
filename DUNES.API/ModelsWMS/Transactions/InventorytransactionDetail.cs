@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace DUNES.API.ModelsWMS.Masters;
 
+/// <summary>
+/// DTO for InventorytransactionHdr
+/// </summary>
 public partial class InventorytransactionDetail
 {
     public int Id { get; set; }

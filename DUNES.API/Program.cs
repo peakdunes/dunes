@@ -175,8 +175,8 @@ builder.Services.AddSwaggerGen(c =>
             "TzebFaultCodes" => new[] { "B2B - Fault Codes CRUD" },
             "TrepairActionsCodes" => new[] { "B2B - Action Codes CRUD" },
             "TzebWorkCodesTargets" => new[] { "B2B - Work Target Codes CRUD" },
-            
 
+            "TransactionWMSINV" => new[] { "WMS - Transactions" },
 
 
             "CommonQueryB2B" => new[] { "B2B - Common queries" },

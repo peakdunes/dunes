@@ -1,4 +1,4 @@
-﻿namespace DUNES.API.DTOs.Inventory
+﻿namespace DUNES.Shared.DTOs.Inventory
 {
     /// <summary>
     /// ZEBRA to PEAK calls table model (_TZEB_B2B_Inb_Cons_Reqs)

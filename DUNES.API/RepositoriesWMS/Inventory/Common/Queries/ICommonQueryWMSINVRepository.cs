@@ -1,5 +1,7 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
+using DUNES.API.ReadModels.WMS;
+using DUNES.Shared.TemporalModels;
 
 namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 {
@@ -168,5 +170,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber);
 
 
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        Task<WmsTransactionsRead> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber);
     }
 }

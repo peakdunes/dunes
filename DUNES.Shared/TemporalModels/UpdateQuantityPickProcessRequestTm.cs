@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DUNES.Shared.WiewModels.Inventory;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,6 @@ namespace DUNES.Shared.TemporalModels
 
         public string companyclient { get; set; }
         public int lineid { get; set; }
-        public List<BinPickTm> itemslist { get; set; } = new();
+        public List<BinPickWm> itemslist { get; set; } = new();
     }
 }

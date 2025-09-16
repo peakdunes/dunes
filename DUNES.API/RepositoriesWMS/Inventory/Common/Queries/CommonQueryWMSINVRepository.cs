@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
+using DUNES.API.ReadModels.WMS;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -35,13 +36,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
         {
             var listbines = await _wmscontext.Bines
-                .Where(x => x.Idcompany == companyid 
-                && x.Idcompanyclient == companyClient 
+                .Where(x => x.Idcompany == companyid
+                && x.Idcompanyclient == companyClient
                 && x.Active == true).ToListAsync();
 
             return listbines;
         }
-        
+
 
         /// <summary>
         /// Get all the bins associated with a client company 
@@ -69,7 +70,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
                && x.Idcompanyclient == companyClient
                && x.Active == true).ToListAsync();
 
-            return listconcepts ;
+            return listconcepts;
         }
 
         /// <summary>
@@ -199,10 +200,10 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
             var listinventorytype = await _wmscontext.InventoryTypes
                .Where(x => x.Idcompany == companyid
                    && x.Idcompanyclient == companyClient
-                   
+
                ).ToListAsync();
 
-                    return listinventorytype;
+            return listinventorytype;
         }
 
 
@@ -249,47 +250,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<List<Inventorydetail>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
         {
-            //var listinventory = await _wmscontext.Inventorydetail
-            //   .Include(x => x.IdbinNavigation)
-            //   .Include(x => x.IdstatusNavigation)
-            //   .Include(x => x.IdtypeNavigation)
-            //   .Include(x => x.IdlocationNavigation)
-            //   .Include(x => x.IdrackNavigation)
-            //   .Include(x => x.IdlocationNavigation)
-            //  .Where(x => x.Idcompany == companyid
-            //      && x.Idcompanyclient == companyClient
-            //      && x.Iditem == partnumber
-
-            //  ).ToListAsync();
-
-
-            //var listinventory = await (from enc in _wmscontext.Inventorydetail
-            // .Include(x => x.IdbinNavigation)
-            // .Include(x => x.IdstatusNavigation)
-            // .Include(x => x.IdtypeNavigation)
-            // .Include(x => x.IdlocationNavigation)
-            // .Include(x => x.IdrackNavigation)
-            // .Include(x => x.IdlocationNavigation)
-            //.Where(x => x.Idcompany == companyid
-            //    && x.Idcompanyclient == companyClient
-            //    && x.Iditem == partnumber
-            //)
-            //join det in _wmscontext.InventoryTypes.Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
-            //select (new Inventorydetail {
-            //        Id = enc.Id,
-            //        Idcompany = enc.Idcompany,
-            //        Idlocation = enc.Idlocation,
-            //        Idtype = enc.Idtype,
-            //        Idrack = enc.Idrack,
-            //        Level = enc.Level,
-            //        Iditem = enc.Iditem,
-            //        TotalQty = enc.TotalQty,
-            //        Idbin = enc.Idbin,
-            //        Idcompanyclient = enc.Idcompanyclient,
-            //        Serialid = enc.Serialid,
-            //        Idstatus = enc.Idstatus
-            //})).ToListAsync();
-
 
             var listinventory = await (from enc in _wmscontext.Inventorydetail
             .Include(x => x.IdbinNavigation)
@@ -320,19 +280,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
         public async Task<List<Inventorydetail>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
         {
-            //var listinventory = await _wmscontext.Inventorydetail
-            // .Include(x => x.IdbinNavigation)
-            // .Include(x => x.IdstatusNavigation)
-            // .Include(x => x.IdtypeNavigation)
-            // .Include(x => x.IdlocationNavigation)
-            // .Include(x => x.IdrackNavigation)
-            // .Include(x => x.IdlocationNavigation)
-            //.Where(x => x.Idcompany == companyid
-            //    && x.Idcompanyclient == companyClient
-            //    && x.Iditem == partnumber
-            //    && x.Idtype == typeid
-
-            //).ToListAsync();
 
             var listinventory = await (from enc in _wmscontext.Inventorydetail
            .Include(x => x.IdbinNavigation)
@@ -346,9 +293,9 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
               && x.Iditem == partnumber
               && x.Idtype == typeid
           )
-            join det in _wmscontext.InventoryTypes
-            .Where(x => x.IsOnHand == true ) on enc.Idtype equals det.Id
-            select (enc)).ToListAsync();
+                                       join det in _wmscontext.InventoryTypes
+                                       .Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
+                                       select (enc)).ToListAsync();
 
 
 
@@ -368,20 +315,97 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
             var listdistribution = await (from enc in _wmscontext.Itemsbybin.Where(x => x.CompanyId == companyid
                  && x.Idcompanyclient == companyClient
                  && x.Itemid == partnumber)
-                join det in _wmscontext.Bines on enc.BinesId equals det.Id
-                select new Itemsbybin
-                {
-                   Id = enc.Id,
-                   CompanyId = companyid,
-                   Idcompanyclient = companyClient,
-                   BinesId = enc.BinesId,
-                   Itemid = enc.Itemid,
-                   tagName = det.TagName!
-                }).ToListAsync();
+                                          join det in _wmscontext.Bines on enc.BinesId equals det.Id
+                                          select new Itemsbybin
+                                          {
+                                              Id = enc.Id,
+                                              CompanyId = companyid,
+                                              Idcompanyclient = companyClient,
+                                              BinesId = enc.BinesId,
+                                              Itemid = enc.Itemid,
+                                              tagName = det.TagName!
+                                          }).ToListAsync();
 
             return listdistribution;
         }
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        public async Task<WmsTransactionsRead> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        {
 
-     
+            List<InventorytransactionHdr> ListHeaders = new List<InventorytransactionHdr>();
+            List<InventorytransactionDetail> ListDetails = new List<InventorytransactionDetail>();
+            List<Inventorymovement> ListMovement = new List<Inventorymovement>();
+
+            WmsTransactionsRead objresponse = new WmsTransactionsRead
+            {
+                ListHdr = ListHeaders,
+                ListDetail = ListDetails,
+                ListMovement = ListMovement
+
+            };
+
+            var infoenctran = await _wmscontext.InventorytransactionHdr
+                .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
+                x.Documentreference == DocumentNumber).ToListAsync();
+
+            List<int> listenc = new List<int>();
+
+
+            if (infoenctran.Count > 0)
+            {
+                objresponse.ListHdr = infoenctran;
+
+                foreach (var item in objresponse.ListHdr)
+                {
+                    listenc.Add(item.Id);
+                }
+
+
+                var infodetail = await _wmscontext.InventorytransactionDetail.Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
+
+                if (infodetail.Count > 0)
+                {
+
+                    objresponse.ListDetail = infodetail;
+
+
+                }
+
+                var infomov = await _wmscontext.Inventorymovement.Where(x => listenc.Contains(x.IdtransactionHead)).ToListAsync();
+
+                if (infomov.Count > 0)
+                {
+
+                    objresponse.ListMovement = infomov;
+
+
+                }
+            }
+
+            return objresponse;
+        }
+
+
+        //public async Task<List<Itemsbybin>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        //{
+
+        //    var infoenctran = await _wmscontext.InventorytransactionHdr
+        //        .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
+        //        x.Documentreference == DocumentNumber).ToListAsync();
+
+        //    List<int> listenc = new List<int>();
+
+        //    if (infoenctran.Count > 0)
+        //    {
+
+        //    }
+
+        //}
     }
 }

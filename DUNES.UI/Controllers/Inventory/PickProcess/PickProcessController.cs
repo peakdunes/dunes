@@ -1,7 +1,9 @@
-﻿using DUNES.Shared.DTOs.Inventory;
+﻿using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Helpers;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
@@ -22,6 +24,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IPickProcessService _service;
         private readonly ICommonINVService _CommonINVService;
+       
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
 
@@ -43,20 +46,41 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             return View();
         }
 
-        public async Task<IActionResult> PickProcessReceiving(string? pickprocessnumber, CancellationToken ct)
+        public async Task<IActionResult> PickProcessReceiving(int companyid, string companyclientid, string? pickprocessnumber, CancellationToken ct)
         {
 
             return await HandleAsync(async ct =>
             {
-                List<BinPickTm> listdistribution = new List<BinPickTm>();
+                List<BinPickWm> listdistribution = new List<BinPickWm>();
+
+                List<InputCallsDto> listinput = new List<InputCallsDto>();
+                List<OutputCallsDto> listoutput = new List<OutputCallsDto>();
+
+                PickProcessCallsReadDto allcalls = new PickProcessCallsReadDto();
+
+                allcalls.outputCallsList = listoutput;
+                allcalls.inputCallsList = listinput;    
 
                 PickProcessHdr objhdr = new PickProcessHdr();
                 List<PickProcessItemDetail> objlist = new List<PickProcessItemDetail>();
 
+                List<WMSHdrTransactionDTO> listenctran = new List<WMSHdrTransactionDTO>();
+                List<WMSDetailTransactionDTO> listdetailtran = new List<WMSDetailTransactionDTO>();
+                List<WMSInventoryMovementDTO> listmovtran = new List<WMSInventoryMovementDTO>();
+
+                WMSTransactionTm wmsobj = new WMSTransactionTm
+                {
+                    ListHdr = listenctran,
+                    ListDetail = listdetailtran,
+                    ListInventoryMovement = listmovtran,
+                };
+
                 PickProcessRequestDto objresult = new PickProcessRequestDto
                 {
                     PickProcessHdr = objhdr,
-                    ListItems = objlist
+                    ListItems = objlist,
+                    CallsRead = allcalls,
+                    ListTransactions = wmsobj
 
                 };
 
@@ -86,6 +110,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 ViewData["companies"] = new SelectList(listclients.Data, "CompanyId", "CompanyId");
 
 
+                //pick process Header and detail information
 
                 var infopickProcess = await _service.GetPickProcessAllInfo(pickprocessnumber, token, ct);
 
@@ -98,6 +123,41 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 objresult.PickProcessHdr = infopickProcess.Data!.PickProcessHdr;
                 objresult.ListItems = infopickProcess.Data.ListItems;
 
+                if (objresult.PickProcessHdr.OutConsReqsId > 0)
+                {
+
+                    //pick process input and output calls
+
+                    var infocall = await _service.GetPickProcessAllCalls(pickprocessnumber, token, ct);
+
+                    if (infocall.Data != null)
+                    {
+                        objresult.CallsRead = infocall.Data;
+                    }
+                }
+
+                //pick process WMS Inventory transctions
+
+
+                var infoWMSTransactions = await _service.GetAllTransactionByDocumentNumber(companyid, companyclientid, pickprocessnumber, token, ct);
+
+                if (infoWMSTransactions.Data != null)
+                {
+
+                    if (infoWMSTransactions.Data.ListHdr.Count > 0)
+                    {
+                        objresult.ListTransactions.ListHdr = infoWMSTransactions.Data.ListHdr;
+                    }
+
+                    if (infoWMSTransactions.Data.ListDetail.Count > 0)
+                    {
+                        objresult.ListTransactions.ListDetail = infoWMSTransactions.Data.ListDetail;
+                    }
+                    if (infoWMSTransactions.Data.ListInventoryMovement.Count > 0)
+                    {
+                        objresult.ListTransactions.ListInventoryMovement = infoWMSTransactions.Data.ListInventoryMovement;
+                    }
+                }
 
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(infopickProcess.Data.ListItems));
 
@@ -196,7 +256,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 var listinventory = await _CommonINVService.GetInventoryByItemInventoryType(_companyDefault, companyclient, partnumberzeb, typeid, token, ct);
 
-                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+                var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
 
 
                 //           Idcompany { get; set; }
@@ -394,9 +454,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //se cargar a lista de distribucion
 
-                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+                var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
 
-                List<BinPickTm> newlistdist = new List<BinPickTm>();
+                List<BinPickWm> newlistdist = new List<BinPickWm>();
 
                 //elimina toda la distribucion para la linea que va ha adicionar
                 //para no duplicar valores
@@ -472,9 +532,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //se cargar a lista de distribucion
 
-                var listdist = JsonConvert.DeserializeObject<List<BinPickTm>>(HttpContext.Session.GetString("distributiondetail"));
+                var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
 
-                List<BinPickTm> newlistdist = new List<BinPickTm>();
+                List<BinPickWm> newlistdist = new List<BinPickWm>();
 
                 foreach (var list in listdist!)
                 {

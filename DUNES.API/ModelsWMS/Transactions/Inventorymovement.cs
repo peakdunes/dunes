@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DUNES.API.ModelsWMS.Masters;
 
+
+/// <summary>
+/// WMS inventory transaction movement
+/// </summary>
 public partial class Inventorymovement
 {
     public int Id { get; set; }

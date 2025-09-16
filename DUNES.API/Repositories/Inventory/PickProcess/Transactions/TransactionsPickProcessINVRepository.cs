@@ -1,7 +1,4 @@
-﻿
-using DUNES.API.Data;
-using DUNES.API.DTOs.Inventory;
-using DUNES.API.Models.Inventory;
+﻿using DUNES.API.Data;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;

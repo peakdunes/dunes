@@ -1,5 +1,4 @@
 ﻿using DUNES.API.DTOs.B2B;
-using DUNES.API.DTOs.Inventory;
 using DUNES.API.Models;
 using DUNES.API.Models.Auth;
 using DUNES.API.Models.B2b;
@@ -246,6 +245,10 @@ namespace DUNES.API.Data
 
 
         /// <summary>
+        /// Zebra inventory log transactions
+        /// </summary>
+        public virtual DbSet<TzebB2bReplacementPartsInventoryLog> TzebB2bReplacementPartsInventoryLog { get; set; }
+        /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
         /// but before the model has been locked down and used to initialize the context.
@@ -254,6 +257,29 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TzebB2bReplacementPartsInventoryLog>(entity =>
+            {
+                entity.ToTable("_TZEB_B2B_Replacement_Parts_Inventory_Log");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.DateInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime")
+                    .HasColumnName("Date_Inserted");
+                entity.Property(e => e.InventoryTypeIdDest).HasColumnName("Inventory_Type_id_Dest");
+                entity.Property(e => e.InventoryTypeIdSource).HasColumnName("Inventory_Type_id_Source");
+                entity.Property(e => e.Notes)
+                    .HasMaxLength(250)
+                    .IsUnicode(false);
+                entity.Property(e => e.PartDefinitionId).HasColumnName("Part_Definition_id");
+                entity.Property(e => e.Qty).HasDefaultValue(1);
+                entity.Property(e => e.RepairNo).HasColumnName("Repair_No");
+                entity.Property(e => e.SerialNo)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("Serial_No");
+            });
 
             modelBuilder.Entity<TzebB2bMasterPartDefinition>(entity =>
             {

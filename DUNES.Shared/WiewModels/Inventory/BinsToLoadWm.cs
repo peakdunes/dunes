@@ -5,9 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.TemporalModels
+namespace DUNES.Shared.WiewModels.Inventory
 {
-    public class BinsToLoadTm
+
+    /// <summary>
+    /// Use to load all bines distribution for a ANS process
+    /// </summary>
+    public class BinsToLoadWm
     {
 
         public int Id { get; set; }

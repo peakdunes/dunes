@@ -1,9 +1,7 @@
-﻿using DUNES.API.DTOs.Inventory;
-using DUNES.API.Models.Inventory;
+﻿using DUNES.API.Models.Inventory;
 
 namespace DUNES.API.ReadModels.Inventory
 {
-
     /// <summary>
     /// input and output pickprocess calls 
     /// </summary>

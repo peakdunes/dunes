@@ -2,7 +2,6 @@
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
-using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Helpers;
 using DUNES.UI.Services.Admin;
@@ -53,7 +52,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         {
             //we create a session variable to load all bins item distribution
 
-            List<BinsToLoadTm> listbinespartno = new List<BinsToLoadTm>();
+            List<BinsToLoadWm> listbinespartno = new List<BinsToLoadWm>();
 
             HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(listbinespartno));
 
@@ -297,12 +296,12 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
 
-                var listItemsBinsByProcess = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+                var listItemsBinsByProcess = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
                 if (listaPartNumber!.Count > 0)
                 {
 
-                    List<BinsToLoadTm> listbintoload = new List<BinsToLoadTm>();
+                    List<BinsToLoadWm> listbintoload = new List<BinsToLoadWm>();
 
 
 
@@ -349,9 +348,9 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             try
             {
-                List<BinsToLoadTm> objlist = new List<BinsToLoadTm>();
+                List<BinsToLoadWm> objlist = new List<BinsToLoadWm>();
 
-                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
                 int totalqty = 0;
                 int totalshipping = 0;
@@ -363,7 +362,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 if (lista.Count == 0)
                 {
-                    BinsToLoadTm objdet = new BinsToLoadTm();
+                    BinsToLoadWm objdet = new BinsToLoadWm();
 
                     objdet.Id = lineid;
                     objdet.tagname = tagname;
@@ -398,7 +397,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                     if (!haydatos)
                     {
-                        BinsToLoadTm objdet = new BinsToLoadTm();
+                        BinsToLoadWm objdet = new BinsToLoadWm();
 
                         objdet.Id = lineid;
                         objdet.tagname = tagname.Trim();
@@ -505,9 +504,9 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 int lineid = 0;
 
-                List<BinsToLoadTm> objlist = new List<BinsToLoadTm>();
+                List<BinsToLoadWm> objlist = new List<BinsToLoadWm>();
 
-                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
                 int totalqty = 0;
                 int totalinbins = 0;
@@ -586,9 +585,9 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                
 
-                List<BinsToLoadTm> objlist = new List<BinsToLoadTm>();
+                List<BinsToLoadWm> objlist = new List<BinsToLoadWm>();
 
-                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
                 int totalqty = 0;
                 int totalinbins = 0;
@@ -672,7 +671,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return await HandleAsync(async ct =>
             {
 
-                var lista = JsonConvert.DeserializeObject<List<BinsToLoadTm>>(HttpContext.Session.GetString("listbinesdistribution"));
+                var lista = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
                 string partnumberzeb = partnumber.Contains("ZEBRA") ? "ZEBRA-" + partnumber.Trim() : partnumber.Trim();
 
@@ -692,7 +691,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         public async Task<IActionResult> BinDistributionDefault(string companyclientid, int typeid, string typename, int statusid, string statusname, CancellationToken ct)
         {
 
-            List<BinsToLoadTm> newListDistribution = new List<BinsToLoadTm>();
+            List<BinsToLoadWm> newListDistribution = new List<BinsToLoadWm>();
 
             string errormessage = string.Empty;
 
@@ -727,7 +726,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         foreach (var item in listdist.Data)
                         {
 
-                            BinsToLoadTm objdet = new BinsToLoadTm();
+                            BinsToLoadWm objdet = new BinsToLoadWm();
 
                             objdet.Id = detail.Id;
                             objdet.tagname = item.TagName;

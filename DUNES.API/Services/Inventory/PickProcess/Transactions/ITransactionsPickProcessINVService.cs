@@ -1,5 +1,4 @@
-﻿using DUNES.API.DTOs.Inventory;
-using DUNES.Shared.DTOs.Inventory;
+﻿using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 

@@ -1,5 +1,4 @@
 ﻿using DUNES.API.Data;
-using DUNES.API.DTOs.Inventory;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.ServicesWMS.Inventory.Transactions;

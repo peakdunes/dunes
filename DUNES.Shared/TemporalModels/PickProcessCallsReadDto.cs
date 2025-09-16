@@ -1,4 +1,5 @@
-﻿using DUNES.API.DTOs.Inventory;
+﻿
+using DUNES.Shared.DTOs.Inventory;
 
 namespace DUNES.API.ReadModels.Inventory
 {

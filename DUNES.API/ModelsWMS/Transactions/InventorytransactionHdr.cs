@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace DUNES.API.ModelsWMS.Masters;
 
+
+/// <summary>
+/// Inventory Transaction Header
+/// </summary>
 public partial class InventorytransactionHdr
 {
     public int Id { get; set; }

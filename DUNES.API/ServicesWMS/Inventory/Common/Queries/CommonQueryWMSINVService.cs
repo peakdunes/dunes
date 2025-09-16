@@ -1,10 +1,12 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
+using DUNES.API.ReadModels.WMS;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 
@@ -237,7 +239,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         }
 
 
-      
+
 
 
 
@@ -379,15 +381,126 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
         {
-     
+
             var info = await _repository.GetItemBinsDistribution(companyid, companyClient, partnumber);
 
             if (info == null)
             {
                 return ApiResponseFactory.NotFound<List<Itemsbybin>>($"there is not distribution for this company client {companyClient} and this part number {partnumber}");
             }
-            
+
             return ApiResponseFactory.Ok(info, "OK");
         }
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        {
+            var info = await _repository.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber);
+
+            if (info.ListHdr.Count <= 0)
+            {
+                return ApiResponseFactory.NotFound<WMSTransactionTm>($"there is not WMS transaction for this company {companyClient} and this document {DocumentNumber}");
+            }
+
+            WMSTransactionTm objresponse = new WMSTransactionTm();
+
+            foreach (var item in info.ListHdr)
+            {
+                WMSHdrTransactionDTO objhdr = new WMSHdrTransactionDTO();
+
+                objhdr.Id = item.Id;
+                objhdr.Idcompany = item.Idcompany;
+                objhdr.CompanyName = string.IsNullOrEmpty(item.IdcompanyNavigation.Name) ? "" : item.IdcompanyNavigation.Name.Trim();
+                objhdr.Idtransactionconcept = item.Idtransactionconcept;
+                objhdr.conceptName = string.IsNullOrEmpty(item.IdtransactionconceptNavigation.Name) ? "" : item.IdtransactionconceptNavigation.Name.Trim();
+                objhdr.IdUser = item.IdUser;
+                objhdr.Datecreated = item.Datecreated;
+                objhdr.Processed = item.Processed;
+                objhdr.IdUserprocess = item.IdUserprocess;
+                objhdr.Idcompanyclient = item.Idcompanyclient;
+                objhdr.Dateprocessed = item.Dateprocessed;
+                objhdr.Documentreference = item.Documentreference;
+                objhdr.Observations = item.Observations;
+                objhdr.Iddivision = item.Iddivision;
+
+                objresponse.ListHdr.Add(objhdr);
+
+            }
+
+            foreach (var item in info.ListDetail)
+            {
+                WMSDetailTransactionDTO objdet = new WMSDetailTransactionDTO();
+
+                objdet.Id = item.Id;
+                objdet.Idtypetransaction = item.Idtypetransaction;
+                objdet.typetransactionName = string.IsNullOrEmpty(item.IdtypetransactionNavigation.Name) ? "" : item.IdtypetransactionNavigation.Name.Trim();
+                objdet.Idlocation = item.Idlocation;
+                objdet.locationName = string.IsNullOrEmpty(item.IdlocationNavigation.Name) ? "" : item.IdlocationNavigation.Name.Trim();
+                objdet.Idtype = item.Idtype;
+                objdet.typeName = string.IsNullOrEmpty(item.IdtypeNavigation.Name) ? "" : item.IdtypeNavigation.Name.Trim();
+                objdet.Idrack = item.Idrack;
+                objdet.rackName = string.IsNullOrEmpty(item.IdrackNavigation.Name) ? "" : item.IdrackNavigation.Name.Trim();
+                objdet.Level = item.Level;
+                objdet.Iditem = item.Iditem;
+                objdet.TotalQty = item.TotalQty;
+                objdet.Idbin = item.Idbin;
+                objdet.binName = string.IsNullOrEmpty(item.IdbinNavigation.TagName) ? "" : item.IdbinNavigation.TagName.Trim();
+                objdet.Idstatus = item.Idstatus;
+                objdet.statusName = string.IsNullOrEmpty(item.IdstatusNavigation.Name) ? "" : item.IdstatusNavigation.Name.Trim();
+                objdet.Serialid = item.Serialid;
+                objdet.Idcompany = item.Idcompany;
+                objdet.companyName = string.IsNullOrEmpty(item.IdcompanyNavigation.Name) ? "" : item.IdcompanyNavigation.Name.Trim();
+                objdet.Idcompanyclient = item.Idcompanyclient;
+                objdet.Iddivision = item.Iddivision;
+                objdet.Idenctransaction = item.Idenctransaction;
+
+                objresponse.ListDetail.Add(objdet);
+            }
+
+            foreach (var item in info.ListMovement)
+            {
+                WMSInventoryMovementDTO objmov = new WMSInventoryMovementDTO();
+
+                objmov.Id = item.Id;
+                objmov.Idtransactiontype = item.Idtransactiontype;
+                objmov.transactionTypeName = string.IsNullOrEmpty(item.IdtransactiontypeNavigation.Name) ? "" : item.IdtransactiontypeNavigation.Name.Trim();
+                objmov.Idlocation = item.Idlocation;
+                objmov.locationName = string.IsNullOrEmpty(item.IdlocationNavigation.Name) ? "" : item.IdlocationNavigation.Name.Trim();
+                objmov.Idtype = item.Idtype;
+                objmov.inventoryTypeName = string.IsNullOrEmpty(item.IdtypeNavigation.Name) ? "" : item.IdtypeNavigation.Name.Trim();
+                objmov.Idrack = item.Idrack;
+                objmov.Level = item.Level;
+                objmov.Idbin = item.Idbin;
+                objmov.binName = string.IsNullOrEmpty(item.IdbinNavigation.TagName) ? "" : item.IdbinNavigation.TagName.Trim();
+                objmov.Iditem = item.Iditem;
+                objmov.Idstatus = item.Idstatus;
+                objmov.statusName = string.IsNullOrEmpty(item.IdstatusNavigation.Name) ? "" : item.IdstatusNavigation.Name.Trim();
+                objmov.Serialid = item.Serialid;
+                objmov.Datecreated = item.Datecreated;
+                objmov.Qtyinput = item.Qtyinput;
+                objmov.Qtyoutput = item.Qtyoutput;
+                objmov.Qtybalance = item.Qtybalance;
+                objmov.Idcompany = item.Idcompany;
+                objmov.companyName = string.IsNullOrEmpty(item.IdcompanyNavigation.Name) ? "" : item.IdcompanyNavigation.Name.Trim();
+                objmov.Idcompanyclient = item.Idcompanyclient;
+                objmov.IdtransactionHead = item.IdtransactionHead;
+                objmov.IdtransactionDetail = item.IdtransactionDetail;
+                objmov.Iddivision = item.Iddivision;
+                objmov.Createdby = item.Createdby;
+                objmov.Idtransactionconcept = item.Idtransactionconcept;
+                objmov.conceptName = string.IsNullOrEmpty(item.IdtransactionconceptNavigation.Name) ? "" : item.IdtransactionconceptNavigation.Name.Trim();
+
+                objresponse.ListInventoryMovement.Add(objmov);
+            }
+
+            return ApiResponseFactory.Ok(objresponse, "OK");
+        }
+
+       
     }
 }

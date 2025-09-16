@@ -1,8 +1,10 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
+using DUNES.API.ReadModels.WMS;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 
 namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 {
@@ -122,20 +124,6 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// Get all active item status for a client company 
         /// </summary>
@@ -189,6 +177,16 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <returns></returns>
         Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber);
 
+
+
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber);
 
 
     }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DUNES.API.DTOs.Inventory
+namespace DUNES.Shared.DTOs.Inventory
 {
 
     /// <summary>

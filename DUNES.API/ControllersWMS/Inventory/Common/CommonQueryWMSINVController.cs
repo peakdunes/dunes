@@ -5,6 +5,7 @@ using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +52,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
         {
-            
+
             var response = await _service.GetAllActiveBinsByCompanyClient(companyid, companyClient);
 
             return StatusCode(response.StatusCode, response);
@@ -74,9 +75,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient)
         {
 
-          var response = await _service.GetAllBinsByCompanyClient(companyid, companyClient);
+            var response = await _service.GetAllBinsByCompanyClient(companyid, companyClient);
 
-          return StatusCode(response.StatusCode, response);
+            return StatusCode(response.StatusCode, response);
 
         }
 
@@ -349,6 +350,23 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         }
 
-        
+
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(WMSTransactionTm), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("all-transactions/{companyid}/{companyClient}/{DocumentNumber}")]
+        public async Task<IActionResult> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        {
+            var response = await _service.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber);
+
+            return StatusCode(response.StatusCode, response);
+        }
     }
 }

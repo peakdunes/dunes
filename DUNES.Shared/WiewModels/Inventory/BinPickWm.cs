@@ -4,9 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.TemporalModels
+namespace DUNES.Shared.WiewModels.Inventory
 {
-    public class BinPickTm
+
+    /// <summary>
+    /// USED for save bin distribution for a pick process
+    /// </summary>
+    public class BinPickWm
     {
         public int lineid { get; set; }  
         public int binidout { get; set; }

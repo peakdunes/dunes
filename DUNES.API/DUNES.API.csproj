@@ -26,12 +26,10 @@
   <ItemGroup>
    
   
-    <Folder Include="ControllersWMS\Inventory\Transactions\" />
-   
-  
     <Folder Include="Logs\" />
     <Folder Include="ModelsWMS\" />
     <Folder Include="Models\B2B\" />
+    <Folder Include="ReadModels\WMS\" />
    
    
   </ItemGroup>
