@@ -19,13 +19,13 @@ namespace DUNES.Shared.WiewModels.Inventory
         public int inventorytype { get; set; }
 
         [MaxLength(50)]
-        public string partnumber { get; set; }
+        public string partnumber { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string tagname { get; set; }
+        public string tagname { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string typename { get; set; }
+        public string typename { get; set; } = string.Empty;
 
         public int qty { get; set; }
 
@@ -36,6 +36,6 @@ namespace DUNES.Shared.WiewModels.Inventory
         public int binid { get; set; }
 
         [MaxLength(100)]
-        public string statusname { get; set; }
+        public string statusname { get; set; } = string.Empty;
     }
 }

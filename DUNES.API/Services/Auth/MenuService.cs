@@ -29,11 +29,12 @@ namespace DUNES.API.Services.Auth
         /// Gets the level 2 menus associated with level1 passed as parameter
         /// </summary>
         /// <param name="level1"></param>
+        /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles)
+        public async Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles, CancellationToken ct)
         {
-            var flatMenu = await _repository.GetLevel2MenuOptions(level1, roles);
+            var flatMenu = await _repository.GetLevel2MenuOptions(level1, roles, ct);
 
             return ApiResponseFactory.Ok(flatMenu, "Menu options level2 availables for this user");
         }
@@ -44,11 +45,16 @@ namespace DUNES.API.Services.Auth
         /// get menu options nivel 1 for role list
         /// </summary>
         /// <param name="userRoles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles)
+        public async Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles, CancellationToken ct)
         {
+
+
+
+
             // 1 Get flat menu list from repository
-            var flatMenu = await _repository.GetAllActiveMenusAsync(userRoles);
+            var flatMenu = await _repository.GetAllActiveMenusAsync(userRoles, ct);
 
             return ApiResponseFactory.Ok(flatMenu, "Menu options availables for this user");
 
@@ -59,8 +65,9 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="code"></param>
         /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles)
+        public async Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(code))
             {
@@ -74,20 +81,10 @@ namespace DUNES.API.Services.Auth
                     };
             }
 
-            var allMenus = await _repository.GetAllMenusByRolesAsync(roles);
+            var allMenus = await _repository.GetAllMenusByRolesAsync(roles, ct);
 
             var breadcrumb = new List<MenuItemDto>();
-
-            //breadcrumb.Add(new MenuItemDto
-            //{
-            //    Code = "00", // Este código será el que el UI use para mostrar el menú raíz
-            //    Title = "Home",
-            //    Controller = "Home",
-            //    Action = "Index",
-            //    Utility = null
-            //});
-
-
+                     
             for (int i = 2; i <= code.Length; i += 2)
             {
                 var partialCode = code.Substring(0, i);
@@ -100,10 +97,16 @@ namespace DUNES.API.Services.Auth
 
             return breadcrumb;
         }
-
-        public async Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action)
+        /// <summary>
+        /// Get all information about a menu option
+        /// </summary>
+        /// <param name="controller"></param>
+        /// <param name="action"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action, CancellationToken ct)
         {
-            var MenuInfo = await _repository.GetCodeByControllerAction(controller, action);
+            var MenuInfo = await _repository.GetCodeByControllerAction(controller, action, ct);
 
 
             if (MenuInfo == null)
@@ -121,5 +124,6 @@ namespace DUNES.API.Services.Auth
         
         }
 
+      
     }
 }

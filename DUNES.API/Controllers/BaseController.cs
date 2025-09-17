@@ -1,102 +1,72 @@
 ﻿using DUNES.API.Utils.Responses;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace DUNES.API.Controllers
 {
-    /// <summary>
-    /// Base controller that provides centralized error handling and standardized API responses.
-    /// </summary>
     [ApiController]
     public abstract class BaseController : ControllerBase
     {
-        /// <summary>
-        /// PASSTHROUGH: Usa este método cuando el servicio YA devuelve ApiResponse<T>
-        /// No re-empaqueta; reenvía el ApiResponse y su HTTP status.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        protected async Task<IActionResult> HandleApi<T>(Func<Task<ApiResponse<T>>> action)
+        #region Private Helpers
+
+        private void LogError(Exception ex, string origen = "[HELPER]")
         {
-            var resp = await action();
-            var status = resp.StatusCode == 0 ? 200 : resp.StatusCode;
-            return StatusCode(status, resp);
+            Log.Error(ex,
+                $"{origen} TraceId: {{TraceId}} - {{Message}}",
+                HttpContext.TraceIdentifier,
+                ex.GetBaseException().Message);
         }
 
+        private IActionResult BuildErrorResponse<T>(Exception ex, int statusCode = 500, string? customMessage = null)
+        {
+            LogError(ex, "[HANDLE]");
+            return StatusCode(statusCode, ApiResponseFactory.Fail<T>(
+                ex.GetBaseException().Message,
+                customMessage ?? "❌ Internal Server Error",
+                statusCode,
+                HttpContext.TraceIdentifier
+            ));
+        }
+
+        private IActionResult BuildCancelResponse<T>()
+        {
+            return StatusCode(499, ApiResponseFactory.Fail<T>(
+                "Request was cancelled",
+                "⚠️ Client closed request",
+                499,
+                HttpContext.TraceIdentifier
+            ));
+        }
+
+        #endregion
+
+        #region Handlers
+
         /// <summary>
-        /// Handles async operations that return a raw data result (T) and wraps it once into ApiResponse.
-        /// Usa este método cuando el servicio devuelve T "puro" (no ApiResponse).
+        /// Use this when the service already returns ApiResponse<T>.
+        /// Controller does not re-wrap; just passes through.
         /// </summary>
-        protected async Task<IActionResult> Handle<T>(Func<Task<T>> action)
+        protected async Task<IActionResult> HandleApi<T>(
+            Func<CancellationToken, Task<ApiResponse<T>>> action,
+            CancellationToken ct)
         {
             try
             {
-                var result = await action();
-
-                return StatusCode(200, ApiResponseFactory.Success(result, "Successful transaction", 200, HttpContext.TraceIdentifier));
+                var resp = await action(ct);
+                var status = resp.StatusCode == 0 ? 200 : resp.StatusCode;
+                return StatusCode(status, resp);
+            }
+            catch (OperationCanceledException)
+            {
+                return BuildCancelResponse<T>();
             }
             catch (Exception ex)
             {
-                return StatusCode(500, ApiResponseFactory.Fail<T>(
-                    ex.GetBaseException().Message,
-                    "❌ Internal Server Error",
-                    500,
-                    HttpContext.TraceIdentifier
-                ));
-            }
-        }
-        /// <summary>
-        /// Handles async operations that return a raw data result (T) and wraps it once into ApiResponse.
-        /// Usa este método cuando el servicio devuelve T "puro" (no ApiResponse).
-        /// </summary>
-        protected async Task<IActionResult> Handle<T>(Func<Task<ApiResponse<T>>> action)
-        {
-            var resp = await action();
-            var status = resp.StatusCode == 0 ? 200 : resp.StatusCode;
-            return StatusCode(status, resp); // no re-empaques
-        }
-
-        /// <summary>
-        /// Handles async operations that already build an IActionResult.
-        /// </summary>
-        protected async Task<IActionResult> Handle(Func<Task<IActionResult>> action)
-        {
-            try
-            {
-                return await action();
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ApiResponseFactory.Fail<object>(
-                    ex.GetBaseException().Message,
-                    "❌ Internal Server Error",
-                    500,
-                    HttpContext.TraceIdentifier
-                ));
+                return BuildErrorResponse<T>(ex);
             }
         }
 
-        /// <summary>
-        /// Handles synchronous operations with return value; wraps once into ApiResponse.
-        /// Usa este método cuando el servicio devuelve T "puro".
-        /// </summary>
-        protected IActionResult HandleSync<T>(Func<T> action)
-        {
-            try
-            {
-                var result = action();
-                return StatusCode(200, ApiResponseFactory.Success(result, "Successful transaction", 200, HttpContext.TraceIdentifier));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ApiResponseFactory.Fail<T>(
-                    ex.GetBaseException().Message,
-                    "❌ Internal Server Error",
-                    500,
-                    HttpContext.TraceIdentifier
-                ));
-            }
-        }
+        #endregion
     }
 }

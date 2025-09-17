@@ -11,11 +11,11 @@ namespace DUNES.API.ReadModels.Inventory
         /// <summary>
         /// ZEBRA to Peak list calls
         /// </summary>
-        public List<InputCallsDto> inputCallsList { get; set; }
+        public List<InputCallsDto> inputCallsList { get; set; } = new();
 
         /// <summary>
         /// Peak to ZEBRA list calls
         /// </summary>
-        public List<OutputCallsDto> outputCallsList { get; set; }
+        public List<OutputCallsDto> outputCallsList { get; set; } = new();
     }
 }

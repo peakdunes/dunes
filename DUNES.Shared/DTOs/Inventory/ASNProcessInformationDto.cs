@@ -14,12 +14,12 @@ namespace DUNES.Shared.DTOs.Inventory
     public class ASNProcessInformationDto
     {
         
-        public List<WMSBinsDto> listbines {  get; set; }
-        public List<WMSConceptsDto> listconcepts { get; set; } 
-        public List<WMSInputTransactionsDto> listinputtransactions { get; set; }
-        public List<InventoryTypeDto> listinventorytype { get; set; }
-        public List<WMSInventoryTypeDto> listwmsinventorytype { get; set; }
-        public List<itemstatusDto> listitemstatus { get; set; }
+        public List<WMSBinsDto> listbines {  get; set; } = new();
+        public List<WMSConceptsDto> listconcepts { get; set; } = new();
+        public List<WMSInputTransactionsDto> listinputtransactions { get; set; } = new();
+        public List<InventoryTypeDto> listinventorytype { get; set; } = new();
+        public List<WMSInventoryTypeDto> listwmsinventorytype { get; set; } = new();
+        public List<itemstatusDto> listitemstatus { get; set; } = new();
 
     }
      

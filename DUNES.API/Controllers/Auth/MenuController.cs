@@ -18,7 +18,7 @@ namespace DUNES.API.Controllers.Auth
     [Authorize] // Only logged-in users can access this controller
     [ApiController]
     [Route("api/[controller]")]
-    public class MenuController : ControllerBase
+    public class MenuController : BaseController
     {
         private readonly IAuthService _authService;
         private readonly IMenuService _menuService;
@@ -44,32 +44,27 @@ namespace DUNES.API.Controllers.Auth
         [HttpGet("options")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<MenuItemDto>))]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetMenuOptions()
+        public async Task<IActionResult> GetMenuOptions(CancellationToken ct)
         {
-            if (!User.Identity?.IsAuthenticated ?? false)
-                return Unauthorized();
+            return await Handle(async ct =>
+            {
+                if (!User.Identity?.IsAuthenticated ?? false)
+                    return Unauthorized(ApiResponseFactory.Unauthorized<object>("User not authenticated"));
 
-            //obtain user information 
-            //var user = await _userManager.GetUserAsync(User);
+                var roles = await _authService.GetRolesFromClaims(User, ct);
+                if (roles == null || roles.Data == null || !roles.Data.Any())
+                    return Forbid("User has no roles assigned.");
 
-            //obtain roles by user
-          
-            var roles = await _authService.GetRolesFromClaims(User);
+                var menuItems = await _menuService.GetMenuHierarchyAsync(roles.Data, ct);
 
-            if (roles == null)
-           
-                return Forbid("User has no roles assigned.");
+                if (menuItems.Data == null || !menuItems.Data.Any())
+                    return Ok(ApiResponseFactory.Ok(menuItems.Data, "No menus available for this user"));
+
+                return Ok(menuItems);
+
+            }, ct);
 
 
-            // Llamamos al service con la lista de roles que Identity nos da
-            var menuItems = await _menuService.GetMenuHierarchyAsync(roles.Data);
-
-            if (menuItems.Data == null || !menuItems.Data.Any())
-                return Ok(ApiResponseFactory.Ok(menuItems.Data, "No menus available for this user"));
-
-            return Ok(menuItems);
-
-           
         }
         /// <summary>
         /// Gets Level 2 menu options based on a Level 1 code.
@@ -89,53 +84,61 @@ namespace DUNES.API.Controllers.Auth
         /// ```
         /// </remarks>
         /// <param name="level1">The Level 1 menu code (e.g. "01").</param>
+        /// <param name="ct">If the request was canceled by the user.</param>
         /// <response code="200">Returns the list of Level 2 menu options.</response>
         /// <response code="400">If the level1 parameter is missing or invalid.</response>
         /// 
         [HttpGet("level2/{level1}")]
         [ProducesResponseType(typeof(IEnumerable<MenuItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> GetLevel2MenuOptions(string level1)
+        public async Task<IActionResult> GetLevel2MenuOptions(string level1, CancellationToken ct)
         {
-            if (string.IsNullOrEmpty(level1))
-                return BadRequest("Parameter 'level1' is required.");
+            return await Handle(async ct =>
+            {
+                if (string.IsNullOrEmpty(level1))
+                    return BadRequest(ApiResponseFactory.BadRequest<object>("Parameter 'level1' is required."));
 
-            // ✅ Ya no pedimos user porque no se usa
-            var roles = await _authService.GetRolesFromClaims(User);
+                var roles = await _authService.GetRolesFromClaims(User, ct);
+                var menulevel2 = await _menuService.GetLevel2MenuOptions(level1, roles.Data, ct);
 
-            var menulevel2 = await _menuService.GetLevel2MenuOptions(level1, roles.Data);
+                if (menulevel2.Data == null || !menulevel2.Data.Any())
+                    return Ok(ApiResponseFactory.Ok(menulevel2.Data, "No menus level 2 available for this user"));
 
-            if (menulevel2.Data == null || !menulevel2.Data.Any())
-                return Ok(ApiResponseFactory.Ok(menulevel2.Data, "No menus level 2 available for this user"));
+                return Ok(menulevel2);
 
-            return Ok(menulevel2);
+            }, ct);
         }
 
         /// <summary>
         /// get all menu options for a level code
         /// </summary>
         /// <param name="code"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("api/menu/breadcrumb/{code}")]
         [ProducesResponseType(typeof(List<MenuItemDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetBreadcrumb(string code)
+        public async Task<IActionResult> GetBreadcrumb(string code, CancellationToken ct)
         {
-            // 1. Obtener los roles desde los claims
-            var roleResponse = await _authService.GetRolesFromClaims(User);
+            return await Handle(async ct =>
+            {
+                // 1. Obtener los roles desde los claims
+                var roleResponse = await _authService.GetRolesFromClaims(User, ct);
 
-            if (roleResponse == null || !roleResponse.Success || roleResponse.Data == null || !roleResponse.Data.Any())
-                return Unauthorized(ApiResponseFactory.NotFound<List<MenuItemDto>>("User does not have any valid roles."));
+                if (roleResponse == null || !roleResponse.Success || roleResponse.Data == null || !roleResponse.Data.Any())
+                    return Unauthorized(ApiResponseFactory.NotFound<List<MenuItemDto>>("User does not have any valid roles."));
 
-            // 2. Generar el breadcrumb usando los roles
-            var breadcrumb = await _menuService.BuildBreadcrumbAsync(code, roleResponse.Data);
+                // 2. Generar el breadcrumb usando los roles
+                var breadcrumb = await _menuService.BuildBreadcrumbAsync(code, roleResponse.Data, ct);
 
-            if (breadcrumb == null || !breadcrumb.Any())
-                return NotFound(ApiResponseFactory.NotFound<List<MenuItemDto>>($"No breadcrumb found for menu code '{code}'"));
+                if (breadcrumb == null || !breadcrumb.Any())
+                    return NotFound(ApiResponseFactory.NotFound<List<MenuItemDto>>($"No breadcrumb found for menu code '{code}'"));
 
-            // 3. Devolver la respuesta envuelta como ApiResponse
-            return Ok(ApiResponseFactory.Ok(breadcrumb));
+                // 3. Devolver la respuesta envuelta como ApiResponse
+                return Ok(ApiResponseFactory.Ok(breadcrumb));
+
+            }, ct);
         }
 
         /// <summary>
@@ -143,6 +146,7 @@ namespace DUNES.API.Controllers.Auth
         /// </summary>
         /// <param name="controller"></param>
         /// <param name="action"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(MenuItemDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -150,16 +154,17 @@ namespace DUNES.API.Controllers.Auth
        
         [HttpGet("codeByControllerAction")]
        // [HttpGet("codeByControllerAction")]
-        public async Task<ActionResult<ApiResponse<MenuItemDto>>> GetCodeByControllerAction(string controller, string action)
+        public async Task<IActionResult> GetCodeByControllerAction(string controller, string action, CancellationToken ct)
         {
-            var menu = await _menuService.GetCodeByControllerAction(controller, action);
+            return await Handle(async ct =>
+            {
+                var menu = await _menuService.GetCodeByControllerAction(controller, action, ct);
+                if (menu == null)
+                    return NotFound(ApiResponseFactory.NotFound<MenuItemDto>($"No breadcrumb found for this controller/action"));
 
-            if (menu == null)
+                return Ok(ApiResponseFactory.Ok(menu));
 
-                return NotFound(ApiResponseFactory.NotFound<List<MenuItemDto>>($"No breadcrumb found for this controller/action"));
-
-
-            return Ok(ApiResponseFactory.Ok(menu));
+            }, ct);
         }
     }
 }

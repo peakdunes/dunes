@@ -25,27 +25,30 @@ namespace DUNES.API.Repositories.Masters
         /// <summary>
         /// get all information
         /// </summary>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken ct)
         {
-            return await _context.Set<T>().ToListAsync();
+            return await _context.Set<T>().ToListAsync(ct);
         }
         /// <summary>
         /// get all information for id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(int id, CancellationToken ct)
         {
-            return await _context.Set<T>().FindAsync(id);
+            return await _context.Set<T>().FindAsync(id, ct);
         }
 
         /// <summary>
         /// add new record
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<T> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity, CancellationToken ct)
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
@@ -55,8 +58,9 @@ namespace DUNES.API.Repositories.Masters
         /// update record by id
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<T> UpdateAsync(T entity)
+        public async Task<T> UpdateAsync(T entity, CancellationToken ct)
         {
             _context.Set<T>().Update(entity);
             await _context.SaveChangesAsync();
@@ -66,8 +70,9 @@ namespace DUNES.API.Repositories.Masters
         /// delete record by id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<bool> DeleteByIdAsync(int id)
+        public async Task<bool> DeleteByIdAsync(int id, CancellationToken ct)
         {
             var entity = await _context.Set<T>().FindAsync(id);
             if (entity == null) return false;
@@ -81,9 +86,10 @@ namespace DUNES.API.Repositories.Masters
         /// </summary>
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<IEnumerable<T>> SearchByFieldAsync(string fieldName, string value)
+        public async Task<IEnumerable<T>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
 

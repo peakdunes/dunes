@@ -66,13 +66,13 @@ namespace DUNES.API.Controllers.Auth
         /// <response code="400">Bad request if required fields are missing.</response>
         /// <response code="401">Unauthorized if the credentials are invalid.</response>
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] LoginModel model, CancellationToken ct)
         {
-            return await Handle(async () =>
+            return await Handle(async ct =>
             {
-                var (token, expiration) = await _authService.LoginAsync(model);
+                var (token, expiration) = await _authService.LoginAsync(model, ct); // 👈 con ct
                 return new { token, expiration };
-            });
+            }, ct);
         }
 
         /// <summary>

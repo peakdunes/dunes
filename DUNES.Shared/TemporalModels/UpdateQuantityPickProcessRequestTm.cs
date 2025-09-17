@@ -10,7 +10,7 @@ namespace DUNES.Shared.TemporalModels
     public class UpdateQuantityPickProcessRequestTm
     {
 
-        public string companyclient { get; set; }
+        public string companyclient { get; set; } = string.Empty;
         public int lineid { get; set; }
         public List<BinPickWm> itemslist { get; set; } = new();
     }

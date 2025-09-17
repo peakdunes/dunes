@@ -24,67 +24,73 @@ namespace DUNES.API.Services.Masters
         /// <summary>
         /// get all data for this table
         /// </summary>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<IEnumerable<T>>> GetAllAsync()
+        public async Task<ApiResponse<IEnumerable<T>>> GetAllAsync(CancellationToken ct)
         {
-            var result = await _repository.GetAllAsync();
+            var result = await _repository.GetAllAsync(ct);
             return ApiResponseFactory.Ok(result);
         }
         /// <summary>
         /// get one register for this id
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<T>> GetByIdAsync(int id)
+        public async Task<ApiResponse<T>> GetByIdAsync(int id, CancellationToken ct)
         {
-            var entity = await _repository.GetByIdAsync(id);
+            var entity = await _repository.GetByIdAsync(id, ct);
             return entity == null
-                ? ApiResponseFactory.NotFound<T>("No se encontró el recurso")
+                ? ApiResponseFactory.NotFound<T>("Information not found")
                 : ApiResponseFactory.Ok(entity);
         }
         /// <summary>
         /// add record
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<T>> AddAsync(T entity)
+        public async Task<ApiResponse<T>> AddAsync(T entity, CancellationToken ct)
         {
-            var created = await _repository.AddAsync(entity);
+            var created = await _repository.AddAsync(entity, ct);
             return ApiResponseFactory.Created(created);
         }
         /// <summary>
         /// update a record
         /// </summary>
         /// <param name="entity"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<T>> UpdateAsync(T entity)
+        public async Task<ApiResponse<T>> UpdateAsync(T entity, CancellationToken ct)
         {
-            var updated = await _repository.UpdateAsync(entity);
+            var updated = await _repository.UpdateAsync(entity, ct);
             return updated == null
-                ? ApiResponseFactory.NotFound<T>("No se pudo actualizar (no encontrado)")
-                : ApiResponseFactory.Ok(updated, "Actualizado correctamente");
+                ? ApiResponseFactory.NotFound<T>("Record not updated")
+                : ApiResponseFactory.Ok(updated, "Update successfull");
         }
         /// <summary>
-        /// delete a record
+        ///  delete a record
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<bool>> DeleteByIdAsync(int id)
+        public async Task<ApiResponse<bool>> DeleteByIdAsync(int id, CancellationToken ct)
         {
-            var deleted = await _repository.DeleteByIdAsync(id);
+            var deleted = await _repository.DeleteByIdAsync(id, ct);
             return deleted
-                ? ApiResponseFactory.Ok(true, "Eliminado correctamente")
-                : ApiResponseFactory.NotFound<bool>("No se encontró el recurso a eliminar");
+                ? ApiResponseFactory.Ok(true, "Record deleted")
+                : ApiResponseFactory.NotFound<bool>("Record not found");
         }
         /// <summary>
         /// Get all table records for a string field
         /// </summary>
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<T>>> SearchByFieldAsync(string fieldName, string value)
+        public async Task<ApiResponse<List<T>>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct)
         {
-            var results = await _repository.SearchByFieldAsync(fieldName, value);
+            var results = await _repository.SearchByFieldAsync(fieldName, value, ct);
 
             if (results == null || !results.Any())
                 return ApiResponseFactory.NotFound<List<T>>($"No records found for {fieldName} containing '{value}'");

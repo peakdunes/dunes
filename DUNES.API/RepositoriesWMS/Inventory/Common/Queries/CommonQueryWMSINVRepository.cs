@@ -33,14 +33,17 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var listbines = await _wmscontext.Bines
+            
+                var listbines = await _wmscontext.Bines
                 .Where(x => x.Idcompany == companyid
                 && x.Idcompanyclient == companyClient
-                && x.Active == true).ToListAsync();
+                && x.Active == true).ToListAsync(ct);
 
-            return listbines;
+                return listbines;
+
+           
         }
 
 
@@ -50,9 +53,9 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Bines>> GetAllBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<List<Bines>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var listbines = await _wmscontext.Bines.Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync();
+            var listbines = await _wmscontext.Bines.Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
 
             return listbines;
         }
@@ -63,12 +66,12 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactionconcepts>> GetAllActiveTransactionsConcept(int companyid, string companyClient)
+        public async Task<List<Transactionconcepts>> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
             var listconcepts = await _wmscontext.Transactionconcepts
                .Where(x => x.Idcompany == companyid
                && x.Idcompanyclient == companyClient
-               && x.Active == true).ToListAsync();
+               && x.Active == true).ToListAsync(ct);
 
             return listconcepts;
         }
@@ -79,12 +82,12 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactionconcepts>> GetAllTransactionsConcept(int companyid, string companyClient)
+        public async Task<List<Transactionconcepts>> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
             var listconcepts = await _wmscontext.Transactionconcepts
                .Where(x => x.Idcompany == companyid
                && x.Idcompanyclient == companyClient
-               ).ToListAsync();
+               ).ToListAsync(ct);
 
             return listconcepts;
         }
@@ -94,13 +97,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient)
+        public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct )
         {
             var listtransactions = await _wmscontext.Transactiontypes
               .Where(x => x.Idcompany == companyid
               && x.Idcompanyclient == companyClient
               && x.Isinput == true
-              ).ToListAsync();
+              ).ToListAsync(ct);
 
             return listtransactions;
         }
@@ -110,13 +113,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactiontypes>> GetAllActiveTransactionsInputType(int companyid, string companyClient)
+        public async Task<List<Transactiontypes>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
              .Where(x => x.Idcompany == companyid
              && x.Idcompanyclient == companyClient
              && x.Isinput == true && x.Active == true
-             ).ToListAsync();
+             ).ToListAsync(ct);
 
             return listtransactions;
         }
@@ -127,13 +130,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactiontypes>> GetAllTransactionsOutputType(int companyid, string companyClient)
+        public async Task<List<Transactiontypes>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
             .Where(x => x.Idcompany == companyid
             && x.Idcompanyclient == companyClient
             && x.Isoutput == true
-            ).ToListAsync();
+            ).ToListAsync(ct);
 
             return listtransactions;
         }
@@ -143,13 +146,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactiontypes>> GetAllActiveTransactionsOutputType(int companyid, string companyClient)
+        public async Task<List<Transactiontypes>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
             .Where(x => x.Idcompany == companyid
             && x.Idcompanyclient == companyClient
             && x.Isoutput == true && x.Active == true
-            ).ToListAsync();
+            ).ToListAsync(ct);
 
             return listtransactions;
         }
@@ -159,13 +162,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<InventoryTypes>> GetAllActiveInventoryType(int companyid, string companyClient)
+        public async Task<List<InventoryTypes>> GetAllActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
             var listinventorytype = await _wmscontext.InventoryTypes
           .Where(x => x.Idcompany == companyid
               && x.Idcompanyclient == companyClient
               && x.Active == true
-          ).ToListAsync();
+          ).ToListAsync(ct);
 
             return listinventorytype;
         }
@@ -176,14 +179,14 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<InventoryTypes>> GetAllOnHandActiveInventoryType(int companyid, string companyClient)
+        public async Task<List<InventoryTypes>> GetAllOnHandActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
             var listinventorytype = await _wmscontext.InventoryTypes
           .Where(x => x.Idcompany == companyid
               && x.Idcompanyclient == companyClient
               && x.Active == true
               && x.IsOnHand == true
-          ).ToListAsync();
+          ).ToListAsync(ct);
 
             return listinventorytype;
         }
@@ -195,13 +198,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<InventoryTypes>> GetAllInventoryType(int companyid, string companyClient)
+        public async Task<List<InventoryTypes>> GetAllInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
             var listinventorytype = await _wmscontext.InventoryTypes
                .Where(x => x.Idcompany == companyid
                    && x.Idcompanyclient == companyClient
 
-               ).ToListAsync();
+               ).ToListAsync(ct);
 
             return listinventorytype;
         }
@@ -213,13 +216,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Itemstatus>> GetAllActiveItemStatus(int companyid, string companyClient)
+        public async Task<List<Itemstatus>> GetAllActiveItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
             var listitemstatus = await _wmscontext.Itemstatus
                .Where(x => x.Idcompany == companyid
                    && x.Idcompanyclient == companyClient
                    && x.Active == true
-               ).ToListAsync();
+               ).ToListAsync(ct);
 
             return listitemstatus;
         }
@@ -231,13 +234,13 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Itemstatus>> GetAllItemStatus(int companyid, string companyClient)
+        public async Task<List<Itemstatus>> GetAllItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
             var listitemstatus = await _wmscontext.Itemstatus
                .Where(x => x.Idcompany == companyid
                    && x.Idcompanyclient == companyClient
 
-               ).ToListAsync();
+               ).ToListAsync(ct);
 
             return listitemstatus;
         }
@@ -248,7 +251,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<List<Inventorydetail>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<List<Inventorydetail>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
 
             var listinventory = await (from enc in _wmscontext.Inventorydetail
@@ -263,7 +266,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
                && x.Iditem == partnumber
            )
                                        join det in _wmscontext.InventoryTypes.Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
-                                       select (enc)).ToListAsync();
+                                       select (enc)).ToListAsync(ct);
 
 
             return listinventory;
@@ -278,7 +281,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="typeid"></param>
         /// <returns></returns>
 
-        public async Task<List<Inventorydetail>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        public async Task<List<Inventorydetail>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid, CancellationToken ct)
         {
 
             var listinventory = await (from enc in _wmscontext.Inventorydetail
@@ -295,7 +298,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
           )
                                        join det in _wmscontext.InventoryTypes
                                        .Where(x => x.IsOnHand == true) on enc.Idtype equals det.Id
-                                       select (enc)).ToListAsync();
+                                       select (enc)).ToListAsync(ct);
 
 
 
@@ -310,7 +313,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        public async Task<List<Itemsbybin>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
             var listdistribution = await (from enc in _wmscontext.Itemsbybin.Where(x => x.CompanyId == companyid
                  && x.Idcompanyclient == companyClient
@@ -324,7 +327,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
                                               BinesId = enc.BinesId,
                                               Itemid = enc.Itemid,
                                               tagName = det.TagName!
-                                          }).ToListAsync();
+                                          }).ToListAsync(ct);
 
             return listdistribution;
         }
@@ -335,24 +338,19 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="DocumentNumber"></param>
         /// <returns></returns>
-        public async Task<WmsTransactionsRead> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        public async Task<WmsTransactionsRead?> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
 
-            List<InventorytransactionHdr> ListHeaders = new List<InventorytransactionHdr>();
-            List<InventorytransactionDetail> ListDetails = new List<InventorytransactionDetail>();
-            List<Inventorymovement> ListMovement = new List<Inventorymovement>();
-
-            WmsTransactionsRead objresponse = new WmsTransactionsRead
-            {
-                ListHdr = ListHeaders,
-                ListDetail = ListDetails,
-                ListMovement = ListMovement
-
-            };
-
+       
+            WmsTransactionsRead objresponse = new WmsTransactionsRead();
+         
             var infoenctran = await _wmscontext.InventorytransactionHdr
                 .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
-                x.Documentreference == DocumentNumber).ToListAsync();
+                x.Documentreference == DocumentNumber).ToListAsync(ct);
+
+
+            if (infoenctran.Count == 0)
+                return null;
 
             List<int> listenc = new List<int>();
 
@@ -368,23 +366,17 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
 
                 var infodetail = await _wmscontext.InventorytransactionDetail.Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
-
+                
                 if (infodetail.Count > 0)
                 {
-
                     objresponse.ListDetail = infodetail;
-
-
                 }
 
                 var infomov = await _wmscontext.Inventorymovement.Where(x => listenc.Contains(x.IdtransactionHead)).ToListAsync();
 
                 if (infomov.Count > 0)
                 {
-
                     objresponse.ListMovement = infomov;
-
-
                 }
             }
 
@@ -392,20 +384,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         }
 
 
-        //public async Task<List<Itemsbybin>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
-        //{
-
-        //    var infoenctran = await _wmscontext.InventorytransactionHdr
-        //        .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
-        //        x.Documentreference == DocumentNumber).ToListAsync();
-
-        //    List<int> listenc = new List<int>();
-
-        //    if (infoenctran.Count > 0)
-        //    {
-
-        //    }
-
-        //}
+       
     }
 }

@@ -11,13 +11,13 @@ namespace DUNES.API.Models.Auth
         /// The user's email address used for login.
         /// </summary>
         [JsonPropertyName("username")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         /// <summary>
         /// The user's password.
         /// </summary>
          
         [JsonPropertyName("password")]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }

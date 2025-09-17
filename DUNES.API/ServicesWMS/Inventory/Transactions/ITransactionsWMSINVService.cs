@@ -14,7 +14,8 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
         /// Create inventory transaction
         /// </summary>
         /// <param name="objcreate"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<int>> CreateInventoryTransaction(NewInventoryTransactionTm objcreate);
+        Task<ApiResponse<int>> CreateInventoryTransaction(NewInventoryTransactionTm objcreate, CancellationToken ct);
     }
 }

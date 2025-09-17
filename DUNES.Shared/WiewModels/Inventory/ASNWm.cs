@@ -10,9 +10,9 @@ namespace DUNES.Shared.WiewModels.Inventory
 {
     public class ASNWm
     {
-        public required ASNHdr asnHdr { get; set; }
+        public ASNHdr asnHdr { get; set; } = new();
 
-        public required List<ASNItemDetail> itemDetail { get; set; }
+        public List<ASNItemDetail> itemDetail { get; set; } = new();
 
     }
 

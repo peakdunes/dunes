@@ -11,6 +11,6 @@ namespace DUNES.Shared.DTOs.Inventory
 
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

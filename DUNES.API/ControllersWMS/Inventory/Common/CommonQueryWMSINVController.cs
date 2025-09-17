@@ -50,16 +50,17 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-act-bins/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
+            return await HandleApi(async ct =>
+             {
+                 var response = await _service.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct);
 
-            var response = await _service.GetAllActiveBinsByCompanyClient(companyid, companyClient);
+                 return response;
 
-            return StatusCode(response.StatusCode, response);
+             }, ct);
 
         }
-
-
 
         /// <summary>
         /// Return all  bins for a company client
@@ -72,10 +73,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-bins/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllBinsByCompanyClient(companyid, companyClient);
+            var response = await _service.GetAllBinsByCompanyClient(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -93,10 +94,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("active-transaction-concepts/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveTransactionsConcept(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllActiveTransactionsConcept(companyid, companyClient);
+            var response = await _service.GetAllActiveTransactionsConcept(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -113,10 +114,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("transaction-concepts/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllTransactionsConcept(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllTransactionsConcept(companyid, companyClient);
+            var response = await _service.GetAllTransactionsConcept(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -134,9 +135,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("active-input-transaction/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveTransactionsInputType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient);
+            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -154,9 +155,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("input-transaction/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllTransactionsInputType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient);
+            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -174,9 +175,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("active-output-transaction/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveTransactionsOutputType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient);
+            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -194,9 +195,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("output-transaction/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllTransactionsOutputType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient);
+            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -214,10 +215,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("active-inventorytype/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveInventoryType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllActiveInventoryType(companyid, companyClient);
+            var response = await _service.GetAllActiveInventoryType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -234,10 +235,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("inventorytype/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllInventoryType(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllInventoryType(companyid, companyClient);
+            var response = await _service.GetAllInventoryType(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -256,10 +257,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("active-itemstatus/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllActiveItemStatus(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllActiveItemStatus(companyid, companyClient);
+            var response = await _service.GetAllActiveItemStatus(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -279,10 +280,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("itemstatus/{companyid}/{companyClient}")]
 
-        public async Task<IActionResult> GetAllItemStatus(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllItemStatus(companyid, companyClient);
+            var response = await _service.GetAllItemStatus(companyid, companyClient, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -300,10 +301,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("onHand-InvByPartNumber/{companyid}/{companyClient}/{partnumber}")]
 
-        public async Task<IActionResult> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<IActionResult> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber , CancellationToken ct)
         {
 
-            var response = await _service.GetOnHandInventoryByItem(companyid, companyClient, partnumber);
+            var response = await _service.GetOnHandInventoryByItem(companyid, companyClient, partnumber, ct );
 
             return StatusCode(response.StatusCode, response);
 
@@ -320,9 +321,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("onHand-InvByPartNumber-Type/{companyid}/{companyClient}/{partnumber}/{typeid}")]
-        public async Task<IActionResult> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        public async Task<IActionResult> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid, CancellationToken ct)
         {
-            var response = await _service.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid);
+            var response = await _service.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -341,10 +342,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("itemBinDistribution/{companyid}/{companyClient}/{partnumber}")]
 
-        public async Task<IActionResult> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        public async Task<IActionResult> GetItemBinsDistribution(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
 
-            var response = await _service.GetItemBinsDistribution(companyid, companyClient, partnumber);
+            var response = await _service.GetItemBinsDistribution(companyid, companyClient, partnumber, ct);
 
             return StatusCode(response.StatusCode, response);
 
@@ -362,9 +363,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("all-transactions/{companyid}/{companyClient}/{DocumentNumber}")]
-        public async Task<IActionResult> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        public async Task<IActionResult> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
-            var response = await _service.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber);
+            var response = await _service.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber, ct);
 
             return StatusCode(response.StatusCode, response);
         }

@@ -23,7 +23,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient);
+        Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
         /// <summary>
         /// Get all Active bins associated with a client company 
@@ -31,7 +31,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient);
+        Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -42,7 +42,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactionconcepts>>> GetAllActiveTransactionsConcept(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactionconcepts>>> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -52,7 +52,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactionconcepts>>> GetAllTransactionsConcept(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactionconcepts>>> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -62,7 +62,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsInputType(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -72,7 +72,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsInputType(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -82,7 +82,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -92,7 +92,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsOutputType(int companyid, string companyClient);
+        Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -102,7 +102,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryType(int companyid, string companyClient);
+        Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryType(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -112,7 +112,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryType(int companyid, string companyClient);
+        Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryType(int companyid, string companyClient, CancellationToken ct);
 
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient);
+        Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient, CancellationToken ct);
 
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatus(int companyid, string companyClient);
+        Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatus(int companyid, string companyClient, CancellationToken ct);
 
 
 
@@ -140,7 +140,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Itemstatus>>> GetAllItemStatus(int companyid, string companyClient);
+        Task<ApiResponse<List<Itemstatus>>> GetAllItemStatus(int companyid, string companyClient, CancellationToken ct);
 
 
         /// <summary>
@@ -150,7 +150,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber);
+        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber, CancellationToken ct);
 
 
 
@@ -163,7 +163,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="partnumber"></param>
         /// <param name="typeid"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid);
+        Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid, CancellationToken ct);
 
 
 
@@ -175,7 +175,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber);
+        Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber, CancellationToken ct);
 
 
 
@@ -186,7 +186,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="DocumentNumber"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber);
+        Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct);
 
 
     }

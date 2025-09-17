@@ -60,7 +60,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
         /// <param name="objcreate"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<int>> CreateInventoryTransaction(NewInventoryTransactionTm objcreate)
+        public async Task<ApiResponse<int>> CreateInventoryTransaction(NewInventoryTransactionTm objcreate, CancellationToken ct)
         {
 
             bool isSerialized = false;
@@ -91,7 +91,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             if (string.IsNullOrEmpty(objcreate.hdr.Codecompanyclient))
                 return ApiResponseFactory.BadRequest<int>("Company Client is required");
 
-            var infocompanyclient = await _masterCompanyclientService.GetByIdAsync(objcreate.hdr.Idcompanyclient);
+            var infocompanyclient = await _masterCompanyclientService.GetByIdAsync(objcreate.hdr.Idcompanyclient, ct);
             
             if (infocompanyclient.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Company Client information not found");
@@ -102,7 +102,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             if (objcreate.hdr.Idtransactionconcept <= 0)
                 return ApiResponseFactory.BadRequest<int>("Concept Transaction is required");
 
-            var infoconcepts = await _commonQueryWMSService.GetAllTransactionsConcept(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient);
+            var infoconcepts = await _commonQueryWMSService.GetAllTransactionsConcept(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient,  ct);
 
             if(infoconcepts.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Concept Transaction not found");
@@ -141,7 +141,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             if (string.IsNullOrEmpty(objcreate.hdr.Iddivision))
                 return ApiResponseFactory.BadRequest<int>("Client division is required");
 
-            var infodivision = await _masterCompanyclientDivisionService.SearchByFieldAsync("CompanyDsc", objcreate.hdr.Codecompanyclient);
+            var infodivision = await _masterCompanyclientDivisionService.SearchByFieldAsync("CompanyDsc", objcreate.hdr.Codecompanyclient, ct);
 
             if (infodivision.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Client division not found");
@@ -273,7 +273,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                     return ApiResponseFactory.BadRequest<int>("Item is required");
 
 
-                var infoItem = await _masterCompanyclientMasterInventory.GetByIdAsync(info.Iditem);
+                var infoItem = await _masterCompanyclientMasterInventory.GetByIdAsync(info.Iditem, ct);
 
                 if (infoItem.Data == null)
                 {

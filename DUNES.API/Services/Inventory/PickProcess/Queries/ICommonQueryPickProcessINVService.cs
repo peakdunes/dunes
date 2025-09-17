@@ -14,13 +14,13 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId);
+        Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct);
 
         /// <summary>
         /// Get all (input, output) calls for a delivery id
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId);
+        Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId,CancellationToken ct);
     }
 }

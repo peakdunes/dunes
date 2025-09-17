@@ -8,7 +8,10 @@ namespace DUNES.API.DTOs.B2B
     /// </summary>
     public class AreaNameDto
     {
+        /// <summary>
+        /// area name
+        /// </summary>
         [Key]
-        public string area { get; set; }
+        public string area { get; set; } = string.Empty;
     }
 }

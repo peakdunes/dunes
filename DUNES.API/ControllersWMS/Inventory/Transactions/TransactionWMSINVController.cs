@@ -39,9 +39,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Transactions
         [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [HttpPost("wms-create-transaction/{objcreate}")]
-        public async Task<IActionResult> CreateInventoryTransaction(NewInventoryTransactionTm objcreate)
+        public async Task<IActionResult> CreateInventoryTransaction(NewInventoryTransactionTm objcreate, CancellationToken ct)
         {
-            var response = await _transactionService.CreateInventoryTransaction(objcreate);
+            var response = await _transactionService.CreateInventoryTransaction(objcreate, ct);
 
             return StatusCode(response.StatusCode, response);
         }

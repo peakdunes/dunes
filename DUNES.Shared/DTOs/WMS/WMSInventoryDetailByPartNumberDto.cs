@@ -18,7 +18,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// company client
         /// </summary>
         [MaxLength(100)]
-        public string companyclientid { get; set; }
+        public string companyclientid { get; set; } = string.Empty;
 
         /// <summary>
         /// location 
@@ -30,7 +30,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// location description
         /// </summary>
         [MaxLength(100)]
-        public string locationname { get; set; }
+        public string locationname { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// Bin description
         /// </summary>
         [MaxLength(100)]
-        public string binname { get; set; }
+        public string binname { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// inventory type description
         /// </summary>
         [MaxLength(100)]
-        public string inventoryname { get; set; }
+        public string inventoryname { get; set; } = string.Empty;
 
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// item status description
         /// </summary>
         [MaxLength(100)]
-        public string statusname { get; set; }
+        public string statusname { get; set; } = string.Empty;
 
         /// <summary>
         /// Rack id
@@ -83,7 +83,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// Rack Description
         /// </summary>
         [MaxLength(100)]
-        public string rackname { get; set; }
+        public string rackname { get; set; } = string.Empty;
 
         /// <summary>
         /// Quantity reserved 

@@ -57,7 +57,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(listbinespartno));
 
 
-            //////////
+            
             return await HandleAsync(async ct =>
             {
                 ASNWm objdto = new ASNWm { asnHdr = new ASNHdr(), itemDetail = new List<ASNItemDetail>() };

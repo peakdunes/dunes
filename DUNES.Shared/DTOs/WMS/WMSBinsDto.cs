@@ -11,6 +11,6 @@ namespace DUNES.Shared.DTOs.WMS
 
         public int Id { get; set; }
 
-        public string TagName { get; set; }
+        public string TagName { get; set; } = string.Empty;
     }
 }

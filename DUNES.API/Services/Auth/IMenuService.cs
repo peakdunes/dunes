@@ -11,16 +11,19 @@ namespace DUNES.API.Services.Auth
         /// <summary>
         /// Gets a hierarchical menu structure filtered by the user roles.
         /// </summary>
-        /// <param name="userRoles">Roles of the logged-in user</param>
-        /// <returns>Hierarchical list of MenuItemDto</returns>
-        Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles);
+        /// <param name="userRoles"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles, CancellationToken ct);
 
         /// <summary>
         /// Gets the level 2 menus associated with level 1 passed as parameter
         /// </summary>
         /// <param name="level1"></param>
+        /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles);
+        Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles, CancellationToken ct);
 
 
 
@@ -29,15 +32,17 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="code"></param>
         /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles);
+        Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles, CancellationToken ct);
 
         /// <summary>
         /// get all menu information for a controller/action
         /// </summary>
         /// <param name="controller"></param>
         /// <param name="action"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action);
+        Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action, CancellationToken ct);
     }
 }

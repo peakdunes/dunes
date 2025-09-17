@@ -19,12 +19,12 @@ namespace DUNES.Shared.DTOs.WMS
         public int Idcompany { get; set; }
         [Display(Name = "Company Description")]
         [MaxLength(200)]
-        public string CompanyName { get; set; }
+        public string CompanyName { get; set; } = string.Empty;
         [Display(Name = "Concept ID")]
         public int Idtransactionconcept { get; set; }
         [Display(Name = "Concept Transaction Description")]
         [MaxLength(200)]
-        public string conceptName { get; set; }
+        public string conceptName { get; set; } = string.Empty;
         [Display(Name = "User Created")]
         public string? IdUser { get; set; }
         [Display(Name = "Date Created")]

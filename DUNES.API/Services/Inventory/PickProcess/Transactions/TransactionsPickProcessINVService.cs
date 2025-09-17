@@ -82,7 +82,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="objInvData"></param>
         /// <param name="lpnid"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData,string lpnid)
+        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData,string lpnid, CancellationToken ct)
         {
             // throw new NotImplementedException();
 
@@ -109,7 +109,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
 
                 //Create WMS Transaction
 
-                var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData);
+                var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData, ct);
 
 
                 if (!wmsTransaction.Success)

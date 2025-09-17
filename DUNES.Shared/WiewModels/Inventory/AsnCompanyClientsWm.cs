@@ -9,10 +9,10 @@ namespace DUNES.UI.WiewModels
     /// </summary>
     public class AsnCompanyClientsWm
     {
-       
-      public ASNWm asdDto { get; set; }
 
-      public  List<WMSClientCompaniesDto> listcompanyclients {  get; set; }
+        public ASNWm asdDto { get; set; } = new();
+
+        public List<WMSClientCompaniesDto> listcompanyclients { get; set; } = new();
 
     }
 

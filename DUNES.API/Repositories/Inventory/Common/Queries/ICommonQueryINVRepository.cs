@@ -1,9 +1,10 @@
 ﻿using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
 
 namespace DUNES.API.Repositories.Inventory.Common.Queries
 { 
     /// <summary>
-    /// All common inventory queries
+    /// All common inventory transactions queries
     /// </summary>
     public interface ICommonQueryINVRepository
     {
@@ -12,6 +13,6 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// </summary>
         /// <param name="DocumentNumber"></param>
         /// <returns></returns>
-        Task<ASNRead> GetAllInventoryTransactionsByDocument(string DocumentNumber);
+        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByDocument(string DocumentNumber);
     }
 }

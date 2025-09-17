@@ -10,31 +10,42 @@ namespace DUNES.API.Repositories.Auth
     public interface IMenuRepository
     {
         /// <summary>
-        /// Retrieves all active menu items from the database.
+        /// 
         /// </summary>
+        /// <returns></returns>
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userRoles"></param>
+        /// <param name="ct"></param>
         /// <returns>List of MenuItemDto with flat structure (not hierarchical yet).</returns>
-        Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles);
+        Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles, CancellationToken ct);
 
         /// <summary>
         /// Gets the level 2 menus associated with level 1 passed as parameter
         /// </summary>
         /// <param name="level1"></param>
+        /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles);
+        Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles, CancellationToken ct);
 
         /// <summary>
         /// get all menu options for role
         /// </summary>
         /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles);
+        Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles, CancellationToken ct);
 
         /// <summary>
         /// get all menu information for a controller/action
         /// </summary>
         /// <param name="controller"></param>
         /// <param name="action"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<MenuItemDto> GetCodeByControllerAction(string controller, string action);
+        Task<MenuItemDto> GetCodeByControllerAction(string controller, string action, CancellationToken ct);
     }
 }

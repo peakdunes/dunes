@@ -18,9 +18,6 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
     public class CommonQueryWMSINVService : ICommonQueryWMSINVService
     {
 
-
-
-
         private readonly ICommonQueryWMSINVRepository _repository;
 
         /// <summary>
@@ -41,9 +38,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveBinsByCompanyClient(companyid, companyClient);
+            var info = await _repository.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -52,18 +49,15 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(info, "OK");
         }
-
-
-
         /// <summary>
         /// Get all the bins associated with a client company 
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllBinsByCompanyClient(companyid, companyClient);
+            var info = await _repository.GetAllBinsByCompanyClient(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -80,9 +74,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactionconcepts>>> GetAllActiveTransactionsConcept(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactionconcepts>>> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveTransactionsConcept(companyid, companyClient);
+            var info = await _repository.GetAllActiveTransactionsConcept(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -98,9 +92,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactionconcepts>>> GetAllTransactionsConcept(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactionconcepts>>> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllTransactionsConcept(companyid, companyClient);
+            var info = await _repository.GetAllTransactionsConcept(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -117,9 +111,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsInputType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveTransactionsInputType(companyid, companyClient);
+            var info = await _repository.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -135,9 +129,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsInputType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllTransactionsInputType(companyid, companyClient);
+            var info = await _repository.GetAllTransactionsInputType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -154,9 +148,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactiontypes>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveTransactionsOutputType(companyid, companyClient);
+            var info = await _repository.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -172,9 +166,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsOutputType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Transactiontypes>>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllTransactionsOutputType(companyid, companyClient);
+            var info = await _repository.GetAllTransactionsOutputType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -189,9 +183,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveInventoryType(companyid, companyClient);
+            var info = await _repository.GetAllActiveInventoryType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -208,9 +202,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllOnHandActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllOnHandActiveInventoryType(companyid, companyClient);
+            var info = await _repository.GetAllOnHandActiveInventoryType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -226,9 +220,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryType(int companyid, string companyClient)
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllInventoryType(companyid, companyClient);
+            var info = await _repository.GetAllInventoryType(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -238,20 +232,15 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
             return ApiResponseFactory.Ok(info, "OK");
         }
 
-
-
-
-
-
         /// <summary>
         /// Get all active item status for a client company 
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatus(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllActiveItemStatus(companyid, companyClient);
+            var info = await _repository.GetAllActiveItemStatus(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -261,17 +250,15 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
             return ApiResponseFactory.Ok(info, "OK");
         }
 
-
-
         /// <summary>
         /// Get all item status for a client company 
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Itemstatus>>> GetAllItemStatus(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Itemstatus>>> GetAllItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
-            var info = await _repository.GetAllItemStatus(companyid, companyClient);
+            var info = await _repository.GetAllItemStatus(companyid, companyClient, ct);
 
             if (info == null)
             {
@@ -287,12 +274,12 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber)
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
 
             List<WMSInventoryDetailByPartNumberDto> objlist = new List<WMSInventoryDetailByPartNumberDto>();
 
-            var info = await _repository.GetOnHandInventoryByItem(companyid, companyClient, partnumber);
+            var info = await _repository.GetOnHandInventoryByItem(companyid, companyClient, partnumber, ct);
 
             if (info == null)
             {
@@ -333,12 +320,12 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="partnumber"></param>
         /// <param name="typeid"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid)
+        public async Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid, CancellationToken ct)
         {
 
             List<WMSInventoryDetailByPartNumberDto> objlist = new List<WMSInventoryDetailByPartNumberDto>();
 
-            var info = await _repository.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid);
+            var info = await _repository.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid, ct);
 
             if (info == null)
             {
@@ -379,10 +366,10 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber)
+        public async Task<ApiResponse<List<Itemsbybin>>> GetItemBinsDistribution(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
 
-            var info = await _repository.GetItemBinsDistribution(companyid, companyClient, partnumber);
+            var info = await _repository.GetItemBinsDistribution(companyid, companyClient, partnumber, ct);
 
             if (info == null)
             {
@@ -398,14 +385,14 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="companyClient"></param>
         /// <param name="DocumentNumber"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber)
+        public async Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
-            var info = await _repository.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber);
+            var info = await _repository.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber, ct);
 
-            if (info.ListHdr.Count <= 0)
-            {
+            if (info == null)
                 return ApiResponseFactory.NotFound<WMSTransactionTm>($"there is not WMS transaction for this company {companyClient} and this document {DocumentNumber}");
-            }
+
+          
 
             WMSTransactionTm objresponse = new WMSTransactionTm();
 

@@ -28,7 +28,13 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
             _repository = repository;
         }
 
-        public async Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId)
+        /// <summary>
+        /// Get all input - output calls for a pick process
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId, CancellationToken ct)
         {
 
             List<InputCallsDto> listinputcalls = new List<InputCallsDto>();
@@ -100,9 +106,9 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// Get all Pick Process Information
         /// </summary>
         /// <param name="DeliveryId"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId)
+        public async Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct)
         {
             var info = await _repository.GetPickProcessAllInfo(DeliveryId);
 

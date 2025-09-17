@@ -87,7 +87,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<PickProcessRead> GetPickProcessAllInfo(string DeliveryId)
+        public async Task<PickProcessRead?> GetPickProcessAllInfo(string DeliveryId)
         {
             var infoHdr = _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.FirstOrDefault(x => x.DeliveryId == DeliveryId);
 

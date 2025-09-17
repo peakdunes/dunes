@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.Controllers.Inventory.PickProcess
 {
-    
+
     /// <summary>
     /// All Inventory Pick Process queries
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-   
-    public class PickProcessINVController : ControllerBase
+
+    public class PickProcessINVController : BaseController
     {
 
 
@@ -36,6 +36,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
 
         /// <summary>Get all pick process information.</summary>
         /// <param name="DeliveryId">Delivery identifier to filter the pick process.</param>
+        ///  <param name="ct"></param>
         /// <remarks>Returns header plus one or more detail lines.</remarks>
         /// <response code="200">Successful; returns data.</response>
         /// <response code="404">Not found if the delivery does not exist.</response>
@@ -46,11 +47,13 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [HttpGet("pickprocess-info/{DeliveryId}")]
-        public async Task<IActionResult> GetPickProcessAllInfo(string DeliveryId)
+        public async Task<IActionResult> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct)
         {
-            var response = await _service.GetPickProcessAllInfo(DeliveryId);
+            return await HandleApi(async ct =>
+            {
 
-            return StatusCode(response.StatusCode, response);
+                return await _service.GetPickProcessAllInfo(DeliveryId, ct);
+            }, ct);
         }
         /// <summary>
         /// Get all (input, output) pick process calls
@@ -60,11 +63,14 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [HttpGet("pickprocess-all-calls/{DeliveryId}")]
-        public async Task<IActionResult> GetPickProcessAllCalls(string DeliveryId)
+        public async Task<IActionResult> GetPickProcessAllCalls(string DeliveryId, CancellationToken ct)
         {
-            var response = await _service.GetPickProcessAllCalls(DeliveryId);
+            return await HandleApi(async ct =>
+            {
+                return await _service.GetPickProcessAllCalls(DeliveryId, ct);
 
-            return StatusCode(response.StatusCode, response);
+
+            }, ct);
         }
 
         /// <summary>
@@ -82,22 +88,22 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
             return StatusCode(response.StatusCode, response);
         }
 
-       /// <summary>
-       /// Create pick process transaction
-       /// </summary>
-       /// <param name="DeliveryId"></param>
-       /// <param name="objInvTransaction"></param>
-       /// <param name="lpnid"></param>
-       /// <returns></returns>
+        /// <summary>
+        /// Create pick process transaction
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="objInvTransaction"></param>
+        /// <param name="lpnid"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<PickProcessResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [HttpPost("create-pickprocess-transaction/{DeliveryId}/{objInvTransaction}/{lpnid}")]
-        public async Task<IActionResult> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvTransaction, string lpnid)
+        public async Task<IActionResult> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvTransaction, string lpnid, CancellationToken ct)
         {
-            var response = await _transactionservice.CreatePickProccessTransaction(DeliveryId, objInvTransaction, lpnid);
+            var response = await _transactionservice.CreatePickProccessTransaction(DeliveryId, objInvTransaction, lpnid, ct);
 
             return StatusCode(response.StatusCode, response);
         }
-       
+
     }
 }

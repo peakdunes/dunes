@@ -24,26 +24,29 @@ namespace DUNES.API.Repositories.Auth
         }
 
         /// <summary>
-        /// Gets all active menu items from the mvcPartRunnerMenu table.
+        /// Gets all active menu items from the mvcPartRunnerMenu table for a role list.
         /// </summary>
-        public async Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles)
+        /// <param name="userRoles"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles, CancellationToken ct)
         {
             var roleList = userRoles.ToList();
             var menus = await _context.MvcPartRunnerMenu
                 .Where(m => m.Active == true && m.Code.Length == 2)
                 .OrderBy(m => m.Order)
-                .ToListAsync(); // ejecuta la query en SQL
+                .ToListAsync(ct); // ejecuta la query en SQL
 
             return menus
                 .Where(m => roleList.Any(role => m.Roles.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
-                    Code = m.Code,
-                    Title = m.Title,
-                    Utility = m.Utility,
-                    Controller = m.Controller,
-                    Action = m.Action,
-                    Roles = m.Roles,
+                    Code = m.Code ?? string.Empty,
+                    Title = m.Title ?? string.Empty,
+                    Utility = m.Utility ?? string.Empty,
+                    Controller = m.Controller ?? string.Empty,
+                    Action = m.Action ?? string.Empty,
+                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = ""
@@ -55,8 +58,9 @@ namespace DUNES.API.Repositories.Auth
         /// </summary>
         /// <param name="level1"></param>
         /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles)
+        public async Task<List<MenuItemDto>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles, CancellationToken ct)
         {
             string previoumenu = string.Empty;
 
@@ -70,23 +74,22 @@ namespace DUNES.API.Repositories.Auth
             var menus = await _context.MvcPartRunnerMenu
                 .Where(m => m.Active == true && m.Code.Length == nextlevel && m.Code.StartsWith(level1.Trim()))
                   .OrderBy(m => m.Order)
-                .ToListAsync(); // ejecuta la query en SQL
+                .ToListAsync(ct); 
 
            var menu2 = menus
                 .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
-                    Code = m.Code,
-                    Title = m.Title,
-                    Utility = m.Utility,
-                    Controller = m.Controller,
-                    Action = m.Action,
-                    Roles = m.Roles,
+                    Code = m.Code ?? string.Empty,
+                    Title = m.Title ?? string.Empty,
+                    Utility = m.Utility ?? string.Empty,
+                    Controller = m.Controller ?? string.Empty,
+                    Action = m.Action ?? string.Empty,
+                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = level1
-                    //previousmenu = large > 2 ? level1.Substring(0, level1.Length - 2) : level1
-                    // previousmenu  = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
+                  
                 })
                 .ToList();
 
@@ -97,28 +100,31 @@ namespace DUNES.API.Repositories.Auth
         /// get all menu option for role
         /// </summary>
         /// <param name="roles"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles)
+        public async Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles, CancellationToken ct)
         {
             var roleList = roles.ToList();
             var menus = await _context.MvcPartRunnerMenu
                 .Where(m => m.Active == true)
                 .OrderBy(m => m.Order)
-                .ToListAsync(); // ejecuta la query en SQL
+                .ToListAsync(ct); // ejecuta la query en SQL
 
            var menu2 = menus
                 .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
-                    Code = m.Code,
-                    Title = m.Title,
-                    Utility = m.Utility,
-                    Controller = m.Controller,
-                    Action = m.Action,
-                    Roles = m.Roles,
+                    Code = m.Code ?? string.Empty,
+                    Title = m.Title ?? string.Empty,
+                    Utility = m.Utility ?? string.Empty,
+                    Controller = m.Controller ?? string.Empty,
+                    Action = m.Action ?? string.Empty,
+                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
-                    previousmenu = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
+                    previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2
+                                ? m.Code.Substring(0, m.Code.Length - 2)
+                                : m.Code ?? string.Empty
 
                 })
                 .ToList();
@@ -132,29 +138,28 @@ namespace DUNES.API.Repositories.Auth
         /// <param name="controller"></param>
         /// <param name="action"></param>
         /// <returns></returns>
-        public async Task<MenuItemDto> GetCodeByControllerAction(string controller, string action)
+        public async Task<MenuItemDto> GetCodeByControllerAction(string controller, string action, CancellationToken ct)
         {
 
             var m = await _context.MvcPartRunnerMenu
                 .FirstOrDefaultAsync(m => m.Active == true
-                    && m.Controller.ToLower() == controller.ToLower()
-                    && m.Action.ToLower() == action.ToLower()
+                    && m.Controller!.ToLower() == controller.ToLower()
+                    && m.Action!.ToLower() == action.ToLower(),ct
                 );
 
             if (m == null) return null;
 
             return  new MenuItemDto
                 {
-                    Code = m.Code,
-                    Title = m.Title,
-                    Utility = m.Utility,
-                    Controller = m.Controller,
-                    Action = m.Action,
-                    Roles = m.Roles,
+                    Code = m.Code ?? string.Empty,
+                    Title = m.Title ?? string.Empty,
+                    Utility = m.Utility ?? string.Empty,
+                    Controller = m.Controller ?? string.Empty,
+                    Action = m.Action ?? string.Empty,
+                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
-                    // previousmenu = m.Code.ToString().Substring(0, (m.Code.Length - 2))
-                    previousmenu = m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code
+                    previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code ?? string.Empty
                 };
         }
 

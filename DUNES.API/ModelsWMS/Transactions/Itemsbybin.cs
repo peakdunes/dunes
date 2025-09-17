@@ -17,5 +17,5 @@ public partial class Itemsbybin
     public string Itemid { get; set; } = null!;
 
     [MaxLength(200)]
-    public string tagName { get; set; }
+    public string tagName { get; set; } = string.Empty;
 }

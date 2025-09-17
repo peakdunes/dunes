@@ -31,66 +31,96 @@ namespace DUNES.API.Controllers.Masters
         /// <summary>
         /// Retrieves all consignment call types.
         /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<TzebB2bConsignmentCallsType>>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            return await Handle(() => _service.GetAllAsync());
+            return await Handle(async ct =>
+            {
+                var items = await _service.GetAllAsync(ct);
+                return items;
+            }, ct);
         }
 
         /// <summary>
         /// Retrieves a specific consignment call type by its ID.
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<TzebB2bConsignmentCallsType>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
-            return await Handle(async () =>
+            return await Handle(async ct =>
             {
-                var item = await _service.GetByIdAsync(id);
+                var item = await _service.GetByIdAsync(id, ct);
                 if (item == null)
-                    return NotFound(ApiResponseFactory.NotFound<object>("Item not found"));
+                    return NotFound(ApiResponseFactory.NotFound<object>("Consigment call type not found"));
                 return Ok(ApiResponseFactory.Ok(item));
-            });
+            }, ct);
         }
 
         /// <summary>
         /// Creates a new consignment call type.
         /// </summary>
+        /// <param name="item"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<TzebB2bConsignmentCallsType>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsType item)
+        public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
         {
-            return await Handle(() => _service.AddAsync(item));
+            return await Handle(async ct =>
+            {
+                var created = await _service.AddAsync(item, ct);
+                return created;
+            }, ct);
         }
 
         /// <summary>
         /// Updates an existing consignment call type.
         /// </summary>
+        /// <param name="item"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<TzebB2bConsignmentCallsType>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsType item)
+        public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
         {
-            return await Handle(() => _service.UpdateAsync(item));
+            return await Handle(async ct =>
+            {
+                var updated = await _service.UpdateAsync(item, ct);
+                return updated;
+            }, ct);
         }
 
         /// <summary>
         /// Deletes a consignment call type by its ID.
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            return await Handle(() => _service.DeleteByIdAsync(id));
+            return await Handle(async ct =>
+            {
+                await _service.DeleteByIdAsync(id, ct);
+                return true;
+            }, ct);
         }
     }
 }

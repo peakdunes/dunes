@@ -25,7 +25,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="objInvData"></param>
         /// <param name="lpnid"></param>
         /// <returns></returns>
-        Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData, string lpnid);
+        Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData, string lpnid, CancellationToken ct);
 
 
         /// <summary>

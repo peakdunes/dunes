@@ -35,52 +35,51 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="userPrincipal">The ClaimsPrincipal object injected by ASP.NET (User)</param>
         /// <returns>List of role names (or empty list if no roles)</returns>
-        public async Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal)
+        public async Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal, CancellationToken ct)
         {
 
-            List<string> roleslist = new List<string>();
+            // Check for cancellation at the start
+            ct.ThrowIfCancellationRequested();
+
+            var roleslist = new List<string>();
 
             // 1. Verifica que hay un usuario autenticado
             if (userPrincipal?.Identity == null || !userPrincipal.Identity.IsAuthenticated)
-                return  ApiResponseFactory.NotFound<List<string>>(
-                    $"This user is not authenticate.");
+                return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
 
             // 2. Obtiene el username (normalmente el email) desde el claim `name`
             var username = userPrincipal.Identity?.Name;
             if (string.IsNullOrEmpty(username))
-                return ApiResponseFactory.NotFound<List<string>>(
-                    $"This user is not authenticate.");
+                return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
+
+            ct.ThrowIfCancellationRequested();
 
             // 3. Busca el usuario en la base de datos de Identity
             var user = await _userManager.FindByNameAsync(username);
             if (user == null)
-                return ApiResponseFactory.NotFound<List<string>>(
-                    $"This user is not authenticate.");
+                return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
 
             // 4. Obtiene los roles desde Identity
             var roles = await _userManager.GetRolesAsync(user);
+            if (roles == null || !roles.Any())
+                return ApiResponseFactory.NotFound<List<string>>("Roles list for this user not found.");
 
-            if (roles == null)
-            {
-                return ApiResponseFactory.NotFound<List<string>>(
-                   $"Roles list for this user not found.");
-            }
-            else
-            {
-                roleslist = roles.ToList();
-            }
+            roleslist = roles.ToList();
 
-                // 5. Devuelve la lista de roles como List<string>
-                return ApiResponseFactory.Ok(roleslist, "Roles availables for this user");
+            ct.ThrowIfCancellationRequested();
+
+            // 5. Devuelve la lista de roles como List<string>
+            return ApiResponseFactory.Ok(roleslist, "Roles available for this user");
         }
 
         /// <summary>
         /// login validation access
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="UnauthorizedAccessException"></exception>
-        public async Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model)
+        public async Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model, CancellationToken ct)
         {
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))

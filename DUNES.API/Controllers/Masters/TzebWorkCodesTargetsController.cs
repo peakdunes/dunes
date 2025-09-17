@@ -31,9 +31,9 @@ namespace DUNES.API.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<TzebWorkCodesTargets>>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            return await Handle(() => _service.GetAllAsync());
+            return await HandleApi(ct => _service.GetAllAsync(ct), ct);
         }
 
         /// <summary>
@@ -44,54 +44,62 @@ namespace DUNES.API.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpGet("GetById/{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
-            return await Handle(async () =>
-            {
-                var item = await _service.GetByIdAsync(id);
-                if (item == null)
-                    return NotFound(ApiResponseFactory.NotFound<object>("Work code target not found"));
-                return Ok(ApiResponseFactory.Ok(item));
-            });
+            return await HandleApi(ct => _service.GetByIdAsync(id, ct), ct);
         }
 
         /// <summary>
         /// Creates a new work code target.
         /// </summary>
-        /// <param name="item">The work code target to create.</param>
+        /// <param name="item"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargets>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebWorkCodesTargets item)
+        public async Task<IActionResult> Create([FromBody] TzebWorkCodesTargets item, CancellationToken ct)
         {
-            return await Handle(() => _service.AddAsync(item));
+            return await HandleApi(async ct =>
+            {
+                var created = await _service.AddAsync(item, ct);
+                return created;
+            }, ct);
         }
 
         /// <summary>
         /// Updates an existing work code target.
         /// </summary>
-        /// <param name="item">The work code target to update.</param>
+        /// <param name="item"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargets>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebWorkCodesTargets item)
+        public async Task<IActionResult> Update([FromBody] TzebWorkCodesTargets item, CancellationToken ct)
         {
-            return await Handle(() => _service.UpdateAsync(item));
+            return await HandleApi(async ct =>
+            {
+                var updated = await _service.UpdateAsync(item, ct);
+                return updated;
+            }, ct);
         }
 
         /// <summary>
         /// Deletes a work code target by ID.
         /// </summary>
-        /// <param name="id">The ID of the work code target to delete.</param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<bool>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpDelete("Delete/{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            return await Handle(() => _service.DeleteByIdAsync(id));
+            return await HandleApi(ct => _service.DeleteByIdAsync(id, ct), ct);
         }
     }
 

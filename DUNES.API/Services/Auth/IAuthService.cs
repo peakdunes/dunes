@@ -13,13 +13,15 @@ namespace DUNES.API.Services.Auth
         /// User Login
         /// </summary>
         /// <param name="model"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model);
+        Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model, CancellationToken ct);
         /// <summary>
         /// Obtain all roles assigned for this user
         /// </summary>
         /// <param name="userPrincipal"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal);
+        Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal, CancellationToken ct);
     }
 }

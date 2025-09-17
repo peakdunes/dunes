@@ -19,16 +19,16 @@ namespace DUNES.Shared.DTOs.WMS
         public int Idtransactiontype { get; set; }
         
         [MaxLength(200)]
-        public string transactionTypeName { get; set; }
+        public string transactionTypeName { get; set; } = string.Empty;
 
         public int Idlocation { get; set; }
         [MaxLength(200)]
-        public string locationName { get; set; }
+        public string locationName { get; set; } = string.Empty;
 
         public int Idtype { get; set; }
 
         [MaxLength(200)]
-        public string inventoryTypeName { get; set; }
+        public string inventoryTypeName { get; set; } = string.Empty;
 
         public int Idrack { get; set; }
 
@@ -37,14 +37,14 @@ namespace DUNES.Shared.DTOs.WMS
         public int Idbin { get; set; }
 
         [MaxLength(200)]
-        public string binName { get; set; }
+        public string binName { get; set; } = string.Empty;
 
         public string? Iditem { get; set; }
 
         public int Idstatus { get; set; }
 
         [MaxLength(200)]
-        public string statusName { get; set; }
+        public string statusName { get; set; } = string.Empty;
 
         public string? Serialid { get; set; }
 
@@ -59,7 +59,7 @@ namespace DUNES.Shared.DTOs.WMS
         public int Idcompany { get; set; }
 
         [MaxLength(200)]
-        public string companyName { get; set; }
+        public string companyName { get; set; } = string.Empty;
 
         public string? Idcompanyclient { get; set; }
 
@@ -74,6 +74,6 @@ namespace DUNES.Shared.DTOs.WMS
         public int Idtransactionconcept { get; set; }
 
         [MaxLength(200)]
-        public string conceptName { get; set; }
+        public string conceptName { get; set; } = string.Empty;
     }
 }
