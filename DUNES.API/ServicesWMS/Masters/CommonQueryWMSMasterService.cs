@@ -31,7 +31,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<Company>> GetCompanyInformation(int companyid)
+        public async Task<ApiResponse<Company>> GetCompanyInformation(int companyid, CancellationToken ct)
         {
 
             var infocompany = await _repository.GetCompanyInformation(companyid);
@@ -48,7 +48,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Locations>>> GetAllLocationsByCompany(int companyid)
+        public async Task<ApiResponse<List<Locations>>> GetAllLocationsByCompany(int companyid, CancellationToken ct)
         {
             var infoloc = await _repository.GetAllLocationsByCompany(companyid);
 
@@ -65,7 +65,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _repository.GetAllInventoryTypesByCompanyClient(companyid, companyClient);
 
@@ -81,7 +81,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _repository.GetAllActiveInventoryTypesByCompanyClient(companyid, companyClient);
 
@@ -99,7 +99,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Itemstatus>>> GetAllItemStatusByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Itemstatus>>> GetAllItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infostatus = await _repository.GetAllItemStatusByCompanyClient(companyid, companyClient);
 
@@ -115,7 +115,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infostatus = await _repository.GetAllActiveItemStatusByCompanyClient(companyid, companyClient);
 
@@ -130,7 +130,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Racks>>> GetAllRacksByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Racks>>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var inforacks = await _repository.GetAllRacksByCompanyClient(companyid, companyClient);
 
@@ -145,7 +145,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Racks>>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Racks>>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var inforacks = await _repository.GetAllActiveRacksByCompanyClient(companyid, companyClient);
 
@@ -160,7 +160,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _repository.GetAllBinsByCompanyClient(companyid, companyClient);
 
@@ -175,7 +175,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _repository.GetAllActiveBinsByCompanyClient(companyid, companyClient);
 

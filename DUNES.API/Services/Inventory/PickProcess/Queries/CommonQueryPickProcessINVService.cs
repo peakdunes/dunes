@@ -1,10 +1,14 @@
 ﻿
+using DUNES.API.Models.B2b;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.B2B;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Services.Inventory.PickProcess.Queries
@@ -27,6 +31,110 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         {
             _repository = repository;
         }
+        /// <summary>
+        /// Displays the 4 tables associated with an Pick Process in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="ConsignRequestId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<TorderRepairTm>> GetAllTablesOrderRepairCreatedByPickProcessAsync(string ConsignRequestId, CancellationToken ct)
+        {
+            TorderRepairTm objresponse = new TorderRepairTm();
+
+            var info = await _repository.GetAllTablesOrderRepairCreatedByPickProcessAsync(ConsignRequestId, ct);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<TorderRepairTm>(
+                    $"There is not ServTrack Tables for this Pick Process number ({ConsignRequestId}).");
+            }
+
+            TorderRepairHdrDto objenc = new TorderRepairHdrDto();
+
+            objenc.RefNo = info.OrHdr.RefNo;
+            objenc.DateCreated = info.OrHdr.DateCreated;
+            objenc.TcustNo = info.OrHdr.TcustNo;
+            objenc.CustRef = info.OrHdr.CustRef;
+            objenc.CustName = info.OrHdr.CustName;
+            objenc.ShipToAddr = info.OrHdr.ShipToAddr;
+            objenc.ShipToAddr1 = info.OrHdr.ShipToAddr1;
+            objenc.TcityId = info.OrHdr.TcityId;
+            objenc.TstateId = info.OrHdr.TstateId;
+            objenc.ZipCode = info.OrHdr.ZipCode;
+            objenc.TstatusId = info.OrHdr.TstatusId;
+            objenc.DateInserted = info.OrHdr.DateInserted;
+
+            objresponse.repairHdr = objenc;
+
+            if (info.ItemList != null)
+            {
+                foreach (var item in info.ItemList)
+                {
+                    TorderRepairItemsDto objitem = new TorderRepairItemsDto();
+
+                    objitem.RefNo = item.RefNo;
+                    objitem.PartNo = item.PartNo;
+                    objitem.Qty = item.Qty;
+                    objitem.CompanyPartNo = item.CompanyPartNo;
+
+                    objresponse.ListItems.Add(objitem);
+                }
+            }
+
+            if (info.ReceivingList != null)
+            {
+                foreach (var item in info.ReceivingList)
+                {
+                    TorderRepairItemsSerialsReceivingDto objitem = new TorderRepairItemsSerialsReceivingDto();
+
+                    objitem.RefNo = item.RefNo; 
+                    objitem.PartNo = item.PartNo;
+                    objitem.DateReceived = item.DateReceived;
+                    objitem.SerialInbound = item.SerialInbound;
+                    objitem.SerialReceived = item.SerialReceived;
+                    objitem.TstatusId = item.TstatusId;
+                    objitem.RepairNo = item.RepairNo;
+                    objitem.Qty = item.Qty;
+                    objitem.QtyReceived = item.QtyReceived;
+                    objitem.Id = item.Id;
+                    objitem.ProjectName = item.ProjectName;
+                    objresponse.ListItemsSerialsReceiving.Add(objitem);
+                }
+            }
+
+            if (info.ShippingList != null)
+            {
+                foreach (var item in info.ShippingList)
+                {
+                    TorderRepairItemsSerialsShippingDto objitem = new TorderRepairItemsSerialsShippingDto();
+
+                    objitem.RefNo = item.RefNo;
+                    objitem.PartNo = item.PartNo;
+                    objitem.DateShip = item.DateShip;
+                    objitem.SerialShip = item.SerialShip;
+                    objitem.TstatusId = item.TstatusId;
+                    objitem.RepairNo = item.RepairNo;
+                    objitem.Qty = item.Qty;
+                    objitem.QtyShip = item.QtyShip;
+                    objitem.ShipViaId = item.ShipViaId;
+                    objitem.Id = item.Id;
+                    objitem.TrackingNumber = item.TrackingNumber;
+                    objitem.ShippingGroupId = item.ShippingGroupId;
+                    objitem.DateTimeShip = item.DateTimeShip;
+                    objitem.UserName = item.UserName;
+                    objitem.DateTrackingNumber = item.DateTrackingNumber;
+
+                    objresponse.ListItemsSerialsShipping.Add(objitem) ;
+                }
+            }
+            return ApiResponseFactory.Ok(objresponse, "OK");
+        }
+
+
 
         /// <summary>
         /// Get all input - output calls for a pick process
@@ -42,7 +150,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
 
             PickProcessCallsReadDto objdto = new PickProcessCallsReadDto();
 
-            var info = await _repository.GetPickProcessAllCalls(DeliveryId);
+            var info = await _repository.GetPickProcessAllCalls(DeliveryId, ct);
 
             if (info == null)
             {
@@ -50,12 +158,12 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
                     $"There is not call information for this Pick Process number ({DeliveryId}).");
             }
 
-          
+
             List<InputCallsDto> listInputCalls = new List<InputCallsDto>();
 
             List<OutputCallsDto> listOutputCalls = new List<OutputCallsDto>();
 
-          
+
             if (info.inputCalls.Count > 0)
             {
                 foreach (var call in info.inputCalls)
@@ -73,7 +181,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
             }
 
 
-           
+
 
             if (info.outputCalls.Count > 0)
             {
@@ -81,7 +189,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
                 {
                     OutputCallsDto objout = new OutputCallsDto();
 
-                 
+
 
                     objout.Id = call.Id;
                     objout.TypeOfCallId = call.TypeOfCallId;
@@ -110,7 +218,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// <returns></returns>
         public async Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct)
         {
-            var info = await _repository.GetPickProcessAllInfo(DeliveryId);
+            var info = await _repository.GetPickProcessAllInfo(DeliveryId, ct);
 
             if (info == null)
             {
@@ -151,7 +259,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
             objenc.ShipDateTimeError = Convert.ToDateTime(info.pickHdr.ShipDateTimeError);
 
             List<PickProcessItemDetail> listDetail = new List<PickProcessItemDetail>();
-          
+
 
             foreach (var item in info.pickdetails)
             {
@@ -162,7 +270,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
                 objdet.LindId = item.LineId;
                 objdet.ItemNumber = item.ItemNumber;
                 objdet.ItemDescription = item.ItemDescription;
-                objdet.RequestQuantity =  Convert.ToInt32(item.RequestedQuantity);
+                objdet.RequestQuantity = Convert.ToInt32(item.RequestedQuantity);
                 objdet.QuantityProcess = 0;
                 objdet.Frm3plLocatorStatus = item.Frm3plLocatorStatus;
                 objdet.PickLPN = item.PickLpn;

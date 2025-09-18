@@ -450,7 +450,7 @@
 
         </div>
     </div>
-   
+
 </div>
 
 
@@ -466,7 +466,7 @@
     <div class="card-body" id="divwms1">
         <div class="row">
             <table id="tableuserwmshdr" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
-             
+
                 <thead class="table-light">
                     <tr>
                         <th>Actions</th>
@@ -522,9 +522,89 @@
     </div>
 
 
-    
+
 
 </div>
+
+
+
+<div class="card shadow-sm mt-2">
+
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 subtitleDunes ms2">ServTrack Order Repair</h6>
+        <a href="#" class="text-decoration-none" onclick="hidewms()">
+            <i id="ocultarWMS" class="fa-solid fa-eye"></i>
+        </a>
+    </div>
+
+    <div class="card-body" id="divwms1">
+
+        <div class="row">
+            
+
+        </div>
+        <div class="row">
+            <table id="tableuseritemsservtrack" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Id)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompany)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].CompanyName)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idtransactionconcept)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].conceptName)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUser)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Datecreated)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Processed)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUserprocess)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompanyclient)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Dateprocessed)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Documentreference)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Observations)</th>
+                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Iddivision)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.ListTransactions.ListHdr != null)
+                    {
+
+
+                        foreach (var item in Model.ListTransactions.ListHdr)
+                        {
+                            <tr>
+                                <td>Actions</td>
+                                <td>@item.Id</td>
+                                <td>@item.Idcompany</td>
+                                <td>@item.CompanyName</td>
+                                <td>@item.Idtransactionconcept</td>
+                                <td>@item.conceptName</td>
+                                <td>@item.IdUser</td>
+                                <td>@item.Datecreated</td>
+                                <td>@item.Processed</td>
+                                <td>@item.IdUserprocess</td>
+                                <td>@item.Idcompanyclient</td>
+                                <td>@item.Dateprocessed</td>
+                                <td>@item.Documentreference</td>
+                                <td>@item.Observations</td>
+                                <td>@item.Iddivision</td>
+
+                            </tr>
+
+                        }
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+
+
+
+</div>
+
 
 <form id="af" style="display:none">
     @Html.AntiForgeryToken()
@@ -1138,14 +1218,14 @@
             const $div1 = $('#header1');
             const $div2 = $('#header2');
             const $div3 = $('#header3');
-            
+
             if (icono.classList.contains("fa-eye")) {
                 $('#ocultarHdr').removeClass("fa-eye");
                 $('#ocultarHdr').addClass("fa-eye-slash");
                 $div1.animate({ opacity: 0, height: "toggle" }, 400);
                 $div2.animate({ opacity: 0, height: "toggle" }, 400);
                 $div3.animate({ opacity: 0, height: "toggle" }, 400);
-              
+
             } else {
                 $('#ocultarHdr').addClass("fa-eye");
                 $('#ocultarHdr').removeClass("fa-eye-slash");
@@ -1162,7 +1242,7 @@
 
            const icono = document.getElementById("ocultarDetail");
            const $div1 = $('#detail1');
-           
+
            if (icono.classList.contains("fa-eye")) {
                 $('#ocultarDetail').removeClass("fa-eye");
                 $('#ocultarDetail').addClass("fa-eye-slash");
@@ -1199,7 +1279,7 @@
         }
 
 
-      
+
 
           function hidewms()
         {
@@ -1211,11 +1291,11 @@
                 $('#ocultarWMS').removeClass("fa-eye");
                 $('#ocultarWMS').addClass("fa-eye-slash");
                $div.animate({ opacity: 0, height: "toggle" }, 400);
-               
+
             } else {
                 $('#ocultarWMS').addClass("fa-eye");
                 $('#ocultarWMS').removeClass("fa-eye-slash");
-               
+
                 $div.animate({ opacity: 1, height: "toggle" }, 400);
             }
 

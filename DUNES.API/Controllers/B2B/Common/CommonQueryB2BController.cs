@@ -13,7 +13,7 @@ namespace DUNES.API.Controllers.B2B.Queries
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-public class CommonQueryB2BController : ControllerBase
+public class CommonQueryB2BController : BaseController
     {
 
         private readonly ICommonQueryB2BService _service;
@@ -31,49 +31,57 @@ public class CommonQueryB2BController : ControllerBase
         /// Get all information about one repair
         /// </summary>
         /// <param name="repairNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("repair-info/{repairNumber}")]
-        public async Task<IActionResult> GetRepairInfo(int repairNumber)
+        public async Task<IActionResult> GetRepairInfo(int repairNumber, CancellationToken ct)
         {
-            var response = await _service.GetRepairInfoAsync(repairNumber);
 
-            // devuelves el ApiResponse tal cual viene del servicio
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetRepairInfoAsync(repairNumber, ct), ct);
+
+           
         }
 
         /// <summary>
         /// Get current area from sql function
         /// </summary>
         /// <param name="repairNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("repair-GetCurrentArea/{repairNumber}")]
-        public async Task<IActionResult> GetAreaByFunction(int repairNumber)
+        public async Task<IActionResult> GetAreaByFunction(int repairNumber, CancellationToken ct)
         {
-            var response = await _service.GetAreaByFunction(repairNumber);
+            return await HandleApi(ct => _service.GetAreaByFunction(repairNumber, ct), ct);
 
-            // devuelves el ApiResponse tal cual viene del servicio
-            return StatusCode(response.StatusCode, response);
+          
         }
 
 
         /// <summary>
-        /// Gets all RMA receiving info by serial number.
+        ///  Gets all RMA receiving info by serial number.
         /// </summary>
+        /// <param name="serialNumber"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [HttpGet("rma/receiving/{serialNumber}")]
-        public async Task<IActionResult> GetRMAReceivingInfo(string serialNumber)
+        public async Task<IActionResult> GetRMAReceivingInfo(string serialNumber, CancellationToken ct)
         {
-            var response = await _service.GetRMAReceivingInfo(serialNumber);
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetRMAReceivingInfo(serialNumber, ct), ct);
+
+
         }
 
         /// <summary>
         /// Validates that the given RMA exists in all 4 required tables.
         /// </summary>
+        /// <param name="refNo"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         [HttpGet("rma/validate/{refNo}")]
-        public async Task<IActionResult> ValidateRMAHasAllTables(int refNo)
+        public async Task<IActionResult> ValidateRMAHasAllTables(int refNo, CancellationToken ct)
         {
-            var response = await _service.GetAllRMATablesCreatedAsync(refNo);
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllRMATablesCreatedAsync(refNo, ct), ct);
+
         }
 
 
@@ -86,12 +94,14 @@ public class CommonQueryB2BController : ControllerBase
         /// _TOrderRepair_Items
         /// </summary>
         /// <param name="refNo"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("order-repair/info/{refNo}")]
-        public async Task<IActionResult> GetAllTablesOrderRepairCreatedAsync(int refNo)
+        public async Task<IActionResult> GetAllTablesOrderRepairCreatedAsync(int refNo, CancellationToken ct)
         {
-            var response = await _service.GetAllTablesOrderRepairCreatedAsync(refNo);
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllTablesOrderRepairCreatedAsync(refNo, ct), ct);
+
+         
         }
 
 
@@ -99,18 +109,18 @@ public class CommonQueryB2BController : ControllerBase
         /// Get info about one repair when it's ready for receive
         /// </summary>
         /// <param name="serialNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<List<RepairReadyToReceiveDto>>))]
         [ProducesResponseType(StatusCodes.Status404NotFound)] // no hay datos
         [ProducesResponseType(StatusCodes.Status409Conflict)] // repair cancel, stopped o closed
         [ProducesResponseType(StatusCodes.Status500InternalServerError)] // error inesperado
         [HttpGet("repair-RepairReadyToReceive/{serialNumber}")]
-        public async Task<IActionResult> GetRepairReadyToReceive(string serialNumber)
+        public async Task<IActionResult> GetRepairReadyToReceive(string serialNumber, CancellationToken ct )
         {
-            var response = await _service.GetRepairReadyToReceive(serialNumber);
+            return await HandleApi(ct => _service.GetRepairReadyToReceive(serialNumber, ct), ct);
 
-            // devuelves el ApiResponse tal cual viene del servicio
-            return StatusCode(response.StatusCode, response);
+         
         }
 
     }

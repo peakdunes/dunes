@@ -34,11 +34,12 @@ namespace DUNES.API.Services.Inventory.ASN.Queries
         /// Get all ASN information
         /// </summary>
         /// <param name="ShipmentNum"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         /// 
 
-        public async Task<ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum)
+        public async Task<ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum, CancellationToken ct)
         {
 
             var info = await _repository.GetASNAllInfo(ShipmentNum);

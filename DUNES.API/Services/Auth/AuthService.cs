@@ -1,6 +1,7 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.Auth;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +15,7 @@ namespace DUNES.API.Services.Auth
     /// <summary>
     /// Authentication services
     /// </summary>
-    public class AuthService: IAuthService
+    public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
         private readonly IConfiguration _configuration;
@@ -79,29 +80,65 @@ namespace DUNES.API.Services.Auth
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="UnauthorizedAccessException"></exception>
-        public async Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model, CancellationToken ct)
+      
+
+
+        public async Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginModel model, CancellationToken ct)
         {
+
+            if (string.IsNullOrEmpty(_configuration["JwtSettings:SecretKey"]))
+                return ApiResponseFactory.Error<LoginResponseDto>("JWT Info not found");
+
+            if (string.IsNullOrEmpty(_configuration["JwtSettings:Issuer"]))
+                return ApiResponseFactory.Error<LoginResponseDto>("JWT Issuer not found");
+
+            if (string.IsNullOrEmpty(_configuration["JwtSettings:Audience"]))
+                return ApiResponseFactory.Error<LoginResponseDto>("JWT Audience not found");
+
+            if (string.IsNullOrEmpty(_configuration["JwtSettings:ExpirationMinutes"]))
+                return ApiResponseFactory.Error<LoginResponseDto>("Session Expiration time not found");
+
+            if (!int.TryParse(_configuration["JwtSettings:ExpirationMinutes"], out var expiration) || expiration <= 0)
+                return ApiResponseFactory.Error<LoginResponseDto>("Session Expiration time not valid");
+
+            // Validate input
+            if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
+                return ApiResponseFactory.Unauthorized<LoginResponseDto>("Username and password are required");
+
+
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
-                throw new UnauthorizedAccessException("Invalid credentials");
+                return ApiResponseFactory.Unauthorized<LoginResponseDto>("Invalid credentials");
+
+            var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, user.UserName),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-        };
+            {
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]));
+            foreach (var role in userRoles)
+                authClaims.Add(new Claim(ClaimTypes.Role, role));
+
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
-                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["JwtSettings:ExpirationMinutes"])),
+                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["JwtSettings:ExpirationMinutes"]!)),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
-            return (new JwtSecurityTokenHandler().WriteToken(token), token.ValidTo);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            string tokenString = tokenHandler.WriteToken(token);
+
+            return ApiResponseFactory.Ok(new LoginResponseDto
+            {
+                Token = tokenString,
+                Expiration = token.ValidTo
+            });
         }
     }
 }

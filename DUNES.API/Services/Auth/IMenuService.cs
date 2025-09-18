@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
+using System.Security.Claims;
 
 namespace DUNES.API.Services.Auth
 {
@@ -14,7 +15,7 @@ namespace DUNES.API.Services.Auth
         /// <param name="userRoles"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(IEnumerable<string> userRoles, CancellationToken ct);
+        Task<ApiResponse<List<MenuItemDto>>> GetMenuHierarchyAsync(ClaimsPrincipal user, CancellationToken ct);
 
         /// <summary>
         /// Gets the level 2 menus associated with level 1 passed as parameter
@@ -23,7 +24,7 @@ namespace DUNES.API.Services.Auth
         /// <param name="roles"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, IEnumerable<string> roles, CancellationToken ct);
+        Task<ApiResponse<List<MenuItemDto>>> GetLevel2MenuOptions(string level1, ClaimsPrincipal user, CancellationToken ct);
 
 
 
@@ -34,7 +35,7 @@ namespace DUNES.API.Services.Auth
         /// <param name="roles"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<MenuItemDto>> BuildBreadcrumbAsync(string code, IEnumerable<string> roles, CancellationToken ct);
+        Task<ApiResponse<List<MenuItemDto>>> BuildBreadcrumbAsync(string code, ClaimsPrincipal user, CancellationToken ct);
 
         /// <summary>
         /// get all menu information for a controller/action

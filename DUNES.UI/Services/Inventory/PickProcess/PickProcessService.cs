@@ -73,5 +73,18 @@ namespace DUNES.UI.Services.Inventory.PickProcess
 
             return await resp.ReadAsApiResponseAsync<WMSTransactionTm>(ct);
         }
+
+        public async Task<ApiResponse<TorderRepairTm>> GetAllTablesOrderRepairCreatedByPickProcessAsync(string ConsignRequestId, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/PickProcessINV/repair-info/{ConsignRequestId}");
+
+            return await resp.ReadAsApiResponseAsync<TorderRepairTm>(ct);
+        }
+
+       
     }
 }

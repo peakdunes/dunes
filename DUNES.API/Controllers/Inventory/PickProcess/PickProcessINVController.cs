@@ -34,7 +34,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         }
 
 
-        /// <summary>Get all pick process information.</summary>
+        /// <summary>Get Header and Detail Pick Process Information.</summary>
         /// <param name="DeliveryId">Delivery identifier to filter the pick process.</param>
         ///  <param name="ct"></param>
         /// <remarks>Returns header plus one or more detail lines.</remarks>
@@ -62,6 +62,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("pickprocess-all-calls/{DeliveryId}")]
         public async Task<IActionResult> GetPickProcessAllCalls(string DeliveryId, CancellationToken ct)
         {
@@ -72,6 +73,28 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
 
             }, ct);
         }
+
+
+        /// <summary>
+        ///  /// Displays the 4 tables associated with an Pick Process in Servtrack.
+        /// _TOrderRepair_Hdr
+        /// _TorderRepair_ItemsSerials_Receiving
+        /// _TorderRepair_ItemsSerials_Shipping 
+        /// _TOrderRepair_Items
+        /// </summary>
+        /// <param name="ConsignRequestId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<TorderRepairTm>))]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ApiResponse<object>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponse<object>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponse<object>))]
+        [HttpGet("repair-info/{ConsignRequestId}")]
+        public async Task<IActionResult> GetRepairInfo(string ConsignRequestId, CancellationToken ct)
+        {
+            return await HandleApi(ct => _service.GetAllTablesOrderRepairCreatedByPickProcessAsync(ConsignRequestId, ct), ct);
+        }
+
 
         /// <summary>
         /// Create a complete repair order servtrak order from a pick process number
@@ -89,7 +112,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         }
 
         /// <summary>
-        /// Create pick process transaction
+        /// Create WMS Pick Process Transaction
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <param name="objInvTransaction"></param>

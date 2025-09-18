@@ -31,7 +31,7 @@ namespace DUNES.API.Repositories.Inventory.ASN.Queries
         /// <param name="ShipmentNum"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ASNRead> GetASNAllInfo(string ShipmentNum)
+        public async Task<ASNRead?> GetASNAllInfo(string ShipmentNum)
         {
 
             var infoHdr = _context.TzebB2bAsnOutHdrDetItemInbConsReqs.FirstOrDefault(x => x.ShipmentNum == ShipmentNum);

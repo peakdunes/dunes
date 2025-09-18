@@ -343,17 +343,17 @@ namespace DUNES.API.Repositories.B2B.Common.Queries
                 RepairReadyToReceiveDto objdet = new RepairReadyToReceiveDto();
 
                 objdet.Id = 1;
-                objdet.SerialINBOUND = info.enc.SerialInbound;
-                objdet.Ref_No = info.enc.RefNo;
-                objdet.Repair_No = info.enc.RepairNo;
-                objdet.Part_No = info.enc.PartNo;
-                objdet.Part_DSC = info.enc.PartDsc;
-                objdet.SerialRECEIVED = info.enc.SerialReceived;
-                objdet.UnitID = info.enc.UnitId;
-                objdet.Company_DSC = info.enc.CompanyDsc;
-                objdet.Division = info.enc.Division;
-                objdet.Spare_Pool_id = info.enc.SparePoolId;
-                objdet.Cust_Ref = info.enc.CustRef;
+                objdet.SerialINBOUND = info?.enc?.SerialInbound?? string.Empty;
+                objdet.Ref_No = info?.enc?.RefNo ?? string.Empty;
+                objdet.Repair_No = info?.enc?.RepairNo ?? string.Empty;
+                objdet.Part_No = info?.enc?.PartNo ?? string.Empty;
+                objdet.Part_DSC = info?.enc?.PartDsc ?? string.Empty;
+                objdet.SerialRECEIVED = info?.enc?.SerialReceived ?? string.Empty;
+                objdet.UnitID = info?.enc?.UnitId ?? string.Empty;
+                objdet.Company_DSC = info?.enc?.CompanyDsc ?? string.Empty;
+                objdet.Division = info?.enc?.Division ?? string.Empty;
+                objdet.Spare_Pool_id = info?.enc?.SparePoolId ?? string.Empty;
+                objdet.Cust_Ref = info?.enc?.CustRef ?? string.Empty;
 
                 listcalls.Add(objdet);
 

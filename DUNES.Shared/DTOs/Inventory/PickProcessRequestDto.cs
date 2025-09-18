@@ -19,6 +19,8 @@ namespace DUNES.Shared.DTOs.Inventory
         public PickProcessCallsReadDto? CallsRead { get; set; }
 
         public WMSTransactionTm? ListTransactions { get; set; }
+
+        public TorderRepairTm? OrderRepair { get; set; }
         
     }
 

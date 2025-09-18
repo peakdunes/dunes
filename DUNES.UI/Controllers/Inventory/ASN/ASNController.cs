@@ -96,13 +96,13 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     return View(objresult);
                 }
 
-                if (listclients.Data.Count <= 0)
+                if (listclients.Data == null || listclients.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not company clients registed", MessageDisplay.Inline);
                     return View(objresult);
                 }
 
-                if (infoasn.Data.itemDetail.Count() <= 0)
+                if (infoasn.Data == null || infoasn.Data.itemDetail.Count() <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not part number detail for this ASN", MessageDisplay.Inline);
                     return View(objresult);

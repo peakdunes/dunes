@@ -17,6 +17,6 @@ namespace DUNES.API.Repositories.Inventory.ASN.Queries
         /// </summary>
         /// <param name="ShipmentNum"></param>
         /// <returns></returns>
-        Task<ASNRead> GetASNAllInfo(string ShipmentNum);
+        Task<ASNRead?> GetASNAllInfo(string ShipmentNum);
     }
 }

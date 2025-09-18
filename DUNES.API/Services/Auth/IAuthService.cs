@@ -1,4 +1,6 @@
 ﻿using DUNES.API.Models.Auth;
+using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using System.Security.Claims;
 
@@ -15,7 +17,7 @@ namespace DUNES.API.Services.Auth
         /// <param name="model"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model, CancellationToken ct);
+        //Task<(string Token, DateTime Expiration)> LoginAsync(LoginModel model, CancellationToken ct);
         /// <summary>
         /// Obtain all roles assigned for this user
         /// </summary>
@@ -23,5 +25,9 @@ namespace DUNES.API.Services.Auth
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal, CancellationToken ct);
+
+        Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginModel model, CancellationToken ct);
+        
+
     }
 }

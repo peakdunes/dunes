@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace DUNES.API.Models.B2b;
 
+/// <summary>
+/// _TorderRepair_ItemsSerials_shipping
+/// </summary>
 public partial class TorderRepairItemsSerialsShipping
 {
     public int RefNo { get; set; }

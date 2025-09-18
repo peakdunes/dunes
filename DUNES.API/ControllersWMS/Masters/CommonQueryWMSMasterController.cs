@@ -1,4 +1,5 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.API.Controllers;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.Models;
@@ -13,7 +14,7 @@ namespace DUNES.API.ControllersWMS.Masters
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class CommonQueryWMSMasterController : ControllerBase
+    public class CommonQueryWMSMasterController : BaseController
     {
 
         private readonly ICommonQueryWMSMasterService _commonQueryWMSMasterService;
@@ -31,17 +32,16 @@ namespace DUNES.API.ControllersWMS.Masters
         /// Get all company information for id
         /// </summary>
         /// <param name="companyid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(Company), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("company-information/{companyid}")]
-        public async Task<IActionResult> GetCompanyInformation(int companyid)
+        public async Task<IActionResult> GetCompanyInformation(int companyid, CancellationToken ct)
         {
-
-            var response = await _commonQueryWMSMasterService.GetCompanyInformation(companyid);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetCompanyInformation(companyid, ct), ct);
+           
 
         }
 
@@ -49,18 +49,15 @@ namespace DUNES.API.ControllersWMS.Masters
         /// Get all locations for a company by id
         /// </summary>
         /// <param name="companyid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Locations>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("company-locations/{companyid}")]
-        public async Task<IActionResult> GetAllLocationsByCompany(int companyid)
+        public async Task<IActionResult> GetAllLocationsByCompany(int companyid, CancellationToken ct)
         {
-
-            var response = await _commonQueryWMSMasterService.GetAllLocationsByCompany(companyid);
-
-            return StatusCode(response.StatusCode, response);
-
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllLocationsByCompany(companyid, ct), ct);
         }
 
         /// <summary>
@@ -68,30 +65,29 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-inventoryTypes/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllLocationsByCompany(int companyid, string companyClient )
+        public async Task<IActionResult> GetAllLocationsByCompany(int companyid, string companyClient, CancellationToken ct )
         {
 
-            var response = await _commonQueryWMSMasterService.GetAllInventoryTypesByCompanyClient(companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
-
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllInventoryTypesByCompanyClient(companyid, companyClient, ct), ct);
         }
 
+       
+
+       
         /// <summary>
         /// Get All Active Inventory Types for a company client 
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-active-inventoryTypes/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _commonQueryWMSMasterService.GetAllActiveInventoryTypesByCompanyClient (companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveInventoryTypesByCompanyClient(companyid, companyClient, ct), ct);
 
         }
 
@@ -100,14 +96,13 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-itemStatus/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllItemStatusByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _commonQueryWMSMasterService.GetAllItemStatusByCompanyClient (companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllItemStatusByCompanyClient(companyid, companyClient, ct), ct);
 
         }
 
@@ -116,14 +111,13 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-active-itemStatus/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _commonQueryWMSMasterService.GetAllActiveItemStatusByCompanyClient(companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveItemStatusByCompanyClient(companyid, companyClient, ct), ct);
 
         }
 
@@ -133,14 +127,13 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-racks/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllRacksByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _commonQueryWMSMasterService.GetAllRacksByCompanyClient(companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllRacksByCompanyClient(companyid, companyClient, ct), ct);
 
         }
 
@@ -150,14 +143,15 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-active-racks/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllActiveRacksByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(companyid, companyClient);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(companyid, companyClient, ct), ct);
 
-            return StatusCode(response.StatusCode, response);
+           
 
         }
 
@@ -167,14 +161,12 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-bins/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _commonQueryWMSMasterService.GetAllBinsByCompanyClient(companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllBinsByCompanyClient(companyid, companyClient, ct), ct);
 
         }
 
@@ -183,14 +175,12 @@ namespace DUNES.API.ControllersWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-active-bins/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient)
+        public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _commonQueryWMSMasterService.GetAllActiveBinsByCompanyClient(companyid, companyClient);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct), ct);
 
         }
        

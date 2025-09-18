@@ -159,6 +159,18 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     }
                 }
 
+                //pick process ServTrack tables
+
+
+                var infoServtrak = await _service.GetAllTablesOrderRepairCreatedByPickProcessAsync(Convert.ToString(infopickProcess.Data!.PickProcessHdr.ConsignRequestID),token, ct);
+
+                if (infoServtrak.Data != null)
+                {
+
+                    objresult.OrderRepair = infoServtrak.Data;
+                }
+
+
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(infopickProcess.Data.ListItems));
 
                 HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(listdistribution));
@@ -378,7 +390,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 var listconcepts = await _CommonINVService.GetAllActiveConceptsByCompanyClient(_companyDefault, companyclient, token, ct);
 
-                if (listconcepts.Data.Count <= 0)
+                if (listconcepts.Data == null || listconcepts.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not WMS transactions concept created for this  company", MessageDisplay.Inline);
                     return View(listbines);

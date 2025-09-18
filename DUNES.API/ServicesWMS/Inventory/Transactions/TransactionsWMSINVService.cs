@@ -82,7 +82,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 return ApiResponseFactory.BadRequest<int>("Company information is required");
             
             //company id validation
-            var infocompany = await _commonQueryWMSMasterService.GetCompanyInformation(objcreate.hdr.Idcompany);
+            var infocompany = await _commonQueryWMSMasterService.GetCompanyInformation(objcreate.hdr.Idcompany,ct);
 
             if(infocompany.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Company  not found");
@@ -176,7 +176,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idlocation <= 0)
                     return ApiResponseFactory.BadRequest<int>("Location not found");
 
-                var infoloc = await _commonQueryWMSMasterService.GetAllLocationsByCompany(objcreate.hdr.Idcompany);
+                var infoloc = await _commonQueryWMSMasterService.GetAllLocationsByCompany(objcreate.hdr.Idcompany, ct);
 
                 if (infoloc.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Locations for this company {objcreate.hdr.Idcompany} not found");
@@ -199,7 +199,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                     return ApiResponseFactory.BadRequest<int>("Inventory type not found");
 
                 
-                var infotype = await _commonQueryWMSMasterService.GetAllActiveInventoryTypesByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient);
+                var infotype = await _commonQueryWMSMasterService.GetAllActiveInventoryTypesByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
                 if (infotype.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Inventory Types for this company {objcreate.hdr.Idcompany} not found");
@@ -221,7 +221,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idrack <= 0)
                     return ApiResponseFactory.BadRequest<int>("Rack not found");
                 
-                var inforack = await _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient);
+                var inforack = await _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
                 if (inforack.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Racks Types for this company {objcreate.hdr.Idcompany} not found");
@@ -252,9 +252,9 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                     return ApiResponseFactory.BadRequest<int>("Item status not found");
 
                
-                var infostatus = await _commonQueryWMSMasterService.GetAllActiveItemStatusByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient);
+                var infostatus = await _commonQueryWMSMasterService.GetAllActiveItemStatusByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
-                if (infostatus.Data.Count <= 0)
+                if (infostatus.Data == null ||infostatus.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Item Status for this company {objcreate.hdr.Idcompany} not found");
 
                 foreach (var infostatusline in infostatus.Data)

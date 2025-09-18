@@ -1,4 +1,5 @@
-﻿using DUNES.API.ServicesWMS.Inventory.Transactions;
+﻿using DUNES.API.Controllers;
+using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
@@ -13,7 +14,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Transactions
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class TransactionWMSINVController : ControllerBase
+    public class TransactionWMSINVController : BaseController 
     {
 
 
@@ -41,9 +42,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Transactions
         [HttpPost("wms-create-transaction/{objcreate}")]
         public async Task<IActionResult> CreateInventoryTransaction(NewInventoryTransactionTm objcreate, CancellationToken ct)
         {
-            var response = await _transactionService.CreateInventoryTransaction(objcreate, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _transactionService.CreateInventoryTransaction(objcreate, ct), ct);
         }
     }
 }

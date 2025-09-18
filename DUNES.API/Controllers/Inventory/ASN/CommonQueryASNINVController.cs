@@ -13,7 +13,7 @@ namespace DUNES.API.Controllers.Inventory.ASN
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class CommonQueryASNINVController : ControllerBase
+    public class CommonQueryASNINVController : BaseController
     {
 
         private readonly ICommonQueryASNINVService _service;
@@ -42,16 +42,10 @@ namespace DUNES.API.Controllers.Inventory.ASN
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
 
         [HttpGet("asn-info/{ShipmentNum}")]
-        public async Task<IActionResult> GetASNAllInfo (string ShipmentNum)
+        public async Task<IActionResult> GetASNAllInfo (string ShipmentNum, CancellationToken ct)
         {
-            var response = await _service.GetASNAllInfo(ShipmentNum);
-
-            return StatusCode(response.StatusCode, response);
-
-
+            return await HandleApi(ct => _service.GetASNAllInfo(ShipmentNum, ct), ct);
         }
-
-      
         
     }
 }

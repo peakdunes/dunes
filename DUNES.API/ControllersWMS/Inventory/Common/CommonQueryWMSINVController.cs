@@ -9,6 +9,7 @@ using DUNES.Shared.TemporalModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace DUNES.API.ControllersWMS.Inventory.Common
 {
@@ -52,13 +53,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            return await HandleApi(async ct =>
-             {
-                 var response = await _service.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct);
 
-                 return response;
-
-             }, ct);
+            return await HandleApi(ct => _service.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct), ct);
+                    
 
         }
 
@@ -76,9 +73,10 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         public async Task<IActionResult> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllBinsByCompanyClient(companyid, companyClient, ct);
+            return await HandleApi(ct => _service.GetAllBinsByCompanyClient(companyid, companyClient, ct), ct);
 
-            return StatusCode(response.StatusCode, response);
+
+          
 
         }
 
@@ -88,6 +86,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactionconcepts>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -96,11 +95,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _service.GetAllActiveTransactionsConcept(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
-
+            return await HandleApi(ct => _service.GetAllActiveTransactionsConcept(companyid, companyClient, ct), ct);
         }
 
         /// <summary>
@@ -108,6 +103,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactionconcepts>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -116,10 +112,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _service.GetAllTransactionsConcept(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllTransactionsConcept(companyid, companyClient, ct), ct);
 
         }
 
@@ -129,6 +122,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactiontypes>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -137,9 +131,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct), ct);
 
         }
 
@@ -149,6 +141,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactiontypes>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -157,9 +150,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllActiveTransactionsInputType(companyid, companyClient, ct), ct);
 
         }
 
@@ -169,6 +160,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactiontypes>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -177,9 +169,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct), ct);
 
         }
 
@@ -189,6 +179,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactiontypes>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -197,9 +188,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
-            var response = await _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllActiveTransactionsOutputType(companyid, companyClient, ct), ct);
 
         }
 
@@ -209,6 +198,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactionconcepts>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -218,9 +208,8 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         public async Task<IActionResult> GetAllActiveInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
 
-            var response = await _service.GetAllActiveInventoryType(companyid, companyClient, ct);
+            return await HandleApi(ct => _service.GetAllActiveInventoryType(companyid, companyClient, ct), ct);
 
-            return StatusCode(response.StatusCode, response);
 
         }
 
@@ -229,6 +218,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Transactionconcepts>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -237,10 +227,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllInventoryType(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _service.GetAllInventoryType(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllInventoryType(companyid, companyClient, ct), ct);
 
         }
 
@@ -251,6 +238,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Itemstatus>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -259,10 +247,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllActiveItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _service.GetAllActiveItemStatus(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllActiveItemStatus(companyid, companyClient, ct), ct);
 
         }
 
@@ -274,6 +259,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Itemstatus>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -282,10 +268,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetAllItemStatus(int companyid, string companyClient, CancellationToken ct)
         {
-
-            var response = await _service.GetAllItemStatus(companyid, companyClient, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetAllItemStatus(companyid, companyClient, ct), ct);
 
         }
 
@@ -295,6 +278,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<WMSInventoryDetailByPartNumberDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -303,10 +287,8 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetOnHandInventoryByItem(int companyid, string companyClient, string partnumber , CancellationToken ct)
         {
+            return await HandleApi(ct => _service.GetOnHandInventoryByItem(companyid, companyClient, partnumber, ct), ct);
 
-            var response = await _service.GetOnHandInventoryByItem(companyid, companyClient, partnumber, ct );
-
-            return StatusCode(response.StatusCode, response);
 
         }
         /// <summary>
@@ -316,6 +298,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
         /// <param name="typeid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<WMSInventoryDetailByPartNumberDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -323,9 +306,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [HttpGet("onHand-InvByPartNumber-Type/{companyid}/{companyClient}/{partnumber}/{typeid}")]
         public async Task<IActionResult> GetOnHandInventoryByItemInventoryType(int companyid, string companyClient, string partnumber, int typeid, CancellationToken ct)
         {
-            var response = await _service.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid, ct);
-
-            return StatusCode(response.StatusCode, response);
+            return await HandleApi(ct => _service.GetOnHandInventoryByItemInventoryType(companyid, companyClient, partnumber, typeid, ct), ct);
 
         }
 
@@ -336,6 +317,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <param name="partnumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Itemsbybin>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -344,10 +326,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
         public async Task<IActionResult> GetItemBinsDistribution(int companyid, string companyClient, string partnumber, CancellationToken ct)
         {
-
-            var response = await _service.GetItemBinsDistribution(companyid, companyClient, partnumber, ct);
-
-            return StatusCode(response.StatusCode, response);
+           return await HandleApi(ct => _service.GetItemBinsDistribution(companyid, companyClient, partnumber,  ct), ct);
 
         }
 
@@ -358,6 +337,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <param name="DocumentNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(WMSTransactionTm), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -365,9 +345,9 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         [HttpGet("all-transactions/{companyid}/{companyClient}/{DocumentNumber}")]
         public async Task<IActionResult> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
-            var response = await _service.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber, ct);
+            return await HandleApi(ct => _service.GetAllTransactionByDocumentNumber(companyid, companyClient, DocumentNumber, ct), ct);
 
-            return StatusCode(response.StatusCode, response);
+
         }
     }
 }

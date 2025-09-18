@@ -14,8 +14,9 @@ namespace DUNES.API.Services.Inventory.ASN.Queries
         /// Get all information about a ASN
         /// </summary>
         /// <param name="ShipmentNum"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task <ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum);
+        Task<ApiResponse<ASNWm>> GetASNAllInfo(string ShipmentNum, CancellationToken ct);
 
 
 

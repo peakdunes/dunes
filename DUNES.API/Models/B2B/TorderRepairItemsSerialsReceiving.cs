@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 
 namespace DUNES.API.Models.B2b;
-
+/// <summary>
+/// _TorderRepair_ItemsSerials_Receiving model
+/// </summary>
 public partial class TorderRepairItemsSerialsReceiving
 {
     public int RefNo { get; set; }

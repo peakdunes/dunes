@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Models.Auth;
 using DUNES.API.Services.Auth;
+using DUNES.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -68,11 +69,9 @@ namespace DUNES.API.Controllers.Auth
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginModel model, CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                var (token, expiration) = await _authService.LoginAsync(model, ct); // 👈 con ct
-                return new { token, expiration };
-            }, ct);
+            return await HandleApi( ct => _authService.LoginAsync(model, ct), ct);
+
+         
         }
 
         /// <summary>

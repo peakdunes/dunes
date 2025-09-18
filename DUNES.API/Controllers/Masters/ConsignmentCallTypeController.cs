@@ -38,11 +38,8 @@ namespace DUNES.API.Controllers.Masters
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                var items = await _service.GetAllAsync(ct);
-                return items;
-            }, ct);
+            return await HandleApi(ct => _service.GetAllAsync( ct), ct);
+                     
         }
 
         /// <summary>
@@ -57,13 +54,8 @@ namespace DUNES.API.Controllers.Masters
         [HttpGet("GetById/{id}")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                var item = await _service.GetByIdAsync(id, ct);
-                if (item == null)
-                    return NotFound(ApiResponseFactory.NotFound<object>("Consigment call type not found"));
-                return Ok(ApiResponseFactory.Ok(item));
-            }, ct);
+            return await HandleApi(ct => _service.GetByIdAsync(id, ct), ct);
+                       
         }
 
         /// <summary>
@@ -78,11 +70,9 @@ namespace DUNES.API.Controllers.Masters
         [HttpPost("Create")]
         public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                var created = await _service.AddAsync(item, ct);
-                return created;
-            }, ct);
+
+            return await HandleApi(ct => _service.AddAsync(item, ct), ct);
+
         }
 
         /// <summary>
@@ -97,11 +87,9 @@ namespace DUNES.API.Controllers.Masters
         [HttpPut("Update")]
         public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                var updated = await _service.UpdateAsync(item, ct);
-                return updated;
-            }, ct);
+            return await HandleApi(ct => _service.UpdateAsync(item, ct), ct);
+
+           
         }
 
         /// <summary>
@@ -116,11 +104,8 @@ namespace DUNES.API.Controllers.Masters
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            return await Handle(async ct =>
-            {
-                await _service.DeleteByIdAsync(id, ct);
-                return true;
-            }, ct);
+            return await HandleApi(ct => _service.DeleteByIdAsync(id, ct), ct);
+                      
         }
     }
 }

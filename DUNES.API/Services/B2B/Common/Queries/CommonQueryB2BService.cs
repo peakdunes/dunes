@@ -29,8 +29,9 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// get all date fields from a servtrack order 
         /// </summary>
         /// <param name="refNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<TorderRepairHdrDatesDto>> GetAllDateFieldsRepair(int refNumber)
+        public async Task<ApiResponse<TorderRepairHdrDatesDto>> GetAllDateFieldsRepair(int refNumber, CancellationToken ct)
         {
             var info = await _repository.GetAllDateFieldsRepair(refNumber);
 
@@ -47,8 +48,9 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// check in the RMA have all records in our database (4 tables)
         /// </summary>
         /// <param name="refNo"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<bool>> GetAllRMATablesCreatedAsync(int refNo)
+        public async Task<ApiResponse<bool>> GetAllRMATablesCreatedAsync(int refNo, CancellationToken ct)
         {
             var exists = await _repository.GetAllRMATablesCreatedAsync(refNo);
 
@@ -68,8 +70,9 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// _TOrderRepair_Items
         /// </summary>
         /// <param name="refNo"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<OrderRepairFourTablesRead>> GetAllTablesOrderRepairCreatedAsync(int refNo)
+        public async Task<ApiResponse<OrderRepairFourTablesRead>> GetAllTablesOrderRepairCreatedAsync(int refNo, CancellationToken ct)
         {
             var info = await _repository.GetAllTablesOrderRepairCreatedAsync(refNo);
 
@@ -86,9 +89,10 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// Get current area from sql function
         /// </summary>
         /// <param name="repairNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<AreaNameDto>> GetAreaByFunction(int repairNumber)
+        public async Task<ApiResponse<AreaNameDto>> GetAreaByFunction(int repairNumber, CancellationToken ct)
         {
             var data = await _repository.GetAreaByFunction(repairNumber);
 
@@ -107,9 +111,10 @@ namespace DUNES.API.Services.B2B.Common.Queries
         /// return all information about one repair number
         /// </summary>
         /// <param name="repairNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<CheckRepairInformationDto>> GetRepairInfoAsync(int repairNumber)
+        public async Task<ApiResponse<CheckRepairInformationDto>> GetRepairInfoAsync(int repairNumber, CancellationToken ct)
         {
 
             var data = await _repository.GetRepairInfoAsync(repairNumber);
@@ -125,15 +130,16 @@ namespace DUNES.API.Services.B2B.Common.Queries
             return ApiResponseFactory.Ok(data, "Repair information retrieved successfully");
 
         }
-      
+
 
         /// <summary>
         /// get RMA information for a serial number
         /// </summary>
         /// <param name="serialNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<TzebInBoundRequestsFile>>> GetRMAReceivingInfo(string serialNumber)
+        public async Task<ApiResponse<List<TzebInBoundRequestsFile>>> GetRMAReceivingInfo(string serialNumber, CancellationToken ct   )
         {
             var data = await _repository.GetRMAReceivingInfo(serialNumber);
 
@@ -148,8 +154,13 @@ namespace DUNES.API.Services.B2B.Common.Queries
 
             return ApiResponseFactory.Ok(data, "OK");
         }
-
-        async Task<ApiResponse<bool>> ICommonQueryB2BService.GetAllRMATablesCreatedAsync(int refNo)
+        /// <summary>
+        /// Check if a RMA was created correcty in our database (4 tables)
+        /// </summary>
+        /// <param name="refNo"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        async Task<ApiResponse<bool>> ICommonQueryB2BService.GetAllRMATablesCreatedAsync(int refNo, CancellationToken ct)
         {
             // Llamas al repository (que devuelve true o false)
             var exists = await _repository.GetAllRMATablesCreatedAsync(refNo);
@@ -162,8 +173,13 @@ namespace DUNES.API.Services.B2B.Common.Queries
             return ApiResponseFactory.Ok(true, $"The RMA {refNo} has records in all 4 tables.");
         }
 
-
-        public async Task<ApiResponse<List<RepairReadyToReceiveDto>>> GetRepairReadyToReceive(string serialNumber)
+        /// <summary>
+        /// Get info about one repair when it's ready for receive
+        /// </summary>
+        /// <param name="serialNumber"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<RepairReadyToReceiveDto>>> GetRepairReadyToReceive(string serialNumber, CancellationToken ct)
         {
             string errormessage = string.Empty;
 
