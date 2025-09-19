@@ -444,6 +444,7 @@
 
                         }
                     }
+
                 </tbody>
             </table>
 
@@ -464,66 +465,227 @@
     </div>
 
     <div class="card-body" id="divwms1">
-        <div class="row">
+        <div class="row mt-4">
+            <h6>Transaction Header</h6>
             <table id="tableuserwmshdr" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
 
                 <thead class="table-light">
                     <tr>
                         <th>Actions</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Id)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompany)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].CompanyName)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idtransactionconcept)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].conceptName)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUser)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Datecreated)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Processed)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUserprocess)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompanyclient)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Dateprocessed)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Documentreference)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Observations)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Iddivision)</th>
+                        <th>Id</th>
+                        <th>Company Id</th>
+                        <th>Company Name</th>
+                        <th>Concept Id</th>
+                        <th>Concept Name</th>
+                        <th>User</th>
+                        <th>Date Created</th>
+                        <th>Is Processed</th>
+                        <th>User Processed</th>
+                        <th>Company Client</th>
+                        <th>Date Processed</th>
+                        <th>Document Reference</th>
+                        <th>Observations</th>
+                        <th>Division ID</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model?.ListTransactions.ListHdr != null)
+                    @if (Model.ListTransactions != null)
                     {
 
-
-                        foreach (var item in Model.ListTransactions.ListHdr)
+                        @if (Model.ListTransactions.ListHdr.Count > 0)
                         {
-                            <tr>
-                                <td>Actions</td>
-                                <td>@item.Id</td>
-                                <td>@item.Idcompany</td>
-                                <td>@item.CompanyName</td>
-                                <td>@item.Idtransactionconcept</td>
-                                <td>@item.conceptName</td>
-                                <td>@item.IdUser</td>
-                                <td>@item.Datecreated</td>
-                                <td>@item.Processed</td>
-                                <td>@item.IdUserprocess</td>
-                                <td>@item.Idcompanyclient</td>
-                                <td>@item.Dateprocessed</td>
-                                <td>@item.Documentreference</td>
-                                <td>@item.Observations</td>
-                                <td>@item.Iddivision</td>
-
-                            </tr>
-
+                            foreach (var item in Model.ListTransactions.ListHdr)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.Id</td>
+                                    <td>@item.Idcompany</td>
+                                    <td>@item.CompanyName</td>
+                                    <td>@item.Idtransactionconcept</td>
+                                    <td>@item.conceptName</td>
+                                    <td>@item.IdUser</td>
+                                    <td>@item.Datecreated</td>
+                                    <td>@item.Processed</td>
+                                    <td>@item.IdUserprocess</td>
+                                    <td>@item.Idcompanyclient</td>
+                                    <td>@item.Dateprocessed</td>
+                                    <td>@item.Documentreference</td>
+                                    <td>@item.Observations</td>
+                                    <td>@item.Iddivision</td>
+                                </tr>
+                            }
                         }
                     }
+
                 </tbody>
             </table>
 
 
         </div>
+
+
+
+        <div class="row mt-4">
+            <h6>Transaction Detail</h6>
+            <table id="tableuserwmsdetail" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>Transaction Type Id</th>
+                        <th>Transaction Name</th>
+                        <th>Location Id</th>
+                        <th>Location Name</th>
+                        <th>Inventory Type ID</th>
+                        <th>Inventory Type Name</th>
+                        <th>Rack Id</th>
+                        <th>Rack Name</th>
+                        <th>Level</th>
+                        <th>Part Number</th>
+                        <th>Total Qty</th>
+                        <th>Bin Id</th>
+                        <th>Bin Name</th>
+                        <th>Status Id</th>
+                        <th>Status Name</th>
+                        <th>Serial ID</th>
+                        <th>Company Id</th>
+                        <th>Company Name</th>
+                        <th>Company Client</th>
+                        <th>Division</th>
+                        <th>Header Transaction ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ListTransactions != null)
+                    {
+
+                        @if (Model.ListTransactions.ListDetail.Count > 0)
+                        {
+                            foreach (var item in Model.ListTransactions.ListDetail)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.Id</td>
+                                    <td>@item.Idtypetransaction</td>
+                                    <td>@item.typetransactionName</td>
+                                    <td>@item.Idlocation</td>
+                                    <td>@item.locationName</td>
+                                    <td>@item.Idtype</td>
+                                    <td>@item.typeName</td>
+                                    <td>@item.Idrack</td>
+                                    <td>@item.rackName</td>
+                                    <td>@item.Level</td>
+                                    <td>@item.Iditem</td>
+                                    <td>@item.TotalQty</td>
+                                    <td>@item.Idbin</td>
+                                    <td>@item.binName</td>
+                                    <td>@item.Idstatus</td>
+                                    <td>@item.statusName</td>
+                                    <td>@item.Serialid</td>
+                                    <td>@item.Idcompany</td>
+                                    <td>@item.companyName</td>
+                                    <td>@item.Idcompanyclient</td>
+                                    <td>@item.Iddivision</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+
+
+
+        <div class="row mt-4">
+            <h6>Inventory Movement Detail</h6>
+            <table id="tableuserwmsinv" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Transaction Type ID</th>
+                        <th>Transaction Type Name</th>
+                        <th>Location ID</th>
+                        <th>Location Name</th>
+                        <th>Inventory Type ID</th>
+                        <th>Inventory Type Name</th>
+                        <th>Rack ID</th>
+                        <th>Level</th>
+                        <th>Bin ID</th>
+                        <th>Bin Name</th>
+                        <th>Part Number</th>
+                        <th>Status Id</th>
+                        <th>Status Name</th>
+                        <th>Serial ID</th>
+                        <th>Date Created</th>
+                        <th>Qty Input</th>
+                        <th>Qty Output</th>
+                        <th>Qty Balance</th>
+                        <th>Company Id</th>
+                        <th>Company Name</th>
+                        <th>Company Client</th>
+                        <th>Id Transaction Head</th>
+                        <th>Id Transaction Detail</th>
+                        <th>Division</th>
+                        <th>Created By</th>
+                        <th>Transaction Concept ID</th>
+                        <th>Concept Name</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ListTransactions != null)
+                    {
+
+                        @if (Model.ListTransactions.ListInventoryMovement.Count > 0)
+                        {
+                            foreach (var item in Model.ListTransactions.ListInventoryMovement)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.Id</td>
+                                    <td>@item.Idtransactiontype</td>
+                                    <td>@item.transactionTypeName</td>
+                                    <td>@item.Idlocation</td>
+                                    <td>@item.locationName</td>
+                                    <td>@item.Idtype</td>
+                                    <td>@item.inventoryTypeName</td>
+                                    <td>@item.Idrack</td>
+                                    <td>@item.Level</td>
+                                    <td>@item.Idbin</td>
+                                    <td>@item.binName</td>
+                                    <td>@item.Iditem</td>
+                                    <td>@item.Idstatus</td>
+                                    <td>@item.statusName</td>
+                                    <td>@item.Serialid</td>
+                                    <td>@item.Datecreated</td>
+                                    <td>@item.Qtyinput</td>
+                                    <td>@item.Qtyoutput</td>
+                                    <td>@item.Qtybalance</td>
+                                    <td>@item.Idcompany</td>
+                                    <td>@item.companyName</td>
+                                    <td>@item.Idcompanyclient</td>
+                                    <td>@item.IdtransactionHead</td>
+                                    <td>@item.IdtransactionDetail</td>
+                                    <td>@item.Iddivision</td>
+                                    <td>@item.Createdby</td>
+                                    <td>@item.Idtransactionconcept</td>
+                                    <td>@item.conceptName</td>
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+            </table>
+        </div>
     </div>
-
-
-
-
 </div>
 
 
@@ -532,67 +694,236 @@
 
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
         <h6 class="mb-0 subtitleDunes ms2">ServTrack Order Repair</h6>
-        <a href="#" class="text-decoration-none" onclick="hidewms()">
-            <i id="ocultarWMS" class="fa-solid fa-eye"></i>
+        <a href="#" class="text-decoration-none" onclick="hideservtrack()">
+            <i id="ocultarServtrack" class="fa-solid fa-eye"></i>
         </a>
     </div>
 
-    <div class="card-body" id="divwms1">
+    <div class="card-body" id="divservtrack1">
 
         <div class="row">
-            
+
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.RefNo" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.RefNo" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.TcustNo" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.TcustNo" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.CustRef" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.CustRef" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-4">
+                <label asp-for="OrderRepair.repairHdr.CustName" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.CustName" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.TstatusId" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.TstatusId" readonly class="form-control" />
+            </div>
 
         </div>
+
         <div class="row">
+
+            <div class="col-12 col-md-6">
+                <label asp-for="OrderRepair.repairHdr.ShipToAddr" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.ShipToAddr" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-6">
+                <label asp-for="OrderRepair.repairHdr.ShipToAddr1" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.ShipToAddr1" readonly class="form-control" />
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.TcityId" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.TcityId" readonly class="form-control" />
+            </div>
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.TstateId" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.TstateId" readonly class="form-control" />
+            </div>
+            <div class="col-12 col-md-2">
+                <label asp-for="OrderRepair.repairHdr.ZipCode" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.ZipCode" readonly class="form-control" />
+            </div>
+
+
+
+            <div class="col-12 col-md-3">
+                <label asp-for="OrderRepair.repairHdr.DateInserted" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.DateInserted" readonly class="form-control" />
+            </div>
+
+            <div class="col-12 col-md-3">
+                <label asp-for="OrderRepair.repairHdr.DateCreated" class="form-label"></label>
+                <input asp-for="OrderRepair.repairHdr.DateCreated" readonly class="form-control" />
+            </div>
+
+        </div>
+
+        <div class="row mt-4">
+            <h6>Items Detail</h6>
             <table id="tableuseritemsservtrack" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
 
                 <thead class="table-light">
                     <tr>
                         <th>Actions</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Id)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompany)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].CompanyName)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idtransactionconcept)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].conceptName)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUser)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Datecreated)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Processed)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].IdUserprocess)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Idcompanyclient)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Dateprocessed)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Documentreference)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Observations)</th>
-                        <th>@Html.DisplayNameFor(model => model.ListTransactions.ListHdr[0].Iddivision)</th>
+                        <th>Reference No</th>
+                        <th>Part Number</th>
+                        <th>Quantity</th>
+                        <th>Company Part Number</th>
+
                     </tr>
                 </thead>
                 <tbody>
-                    @if (Model?.ListTransactions.ListHdr != null)
+                    @if (Model.OrderRepair != null)
                     {
 
-
-                        foreach (var item in Model.ListTransactions.ListHdr)
+                        @if (Model.OrderRepair.ListItems.Count > 0)
                         {
-                            <tr>
-                                <td>Actions</td>
-                                <td>@item.Id</td>
-                                <td>@item.Idcompany</td>
-                                <td>@item.CompanyName</td>
-                                <td>@item.Idtransactionconcept</td>
-                                <td>@item.conceptName</td>
-                                <td>@item.IdUser</td>
-                                <td>@item.Datecreated</td>
-                                <td>@item.Processed</td>
-                                <td>@item.IdUserprocess</td>
-                                <td>@item.Idcompanyclient</td>
-                                <td>@item.Dateprocessed</td>
-                                <td>@item.Documentreference</td>
-                                <td>@item.Observations</td>
-                                <td>@item.Iddivision</td>
-
-                            </tr>
-
+                            foreach (var item in Model.OrderRepair.ListItems)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.RefNo</td>
+                                    <td>@item.PartNo</td>
+                                    <td>@item.Qty</td>
+                                    <td>@item.CompanyPartNo</td>
+                                </tr>
+                            }
                         }
                     }
+
+                </tbody>
+            </table>
+
+
+        </div>
+
+        <div class="row mt-4">
+            <h6>Receiving Detail</h6>
+            <table id="tableuserreceivingservtrack" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Reference No</th>
+                        <th>Part Number</th>
+                        <th>Date Received</th>
+                        <th>Serial Inbound</th>
+                        <th>Serial Received</th>
+                        <th>Status ID</th>
+                        <th>Repair Number</th>
+                        <th>Qty</th>
+                        <th>Qty Received</th>
+                        <th>Id</th>
+                        <th>Project Name</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.OrderRepair != null)
+                    {
+
+                        @if (Model.OrderRepair.ListItemsSerialsReceiving.Count > 0)
+                        {
+                            foreach (var item in Model.OrderRepair.ListItemsSerialsReceiving)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.RefNo</td>
+                                    <td>@item.PartNo</td>
+                                    <td>@item.DateReceived</td>
+                                    <td>@item.SerialInbound</td>
+                                    <td>@item.SerialReceived</td>
+                                    <td>@item.TstatusId</td>
+                                    <td>@item.RepairNo</td>
+                                    <td>@item.Qty</td>
+                                    <td>@item.QtyReceived</td>
+                                    <td>@item.Id</td>
+                                    <td>@item.ProjectName</td>
+
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+
+
+        <div class="row mt-4">
+            <h6>Shipping Detail</h6>
+            <table id="tableusershippingservtrack" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Reference No</th>
+                        <th>Part Number</th>
+                        <th>Date Ship</th>
+                        <th>Serial Ship</th>
+                        <th>Status Id</th>
+                        <th>Repair No</th>
+                        <th>Qty</th>
+                        <th>Qty Ship</th>
+                        <th>Ship Via Id</th>
+                        <th>Id</th>
+                        <th>TrackingNumber</th>
+                        <th>Shipping Group Id</th>
+                        <th>DateTime Ship</th>
+                        <th>UserName</th>
+                        <th>Date TrackingNumber</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.OrderRepair != null)
+                    {
+
+                        @if (Model.OrderRepair.ListItemsSerialsShipping.Count > 0)
+                        {
+                            foreach (var item in Model.OrderRepair.ListItemsSerialsShipping)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@item.RefNo</td>
+                                    <td>@item.PartNo</td>
+                                    <td>@item.DateShip</td>
+                                    <td>@item.SerialShip</td>
+                                    <td>@item.TstatusId</td>
+                                    <td>@item.RepairNo</td>
+                                    <td>@item.Qty</td>
+                                    <td>@item.QtyShip</td>
+                                    <td>@item.ShipViaId</td>
+                                    <td>@item.Id</td>
+                                    <td>@item.TrackingNumber</td>
+                                    <td>@item.ShippingGroupId</td>
+                                    <td>@item.DateTimeShip</td>
+                                    <td>@item.UserName</td>
+                                    <td>@item.DateTrackingNumber</td>
+
+                                </tr>
+                            }
+                        }
+                    }
+
                 </tbody>
             </table>
 
@@ -600,10 +931,9 @@
         </div>
     </div>
 
-
-
-
 </div>
+
+
 
 
 <form id="af" style="display:none">
@@ -630,6 +960,91 @@
                    autoWidth: false,
                    responsive: true,
                    pageLength: 10,
+                   scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+               });
+
+                $('#tableuserwmsdetail').DataTable({
+                   processing: true,
+                   deferRender: true,
+                   stateSave: true,
+                   autoWidth: false,
+                   responsive: true,
+                   pageLength: 10,
+                   scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+               });
+
+
+                 $('#tableuserwmsinv').DataTable({
+                   processing: true,
+                   deferRender: true,
+                   stateSave: true,
+                   autoWidth: false,
+                   responsive: true,
+                   pageLength: 10,
+                   scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+               });
+
+                 $('#tableuseritemsservtrack').DataTable({
+                   processing: true,
+                   deferRender: true,
+                   stateSave: true,
+                   autoWidth: false,
+                   responsive: true,
+                   pageLength: 10,
+                   scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+               });
+
+
+
+                 $('#tableuserreceivingservtrack').DataTable({
+                   processing: true,
+                   deferRender: true,
+                   stateSave: true,
+                   autoWidth: false,
+                   responsive: true,
+                   pageLength: 10,
+                   scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+               });
+
+
+                  $('#tableusershippingservtrack').DataTable({
+                   processing: true,
+                   deferRender: true,
+                   stateSave: true,
+                   autoWidth: false,
+                   responsive: true,
+                   pageLength: 10,
+                   scrollX:true,
                    "bPaginate": false,
                    "bLengthChange": false,
                    "bFilter": true,
@@ -1278,7 +1693,25 @@
 
         }
 
+            function hideservtrack()
+        {
 
+           const icono = document.getElementById("ocultarServtrack");
+             const $div = $('#divservtrack1');
+
+            if (icono.classList.contains("fa-eye")) {
+                $('#ocultarServtrack').removeClass("fa-eye");
+                $('#ocultarServtrack').addClass("fa-eye-slash");
+               $div.animate({ opacity: 0, height: "toggle" }, 400);
+
+            } else {
+                $('#ocultarServtrack').addClass("fa-eye");
+                $('#ocultarServtrack').removeClass("fa-eye-slash");
+
+                $div.animate({ opacity: 1, height: "toggle" }, 400);
+            }
+
+        }
 
 
           function hidewms()
