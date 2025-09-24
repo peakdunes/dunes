@@ -1,4 +1,5 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 
@@ -14,21 +15,35 @@ namespace DUNES.API.ServicesWMS.Masters
         /// Get all information for a company by id
         /// </summary>
         /// <param name="companyid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<Company>> GetCompanyInformation(int companyid, CancellationToken ct);
+
+
+
+        /// <summary>
+        /// Get all Company Client actives for a Location id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="locationid"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSLocationclientsDTO>>> GetAllActiveClientCompaniesByLocation(int companyid, int locationid, CancellationToken ct);
 
         /// <summary>
         /// Get all locations for a company by id
         /// </summary>
         /// <param name="companyid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<Locations>>> GetAllLocationsByCompany(int companyid, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct);
 
         /// <summary>
         /// Get all inventory type for a company client by id
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -37,6 +52,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -46,6 +62,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Itemstatus>>> GetAllItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -54,6 +71,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -63,6 +81,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Racks>>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -71,6 +90,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Racks>>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -81,6 +101,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Bines>>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
@@ -89,6 +110,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 

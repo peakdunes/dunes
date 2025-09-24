@@ -3,6 +3,7 @@ using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Infrastructure;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 
 namespace DUNES.UI.Services.Inventory.Common
@@ -66,7 +67,7 @@ namespace DUNES.UI.Services.Inventory.Common
             return await resp.ReadAsApiResponseAsync<List<WMSConceptsDto>>(ct);
         }
 
-        public async Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -75,7 +76,7 @@ namespace DUNES.UI.Services.Inventory.Common
 
             resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-input-transaction/{companyid}/{companyClient}");
 
-            return await resp.ReadAsApiResponseAsync<List<WMSInputTransactionsDto>>(ct);
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
         }
 
         public async Task<ApiResponse<List<InventoryTypeDto>>> GetAllActiveInventoryTypes(string token, CancellationToken ct)
@@ -150,7 +151,7 @@ namespace DUNES.UI.Services.Inventory.Common
             return await resp.ReadAsApiResponseAsync<List<WMSItemByBinsDto>>(ct);
         }
 
-        public async Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -159,7 +160,99 @@ namespace DUNES.UI.Services.Inventory.Common
 
             resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-output-transaction/{companyid}/{companyClient}");
 
-            return await resp.ReadAsApiResponseAsync<List<WMSInputTransactionsDto>>(ct);
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
         }
+
+        public async Task<ApiResponse<List<TdivisionCompanyDto>>> GetDivisionByCompanyClient(string companyclient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/division-by-companyclient/{companyclient}");
+
+            return await resp.ReadAsApiResponseAsync<List<TdivisionCompanyDto>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-transfer-input-transaction/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/all-transfer-input-transaction/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/active-transfer-output-transaction/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/all-transfer-output-transaction/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSTransactionsDto>>(ct);
+        }
+        
+        public async Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(int companyid, string companyClient, int id, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/transaction-by-id/{companyid}/{companyClient}/{id}");
+
+            return await resp.ReadAsApiResponseAsync<WMSTransactionsDto>(ct);
+        }
+        /// <summary>
+        /// Get All Active Locations for a company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSMaster/company-locations/{companyid}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSLocationsDTO>>(ct);
+        }
+
+      
     }
 }

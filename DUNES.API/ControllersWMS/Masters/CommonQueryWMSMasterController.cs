@@ -2,6 +2,7 @@
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -51,14 +52,31 @@ namespace DUNES.API.ControllersWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<Locations>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSLocationsDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("company-locations/{companyid}")]
-        public async Task<IActionResult> GetAllLocationsByCompany(int companyid, CancellationToken ct)
+        public async Task<IActionResult> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct)
         {
-            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllLocationsByCompany(companyid, ct), ct);
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveLocationsByCompany(companyid, ct), ct);
         }
+
+        /// <summary>
+        /// Get All active company clients by location id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="locationid"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<WMSLocationsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("companyclients-active-by-locations/{companyid}/{locationid}")]
+        public async Task<IActionResult> GetAllActiveClientCompaniesByLocation(int companyid,int locationid, CancellationToken ct)
+        {
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveClientCompaniesByLocation(companyid, locationid, ct), ct);
+        }
+
 
         /// <summary>
         /// Get All Inventory Types for a company client 
@@ -68,7 +86,7 @@ namespace DUNES.API.ControllersWMS.Masters
         /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("companyClient-inventoryTypes/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllLocationsByCompany(int companyid, string companyClient, CancellationToken ct )
+        public async Task<IActionResult> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct )
         {
 
             return await HandleApi(ct => _commonQueryWMSMasterService.GetAllInventoryTypesByCompanyClient(companyid, companyClient, ct), ct);

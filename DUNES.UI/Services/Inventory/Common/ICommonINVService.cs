@@ -8,7 +8,18 @@ namespace DUNES.UI.Services.Inventory.Common
     public interface ICommonINVService
     {
 
-      
+
+        /// <summary>
+        /// Get all active location for a company
+        /// </summary>
+        /// <param name="asnNumber"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, string token, CancellationToken ct);
+
+
+
         /// <summary>
         /// Get all company client information created in WMS system
         /// </summary>
@@ -17,6 +28,18 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<WMSClientCompaniesDto>>> GetClientCompanies(string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all division by company client
+        /// </summary>
+        /// <param name="companyclient"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<TdivisionCompanyDto>>> GetDivisionByCompanyClient(string companyclient ,string token, CancellationToken ct);
+
+
         /// <summary>
         /// All active Bins for a company client
         /// </summary>
@@ -46,7 +69,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -57,7 +80,83 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSInputTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get All Active Input Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get All Input Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
+
+
+
+        /// <summary>
+        /// Get All Active Output Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
+
+        /// <summary>
+        /// Get All Output Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get one transaction type by ID
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(int companyid, string companyClient, int id, string token, CancellationToken ct);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         /// <summary>

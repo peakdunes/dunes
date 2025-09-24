@@ -248,13 +248,36 @@
 
 
     <div class="row gx-3 gy-2 px-3 mb-3" id="detail1">
+
         <div class="col-12 col-md-3">
-            <label class="form-label">Company Client</label>
-            <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
-                <option value="0" selected disabled>Select Client Company</option>
+            <label class="form-label">Location</label>
+            <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
+                <option value="" selected disabled>Select Location</option>
             </select>
         </div>
 
+
+        <div class="col-12 col-md-3">
+            <label class="form-label">Company Client</label>
+            <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
+                <option value="" selected disabled>Select Client Company</option>
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label">Division</label>
+            <select id="divisionid" disabled class="form-control">
+               
+            </select>
+        </div>
+        <div class="col-12 col-md-3">
+            <label class="form-label">LPN</label>
+            <input ID="lpnid" disabled class="form-control" />
+        </div>
+
+    
+
+    </div>
+    <div class="row gx-3 gy-2 px-3 mb-3" id="detail2">
 
         <div class="col-12 col-md-3">
             <label class="form-label">Concept</label>
@@ -268,15 +291,14 @@
             <select id="transactionid" disabled class="form-control">
             </select>
         </div>
+        <div class="col-12 col-md-6">
+            <label class="form-label">Observations (500)</label>
+            <input ID="observations" maxlength="500" class="form-control" />
 
-        <div class="col-12 col-md-2">
-            <label class="form-label">LPN</label>
-            <input ID="lpnid" class="form-control" />
         </div>
-
-
+      
     </div>
-
+    
 </div>
 
 
@@ -1336,17 +1358,14 @@
 
           }
 
-           $('#companyclient').change(function()
-        {
-
-
-            var companyClient = $(this).val();
-
+          function clearComboBox()
+          {
+            
             var $bin = $('#binselid');
             var $concepts = $('#conceptid');
             var $transactions = $('#transactionid');
+            var $division = $('#divisionid');
 
-            // reset select bins
             $bin.empty()
             .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
             .prop('disabled', true);
@@ -1361,6 +1380,43 @@
             .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
             .prop('disabled', true);
 
+            $division.empty()
+            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+          }
+
+        $('#locationid').change(function(){
+
+            var $companyClient = $(this).val();
+            var $bin = $('#binselid');
+            var $concepts = $('#conceptid');
+            var $transactions = $('#transactionid');
+            var $division = $('#divisionid');
+
+            clearComboBox();
+
+             $companyClient.empty()
+            .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+
+           
+        
+        })
+          
+          
+        $('#companyclient').change(function()
+        {
+
+
+            var companyClient = $(this).val();
+            var $bin = $('#binselid');
+            var $concepts = $('#conceptid');
+            var $transactions = $('#transactionid');
+            var $division = $('#divisionid');
+
+             clearComboBox();
 
 
             if (!companyClient) return;
@@ -1386,7 +1442,7 @@
                 }
 
                 var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
-                if (Array.isArray(listc) && list.length)
+                if (Array.isArray(listc) && listc.length)
                 {
                     $.each(listc, function (_, it) {
                     var id = (it.id !== undefined) ? it.id : it.Id;
@@ -1398,7 +1454,7 @@
 
 
                   var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
-                if (Array.isArray(listt) && list.length)
+                if (Array.isArray(listt) && listt.length)
                 {
                     $.each(listt, function (_, it) {
                     var id = (it.id !== undefined) ? it.id : it.Id;
@@ -1407,6 +1463,22 @@
                     });
                     $transactions.prop('disabled', false);
                 }
+
+                var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+
+                if (Array.isArray(lisdiv) && lisdiv.length)
+                {
+                    $.each(lisdiv, function (_, it) {
+
+                    var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                    var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                    $division.append($('<option>', { value: id, text: name }));
+                    });
+                    $division.prop('disabled', false);
+                }
+
+                $('#lpnid').prop('disabled', false);
+
             })
             .fail(function (xhr) {
                 console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
@@ -1538,7 +1610,6 @@
 
         function loadDataDetail(data)
         {
-            alert('load detail');
 
              if (data != null) {
 
@@ -1657,15 +1728,18 @@
 
            const icono = document.getElementById("ocultarDetail");
            const $div1 = $('#detail1');
+           const $div2 = $('#detail2');
 
            if (icono.classList.contains("fa-eye")) {
                 $('#ocultarDetail').removeClass("fa-eye");
                 $('#ocultarDetail').addClass("fa-eye-slash");
                  $div1.animate({ opacity: 0, height: "toggle" }, 400);
+                 $div2.animate({ opacity: 0, height: "toggle" }, 400);
             } else {
                 $('#ocultarDetail').addClass("fa-eye");
                 $('#ocultarDetail').removeClass("fa-eye-slash");
                  $div1.animate({ opacity: 1, height: "toggle" }, 400);
+                 $div2.animate({ opacity: 1, height: "toggle" }, 400);
             }
 
         }
@@ -1735,6 +1809,15 @@
         }
         async function processPick()
         {
+
+            var DeliveryId = $('#pickprocessnumber').val();
+
+            if (DeliveryId == null || DeliveryId == '')
+            {
+                 errorAction("Pick Process Number is required");
+                  return;
+            }
+
             const ok = await confirmAction("¿Do you want to proccess this delivery ?");
 
             if (!ok) return;
@@ -1744,17 +1827,15 @@
             var continueP = true;
 
             table.rows({ search: 'applied' }).every(function () {
-            let data = this.data();  // obtienes el objeto por fila
+                let data = this.data();  // obtienes el objeto por fila
 
-            let val1 = Number(data.requestquantity);
-            let val2 = Number(data.quantityprocess);
+                let val1 = Number(data.requestquantity);
+                let val2 = Number(data.quantityprocess);
 
 
                 if (val1 !== val2)
                 {
-
                     continueP = false
-
                 }
             });
 
@@ -1762,11 +1843,60 @@
             {
               errorAction("You must receive all items");
                   return;
-
             }
+
+            const companyclient = document.getElementById("companyclient").value;
+
+            if (companyclient === "") {
+                errorAction("Company client is required");
+                return;
+            }
+
+            const conceptid = document.getElementById("conceptid").value;
+
+            if (conceptid === "") {
+                        errorAction("Concept ID client is required");
+                        return;
+            }
+
+            const transactionid = document.getElementById("transactionid").value;
+
+            if (transactionid === "") {
+                        errorAction("Transaction ID client is required");
+                        return;
+            }
+
+             const division = document.getElementById("division").value;
+
+            if (division === "") {
+                        errorAction("Division ID is required");
+                        return;
+            }
+            
+            var lpnid = $('#lpnid').val();
+             if (lpnid === "")
+             {
+                        errorAction("LPN is required");
+                        return;
+            }
+
+            var documentReference = DeliveryId;
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            var observations = $('#observations').val();
+
             showSpinner();
 
-            $.ajax({url:"@Url.Action("processPick", "PickProcess")", data:{}, type:"post"})
+            $.ajax({url:"@Url.Action("processPick", "PickProcess")",
+                data:{DeliveryId:DeliveryId,
+                    companyclient: companyclient,
+                    conceptid: conceptid,
+                    transactionid : transactionid,
+                    division : division,
+                    lpnid : lpnid,
+                    observations:observations
+                    }, type:"post", headers: { 'RequestVerificationToken': token }})
             .done(function(){})
             .fail(function(){})
             .always(function()

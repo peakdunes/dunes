@@ -58,6 +58,11 @@ namespace DUNES.API.Data
         public virtual DbSet<Locations> Locations { get; set; }
 
         /// <summary>
+        /// Clients by locations
+        /// </summary>
+        public virtual DbSet<Locationclients> Locationclients { get; set; }
+
+        /// <summary>
         /// Bines Master
         /// </summary>
         public virtual DbSet<Bines> Bines { get; set; }
@@ -99,6 +104,9 @@ namespace DUNES.API.Data
         /// Part Number by bin distribution
         /// </summary>
         public virtual DbSet<Itemsbybin> Itemsbybin { get; set; }
+
+
+      
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
@@ -106,6 +114,19 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+
+            modelBuilder.Entity<Locationclients>(entity =>
+            {
+                entity.ToTable("locationclients");
+
+                entity.HasIndex(e => e.Idcompany, "IX_locationclients_Idcompany");
+
+                entity.HasIndex(e => e.Idlocation, "IX_locationclients_Idlocation");
+
+                entity.Property(e => e.Active).HasColumnName("active");
+                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
+            });
 
             modelBuilder.Entity<Itemsbybin>(entity =>
             {

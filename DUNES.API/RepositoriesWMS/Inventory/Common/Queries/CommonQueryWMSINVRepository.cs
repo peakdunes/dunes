@@ -35,15 +35,15 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            
-                var listbines = await _wmscontext.Bines
-                .Where(x => x.Idcompany == companyid
-                && x.Idcompanyclient == companyClient
-                && x.Active == true).ToListAsync(ct);
 
-                return listbines;
+            var listbines = await _wmscontext.Bines
+            .Where(x => x.Idcompany == companyid
+            && x.Idcompanyclient == companyClient
+            && x.Active == true).ToListAsync(ct);
 
-           
+            return listbines;
+
+
         }
 
 
@@ -97,7 +97,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
         /// <returns></returns>
-        public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct )
+        public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
               .Where(x => x.Idcompany == companyid
@@ -341,9 +341,9 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<WmsTransactionsRead?> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
 
-       
+
             WmsTransactionsRead objresponse = new WmsTransactionsRead();
-         
+
             var infoenctran = await _wmscontext.InventorytransactionHdr
                 .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
                 x.Documentreference == DocumentNumber).ToListAsync(ct);
@@ -366,7 +366,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
 
                 var infodetail = await _wmscontext.InventorytransactionDetail.Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
-                
+
                 if (infodetail.Count > 0)
                 {
                     objresponse.ListDetail = infodetail;
@@ -382,8 +382,97 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return objresponse;
         }
+        /// <summary>
+        /// Get All Active Input Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<Transactiontypes>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+               .Where(x => x.Idcompany == companyid
+               && x.Idcompanyclient == companyClient
+               && x.Isinput == true && x.Active == true && x.Match != "" && x.Match != null
+               ).ToListAsync(ct);
+            return listtransactions;
+        }
+
+        /// <summary>
+        /// Get All Input Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<Transactiontypes>> GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+              .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Isinput == true && x.Match != "" && x.Match != null
+              ).ToListAsync(ct);
+            return listtransactions;
+        }
 
 
-       
+        /// <summary>
+        /// Get All Active Output Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<Transactiontypes>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+               .Where(x => x.Idcompany == companyid
+               && x.Idcompanyclient == companyClient
+               && x.Isoutput == true && x.Active == true && x.Match != "" && x.Match != null
+               ).ToListAsync(ct);
+            return listtransactions;
+        }
+
+        /// <summary>
+        /// Get All Output Type Transfer transactions
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<Transactiontypes>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            var listtransactions = await _wmscontext.Transactiontypes
+              .Where(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient
+              && x.Isoutput == true && x.Match != "" && x.Match != null
+              ).ToListAsync(ct);
+            return listtransactions;
+        }
+
+
+        /// <summary>
+        /// Get one transaction type by ID
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<Transactiontypes> GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct)
+        {
+            var uniquetransaction = await _wmscontext.Transactiontypes
+              .FirstOrDefaultAsync(x => x.Idcompany == companyid
+              && x.Idcompanyclient == companyClient && x.Id == id, ct);
+
+
+            return uniquetransaction;
+        }
     }
 }

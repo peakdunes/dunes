@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Transactions;
 
 namespace DUNES.UI.Controllers.Inventory.PickProcess
 {
@@ -25,6 +26,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         private readonly IPickProcessService _service;
         private readonly ICommonINVService _CommonINVService;
        
+
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
 
@@ -92,6 +94,22 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 if (token == null)
                     return RedirectToLogin();
 
+                //get all active locations
+
+                var locations = await _CommonINVService.GetAllActiveLocationsByCompany(_companyDefault, token, ct);
+
+                if (locations.Error != null)
+                {
+                    MessageHelper.SetMessage(this, "danger", locations.Error, MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+                if (locations.Data == null || locations.Data.Count <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "there is not company locations actives", MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
                 var listclients = await _CommonINVService.GetClientCompanies(token, ct);
 
 
@@ -101,7 +119,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     return View(objresult);
                 }
 
-                if (listclients.Data.Count <= 0)
+                if (listclients.Data == null || listclients.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not company clients registed", MessageDisplay.Inline);
                     return View(objresult);
@@ -109,7 +127,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 ViewData["companies"] = new SelectList(listclients.Data, "CompanyId", "CompanyId");
 
-
+                ViewData["locations"] = new SelectList(locations.Data, "Id", "Name");
                 //pick process Header and detail information
 
                 var infopickProcess = await _service.GetPickProcessAllInfo(pickprocessnumber, token, ct);
@@ -350,7 +368,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
-            List<WMSInputTransactionsDto> listinputtransactionsresult = new List<WMSInputTransactionsDto>();
+            List<WMSTransactionsDto> listinputtransactionsresult = new List<WMSTransactionsDto>();
 
 
 
@@ -368,7 +386,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 var listbines = await _CommonINVService.GetAllActiveBinsByCompanyClient(_companyDefault, companyclient, token, ct);
 
-                if (listbines.Data.Count <= 0)
+                if (listbines.Data == null || listbines.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not bins created for this  company", MessageDisplay.Inline);
                     return View(listbines);
@@ -408,27 +426,38 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 objinformation.listconcepts = listconceptsresult;
 
+                //load divisions
+                
+                var listdivision = await _CommonINVService.GetDivisionByCompanyClient(companyclient, token, ct);
+
+                if (listdivision.Data == null || listdivision.Data.Count <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", $"there is not Division for this for this  company client {companyclient}", MessageDisplay.Inline);
+                    return View(listbines);
+                }
+
+                foreach (var b in listdivision.Data)
+                {
+                    TdivisionCompanyDto objdet = new TdivisionCompanyDto();
+
+                    objdet.CompanyDsc = b.CompanyDsc;
+                    objdet.DivisionDsc = b.DivisionDsc;
+
+                    objinformation.listtdivisioncompany.Add(objdet);
+                }
+
+               
                 //load input transactions
 
-                var listtransactions = await _CommonINVService.GetAllActiveOutputTransactionsByCompanyClient(_companyDefault, companyclient, token, ct);
+                var listtransactions = await _CommonINVService.GetAllActiveTransferTransactionsInputType(_companyDefault, companyclient, token, ct);
 
-                if (listtransactions.Data.Count <= 0)
+                if (listtransactions.Data == null ||listtransactions.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not WMS output transactions created for this  company", MessageDisplay.Inline);
                     return View(listbines);
                 }
-
-                foreach (var b in listtransactions.Data)
-                {
-                    WMSInputTransactionsDto objdet = new WMSInputTransactionsDto();
-
-                    objdet.Id = b.Id;
-                    objdet.Name = b.Name.Trim();
-
-                    listinputtransactionsresult.Add(objdet);
-                }
-
-                objinformation.listinputtransactions = listinputtransactionsresult;
+   
+                 objinformation.listinputtransactions = listtransactions.Data;
 
                 return Ok(new
                 {
@@ -510,17 +539,110 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         }
 
         [HttpPost]
-        public IActionResult processPick(string DeliveryId)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProcessPick(string DeliveryId, string companyclient, int conceptid,
+                           int transactionid, string  division, string lpnid , string observations, CancellationToken ct)
         {
 
-            //1.we need to create order repair (4 tables)
-            //2. we need to create WMS transfer to type reserved
-            //3. we need to update pickprocess tables
-            //4. we need to put call type 13
+            var token = GetToken();
+            if (token == null)
+                return RedirectToLogin();
+
+            var infotraninput = await _CommonINVService.GetTransactionsTypeById(_companyDefault, companyclient, transactionid, token, ct);
+
+            if (infotraninput == null)
+            {
+                return Ok(new { status = $"Transction type Id {transactionid} not found " });
+            }
+
+            int OutPutTransactionId = 0;
+
+            var infotranoutput = await _CommonINVService.GetAllActiveTransferTransactionsOutputType(_companyDefault, companyclient, token, ct);
+
+            if (infotranoutput.Data == null ||infotranoutput.Data.Count <= 0)
+            {
+                return Ok(new { status = "Output Transfer transaction not found " });
+            }
+
+            foreach(var info in infotranoutput.Data)
+            {
+                if (info.match.ToUpper().Trim() == infotraninput.Data!.match.ToUpper().Trim())
+                {
+                    OutPutTransactionId = info.Id;
+
+                }
+            }
+            if (OutPutTransactionId == 0)
+            {
+                return Ok(new { status = "Output Transfer transaction match not found " });
+            }
+
+            WMSCreateHeaderTransactionDTO hdr = new WMSCreateHeaderTransactionDTO();
+
+            hdr.Idcompany = _companyDefault;
+            hdr.Idtransactionconcept = conceptid;
+            hdr.IdUser = User.Identity.Name;
+            hdr.IdUserprocess = string.Empty;
+            hdr.Idcompanyclient = 0;
+            hdr.Codecompanyclient = companyclient.Trim();
+            hdr.Documentreference = DeliveryId.Trim();
+            hdr.Observations = observations.Trim();
+            hdr.Iddivision = division;
+
+            var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
+
+            foreach(var info in listdist)
+            {
+                WMSCreateDetailTransactionDTO objdet = new WMSCreateDetailTransactionDTO();
+
+                //objdet.Idtypetransaction = transactionid;
+
+                //pbjdet.Idlocation { get; set; }
+
+                //bjdet.Idtype = info.typereserveid;
+
+                //bjdet.Idrack { get; set; }
+
+                //bjdet.Level { get; set; }
+
+                //bjdet.Codeitem { get; set; }
+
+                //bjdet.Iditem { get; set; }
+
+                //bjdet.TotalQty { get; set; }
+
+                //bjdet.Idbin { get; set; }
+
+                //bjdet.Idstatus { get; set; }
+
+                //bjdet.Serialid { get; set; }
+
+                //bjdet.Idcompany { get; set; }
+
+                //bjdet.Idcompanyclient { get; set; }
+
+                //bjdet.Iddivision { get; set; }
+
+                //bjdet.Idenctransaction { get; set; }
+
+
+            }
+
+            List<WMSCreateDetailTransactionDTO> Listdetails = new List<WMSCreateDetailTransactionDTO>();
+
+          
+           
 
 
 
-            return new ObjectResult(new { status = "Ok" });
+            return await HandleAsync(async ct =>
+            {
+                var infotran = ""; // = _service.CreatePickProccessTransaction(DeliveryId, objInvData, lpnid, token, ct); 
+
+                return Ok(new { status = "OK", infotran = infotran });
+            }, ct);
+
+           
         }
 
 

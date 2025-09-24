@@ -16,10 +16,12 @@ namespace DUNES.Shared.DTOs.Inventory
         
         public List<WMSBinsDto> listbines {  get; set; } = new();
         public List<WMSConceptsDto> listconcepts { get; set; } = new();
-        public List<WMSInputTransactionsDto> listinputtransactions { get; set; } = new();
+        public List<WMSTransactionsDto> listinputtransactions { get; set; } = new();
         public List<InventoryTypeDto> listinventorytype { get; set; } = new();
         public List<WMSInventoryTypeDto> listwmsinventorytype { get; set; } = new();
         public List<itemstatusDto> listitemstatus { get; set; } = new();
+        public List<TdivisionCompanyDto> listtdivisioncompany { get; set;} = new();
+
 
     }
      

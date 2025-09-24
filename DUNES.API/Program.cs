@@ -5,6 +5,7 @@ using DUNES.API.Models.Masters;
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
+using DUNES.API.Repositories.Inventory.Common.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
@@ -14,6 +15,7 @@ using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
+using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
@@ -163,6 +165,7 @@ builder.Services.AddSwaggerGen(c =>
 
         return controllerName switch
         {
+            "CommonQueryINV" => new[] { "Inventory - Common Queries" },
             "PickProcessINV" => new[] { "Inventory - Pick Process" },
             "CommonQueryASNINV" => new[] { "Inventory ASN - Common queries" },
             "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
@@ -225,7 +228,8 @@ builder.Services.AddScoped<ICommonQueryPickProcessINVService, CommonQueryPickPro
 builder.Services.AddScoped<ITransactionsPickProcessINVRepository, TransactionsPickProcessINVRepository>();
 builder.Services.AddScoped<ITransactionsPickProcessINVService, TransactionsPickProcessINVService>();
 
-
+builder.Services.AddScoped<ICommonQueryINVRepository, CommonQueryINVRepository>();
+builder.Services.AddScoped<ICommonQueryINVService, CommonQueryINVService>();
 
 //generic service for master tables
 builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<>));

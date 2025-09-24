@@ -138,7 +138,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
-            List<WMSInputTransactionsDto> listinputtransactionsresult = new List<WMSInputTransactionsDto>();
+            List<WMSTransactionsDto> listinputtransactionsresult = new List<WMSTransactionsDto>();
 
             List<InventoryTypeDto> listinventorytypesresult = new List<InventoryTypeDto>();
 
@@ -212,10 +212,13 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 foreach (var b in listtransactions.Data)
                 {
-                    WMSInputTransactionsDto objdet = new WMSInputTransactionsDto();
+                    WMSTransactionsDto objdet = new WMSTransactionsDto();
 
                     objdet.Id = b.Id;
                     objdet.Name = b.Name.Trim();
+                    objdet.match = b.match.Trim();
+                    objdet.isInput = b.isInput;
+                    objdet.isOutput = b.isOutput;
 
                     listinputtransactionsresult.Add(objdet);
                 }
@@ -261,6 +264,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                     objdet.Id = b.Id;
                     objdet.Name = b.Name.Trim();
+                    
 
                     listwmsinventorytypesresult.Add(objdet);
                 }

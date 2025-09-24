@@ -119,6 +119,52 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         Task<List<Transactiontypes>> GetAllTransactionsOutputType(int companyid, string companyClient , CancellationToken ct);
 
 
+        /// <summary>
+        /// Get all active Input Transfer Transactions for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<List<Transactiontypes>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all Input Transfer Transactions for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<List<Transactiontypes>> GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all active Output Transfer Transactions for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<List<Transactiontypes>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all Output Transfer Transactions for a client company 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<List<Transactiontypes>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct);
+
+
+
+
+        /// <summary>
+        /// Get Transactions for a client company by Id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <returns></returns>
+        Task<Transactiontypes> GetTransactionsTypeById(int companyid, string companyClient,int id, CancellationToken ct);
+
 
         /// <summary>
         /// Get all active item status for a client company 

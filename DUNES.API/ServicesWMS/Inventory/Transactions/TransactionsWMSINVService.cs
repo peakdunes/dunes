@@ -1,4 +1,5 @@
-﻿using DUNES.API.Models.Masters;
+﻿using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Masters;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
@@ -176,14 +177,14 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idlocation <= 0)
                     return ApiResponseFactory.BadRequest<int>("Location not found");
 
-                var infoloc = await _commonQueryWMSMasterService.GetAllLocationsByCompany(objcreate.hdr.Idcompany, ct);
+                var infoloc = await _commonQueryWMSMasterService.GetAllActiveLocationsByCompany(objcreate.hdr.Idcompany, ct);
 
-                if (infoloc.Data.Count <= 0)
+                if (infoloc.Data == null || infoloc.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Locations for this company {objcreate.hdr.Idcompany} not found");
 
                 foreach(var infodet in infoloc.Data)
                 {
-                    if(infodet.Id == info.Idlocation && infodet.Active == true)
+                    if(infodet.Id == info.Idlocation)
                     thereIsLocation = true;
                     break;
                 }

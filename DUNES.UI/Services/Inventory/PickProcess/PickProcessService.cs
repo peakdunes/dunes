@@ -3,6 +3,7 @@ using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.UI.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 
@@ -85,6 +86,18 @@ namespace DUNES.UI.Services.Inventory.PickProcess
             return await resp.ReadAsApiResponseAsync<TorderRepairTm>(ct);
         }
 
-       
+        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData, string lpnid, string token, CancellationToken ct)
+        {
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{objInvData}/{lpnid}/{token}");
+
+            return await resp.ReadAsApiResponseAsync<PickProcessResponseDto>(ct);
+
+
+        }
     }
 }

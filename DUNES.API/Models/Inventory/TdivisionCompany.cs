@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DUNES.API.Models.Masters;
-
+namespace DUNES.API.Models.Inventory;
+/// <summary>
+/// Company Division 
+/// </summary>
 public partial class TdivisionCompany
 {
     public string DivisionDsc { get; set; } = null!;
