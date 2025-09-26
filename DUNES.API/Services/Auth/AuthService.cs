@@ -118,6 +118,15 @@ namespace DUNES.API.Services.Auth
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            //var authClaims = new List<Claim>
+            //{
+            //    new Claim(JwtRegisteredClaimNames.Sub, user.Id),                 
+            //    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),   
+            //    new Claim("email", user.Email ?? string.Empty),
+            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            //};
+
+
             foreach (var role in userRoles)
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
 
@@ -137,7 +146,8 @@ namespace DUNES.API.Services.Auth
             return ApiResponseFactory.Ok(new LoginResponseDto
             {
                 Token = tokenString,
-                Expiration = token.ValidTo
+                Expiration = token.ValidTo,
+                UserName = user.UserName!
             });
         }
     }

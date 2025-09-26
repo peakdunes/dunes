@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,13 +18,13 @@ namespace DUNES.API.Controllers.Masters
     [Authorize]
     public class ConsignmentCallTypeController : BaseController
     {
-        private readonly IMasterService<TzebB2bConsignmentCallsType> _service;
+        private readonly IMasterService<TzebB2bConsignmentCallsType, TzebB2bConsignmentCallsTypeDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsignmentCallTypeController"/> class.
         /// </summary>
         /// <param name="service">The master service for Consignment Call Types.</param>
-        public ConsignmentCallTypeController(IMasterService<TzebB2bConsignmentCallsType> service)
+        public ConsignmentCallTypeController(IMasterService<TzebB2bConsignmentCallsType, TzebB2bConsignmentCallsTypeDto> service)
         {
             _service = service;
         }
@@ -68,7 +69,7 @@ namespace DUNES.API.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TzebB2bConsignmentCallsTypeDto item, CancellationToken ct)
         {
 
             return await HandleApi(ct => _service.AddAsync(item, ct), ct);
@@ -85,7 +86,7 @@ namespace DUNES.API.Controllers.Masters
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsType item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TzebB2bConsignmentCallsTypeDto item, CancellationToken ct)
         {
             return await HandleApi(ct => _service.UpdateAsync(item, ct), ct);
 

@@ -1,24 +1,29 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.Controllers.Masters
 {
+
+    /// <summary>
+    /// All service for master inventory table
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class MasterInventoryController : BaseController
     {
 
-        private readonly IMasterService<TzebB2bMasterPartDefinition> _service;
+        private readonly IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TzebB2bMasterPartDefinition"/> class.
         /// </summary>
         /// <param name="service">The master service for Inventory Master.</param>
-        public MasterInventoryController(IMasterService<TzebB2bMasterPartDefinition> service)
+        public MasterInventoryController(IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> service)
         {
             _service = service;
         }
@@ -74,11 +79,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebB2bMasterPartDefinition>), 201)]
+        [ProducesResponseType(typeof(ApiResponse<TzebB2bMasterPartDefinitionDto>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebB2bMasterPartDefinition item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TzebB2bMasterPartDefinitionDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
@@ -93,11 +98,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebB2bMasterPartDefinition>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<TzebB2bMasterPartDefinitionDto>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebB2bMasterPartDefinition item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TzebB2bMasterPartDefinitionDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {

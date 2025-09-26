@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,13 +17,13 @@ namespace DUNES.API.Controllers.Masters
     [Authorize]
     public class TrepairActionsCodesController : BaseController
     {
-        private readonly IMasterService<TrepairActionsCodes> _service;
+        private readonly IMasterService<TrepairActionsCodes, TrepairActionsCodesDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TrepairActionsCodesController"/> class.
         /// </summary>
         /// <param name="service">The master service for Repair Actions Codes.</param>
-        public TrepairActionsCodesController(IMasterService<TrepairActionsCodes> service)
+        public TrepairActionsCodesController(IMasterService<TrepairActionsCodes, TrepairActionsCodesDto> service)
         {
             _service = service;
         }
@@ -62,11 +63,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TrepairActionsCodes>), 201)]
+        [ProducesResponseType(typeof(ApiResponse<TrepairActionsCodesDto>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TrepairActionsCodes item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TrepairActionsCodesDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
@@ -81,11 +82,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TrepairActionsCodes>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<TrepairActionsCodesDto>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TrepairActionsCodes item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TrepairActionsCodesDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {

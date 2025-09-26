@@ -201,6 +201,21 @@ namespace DUNES.API.ControllersWMS.Masters
             return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveBinsByCompanyClient(companyid, companyClient, ct), ct);
 
         }
-       
+
+        /// <summary>
+        /// Get all Warehouse Organization for a Client Company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("companyClient-warehouse-organization/{companyid}/{companyClient}")]
+        public async Task<IActionResult> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        {
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllWareHouseOrganizationByCompanyClient(companyid, companyClient, ct), ct);
+
+        }
+
+        
     }
 }

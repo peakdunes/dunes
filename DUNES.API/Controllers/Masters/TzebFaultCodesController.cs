@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,13 @@ namespace DUNES.API.Controllers.Masters
     [ApiController]
     public class TzebFaultCodesController : BaseController
     {
-        private readonly IMasterService<TzebFaultCodes> _service;
+        private readonly IMasterService<TzebFaultCodes, TzebFaultCodesDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TzebFaultCodesController"/> class.
         /// </summary>
         /// <param name="service">The master service for Fault Codes.</param>
-        public TzebFaultCodesController(IMasterService<TzebFaultCodes> service)
+        public TzebFaultCodesController(IMasterService<TzebFaultCodes, TzebFaultCodesDto> service)
         {
             _service = service;
         }
@@ -59,11 +60,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebFaultCodes>), 201)]
+        [ProducesResponseType(typeof(ApiResponse<TzebFaultCodesDto>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebFaultCodes item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TzebFaultCodesDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
@@ -78,11 +79,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebFaultCodes>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<TzebFaultCodesDto>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebFaultCodes item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TzebFaultCodesDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {

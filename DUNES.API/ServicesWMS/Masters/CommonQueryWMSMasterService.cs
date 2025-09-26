@@ -238,5 +238,42 @@ namespace DUNES.API.ServicesWMS.Masters
 
             return ApiResponseFactory.Ok(objlist, "OK");
         }
+
+        /// <summary>
+        /// Get all Warehouse Organization for a Client Company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<WMSWarehouseorganizationDto>>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        {
+            var infoorg = await _repository.GetAllWareHouseOrganizationByCompanyClient(companyid, companyClient, ct);
+
+            if (infoorg.Count <= 0)
+                return ApiResponseFactory.BadRequest<List<WMSWarehouseorganizationDto>>($"Company Clients don't have a active WareHouse Organization {companyClient} not found");
+
+            List<WMSWarehouseorganizationDto> objlist = new List<WMSWarehouseorganizationDto>();
+
+            foreach (var infob in infoorg)
+            {
+                WMSWarehouseorganizationDto objdet = new WMSWarehouseorganizationDto();
+
+
+                objdet.Id = infob.Id;
+                objdet.Idcompany = infob.Idcompany;
+                objdet.Idcompanyclient = infob.Idcompanyclient;
+                objdet.Iddivision = infob.Iddivision;
+                objdet.Idlocation = infob.Idlocation;
+                objdet.Idrack = infob.Idrack;
+                objdet.Level = infob.Level;
+                objdet.Idbin = infob.Idbin;
+
+                objlist.Add(objdet);
+
+            }
+
+            return ApiResponseFactory.Ok(objlist, "OK");
+        }
     }
 }

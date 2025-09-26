@@ -28,14 +28,18 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System;
-using System.Reflection;
+
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+using AutoMapper;
+using System.Reflection;
+using DUNES.API.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -198,6 +202,8 @@ builder.Services.AddSwaggerGen(c =>
 
 //SERVICES
 
+//Mapper
+
 
 //AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -235,8 +241,7 @@ builder.Services.AddScoped<ICommonQueryINVService, CommonQueryINVService>();
 builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<>));
 
 //para usar en el CRUD de las tablas maestras
-builder.Services.AddScoped(typeof(IMasterService<>), typeof(MasterService<>));
-
+builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 
 //WMS MASTER SERVICES
 
@@ -256,6 +261,7 @@ builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepo
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -278,6 +284,8 @@ app.UseSerilogRequestLogging();
 app.UseRouting();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 app.MapControllers();

@@ -9,6 +9,8 @@ using DUNES.API.Services.Masters;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 
@@ -21,10 +23,10 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
     {
 
         private readonly ICommonQueryWMSMasterService _commonQueryWMSMasterService;
-        private readonly IMasterService<WmsCompanyclient> _masterCompanyclientService;
-        private readonly IMasterService<TdivisionCompany> _masterCompanyclientDivisionService;
+        private readonly IMasterService<WmsCompanyclient, WmsCompanyclientDto> _masterCompanyclientService;
+        private readonly IMasterService<TdivisionCompany, TdivisionCompanyDto> _masterCompanyclientDivisionService;
 
-        private readonly IMasterService<TzebB2bMasterPartDefinition> _masterCompanyclientMasterInventory;
+        private readonly IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> _masterCompanyclientMasterInventory;
 
         private readonly ICommonQueryWMSINVService _commonQueryWMSService;
         private readonly ITransactionsWMSINVRepository _repository;
@@ -41,10 +43,11 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
         /// <param name="httpContextAccessor"></param>
         /// <param name="masterCompanyclientDivisionService"></param>
         /// <param name="masterCompanyclientMasterInventory"></param>
-        public TransactionsWMSINVService(ITransactionsWMSINVRepository repository, 
-            ICommonQueryWMSINVService commonQueryWMSService, IMasterService<WmsCompanyclient> masterCompanyclientService,
+        public TransactionsWMSINVService(ITransactionsWMSINVRepository repository,
+            ICommonQueryWMSINVService commonQueryWMSService, IMasterService<WmsCompanyclient, WmsCompanyclientDto> masterCompanyclientService,
             ICommonQueryWMSMasterService commonQueryWMSMasterService, IHttpContextAccessor httpContextAccessor,
-            IMasterService<TdivisionCompany> masterCompanyclientDivisionService, IMasterService<TzebB2bMasterPartDefinition> masterCompanyclientMasterInventory)
+            IMasterService<TdivisionCompany, TdivisionCompanyDto> masterCompanyclientDivisionService,
+            IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> masterCompanyclientMasterInventory)
         {
             _repository = repository;
             _commonQueryWMSService = commonQueryWMSService;
@@ -81,11 +84,11 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             //HDR data validation
             if (objcreate.hdr.Idcompany <= 0)
                 return ApiResponseFactory.BadRequest<int>("Company information is required");
-            
-            //company id validation
-            var infocompany = await _commonQueryWMSMasterService.GetCompanyInformation(objcreate.hdr.Idcompany,ct);
 
-            if(infocompany.Data == null)
+            //company id validation
+            var infocompany = await _commonQueryWMSMasterService.GetCompanyInformation(objcreate.hdr.Idcompany, ct);
+
+            if (infocompany.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Company  not found");
 
             //company client validation
@@ -93,7 +96,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 return ApiResponseFactory.BadRequest<int>("Company Client is required");
 
             var infocompanyclient = await _masterCompanyclientService.GetByIdAsync(objcreate.hdr.Idcompanyclient, ct);
-            
+
             if (infocompanyclient.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Company Client information not found");
 
@@ -103,12 +106,12 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             if (objcreate.hdr.Idtransactionconcept <= 0)
                 return ApiResponseFactory.BadRequest<int>("Concept Transaction is required");
 
-            var infoconcepts = await _commonQueryWMSService.GetAllTransactionsConcept(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient,  ct);
+            var infoconcepts = await _commonQueryWMSService.GetAllTransactionsConcept(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
-            if(infoconcepts.Data == null)
+            if (infoconcepts.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Concept Transaction not found");
 
-            foreach(var info in  infoconcepts.Data)
+            foreach (var info in infoconcepts.Data)
             {
                 if (info.Id == objcreate.hdr.Idtransactionconcept)
                 {
@@ -116,26 +119,18 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 }
             }
 
-            if (thereIsIdConcept)
+            if (!thereIsIdConcept)
             {
                 return ApiResponseFactory.BadRequest<int>("Concept Transaction not valid");
             }
 
             //user validation
 
+            objcreate.hdr.IdUser = _httpContextAccessor.HttpContext?.User?.Identity?.Name;
+
             if (string.IsNullOrEmpty(objcreate.hdr.IdUser))
                 return ApiResponseFactory.BadRequest<int>("User not found");
-
-            //we obtain JWT user authenticated
-
-            var userIdClaim = _httpContextAccessor.HttpContext.User.FindFirst("name")?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
-                return ApiResponseFactory.Unauthorized<int>("User not authenticated");
-
-                       
-            if (objcreate.hdr.IdUser != userIdClaim)
-                return ApiResponseFactory.Forbidden<int>("User ID in payload does not match authenticated user");
-
+                      
 
 
             //division validation
@@ -147,16 +142,15 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             if (infodivision.Data == null)
                 return ApiResponseFactory.BadRequest<int>("Client division not found");
 
-            foreach(var infodiv in infodivision.Data)
+
+            if (infodivision.Data.DivisionDsc.ToUpper() == objcreate.hdr.Iddivision.ToUpper() && infodivision.Data.Active == true)
             {
-                if (infodiv.DivisionDsc.ToUpper() == objcreate.hdr.Iddivision.ToUpper() && infodiv.Active == true)
-                {
-                    thereIsDivision = true;
-                    break;
-                }
+                thereIsDivision = true;
+
             }
 
-            if(!thereIsDivision)
+
+            if (!thereIsDivision)
             {
                 return ApiResponseFactory.BadRequest<int>($"This division : {objcreate.hdr.Iddivision.Trim()} was not found or there is not active");
             }
@@ -182,10 +176,10 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (infoloc.Data == null || infoloc.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Locations for this company {objcreate.hdr.Idcompany} not found");
 
-                foreach(var infodet in infoloc.Data)
+                foreach (var infodet in infoloc.Data)
                 {
-                    if(infodet.Id == info.Idlocation)
-                    thereIsLocation = true;
+                    if (infodet.Id == info.Idlocation)
+                        thereIsLocation = true;
                     break;
                 }
                 if (!thereIsLocation)
@@ -199,17 +193,19 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idtype <= 0)
                     return ApiResponseFactory.BadRequest<int>("Inventory type not found");
 
-                
+
                 var infotype = await _commonQueryWMSMasterService.GetAllActiveInventoryTypesByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
-                if (infotype.Data.Count <= 0)
+                if (infotype.Data ==null || infotype.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Inventory Types for this company {objcreate.hdr.Idcompany} not found");
 
                 foreach (var infotypeline in infotype.Data)
                 {
                     if (infotypeline.Id == info.Idtype)
+                    {
                         thereIsInventoryType = true;
-                    break;
+                        break;
+                    }
                 }
                 if (!thereIsInventoryType)
                 {
@@ -221,17 +217,19 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
 
                 if (info.Idrack <= 0)
                     return ApiResponseFactory.BadRequest<int>("Rack not found");
-                
+
                 var inforack = await _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
-                if (inforack.Data.Count <= 0)
+                if (inforack.Data == null || inforack.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Racks Types for this company {objcreate.hdr.Idcompany} not found");
 
                 foreach (var inforackline in inforack.Data)
                 {
                     if (inforackline.Id == info.Idrack)
+                    {
                         thereIsRacks = true;
-                    break;
+                        break;
+                    }
                 }
                 if (!thereIsRacks)
                 {
@@ -252,17 +250,19 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idstatus <= 0)
                     return ApiResponseFactory.BadRequest<int>("Item status not found");
 
-               
+
                 var infostatus = await _commonQueryWMSMasterService.GetAllActiveItemStatusByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
 
-                if (infostatus.Data == null ||infostatus.Data.Count <= 0)
+                if (infostatus.Data == null || infostatus.Data.Count <= 0)
                     return ApiResponseFactory.BadRequest<int>($"Active Item Status for this company {objcreate.hdr.Idcompany} not found");
 
                 foreach (var infostatusline in infostatus.Data)
                 {
                     if (infostatusline.Id == info.Idstatus)
+                    {
                         thereIsItemStatus = true;
-                    break;
+                        break;
+                    }
                 }
                 if (!thereIsItemStatus)
                 {

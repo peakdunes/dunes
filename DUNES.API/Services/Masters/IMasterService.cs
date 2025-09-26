@@ -8,35 +8,38 @@ namespace DUNES.API.Services.Masters
     /// Service for all master tables
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IMasterService<T> where T : class
+    /// <typeparam name="TDto"></typeparam>
+    public interface IMasterService<T, TDto>
+     where T : class
+     where TDto : class
     {
         /// <summary>
         /// get all data for this table
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<IEnumerable<T>>> GetAllAsync(CancellationToken ct);
+        Task<ApiResponse<IEnumerable<TDto>>> GetAllAsync(CancellationToken ct);
         /// <summary>
         /// get one register for this id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<T>> GetByIdAsync(int id, CancellationToken ct);
+        Task<ApiResponse<TDto>> GetByIdAsync(int id, CancellationToken ct);
         /// <summary>
         /// add record
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="dto"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<T>> AddAsync(T entity, CancellationToken ct );
+        Task<ApiResponse<TDto>> AddAsync(TDto dto, CancellationToken ct );
         /// <summary>
         /// update a record
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="dto"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<T>> UpdateAsync(T entity, CancellationToken ct);
+        Task<ApiResponse<TDto>> UpdateAsync(TDto dto, CancellationToken ct);
         /// <summary>
         /// delete a record
         /// </summary>
@@ -52,6 +55,6 @@ namespace DUNES.API.Services.Masters
         /// <param name="value"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<T>>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct);
+        Task<ApiResponse<TDto>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct);
     }
 }

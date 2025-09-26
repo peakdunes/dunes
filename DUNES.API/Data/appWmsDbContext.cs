@@ -1,5 +1,6 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
+using DUNES.API.ModelWMS.Masters;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Data
@@ -105,8 +106,10 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<Itemsbybin> Itemsbybin { get; set; }
 
-
-      
+        /// <summary>
+        /// warehouse organization
+        /// </summary>
+        public virtual DbSet<Warehouseorganization> warehouseorganization { get; set; }
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
@@ -115,6 +118,22 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 
+            modelBuilder.Entity<Warehouseorganization>(entity =>
+            {
+                entity.ToTable("warehouseorganization");
+
+                entity.HasIndex(e => e.Idbin, "IX_warehouseorganization_Idbin");
+
+                entity.HasIndex(e => e.Idcompany, "IX_warehouseorganization_Idcompany");
+
+                entity.HasIndex(e => e.Idlocation, "IX_warehouseorganization_Idlocation");
+
+                entity.HasIndex(e => e.Idrack, "IX_warehouseorganization_Idrack");
+
+                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
+                entity.Property(e => e.Iddivision).HasMaxLength(200);
+                entity.Property(e => e.Level).HasColumnName("level");
+            });
 
             modelBuilder.Entity<Locationclients>(entity =>
             {

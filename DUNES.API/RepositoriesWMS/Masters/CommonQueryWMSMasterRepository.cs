@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelWMS.Masters;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters
@@ -75,7 +76,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<InventoryTypes>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _wmscontext.InventoryTypes
-                .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+                .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
 
             return infotypes;
         }
@@ -106,7 +107,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Itemstatus>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infostatus = await _wmscontext.Itemstatus
-               .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
 
             return infostatus;
         }
@@ -139,7 +140,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Racks>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infofacks = await _wmscontext.Racks
-               .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
 
             return infofacks;
         }
@@ -154,7 +155,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Bines>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _wmscontext.Bines
-            .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
 
             return infobins;
 
@@ -165,12 +166,11 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
         /// <returns></returns>
         public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _wmscontext.Bines
-               .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
 
             return infobins;
         }
@@ -187,7 +187,19 @@ namespace DUNES.API.RepositoriesWMS.Masters
                                                         && x.Idlocation == locationid && x.Active == true).ToListAsync(ct);
             return intoclientloclist;
         }
+        /// <summary>
+        /// Get all Warehouse Organization for a Client Company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public Task<List<Warehouseorganization>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        {
+            var infoOrg = _wmscontext.warehouseorganization.Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
 
-      
+            return infoOrg;
+        }
     }
 }

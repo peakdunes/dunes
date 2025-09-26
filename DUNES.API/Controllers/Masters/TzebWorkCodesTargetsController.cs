@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,13 +15,13 @@ namespace DUNES.API.Controllers.Masters
     [ApiController]
     public class TzebWorkCodesTargetsController : BaseController
     {
-        private readonly IMasterService<TzebWorkCodesTargets> _service;
+        private readonly IMasterService<TzebWorkCodesTargets, TzebWorkCodesTargetsDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TzebWorkCodesTargetsController"/> class.
         /// </summary>
         /// <param name="service">The master service for Work Codes Targets.</param>
-        public TzebWorkCodesTargetsController(IMasterService<TzebWorkCodesTargets> service)
+        public TzebWorkCodesTargetsController(IMasterService<TzebWorkCodesTargets, TzebWorkCodesTargetsDto> service)
         {
             _service = service;
         }
@@ -55,11 +56,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargets>), 201)]
+        [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargetsDto>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebWorkCodesTargets item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TzebWorkCodesTargetsDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
@@ -74,11 +75,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargets>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<TzebWorkCodesTargetsDto>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebWorkCodesTargets item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TzebWorkCodesTargetsDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {

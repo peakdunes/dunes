@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Models.Masters;
 using DUNES.API.Services.Masters;
 using DUNES.API.Utils.Responses;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -16,13 +17,13 @@ namespace DUNES.API.Controllers.Masters
     [Authorize]
     public class TzebB2bInventoryTypeController : BaseController
     {
-        private readonly IMasterService<TzebB2bInventoryType> _service;
+        private readonly IMasterService<TzebB2bInventoryType, TzebB2bInventoryTypeDto> _service;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TzebB2bInventoryTypeController"/> class.
         /// </summary>
         /// <param name="service">The master service for Inventory Types.</param>
-        public TzebB2bInventoryTypeController(IMasterService<TzebB2bInventoryType> service)
+        public TzebB2bInventoryTypeController(IMasterService<TzebB2bInventoryType, TzebB2bInventoryTypeDto> service)
         {
             _service = service;
         }
@@ -62,11 +63,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebB2bInventoryType>), 201)]
+        [ProducesResponseType(typeof(ApiResponse<TzebB2bInventoryTypeDto>), 201)]
         [ProducesResponseType(typeof(ApiResponse<object>), 400)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPost("Create")]
-        public async Task<IActionResult> Create([FromBody] TzebB2bInventoryType item, CancellationToken ct)
+        public async Task<IActionResult> Create([FromBody] TzebB2bInventoryTypeDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
@@ -81,11 +82,11 @@ namespace DUNES.API.Controllers.Masters
         /// <param name="item"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<TzebB2bInventoryType>), 200)]
+        [ProducesResponseType(typeof(ApiResponse<TzebB2bInventoryTypeDto>), 200)]
         [ProducesResponseType(typeof(ApiResponse<object>), 404)]
         [ProducesResponseType(typeof(ApiResponse<object>), 500)]
         [HttpPut("Update")]
-        public async Task<IActionResult> Update([FromBody] TzebB2bInventoryType item, CancellationToken ct)
+        public async Task<IActionResult> Update([FromBody] TzebB2bInventoryTypeDto item, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {

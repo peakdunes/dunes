@@ -48,6 +48,6 @@
         /// <param name="value"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<IEnumerable<T>> SearchByFieldAsync(string fieldName, string value,CancellationToken ct);
+        Task<T> SearchByFieldAsync(string fieldName, string value,CancellationToken ct);
     }
 }

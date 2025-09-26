@@ -1,10 +1,13 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Infrastructure;
+using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Xml.Linq;
 
 namespace DUNES.UI.Services.Inventory.Common
 {
@@ -39,7 +42,7 @@ namespace DUNES.UI.Services.Inventory.Common
         }
 
   
-        public async Task<ApiResponse<List<WMSClientCompaniesDto>>> GetClientCompanies(string token, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSLocationclientsDTO>>> GetAllActiveClientCompaniesByLocation( int companyid, int locationid, string token, CancellationToken ct)
         {
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -47,9 +50,9 @@ namespace DUNES.UI.Services.Inventory.Common
             HttpResponseMessage resp;
 
 
-            resp = await _httpClient.GetAsync($"/api/WmsCompanyclient/GetAll");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSMaster/companyclients-active-by-locations/{companyid}/{locationid}");
 
-            return await resp.ReadAsApiResponseAsync<List<WMSClientCompaniesDto>>(ct);
+            return await resp.ReadAsApiResponseAsync<List<WMSLocationclientsDTO>>(ct);
 
         }
 
@@ -251,6 +254,31 @@ namespace DUNES.UI.Services.Inventory.Common
             resp = await _httpClient.GetAsync($"/api/CommonQueryWMSMaster/company-locations/{companyid}");
 
             return await resp.ReadAsApiResponseAsync<List<WMSLocationsDTO>>(ct);
+        }
+
+        public async Task<ApiResponse<List<WMSWarehouseorganizationDto>>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, string token ,CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSMaster/companyClient-warehouse-organization/{companyid}/{companyClient}");
+
+            return await resp.ReadAsApiResponseAsync<List<WMSWarehouseorganizationDto>>(ct);
+        }
+
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByName(string companyname, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+                                                           
+
+            resp = await _httpClient.GetAsync($"/api/WmsCompanyclient/client-company-information-by-name/{companyname}");
+
+            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
+
         }
 
       

@@ -1,4 +1,5 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.ModelWMS.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
@@ -115,6 +116,14 @@ namespace DUNES.API.ServicesWMS.Masters
         Task<ApiResponse<List<Bines>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
+        /// <summary>
+        /// Get all Warehouse Organization for a Client Company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSWarehouseorganizationDto>>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
     }

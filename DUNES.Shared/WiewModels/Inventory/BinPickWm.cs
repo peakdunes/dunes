@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,5 +27,14 @@ namespace DUNES.Shared.WiewModels.Inventory
         /// inventory original
         /// </summary>
         public int inventorytypeid { get; set; }
+
+        //rack id bin output
+        public int rackid { get; set; }
+
+        /// <summary>
+        /// part number ID
+        /// </summary>
+        [MaxLength(50)]
+        public string partnumber { get; set; } = string.Empty;
     }
 }

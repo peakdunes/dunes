@@ -79,8 +79,11 @@ namespace DUNES.UI.Controllers.Auth
 
                 var expiration = doc.RootElement.GetProperty("data").GetProperty("expiration").GetDateTime();
 
+                var userName = doc.RootElement.GetProperty("data").GetProperty("userName").GetString();
+
                 // Guardamos el token en Session
-                HttpContext.Session.SetString("JWToken", token);
+                HttpContext.Session.SetString("JWToken", token!);
+                HttpContext.Session.SetString("UserName", userName!);
 
                 // Redirigimos al Home (o a donde quieras)
                 return RedirectToAction("Index", "Home");

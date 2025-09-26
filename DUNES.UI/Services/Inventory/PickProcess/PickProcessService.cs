@@ -4,8 +4,10 @@ using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.UI.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace DUNES.UI.Services.Inventory.PickProcess
 {
@@ -93,9 +95,21 @@ namespace DUNES.UI.Services.Inventory.PickProcess
 
             HttpResponseMessage resp;
 
-            resp = await _httpClient.GetAsync($"/api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{objInvData}/{lpnid}/{token}");
 
-            return await resp.ReadAsApiResponseAsync<PickProcessResponseDto>(ct);
+            var json = JsonConvert.SerializeObject(objInvData);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+          
+
+
+            //resp = await _httpClient.PostAsync($"/api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{objInvData}/{lpnid}/{token}");
+
+            var respapi = await _httpClient.PostAsync(
+                $"api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{lpnid}",
+                content
+            );
+
+            return await respapi.ReadAsApiResponseAsync<PickProcessResponseDto>(ct);
 
 
         }

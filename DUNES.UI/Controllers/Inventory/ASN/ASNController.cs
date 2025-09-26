@@ -87,8 +87,8 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //var infobines = await _ASNService.GetAllActiveBinsByCompanyClient(1, "ZEBRA PAR1", token, ct);
 
-
-                var listclients = await _CommonINVService.GetClientCompanies(token, ct);
+                //QUITAR EL 1, 1 PARA COMPANY Y LOCATON
+                var listclients = await _CommonINVService.GetAllActiveClientCompaniesByLocation(1,1, token, ct);
 
                 if (listclients.Error != null)
                 {
@@ -115,7 +115,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 ViewData["companies"] = new SelectList(listclients.Data, "CompanyId", "CompanyId");
 
                 objresult.asdDto = infoasn.Data!;
-                objresult.listcompanyclients = listclients.Data!;
+                //objresult.listcompanyclients = listclients.Data!;
 
                 return View(objresult);
 

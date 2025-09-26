@@ -1,4 +1,5 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.WiewModels.Inventory;
@@ -27,8 +28,21 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSClientCompaniesDto>>> GetClientCompanies(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationclientsDTO>>> GetAllActiveClientCompaniesByLocation( int companyid, int locationid, string token, CancellationToken ct);
 
+       
+
+
+        /// <summary>
+        /// Get all company client information created in WMS system
+        /// </summary>
+        /// <param name="asnNumber"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByName(string companyname,  string token, CancellationToken ct);
+
+       
 
         /// <summary>
         /// Get all division by company client
@@ -140,25 +154,6 @@ namespace DUNES.UI.Services.Inventory.Common
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         /// <summary>
         /// All active item status for a company client
         /// </summary>
@@ -219,6 +214,18 @@ namespace DUNES.UI.Services.Inventory.Common
         /// 
 
         Task<ApiResponse<List<WMSItemByBinsDto>>> GetItemBinsDistribution(int companyid, string companyClient, string parnumber, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all Warehouse Organization for a Client Company
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSWarehouseorganizationDto>>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+
+
 
     }
 }

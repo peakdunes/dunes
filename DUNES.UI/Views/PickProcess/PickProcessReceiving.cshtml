@@ -76,6 +76,12 @@
                                         Bin Name
                                     </th>
                                     <th>
+                                        Rack Id
+                                    </th>
+                                    <th>
+                                        Rack Name
+                                    </th>
+                                    <th>
                                         Inventory Type
                                     </th>
                                     <th>
@@ -252,15 +258,15 @@
         <div class="col-12 col-md-3">
             <label class="form-label">Location</label>
             <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
-                <option value="" selected disabled>Select Location</option>
+                <option disabled selected>Select Location</option>
             </select>
         </div>
 
 
         <div class="col-12 col-md-3">
             <label class="form-label">Company Client</label>
-            <select id="companyclient" class="form-control" asp-items="@ViewBag.companies">
-                <option value="" selected disabled>Select Client Company</option>
+            <select id="companyclient" disabled class="form-control">
+                
             </select>
         </div>
         <div class="col-12 col-md-3">
@@ -1174,7 +1180,8 @@
 
           })
 
-
+          //Abort or cancelation by user
+          let currentRequest = null;
 
 
         async  function openmodal(lineid, partnumber, qty, typeidst)
@@ -1244,6 +1251,8 @@
                                   JsonArrayInventory.push({
                                           binid: f.binid,
                                           binname: f.binname,
+                                          rackid : f.rackid,
+                                          rackname : f.rackname,
                                           inventorytypeid : f.inventorytypeid,
                                           typename: f.inventoryname,
                                           statusid: f.statusid,
@@ -1253,7 +1262,7 @@
                                              class="form-control form-control-sm qty-input"
                                              value="${f.qtyreserved}"
                                              min="0" step="1"
-                                             data-binid="${f.binid}" data-invtype = "${f.inventorytypeid}" data-statusname="${f.statusid}">`
+                                             data-binid="${f.binid}" data-rackid="${f.rackid}" data-invtype = "${f.inventorytypeid}" data-statusname="${f.statusid}">`
                                   });
                                }
 
@@ -1275,6 +1284,8 @@
                                    columns: [
                                        { "data": "binid" },
                                        { "data": "binname" },
+                                       { "data": "rackid" },
+                                       { "data": "rackname" },
                                        { "data": "inventorytypeid" },
                                        { "data": "typename" },
                                        { "data": "statusid"},
@@ -1386,14 +1397,16 @@
 
           }
 
-        $('#locationid').change(function(){
+        $('#locationid').change(async function(){
 
-            var $companyClient = $(this).val();
-            var $bin = $('#binselid');
-            var $concepts = $('#conceptid');
-            var $transactions = $('#transactionid');
-            var $division = $('#divisionid');
+            if (currentRequest) {
+                currentRequest.abort();
+            }
 
+            var $companyClient = $('#companyclient');
+
+            var locationid = $(this).val();
+          
             clearComboBox();
 
              $companyClient.empty()
@@ -1401,7 +1414,57 @@
             .prop('disabled', true);
 
 
-           
+             if (!locationid) return;
+
+
+              // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            showSpinner();
+
+            currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
+                    data: { __RequestVerificationToken: token,  locationid: locationid }})
+            .done(function (res)
+            {
+                
+                if (res.message == "OK")
+                {
+                    
+                    var list = (res && res.data) ? res.data : [];
+
+                  
+
+                    if (Array.isArray(list) && list.length)
+                    {
+                        $.each(list, function (_, it) {
+                        var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                        var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                        $companyClient.append($('<option>', { value: id, text: name }));
+                        });
+                        $companyClient.prop('disabled', false);
+                    }
+                }
+                else
+                {
+                      $('#locationid option').prop('selected', function () {
+                                return this.defaultSelected;
+                      });
+
+                    errorAction(res.message);
+                }
+             
+
+
+            })
+            .fail(function (xhr, status) {
+                 if (status !== "abort") {
+                    errorAction("Error:", status);
+                }
+            }).always(function(){
+
+                hideSpinner();
+            });
         
         })
           
@@ -1418,16 +1481,13 @@
 
              clearComboBox();
 
+                // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+            var token = $('input[name="__RequestVerificationToken"]').val();
 
             if (!companyClient) return;
 
-            // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            showSpinner();
-
-            $.ajax({url: '@Url.Action("getAllAditionalInformation", "PickProcess")',type: 'POST',
-                    data: { __RequestVerificationToken: token,  companyclient: companyClient }})
+               $.ajax({url: '@Url.Action("getAllAditionalInformation", "PickProcess")',type: 'POST',
+                    data: { __RequestVerificationToken: token,  companyClient: companyClient }})
             .done(function (res)
             {
                 var list = (res && res.data.listbines) ? res.data.listbines : [];
@@ -1487,6 +1547,7 @@
 
                 hideSpinner();
             });
+          
         })
 
 
@@ -1517,11 +1578,22 @@
         {
               const binidin = $('#binselid').val();
 
+              const partnumber = $('#partnoid').val();
+
+              
+
               const typereserveid = $('#typereserveid').val();
 
               const token = $('input[name="__RequestVerificationToken"]').val();
 
               var lineid = $('#lineid').val();
+
+              if (partnumber == '' || partnumber == null)
+              {
+                   errorAction("Part Number is required");
+                   return;
+              }
+
 
               if (binidin == 0 || binidin == null)
               {
@@ -1558,14 +1630,12 @@
                 const binidout = Number($(this).data('binid'));
                 const statusid = $(this).data('statusname');
                 const inventorytypeid = $(this).data('invtype');
+                const rackid = $(this).data('rackid');
                 const qty   = Number($(this).val() || 0);
-
-
-
 
                 if (qty > 0)
                     {
-                    res.push({lineid, binidout, qty, typereserveid, binidin, statusid, inventorytypeid });
+                    res.push({lineid, binidout, qty, typereserveid, binidin, statusid, inventorytypeid , rackid, partnumber});
                     }
                 });
 
@@ -1586,6 +1656,8 @@
                     })
                     .done(function (data)
                     {
+                       
+
                        if (data.status == "OK")
                        {
                            loadDataDetail(data.lista);
@@ -1810,7 +1882,12 @@
         async function processPick()
         {
 
-            var DeliveryId = $('#pickprocessnumber').val();
+             const ok = await confirmAction("¿Do you want to proccess this delivery ?");
+
+            if (!ok) return;
+
+
+            var DeliveryId = $('#PickProcessHdr_DeliveryId').val();
 
             if (DeliveryId == null || DeliveryId == '')
             {
@@ -1818,9 +1895,7 @@
                   return;
             }
 
-            const ok = await confirmAction("¿Do you want to proccess this delivery ?");
-
-            if (!ok) return;
+           
 
             let table = $('#tableuser').DataTable();
 
@@ -1845,6 +1920,14 @@
                   return;
             }
 
+              const locationid = document.getElementById("locationid").value;
+
+            if (locationid === "") {
+                errorAction("Location is required");
+                return;
+            }
+
+
             const companyclient = document.getElementById("companyclient").value;
 
             if (companyclient === "") {
@@ -1866,14 +1949,14 @@
                         return;
             }
 
-             const division = document.getElementById("division").value;
+             const division = document.getElementById("divisionid").value;
 
             if (division === "") {
                         errorAction("Division ID is required");
                         return;
             }
             
-            var lpnid = $('#lpnid').val();
+            var lpnid = $('#lpnid').val();pickprocessnumber
              if (lpnid === "")
              {
                         errorAction("LPN is required");
@@ -1886,6 +1969,8 @@
 
             var observations = $('#observations').val();
 
+            alert('todo validado');
+
             showSpinner();
 
             $.ajax({url:"@Url.Action("processPick", "PickProcess")",
@@ -1895,10 +1980,30 @@
                     transactionid : transactionid,
                     division : division,
                     lpnid : lpnid,
-                    observations:observations
+                    observations:observations,
+                    locationid:locationid
                     }, type:"post", headers: { 'RequestVerificationToken': token }})
-            .done(function(){})
-            .fail(function(){})
+            .done(function(data){
+
+                   if (data.status == "OK")
+                       {
+                           loadDataDetail(data.lista);
+
+                       }
+                       else
+                       {
+                            errorAction(data.status);
+                       }
+            
+            })
+            .fail(function(jqXHR, textStatus, errorThrown){
+            
+                        if (jqXHR.status === 500) {
+                    errorAction('Error interno del servidor. Intenta más tarde.');
+                } else {
+                    errorAction('Error inesperado: ' + jqXHR.status);
+                }
+            })
             .always(function()
             {
                 hideSpinner();

@@ -89,7 +89,7 @@ namespace DUNES.API.Repositories.Masters
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException"></exception>
-        public async Task<IEnumerable<T>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct)
+        public async Task<T> SearchByFieldAsync(string fieldName, string value, CancellationToken ct)
         {
             var parameter = Expression.Parameter(typeof(T), "x");
 
@@ -106,7 +106,7 @@ namespace DUNES.API.Repositories.Masters
 
             var lambda = Expression.Lambda<Func<T, bool>>(containsCall, parameter);
 
-            return await _context.Set<T>().Where(lambda).ToListAsync();
+            return await _context.Set<T>().FirstOrDefaultAsync(lambda,ct);
         }
 
     }

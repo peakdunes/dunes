@@ -120,11 +120,17 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<PickProcessResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        [HttpPost("create-pickprocess-transaction/{DeliveryId}/{objInvTransaction}/{lpnid}")]
-        public async Task<IActionResult> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvTransaction, string lpnid, CancellationToken ct)
+        //[HttpPost("create-pickprocess-transaction/{DeliveryId}/{objInvTransaction}/{lpnid}")]
+        //public async Task<IActionResult> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvTransaction, string lpnid, CancellationToken ct)
+        //{
+        //    var response = await _transactionservice.CreatePickProccessTransaction(DeliveryId, objInvTransaction, lpnid, ct);
+
+        //    return StatusCode(response.StatusCode, response);
+        //}
+        [HttpPost("create-pickprocess-transaction/{DeliveryId}/{lpnid}")]
+        public async Task<IActionResult> CreatePickProccessTransaction(string DeliveryId, [FromBody] NewInventoryTransactionTm objInvTransaction, string lpnid, CancellationToken ct)
         {
             var response = await _transactionservice.CreatePickProccessTransaction(DeliveryId, objInvTransaction, lpnid, ct);
-
             return StatusCode(response.StatusCode, response);
         }
 
