@@ -59,8 +59,10 @@ namespace DUNES.Shared.DTOs.Inventory
 
         public DateTime DateTimeProcessed { get; set; }
 
+        [Display(Name ="Stage Call")]
         public int OutConsReqsId { get; set; }
 
+        [Display(Name = "Date Stage Call")]
         public DateTime DateTimeConfirmed { get; set; }
 
         public DateTime DateTimeOnlineOrders { get; set; }

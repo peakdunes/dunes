@@ -40,7 +40,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
                 objhdr.IdUser = objdata.hdr.IdUser;
                 objhdr.Datecreated = DateTime.Now;
                 objhdr.Processed = false;
-                objhdr.IdUserprocess = null;
+                objhdr.IdUserprocess = string.Empty;
                 objhdr.Idcompanyclient = objdata.hdr.Codecompanyclient;
                 objhdr.Dateprocessed = DateTime.MinValue;
                 objhdr.Documentreference = string.IsNullOrEmpty(objdata.hdr.Documentreference) ? "" : objdata.hdr.Documentreference;

@@ -18,6 +18,8 @@ namespace DUNES.API.Profiles
         {
             CreateMap<WmsCompanyclient, WmsCompanyclientDto>().ReverseMap();
             CreateMap<TdivisionCompany, TdivisionCompanyDto>().ReverseMap();
+            CreateMap<TzebB2bMasterPartDefinition,TzebB2bMasterPartDefinitionDto>().ReverseMap();
+
         }
 
     }

@@ -340,13 +340,16 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<WmsTransactionsRead?> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct)
         {
-
-
+         
+          
             WmsTransactionsRead objresponse = new WmsTransactionsRead();
 
             var infoenctran = await _wmscontext.InventorytransactionHdr
-                .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient &&
-                x.Documentreference == DocumentNumber).ToListAsync(ct);
+                .Include(x  => x.IdcompanyNavigation)
+                .Include(x => x.IdtransactionconceptNavigation)
+                .Where(x => x.Idcompany == companyid 
+               // && x.Idcompanyclient == companyClient 
+                && x.Documentreference == DocumentNumber).ToListAsync(ct);
 
 
             if (infoenctran.Count == 0)
@@ -363,9 +366,17 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
                 {
                     listenc.Add(item.Id);
                 }
+                
 
-
-                var infodetail = await _wmscontext.InventorytransactionDetail.Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
+                var infodetail = await _wmscontext.InventorytransactionDetail
+                    .Include(x => x.IdtypetransactionNavigation)
+                    .Include(x => x.IdlocationNavigation)
+                    .Include(x => x.IdtypeNavigation)
+                    .Include(x => x.IdrackNavigation)
+                    .Include(x => x.IdbinNavigation)
+                    .Include(x => x.IdstatusNavigation)
+                    .Include(x => x.IdcompanyNavigation)
+                    .Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
 
                 if (infodetail.Count > 0)
                 {

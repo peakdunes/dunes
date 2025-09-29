@@ -15,14 +15,14 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<ServTrackReferenceCreatedDto> CreateServTrackOrderFromPickProcess(string DeliveryId);
+        Task<ServTrackReferenceCreatedDto> CreateServTrackOrderFromPickProcess(string DeliveryId );
 
         /// <summary>
         /// Create a pick process call (number 13) for a pick process
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<int> CreatePickProcessCall(string DeliveryId);
+        Task<int> CreatePickProcessCall(string DeliveryId, CancellationToken ct);
 
         /// <summary>
         /// Update pickprocess table for pick and confirm process 

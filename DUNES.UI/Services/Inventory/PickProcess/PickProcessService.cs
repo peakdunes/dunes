@@ -8,6 +8,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Transactions;
 
 namespace DUNES.UI.Services.Inventory.PickProcess
 {
@@ -71,7 +72,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage resp;
-
+                                                
             resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/all-transactions/{companyid}/{companyClient}/{DocumentNumber}");
 
             return await resp.ReadAsApiResponseAsync<WMSTransactionTm>(ct);

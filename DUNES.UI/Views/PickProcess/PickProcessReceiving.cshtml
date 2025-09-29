@@ -132,6 +132,7 @@
                        id="pickprocessnumber"
                        name="pickprocessnumber"
                        class="form-control"
+                       oninput="clearform()"
                        placeholder="Scan or type your Pick Process..."
                        required
                        autofocus />
@@ -237,7 +238,10 @@
         </div>
 
 
-
+        <div class="col-12 col-md-1">
+            <label asp-for="PickProcessHdr.OutConsReqsId" class="form-label"></label>
+            <input asp-for="PickProcessHdr.OutConsReqsId" readonly class="form-control" />
+        </div>
 
     </div>
 </div>
@@ -299,7 +303,7 @@
         </div>
         <div class="col-12 col-md-6">
             <label class="form-label">Observations (500)</label>
-            <input ID="observations" maxlength="500" class="form-control" />
+            <input ID="observations" disabled maxlength="500" class="form-control" />
 
         </div>
       
@@ -376,111 +380,7 @@
 </div>
 
 
-<div class="card shadow-sm mt-2">
 
-    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-        <h6 class="mb-0 subtitleDunes ms2">Pick Process Calls Information</h6>
-        <a href="#" class="text-decoration-none" onclick="hidecalls()">
-            <i id="ocultarCalls" class="fa-solid fa-eye"></i>
-        </a>
-    </div>
-
-    <div class="card-body" id="divbody1">
-        <div class="row">
-            <table id="tableuserinputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
-                <caption style="caption-side: top; text-align: left; font-weight: bold;">
-                    ZEBRA TO PEAKTECH CALLS
-                </caption>
-                <thead class="table-light">
-                    <tr>
-                        <th>Actions</th>
-                        <th>Id</th>
-                        <th>TransactionCode</th>
-                        <th>DateTimeInserted</th>
-                        <th>Error</th>
-                        <th>Processed</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model?.CallsRead.inputCallsList != null)
-                    {
-
-
-                        foreach (var item in Model.CallsRead.inputCallsList)
-                        {
-                            <tr>
-                                <td>
-                                </td>
-                                <td>@item.Id</td>
-                                <td>@item.TransactionCode</td>
-                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@item.Error</td>
-                                <td>@item.Processed</td>
-
-                            </tr>
-
-                        }
-                    }
-                </tbody>
-            </table>
-
-
-        </div>
-    </div>
-
-
-    <div class="card-body" id="divbody2">
-        <div class="row">
-            <table id="tableuseroutputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
-                <caption style="caption-side: top; text-align: left; font-weight: bold;">
-                    PEAKTECH CALLS TO ZEBRA
-                </caption>
-                <thead class="table-light">
-                    <tr>
-                        <th>Actions</th>
-                        <th>Id</th>
-                        <th>TypeOfCallId</th>
-                        <th>TypeOfCallDescription</th>
-                        <th>DateTimeInserted</th>
-                        <th>AckReceived</th>
-                        <th>Result</th>
-                        <th>DateTimeSent</th>
-                        <th>InProcess</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model?.CallsRead.outputCallsList != null)
-                    {
-
-
-                        foreach (var item in Model.CallsRead.outputCallsList)
-                        {
-                            <tr>
-                                <td>
-                                </td>
-                                <td>@item.Id</td>
-                                <td>@item.TypeOfCallId</td>
-                                <td>@item.TypeOfCallDescription</td>
-                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@item.AckReceived</td>
-                                <td>@item.Result</td>
-                                <td>@Convert.ToDateTime(@item.DateTimeSent).ToString("yyyy-MM-dd HH:mm")</td>
-                                <td>@item.InProcess</td>
-
-
-                            </tr>
-
-                        }
-                    }
-
-                </tbody>
-            </table>
-
-
-        </div>
-    </div>
-
-</div>
 
 
 <div class="card shadow-sm mt-2">
@@ -594,8 +494,7 @@
                             foreach (var item in Model.ListTransactions.ListDetail)
                             {
                                 <tr>
-                                    <td>
-                                    </td>
+                                    <td></td>
                                     <td>@item.Id</td>
                                     <td>@item.Idtypetransaction</td>
                                     <td>@item.typetransactionName</td>
@@ -617,6 +516,7 @@
                                     <td>@item.companyName</td>
                                     <td>@item.Idcompanyclient</td>
                                     <td>@item.Iddivision</td>
+                                    <td>@item.Idenctransaction</td>
                                 </tr>
                             }
                         }
@@ -716,7 +616,111 @@
     </div>
 </div>
 
+<div class="card shadow-sm mt-2">
 
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 subtitleDunes ms2">Pick Process Calls Information</h6>
+        <a href="#" class="text-decoration-none" onclick="hidecalls()">
+            <i id="ocultarCalls" class="fa-solid fa-eye"></i>
+        </a>
+    </div>
+
+    <div class="card-body" id="divbody1">
+        <div class="row">
+            <table id="tableuserinputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                    ZEBRA TO PEAKTECH CALLS
+                </caption>
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>TransactionCode</th>
+                        <th>DateTimeInserted</th>
+                        <th>Error</th>
+                        <th>Processed</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.CallsRead.inputCallsList != null)
+                    {
+
+
+                        foreach (var item in Model.CallsRead.inputCallsList)
+                        {
+                            <tr>
+                                <td>
+                                </td>
+                                <td>@item.Id</td>
+                                <td>@item.TransactionCode</td>
+                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@item.Error</td>
+                                <td>@item.Processed</td>
+
+                            </tr>
+
+                        }
+                    }
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+
+    <div class="card-body" id="divbody2">
+        <div class="row">
+            <table id="tableuseroutputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                    PEAKTECH TO ZEBRA CALLS
+                </caption>
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>TypeOfCallId</th>
+                        <th>TypeOfCallDescription</th>
+                        <th>DateTimeInserted</th>
+                        <th>AckReceived</th>
+                        <th>Result</th>
+                        <th>DateTimeSent</th>
+                        <th>InProcess</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.CallsRead.outputCallsList != null)
+                    {
+
+
+                        foreach (var item in Model.CallsRead.outputCallsList)
+                        {
+                            <tr>
+                                <td>
+                                </td>
+                                <td>@item.Id</td>
+                                <td>@item.TypeOfCallId</td>
+                                <td>@item.TypeOfCallDescription</td>
+                                <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@item.AckReceived</td>
+                                <td>@item.Result</td>
+                                <td>@Convert.ToDateTime(@item.DateTimeSent).ToString("yyyy-MM-dd HH:mm")</td>
+                                <td>@item.InProcess</td>
+
+
+                            </tr>
+
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+    </div>
+
+</div>
 
 <div class="card shadow-sm mt-2">
 
@@ -998,19 +1002,8 @@
                });
 
                 $('#tableuserwmsdetail').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
+                    scrollX:true
+                    
                });
 
 
@@ -1179,6 +1172,76 @@
             });
 
           })
+
+
+
+          function clearform()
+          {
+
+            $('#tableuserwmshdr').DataTable().clear().draw();
+            $('#tableuserwmsdetail').DataTable().clear().draw();
+            $('#tableuserwmsinv').DataTable().clear().draw();
+            $('#tableuseritemsservtrack').DataTable().clear().draw();
+            $('#tableuserreceivingservtrack').DataTable().clear().draw();
+            $('#tableusershippingservtrack').DataTable().clear().draw();
+            $('#tableuseroutputcalls').DataTable().clear().draw();
+            $('#tableuserinputcalls').DataTable().clear().draw();
+            $('#tableuserbinitems').DataTable().clear().draw();
+            $('#tableuser').DataTable().clear().draw();
+           
+            
+            $('#PickProcessHdr_Id').val('');
+            $('#PickProcessHdr_DeliveryId').val('');
+            $('#PickProcessHdr_ConsignRequestID').val('');
+            $('#PickProcessHdr_Batchid').val('');
+            $('#PickProcessHdr_DateCreated').val('');
+            $('#PickProcessHdr_Address1').val('');
+            $('#PickProcessHdr_Address2').val('');
+            $('#PickProcessHdr_City').val('');
+            $('#PickProcessHdr_State').val('');
+            $('#PickProcessHdr_ZipCode').val('');
+            $('#PickProcessHdr_Country').val('');
+            $('#PickProcessHdr_Carrier').val('');
+            $('#PickProcessHdr_ShipMethod').val('');
+            $('#PickProcessHdr_OutConsReqsId').val('');
+
+
+            $('#lpnid').val('');
+            $('#observations').val('');
+
+            $('#lpnid').prop('disabled', true);
+            $('#observations').prop('disabled', true);
+
+            $('#locationid option').prop('selected', function () {
+            return this.defaultSelected;
+            });
+
+            $('#companyclient').empty();
+            $('#divisionid').empty();
+            $('#conceptid').empty();
+            $('#transactionid').empty();
+
+            $('#companyclient').prop('disabled', true);
+            $('#divisionid').prop('disabled', true);
+            $('#conceptid').prop('disabled', true);
+            $('#transactionid').prop('disabled', true);
+
+
+            $('#OrderRepair_repairHdr_RefNo').val('');
+            $('#OrderRepair_repairHdr_TcustNo').val('');
+            $('#OrderRepair_repairHdr_CustRef').val('');
+            $('#OrderRepair_repairHdr_CustName').val('');
+            $('#OrderRepair_repairHdr_TstatusId').val('');
+            $('#OrderRepair_repairHdr_ShipToAddr').val('');
+            $('#OrderRepair_repairHdr_ShipToAddr1').val('');
+            $('#OrderRepair_repairHdr_TcityId').val('');
+            $('#OrderRepair_repairHdr_TstateId').val('');
+            $('#OrderRepair_repairHdr_ZipCode').val('');
+            $('#OrderRepair_repairHdr_DateInserted').val('');
+            $('#OrderRepair_repairHdr_DateCreated').val('');
+      
+
+          }
 
           //Abort or cancelation by user
           let currentRequest = null;
@@ -1538,7 +1601,7 @@
                 }
 
                 $('#lpnid').prop('disabled', false);
-
+                 $('#observations').prop('disabled', false);
             })
             .fail(function (xhr) {
                 console.error('getClientBins FAIL:', xhr.status, xhr.responseText);

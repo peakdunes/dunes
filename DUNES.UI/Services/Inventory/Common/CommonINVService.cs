@@ -281,6 +281,16 @@ namespace DUNES.UI.Services.Inventory.Common
 
         }
 
-      
+        public async Task<ApiResponse<TzebB2bMasterPartDefinitionDto>> GetByPartNumber(string partnumber, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+            resp = await _httpClient.GetAsync($"/api/MasterInventory/GetByPartNumber/{partnumber}");
+
+            return await resp.ReadAsApiResponseAsync<TzebB2bMasterPartDefinitionDto>(ct);
+        }
     }
 }

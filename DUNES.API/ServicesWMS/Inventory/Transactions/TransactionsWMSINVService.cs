@@ -1,4 +1,5 @@
-﻿using DUNES.API.Models.Inventory;
+﻿using DUNES.API.Data;
+using DUNES.API.Models.Inventory;
 using DUNES.API.Models.Masters;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
@@ -13,6 +14,8 @@ using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DUNES.API.ServicesWMS.Inventory.Transactions
 {
@@ -33,6 +36,8 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
 
         private readonly IHttpContextAccessor _httpContextAccessor;
 
+        private readonly appWmsDbContext _wmsdbcontext;
+
         /// <summary>
         /// dependency injection
         /// </summary>
@@ -47,7 +52,8 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             ICommonQueryWMSINVService commonQueryWMSService, IMasterService<WmsCompanyclient, WmsCompanyclientDto> masterCompanyclientService,
             ICommonQueryWMSMasterService commonQueryWMSMasterService, IHttpContextAccessor httpContextAccessor,
             IMasterService<TdivisionCompany, TdivisionCompanyDto> masterCompanyclientDivisionService,
-            IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> masterCompanyclientMasterInventory)
+            IMasterService<TzebB2bMasterPartDefinition, TzebB2bMasterPartDefinitionDto> masterCompanyclientMasterInventory,
+            appWmsDbContext wmsdbcontext)
         {
             _repository = repository;
             _commonQueryWMSService = commonQueryWMSService;
@@ -56,6 +62,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             _httpContextAccessor = httpContextAccessor;
             _masterCompanyclientDivisionService = masterCompanyclientDivisionService;
             _masterCompanyclientMasterInventory = masterCompanyclientMasterInventory;
+            _wmsdbcontext = wmsdbcontext;
         }
 
         /// <summary>
@@ -292,6 +299,29 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
             var transactionId = await _repository.CreateInventoryTransaction(objcreate);
 
             return ApiResponseFactory.Ok(transactionId, "OK");
+        }
+
+        public Task<ApiResponse<bool>> DeleteInventoryTransaction(int transactionNumber, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Asocia el <see cref="DbContext"/> actual a una transacción existente.
+        /// </summary>
+        /// <param name="tx">
+        /// Transacción abierta en otro <see cref="DbContext"/> (generalmente iniciada en la capa de servicio principal).
+        /// </param>
+        /// <remarks>
+        /// Este método permite que múltiples <see cref="DbContext"/> que apuntan a la misma instancia
+        /// de SQL Server trabajen bajo la misma transacción. De esta forma, si se hace Commit o Rollback,
+        /// los cambios en ambos contextos se confirman o revierten de manera consistente.
+        /// 
+        /// ⚠️ Importante: Solo funciona si todos los contextos apuntan a la misma instancia de base de datos.
+        /// </remarks>
+        public async Task UseDbTransactionAsync(IDbContextTransaction tx)
+        {
+            await _wmsdbcontext.Database.UseTransactionAsync(tx.GetDbTransaction());
         }
     }
 }

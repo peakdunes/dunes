@@ -199,9 +199,7 @@ namespace DUNES.UI.Services.Inventory.Common
 
 
         Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItemInventoryType(int companyid, string companyClient, string parnumber, int typeid, string token,  CancellationToken ct);
-
-        
-
+                
 
         /// <summary>
         /// All Item Bin distribution for a item company client
@@ -226,6 +224,14 @@ namespace DUNES.UI.Services.Inventory.Common
         Task<ApiResponse<List<WMSWarehouseorganizationDto>>> GetAllWareHouseOrganizationByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
 
+        /// <summary>
+        /// Get all information about an item by partnumber
+        /// </summary>
+        /// <param name="partnumber"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<TzebB2bMasterPartDefinitionDto>> GetByPartNumber(string partnumber, string token, CancellationToken ct);
 
     }
 }

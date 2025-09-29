@@ -141,8 +141,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //pick process WMS Inventory transctions
 
+               
 
-                var infoWMSTransactions = await _service.GetAllTransactionByDocumentNumber(companyid, companyclientid, pickprocessnumber, token, ct);
+                var infoWMSTransactions = await _service.GetAllTransactionByDocumentNumber(_companyDefault, "abc", pickprocessnumber, token, ct);
 
                 if (infoWMSTransactions.Data != null)
                 {
@@ -650,9 +651,21 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 foreach (var info in listdist)
                 {
 
+
+                    int iditemsel = 0;
                     //search item information
 
-                    //var iteminfo = .get
+                    string partnumberzeb = info.partnumber.Contains("ZEBRA") ? info.partnumber.Trim() : "ZEBRA-" + info.partnumber.Trim();
+
+                    var itemInfo = await _CommonINVService.GetByPartNumber(partnumberzeb, token, ct);
+
+                    if (itemInfo == null || itemInfo.Data == null)
+                    {
+                        return Ok(new { status = $"There is not information for this part number {info.partnumber} " });
+                    }
+
+
+                    iditemsel = itemInfo.Data.Id;
 
                     WMSCreateDetailTransactionDTO objdetinput = new WMSCreateDetailTransactionDTO();
 
@@ -690,8 +703,8 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     objdetinput.Idtype = info.typereserveid;
                     objdetinput.Idrack = rackIdInput;
                     objdetinput.Level = levelIdInput;
-                    objdetinput.Codeitem = info.partnumber;
-                    objdetinput.Iditem = 0;
+                    objdetinput.Codeitem = partnumberzeb;
+                    objdetinput.Iditem = iditemsel;
                     objdetinput.TotalQty = info.qty;
                     objdetinput.Idbin = info.binidin;
                     objdetinput.Idstatus = info.statusid;
@@ -713,8 +726,8 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     objdetoutput.Idtype = info.inventorytypeid;
                     objdetoutput.Idrack = rackIdOutput;
                     objdetoutput.Level = levelIdOutput;
-                    objdetoutput.Codeitem = info.partnumber;
-                    objdetoutput.Iditem = 0;
+                    objdetoutput.Codeitem = partnumberzeb;
+                    objdetoutput.Iditem = iditemsel;
                     objdetoutput.TotalQty = info.qty;
                     objdetoutput.Idbin = info.binidout;
                     objdetoutput.Idstatus = info.statusid;

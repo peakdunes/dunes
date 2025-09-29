@@ -1,6 +1,7 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DUNES.API.Services.Inventory.PickProcess.Transactions
 {
@@ -33,7 +34,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        Task<ApiResponse<int>> CreatePickProcessCall(string DeliveryId);
+        Task<ApiResponse<int>> CreatePickProcessCall(string DeliveryId, CancellationToken ct);
 
 
         /// <summary>
@@ -44,6 +45,9 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="LPNNumber"></param>
         /// <returns></returns>
         Task<ApiResponse<bool>> UpdatePickProcessTables(string DeliveryId, int call13id, string LPNNumber);
+
+
+        
     }
 
 

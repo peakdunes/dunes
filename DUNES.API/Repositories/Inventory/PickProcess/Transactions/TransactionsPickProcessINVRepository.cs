@@ -2,6 +2,7 @@
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
 {
@@ -58,12 +59,12 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
-        public async Task<int> CreatePickProcessCall(string DeliveryId)
+        /// 
+        public async Task<int> CreatePickProcessCall(string DeliveryId, CancellationToken ct = default)
         {
+            var connection = _context.Database.GetDbConnection();
 
-            //we need to create this new SP en production database
-
-            using var command = _context.Database.GetDbConnection().CreateCommand();
+            await using var command = connection.CreateCommand();
             command.CommandText = "_SPZEB_B2B_Insert_Stage_Call_For_DeliveryID_ReturnID";
             command.CommandType = System.Data.CommandType.StoredProcedure;
 
@@ -72,13 +73,44 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             param.Value = DeliveryId;
             command.Parameters.Add(param);
 
-            await _context.Database.OpenConnectionAsync();
+            // ⚠️ Asociar transacción activa de EF Core
+            var currentTx = _context.Database.CurrentTransaction;
+            if (currentTx != null)
+            {
+                command.Transaction = currentTx.GetDbTransaction();
+            }
 
-            var result = await command.ExecuteScalarAsync();
+            if (connection.State != System.Data.ConnectionState.Open)
+            {
+                await connection.OpenAsync(ct);
+            }
+
+            var result = await command.ExecuteScalarAsync(ct);
 
             return result != null ? Convert.ToInt32(result) : -1;
         }
-        /// <summary>
+
+        //public async Task<int> CreatePickProcessCall(string DeliveryId)
+        //{
+
+        //    //we need to create this new SP en production database
+
+        //    using var command = _context.Database.GetDbConnection().CreateCommand();
+        //    command.CommandText = "_SPZEB_B2B_Insert_Stage_Call_For_DeliveryID_ReturnID";
+        //    command.CommandType = System.Data.CommandType.StoredProcedure;
+
+        //    var param = command.CreateParameter();
+        //    param.ParameterName = "@DELIVERYid";
+        //    param.Value = DeliveryId;
+        //    command.Parameters.Add(param);
+
+        //    await _context.Database.OpenConnectionAsync();
+
+        //    var result = await command.ExecuteScalarAsync();
+
+        //    return result != null ? Convert.ToInt32(result) : -1;
+        //}
+        ///// <summary>
         /// update pick process tables from pick or confirm process
         /// </summary>
         /// <param name="DeliveryId"></param>

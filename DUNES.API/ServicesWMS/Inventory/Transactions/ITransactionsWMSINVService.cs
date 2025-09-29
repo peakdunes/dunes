@@ -1,6 +1,7 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DUNES.API.ServicesWMS.Inventory.Transactions
 {
@@ -17,5 +18,15 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<int>> CreateInventoryTransaction(NewInventoryTransactionTm objcreate, CancellationToken ct);
+
+
+        /// <summary>
+        /// Delete inventory transaction NO Processed (Header and details)
+        /// </summary>
+        /// <param name="transactionNumber"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<bool>> DeleteInventoryTransaction(int transactionNumber, CancellationToken ct);
+
     }
 }
