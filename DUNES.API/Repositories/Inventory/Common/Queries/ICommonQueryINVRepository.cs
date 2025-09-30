@@ -13,16 +13,28 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// Get all inventory transactions for a Document Number
         /// </summary>
         /// <param name="DocumentNumber"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByDocument(string DocumentNumber);
+        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByDocument(string DocumentNumber, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all inventory transactions for a Document Number and a search Start Date
+        /// </summary>
+        /// <param name="DocumentNumber"></param>
+        /// <param name="startDate"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, CancellationToken ct);
 
 
         /// <summary>
         /// Get all inventory transactions for a Part Number ID
         /// </summary>
         /// <param name="PartNumberId"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByPartNumberId(int PartNumberId);
+        Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByPartNumberId(int PartNumberId, CancellationToken ct);
 
 
 
@@ -30,7 +42,8 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// Get all Division for a company
         /// </summary>
         /// <param name="CompanyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<TdivisionCompany>> GetDivisionByCompanyClient(string CompanyClient);
+        Task<List<TdivisionCompany>> GetDivisionByCompanyClient(string CompanyClient, CancellationToken ct);
     }
 }

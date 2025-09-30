@@ -31,8 +31,8 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByDocument(string DocumentNumber, CancellationToken ct)
         {
-           
-            var infotransactions = await _repository.GetAllInventoryTransactionsByDocument(DocumentNumber);
+
+            var infotransactions = await _repository.GetAllInventoryTransactionsByDocument(DocumentNumber, ct);
 
             if (infotransactions == null)
             {
@@ -42,6 +42,31 @@ namespace DUNES.API.Services.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(infotransactions!, "OK");
         }
+
+
+        /// <summary>
+        /// Get all inventory transactions for a Document Number and a search Start Date
+        /// </summary>
+        /// <param name="DocumentNumber"></param>
+        /// <param name="startDate"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+
+        public async Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, CancellationToken ct)
+        {
+
+            var infotransactions = await _repository.GetAllInventoryTransactionsByDocumentStartDate(DocumentNumber, startDate, ct);
+
+            if (infotransactions == null)
+            {
+                return ApiResponseFactory.NotFound<List<TzebB2bReplacementPartsInventoryLogDto>>(
+                   $"There is not transactions for this document ({DocumentNumber}).");
+            }
+
+            return ApiResponseFactory.Ok(infotransactions!, "OK");
+        }
+
+
         /// <summary>
         /// Get all inventory transactions for a Part Number ID
         /// </summary>
@@ -50,7 +75,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByPartNumberId(int PartNumberId, CancellationToken ct)
         {
-            var infotransactions = await _repository.GetAllInventoryTransactionsByPartNumberId(PartNumberId);
+            var infotransactions = await _repository.GetAllInventoryTransactionsByPartNumberId(PartNumberId, ct);
 
             if (infotransactions == null)
             {
@@ -69,7 +94,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<ApiResponse<List<TdivisionCompanyDto>>> GetDivisionByCompanyClient(string CompanyClient, CancellationToken ct)
         {
-            var infodivisions = await _repository.GetDivisionByCompanyClient(CompanyClient);
+            var infodivisions = await _repository.GetDivisionByCompanyClient(CompanyClient, ct);
 
             if (infodivisions == null)
             {
@@ -90,5 +115,7 @@ namespace DUNES.API.Services.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(listdiv!, "OK");
         }
+
+      
     }
 }

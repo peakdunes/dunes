@@ -175,6 +175,10 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 }
 
 
+                //ZEBRA inventory movement
+
+                var infozebramov = await _CommonINVService.GetAllInventoryTransactionsByDocumentStartDate(pickprocessnumber, Convert.ToDateTime("09/30/2525 11:00:00"), token, ct);
+
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(infopickProcess.Data.ListItems));
 
                 HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(listdistribution));
@@ -697,7 +701,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                     }
 
-                    ////input transaction
+                    ////ouput transaction
                     objdetinput.Idtypetransaction = OutPutTransactionId;
                     objdetinput.Idlocation = locationid;
                     objdetinput.Idtype = info.typereserveid;
@@ -706,7 +710,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     objdetinput.Codeitem = partnumberzeb;
                     objdetinput.Iditem = iditemsel;
                     objdetinput.TotalQty = info.qty;
-                    objdetinput.Idbin = info.binidin;
+                    objdetinput.Idbin = info.binidout;
                     objdetinput.Idstatus = info.statusid;
                     objdetinput.Serialid = "";
                     objdetinput.Idcompany = _companyDefault;
@@ -729,7 +733,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     objdetoutput.Codeitem = partnumberzeb;
                     objdetoutput.Iditem = iditemsel;
                     objdetoutput.TotalQty = info.qty;
-                    objdetoutput.Idbin = info.binidout;
+                    objdetoutput.Idbin = info.binidin;
                     objdetoutput.Idstatus = info.statusid;
                     objdetoutput.Serialid = "";
                     objdetoutput.Idcompany = _companyDefault;

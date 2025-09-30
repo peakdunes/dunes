@@ -233,5 +233,17 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <returns></returns>
         Task<ApiResponse<TzebB2bMasterPartDefinitionDto>> GetByPartNumber(string partnumber, string token, CancellationToken ct);
 
+
+
+        /// <summary>
+        /// Get all inventory transactions for a Document Number and a search Start Date
+        /// </summary>
+        /// <param name="DocumentNumber"></param>
+        /// <param name="startDate"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, string token, CancellationToken ct);
+
     }
 }

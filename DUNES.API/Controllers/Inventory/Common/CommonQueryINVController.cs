@@ -50,6 +50,26 @@ namespace DUNES.API.Controllers.Inventory.Common
             }, ct);
         }
 
+
+        /// <summary>
+        /// Get all inventory transactions for a Document Number and a search Start Date
+        /// </summary>
+        /// <param name="DocumentNumber"></param>
+        /// <param name="ct"></param>
+        /// <param name="StartDate"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpGet("inv-transactions-by-document-date/{DocumentNumber}/{StartDate}")]
+        public async Task<IActionResult> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime StartDate, CancellationToken ct)
+        {
+            return await HandleApi(async ct =>
+            {
+
+                return await _commonQueryINVService.GetAllInventoryTransactionsByDocumentStartDate(DocumentNumber, StartDate, ct);
+            }, ct);
+        }
+
         /// <summary>
         /// Get all inventory transactions for a Part Number ID
         /// </summary>

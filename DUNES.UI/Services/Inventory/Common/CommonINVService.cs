@@ -6,8 +6,12 @@ using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Infrastructure;
 using Microsoft.VisualBasic;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using System.Net.Http.Headers;
+using System.Reflection.Metadata;
+using System.Transactions;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.UI.Services.Inventory.Common
 {
@@ -291,6 +295,18 @@ namespace DUNES.UI.Services.Inventory.Common
             resp = await _httpClient.GetAsync($"/api/MasterInventory/GetByPartNumber/{partnumber}");
 
             return await resp.ReadAsApiResponseAsync<TzebB2bMasterPartDefinitionDto>(ct);
+        }
+
+        public async Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+                                                                    
+            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/inv-transactions-by-document-date/{DocumentNumber}/{startDate}");
+
+            return await resp.ReadAsApiResponseAsync<List<TzebB2bReplacementPartsInventoryLogDto>>(ct);
         }
     }
 }
