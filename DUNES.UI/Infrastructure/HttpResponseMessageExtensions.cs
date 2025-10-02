@@ -10,8 +10,8 @@ namespace DUNES.UI.Infrastructure
             new() { PropertyNameCaseInsensitive = true };
 
         /// <summary>
-        /// Normaliza cualquier respuesta a ApiResponse&lt;T&gt; sin lanzar excepciones:
-        /// - Si viene ApiResponse&lt;T&gt; válido → lo devuelve (sin tocar Error).
+        /// Normaliza cualquier respuesta a ApiResponse; sin lanzar excepciones:
+        /// - Si viene ApiResponse; válido → lo devuelve (sin tocar Error).
         /// - Si viene T "plano" → lo envuelve en ApiResponse.Data.
         /// - Si el JSON es inválido/otro esquema → ApiResponse.Error con detalle.
         /// </summary>

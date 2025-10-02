@@ -27,8 +27,9 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IASNService _ASNService;
         private readonly ICommonINVService _CommonINVService;
-        public readonly IConfiguration _config;
-        public readonly int _companyDefault;
+        private readonly IConfiguration _config;
+        private readonly int _companyDefault;
+        private readonly string _typeDocument = "ASN";
 
 
         public AsnController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService,
@@ -57,7 +58,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             HttpContext.Session.SetString("listbinesdistribution", JsonConvert.SerializeObject(listbinespartno));
 
 
-            
+
             return await HandleAsync(async ct =>
             {
                 ASNWm objdto = new ASNWm { asnHdr = new ASNHdr(), itemDetail = new List<ASNItemDetail>() };
@@ -84,11 +85,61 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     return View(objresult);
                 }
 
+                if (infoasn == null || infoasn.Data.asnHdr == null)
+                {
+                    MessageHelper.SetMessage(this, "danger", "There is not information about this ASN", MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+
+                if (infoasn.Data.itemDetail.Count <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "There is not information detail about this ASN", MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+                //check all calls
+
+
+                //ASN process input and output calls
+
+                var infocall = await _CommonINVService.GetAllCalls(asnnumber, _typeDocument, token, ct);
+
+                if (infocall.Data != null)
+                {
+                    objresult.CallsRead = infocall.Data;
+                }
+
+
+
+
+                //get all active locations
+
+                var locations = await _CommonINVService.GetAllActiveLocationsByCompany(_companyDefault, token, ct);
+
+                if (locations.Error != null)
+                {
+                    MessageHelper.SetMessage(this, "danger", locations.Error, MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+                if (locations.Data == null || locations.Data.Count <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "there is not company locations actives", MessageDisplay.Inline);
+                    return View(objresult);
+                }
+
+
+
+                ViewData["locations"] = new SelectList(locations.Data, "Id", "Name");
+                //pick process Header and detail information
+
+
 
                 //var infobines = await _ASNService.GetAllActiveBinsByCompanyClient(1, "ZEBRA PAR1", token, ct);
 
                 //QUITAR EL 1, 1 PARA COMPANY Y LOCATON
-                var listclients = await _CommonINVService.GetAllActiveClientCompaniesByLocation(1,1, token, ct);
+                var listclients = await _CommonINVService.GetAllActiveClientCompaniesByLocation(1, 1, token, ct);
 
                 if (listclients.Error != null)
                 {
@@ -116,6 +167,13 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 objresult.asdDto = infoasn.Data!;
                 //objresult.listcompanyclients = listclients.Data!;
+
+                foreach (var item in objresult.asdDto.itemDetail)
+                {
+                    item.QuantityPending = (item.QuantityShipped - item.QuantityReceived);
+
+                }
+
 
                 return View(objresult);
 
@@ -230,7 +288,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 var listinventorytypes = await _CommonINVService.GetAllActiveInventoryTypes(token, ct);
 
-                if (listinventorytypes.Data.Count <= 0)
+                if (listinventorytypes.Data == null || listinventorytypes.Data.Count <= 0)
                 {
                     MessageHelper.SetMessage(this, "danger", "there is not inventory types created", MessageDisplay.Inline);
                     return View(listbines);
@@ -264,7 +322,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                     objdet.Id = b.Id;
                     objdet.Name = b.Name.Trim();
-                    
+
 
                     listwmsinventorytypesresult.Add(objdet);
                 }
@@ -294,6 +352,27 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 objinformation.listitemstatus = listitemstatusresult;
 
+                //load divisions
+
+                var listdivision = await _CommonINVService.GetDivisionByCompanyClient(companyclient, token, ct);
+
+                if (listdivision.Data == null || listdivision.Data.Count <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", $"there is not Division for this for this  company client {companyclient}", MessageDisplay.Inline);
+                    return View(listbines);
+                }
+
+                foreach (var b in listdivision.Data)
+                {
+                    TdivisionCompanyDto objdet = new TdivisionCompanyDto();
+
+                    objdet.CompanyDsc = b.CompanyDsc;
+                    objdet.DivisionDsc = b.DivisionDsc;
+
+                    objinformation.listtdivisioncompany.Add(objdet);
+                }
+
+
 
                 //we check if the items list have a assigned bin in WMS system
 
@@ -322,7 +401,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                             itemname = item.ItemNumber.ToString();
                         }
                         var listdistribution = await _CommonINVService.GetInventoryByItem(_companyDefault, companyclient, itemname, token, ct);
-                                          
+
 
                     }
                 }
@@ -587,7 +666,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return await HandleAsync(async ct =>
             {
 
-               
+
 
                 List<BinsToLoadWm> objlist = new List<BinsToLoadWm>();
 
@@ -600,7 +679,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 {
                     if (item.lineid != lineid)
                     {
-                       
+
                         objlist.Add(item);
                     }
                 }
@@ -677,7 +756,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 var lista = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
-                string partnumberzeb = partnumber.Contains("ZEBRA") ? "ZEBRA-" + partnumber.Trim() : partnumber.Trim();
+                string partnumberzeb = partnumber.Contains("ZEBRA") ? partnumber.Trim() : "ZEBRA-" + partnumber.Trim();
 
 
                 var listinventory = await _CommonINVService.GetInventoryByItem(_companyDefault, companyclient, partnumberzeb, token, ct);

@@ -27,7 +27,6 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// <returns></returns>
         Task<List<TzebB2bReplacementPartsInventoryLogDto>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, CancellationToken ct);
 
-
         /// <summary>
         /// Get all inventory transactions for a Part Number ID
         /// </summary>
@@ -45,5 +44,16 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<List<TdivisionCompany>> GetDivisionByCompanyClient(string CompanyClient, CancellationToken ct);
+
+
+
+        /// <summary>
+        /// Gell all (input, output) calls for an pick process
+        /// </summary>
+        /// <param name="DocumentId"></param>
+        /// <param name="processtype">(ASN-PICKPROCESS-B2B)</param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ProcessCallsRead?> GetAllCalls(string DocumentId, string processtype, CancellationToken ct);
     }
 }

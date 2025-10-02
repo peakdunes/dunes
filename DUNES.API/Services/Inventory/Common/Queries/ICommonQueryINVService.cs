@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Models.Inventory;
+using DUNES.API.ReadModels.Inventory;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 
@@ -45,5 +46,19 @@ namespace DUNES.API.Services.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<TdivisionCompanyDto>>> GetDivisionByCompanyClient(string CompanyClient, CancellationToken ct);
+
+
+
+        /// <summary>
+        /// Get all (input, output) calls for a delivery id
+        /// </summary>
+        /// <param name="DocumentId"></param>
+        /// <param name="processtype">(ASN-PICKPROCESS-B2B)</param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<PickProcessCallsReadDto>> GetAllCalls(string DocumentId,string processtype, CancellationToken ct);
+
+
+
     }
 }

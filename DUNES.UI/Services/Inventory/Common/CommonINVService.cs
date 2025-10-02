@@ -1,4 +1,5 @@
-﻿using DUNES.Shared.DTOs.Inventory;
+﻿using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
@@ -91,7 +92,7 @@ namespace DUNES.UI.Services.Inventory.Common
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage resp;
-
+            
 
             resp = await _httpClient.GetAsync($"/api/TzebB2bInventoryType/GetAll");
 
@@ -303,10 +304,31 @@ namespace DUNES.UI.Services.Inventory.Common
 
             HttpResponseMessage resp;
 
-                                                                    
-            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/inv-transactions-by-document-date/{DocumentNumber}/{startDate}");
+            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/inv-transactions-by-document-date/{DocumentNumber}?startDate={startDate:O}");
 
+           
             return await resp.ReadAsApiResponseAsync<List<TzebB2bReplacementPartsInventoryLogDto>>(ct);
         }
+
+        /// <summary>
+        /// Get all input - output call for a ASN - Pick Process Document
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<PickProcessCallsReadDto>> GetAllCalls(string DocumentId, string processtype, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryINV/all-calls/{DocumentId}/{processtype}");
+
+            return await resp.ReadAsApiResponseAsync<PickProcessCallsReadDto>(ct);
+        }
+
     }
 }

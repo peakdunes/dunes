@@ -7,6 +7,7 @@ using DUNES.Shared.Models;
 
 namespace DUNES.API.Services.Inventory.Common.Queries
 {
+    
     /// <summary>
     /// All common inventory transactions queries
     /// </summary>
@@ -116,6 +117,81 @@ namespace DUNES.API.Services.Inventory.Common.Queries
             return ApiResponseFactory.Ok(listdiv!, "OK");
         }
 
-      
+
+        /// <summary>
+        /// Get all input - output calls for a pick process
+        /// </summary>
+        /// <param name="DocumentId"></param>
+        /// <param name="processtype"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<PickProcessCallsReadDto>> GetAllCalls(string DocumentId,string processtype, CancellationToken ct)
+        {
+
+            List<InputCallsDto> listinputcalls = new List<InputCallsDto>();
+            List<OutputCallsDto> listoutputcalls = new List<OutputCallsDto>();
+
+            PickProcessCallsReadDto objdto = new PickProcessCallsReadDto();
+
+            var info = await _repository.GetAllCalls(DocumentId, processtype, ct);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<PickProcessCallsReadDto>(
+                    $"There is not call information for this Pick Process number ({DocumentId}).");
+            }
+
+
+            List<InputCallsDto> listInputCalls = new List<InputCallsDto>();
+
+            List<OutputCallsDto> listOutputCalls = new List<OutputCallsDto>();
+
+
+            if (info.inputCalls != null)
+            {
+                foreach (var call in info.inputCalls)
+                {
+                    InputCallsDto objin = new InputCallsDto();
+
+                    objin.Id = call.Id;
+                    objin.TransactionCode = call.TransactionCode;
+                    objin.DateTimeInserted = call.DateTimeInserted;
+                    objin.Error = call.Error;
+                    objin.Processed = call.Processed;
+
+                    listInputCalls.Add(objin);
+                }
+            }
+
+
+
+
+            if (info.outputCalls != null)
+            {
+                foreach (var call in info.outputCalls)
+                {
+                    OutputCallsDto objout = new OutputCallsDto();
+
+
+
+                    objout.Id = call.Id;
+                    objout.TypeOfCallId = call.TypeOfCallId;
+                    objout.TypeOfCallDescription = call.callName;
+                    objout.DateTimeInserted = call.DateTimeInserted;
+                    objout.AckReceived = call.AckReceived;
+                    objout.Result = call.Result;
+                    objout.DateTimeSent = call.DateTimeSent;
+                    objout.InProcess = call.InProcess;
+
+                    listOutputCalls.Add(objout);
+                }
+            }
+
+            objdto.inputCallsList = listInputCalls;
+            objdto.outputCallsList = listOutputCalls;
+
+            return ApiResponseFactory.Ok(objdto, "OK");
+        }
+
     }
 }

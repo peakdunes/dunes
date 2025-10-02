@@ -154,10 +154,10 @@
 
 <div class="card shadow-sm mb-2">
     <div class="card-header bg-white d-flex justify-content-between align-items-center">
-       
-       
-              
-        
+
+
+
+
         <h5 class="mb-0 display-6 fs-4 text-primary ms2"><span id="title">Pick Process Header &nbsp; @Model.PickProcessHdr.DeliveryId</span> </h5>
         <a href="#" class="text-decoration-none" onclick="hideheader()">
             <i id="ocultarHdr" class="fa-solid fa-eye"></i>
@@ -274,13 +274,11 @@
         <div class="col-12 col-md-3">
             <label class="form-label">Company Client</label>
             <select id="companyclient" disabled class="form-control">
-                
             </select>
         </div>
         <div class="col-12 col-md-3">
             <label class="form-label">Division</label>
             <select id="divisionid" disabled class="form-control">
-               
             </select>
         </div>
         <div class="col-12 col-md-3">
@@ -288,7 +286,7 @@
             <input ID="lpnid" disabled class="form-control" />
         </div>
 
-    
+
 
     </div>
     <div class="row gx-3 gy-2 px-3 mb-3" id="detail2">
@@ -310,9 +308,9 @@
             <input ID="observations" disabled maxlength="500" class="form-control" />
 
         </div>
-      
+
     </div>
-    
+
 </div>
 
 
@@ -481,8 +479,8 @@
                         <th>Rack Id</th>
                         <th>Rack Name</th>
                         <th>Level</th>
-                       
-                        
+
+
                         <th>Status Id</th>
                         <th>Status Name</th>
                         <th>Serial ID</th>
@@ -519,8 +517,8 @@
                                     <td>@item.Idrack</td>
                                     <td>@item.rackName</td>
                                     <td>@item.Level</td>
-                                  
-                                   
+
+
                                     <td>@item.Idstatus</td>
                                     <td>@item.statusName</td>
                                     <td>@item.Serialid</td>
@@ -552,26 +550,26 @@
                         <th>ID</th>
                         <th>Transaction Type ID</th>
                         <th>Transaction Type Name</th>
-                        
+
                         <th>Bin ID</th>
                         <th>Bin Name</th>
                         <th>Part Number</th>
                         <th>Qty Input</th>
                         <th>Qty Output</th>
                         <th>Qty Balance</th>
-                        
+
                         <th>Location ID</th>
                         <th>Location Name</th>
                         <th>Inventory Type ID</th>
                         <th>Inventory Type Name</th>
                         <th>Rack ID</th>
                         <th>Level</th>
-                      
+
                         <th>Status Id</th>
                         <th>Status Name</th>
                         <th>Serial ID</th>
                         <th>Date Created</th>
-                      
+
                         <th>Company Id</th>
                         <th>Company Name</th>
                         <th>Company Client</th>
@@ -611,12 +609,12 @@
                                     <td>@item.inventoryTypeName</td>
                                     <td>@item.Idrack</td>
                                     <td>@item.Level</td>
-                                 
+
                                     <td>@item.Idstatus</td>
                                     <td>@item.statusName</td>
                                     <td>@item.Serialid</td>
                                     <td>@item.Datecreated</td>
-                                    
+
                                     <td>@item.Idcompany</td>
                                     <td>@item.companyName</td>
                                     <td>@item.Idcompanyclient</td>
@@ -983,8 +981,79 @@
 
         </div>
     </div>
-
 </div>
+<div class="card shadow-sm mt-2">
+
+
+
+    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 display-6 fs-4 text-primary ms2">ZEBRA Inventory movement</h6>
+        <a href="#" class="text-decoration-none" onclick="hidezebramov()">
+            <i id="ocultarZebraMov" class="fa-solid fa-eye"></i>
+        </a>
+    </div>
+
+    <div class="card-body" id="divzebramov1">
+
+        <div class="row mt-4">
+
+            <table id="tableuserzebramovinv" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+                <thead class="table-light">
+                    <tr>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>Part Definition Id</th>
+                        <th>Part Number</th>
+                        <th>Inv Type Id Source</th>
+                        <th>Inv Source Name</th>
+                        <th>Inv Type Id Dest</th>
+                        <th>Inv Dest Name</th>
+                        <th>SerialNo</th>
+                        <th>Qty</th>
+                        <th>Notes</th>
+                        <th>RepairNo</th>
+                        <th>DateInserted</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.ListInvMovZebra != null)
+                    {
+
+                        @if (Model.ListInvMovZebra.Count > 0)
+                        {
+                            foreach (var item in Model.ListInvMovZebra)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@item.Id</td>
+                                    <td>@item.PartDefinitionId</td>
+                                    <td>@item.PartNumberName</td>
+                                    <td>@item.InventoryTypeIdSource</td>
+                                    <td>@item.InvSourceName</td>
+                                    <td>@item.InventoryTypeIdDest</td>
+                                    <td>@item.InvDestName</td>
+                                    <td>@item.SerialNo</td>
+                                    <td>@item.Qty</td>
+                                    <td>@item.Notes</td>
+                                    <td>@item.RepairNo</td>
+                                    <td>@item.DateInserted</td>
+
+                                </tr>
+                            }
+                        }
+                    }
+
+                </tbody>
+            </table>
+
+
+        </div>
+
+    </div>
+</div>
+
+
 
 
 
@@ -1022,6 +1091,20 @@
                    "searching": false
                });
 
+
+
+                 $('#tableuserzebramovinv').DataTable({
+                    scrollX:true,
+                   "bPaginate": false,
+                   "bLengthChange": false,
+                   "bFilter": true,
+                   "bInfo": false,
+                   "bAutoWidth": false,
+                   "searching": false
+
+               });
+
+
                 $('#tableuserwmsdetail').DataTable({
                     scrollX:true,
                    "bPaginate": false,
@@ -1030,7 +1113,7 @@
                    "bInfo": false,
                    "bAutoWidth": false,
                    "searching": false
-                    
+
                });
 
 
@@ -1209,8 +1292,8 @@
             $('#tableuserinputcalls').DataTable().clear().draw();
             $('#tableuserbinitems').DataTable().clear().draw();
             $('#tableuser').DataTable().clear().draw();
-           
-            
+
+
             $('#PickProcessHdr_Id').val('');
             $('#PickProcessHdr_DeliveryId').val('');
             $('#PickProcessHdr_ConsignRequestID').val('');
@@ -1262,7 +1345,7 @@
             $('#OrderRepair_repairHdr_ZipCode').val('');
             $('#OrderRepair_repairHdr_DateInserted').val('');
             $('#OrderRepair_repairHdr_DateCreated').val('');
-      
+
 
           }
 
@@ -1457,7 +1540,7 @@
 
           function clearComboBox()
           {
-            
+
             var $bin = $('#binselid');
             var $concepts = $('#conceptid');
             var $transactions = $('#transactionid');
@@ -1492,7 +1575,7 @@
             var $companyClient = $('#companyclient');
 
             var locationid = $(this).val();
-          
+
             clearComboBox();
 
              $companyClient.empty()
@@ -1512,13 +1595,13 @@
                     data: { __RequestVerificationToken: token,  locationid: locationid }})
             .done(function (res)
             {
-                
+
                 if (res.message == "OK")
                 {
-                    
+
                     var list = (res && res.data) ? res.data : [];
 
-                  
+
 
                     if (Array.isArray(list) && list.length)
                     {
@@ -1539,7 +1622,7 @@
 
                     errorAction(res.message);
                 }
-             
+
 
 
             })
@@ -1551,10 +1634,10 @@
 
                 hideSpinner();
             });
-        
+
         })
-          
-          
+
+
         $('#companyclient').change(function()
         {
 
@@ -1633,7 +1716,7 @@
 
                 hideSpinner();
             });
-          
+
         })
 
 
@@ -1666,7 +1749,7 @@
 
               const partnumber = $('#partnoid').val();
 
-              
+
 
               const typereserveid = $('#typereserveid').val();
 
@@ -1742,7 +1825,7 @@
                     })
                     .done(function (data)
                     {
-                       
+
 
                        if (data.status == "OK")
                        {
@@ -1903,7 +1986,7 @@
         }
 
 
-         function hidecalls()
+        function hidecalls()
         {
 
            const icono = document.getElementById("ocultarCalls");
@@ -1925,7 +2008,31 @@
 
         }
 
-            function hideservtrack()
+
+         function hidezebramov()
+        {
+
+           const icono = document.getElementById("ocultarZebraMov");
+
+           const $div1 = $('#divzebramov1');
+           
+
+            if (icono.classList.contains("fa-eye")) {
+                $('#ocultarZebraMov').removeClass("fa-eye");
+                $('#ocultarZebraMov').addClass("fa-eye-slash");
+                $div1.animate({ opacity: 0, height: "toggle" }, 400);
+              
+            } else {
+                $('#ocultarZebraMov').addClass("fa-eye");
+                $('#ocultarZebraMov').removeClass("fa-eye-slash");
+                $div1.animate({ opacity: 1, height: "toggle" }, 400);
+            
+            }
+
+        }
+
+
+        function hideservtrack()
         {
 
            const icono = document.getElementById("ocultarServtrack");
@@ -1981,7 +2088,7 @@
                   return;
             }
 
-           
+
 
             let table = $('#tableuser').DataTable();
 
@@ -2041,7 +2148,7 @@
                         errorAction("Division ID is required");
                         return;
             }
-            
+
             var lpnid = $('#lpnid').val();pickprocessnumber
              if (lpnid === "")
              {
@@ -2080,10 +2187,10 @@
                        {
                             errorAction(data.status);
                        }
-            
+
             })
             .fail(function(jqXHR, textStatus, errorThrown){
-            
+
                         if (jqXHR.status === 500) {
                     errorAction('Error interno del servidor. Intenta más tarde.');
                 } else {

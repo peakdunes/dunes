@@ -19,15 +19,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// <returns></returns>
         Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct);
 
-        /// <summary>
-        /// Get all (input, output) calls for a delivery id
-        /// </summary>
-        /// <param name="DeliveryId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId,CancellationToken ct);
-
-
+      
 
         /// <summary>
         /// Displays the 4 tables associated with an Pick Process in Servtrack.

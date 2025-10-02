@@ -49,23 +49,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
             //throw new NotImplementedException();
         }
 
-        /// <summary>
-        /// Get all call Peak to ZEBRA information
-        /// </summary>
-        /// <param name="DeliveryId"></param>
-        /// <param name="token"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            HttpResponseMessage resp;
-         
-            resp = await _httpClient.GetAsync($"/api/PickProcessINV/pickprocess-all-calls/{DeliveryId}");
-
-            return await resp.ReadAsApiResponseAsync<PickProcessCallsReadDto>(ct);
-        }
+       
 
         public async Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, string token, CancellationToken ct)
         {

@@ -19,13 +19,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
         /// <returns></returns>
         Task<PickProcessRead?> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct);
 
-        /// <summary>
-        /// Gell all (input, output) calls for an pick process
-        /// </summary>
-        /// <param name="DeliveryId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<PickProcessCallsRead?> GetPickProcessAllCalls(string DeliveryId, CancellationToken ct);
+        
 
 
         /// <summary>

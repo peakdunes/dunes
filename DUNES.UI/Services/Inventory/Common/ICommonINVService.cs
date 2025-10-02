@@ -1,4 +1,5 @@
-﻿using DUNES.Shared.DTOs.Inventory;
+﻿using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
@@ -245,5 +246,15 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <returns></returns>
         Task<ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime startDate, string token, CancellationToken ct);
 
+
+
+        /// <summary>
+        /// Get all input - output call for a ASN - Pick Process Document
+        /// </summary>
+        /// <param name="DeliveryId"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<PickProcessCallsReadDto>> GetAllCalls(string DocumentId, string processtype, string token, CancellationToken ct);
     }
 }

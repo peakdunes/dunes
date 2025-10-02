@@ -5,7 +5,7 @@ namespace DUNES.API.ReadModels.Inventory
     /// <summary>
     /// input and output pickprocess calls 
     /// </summary>
-    public class PickProcessCallsRead
+    public class ProcessCallsRead
     {
         /// <summary>
         /// ZEBRA to Peak list calls

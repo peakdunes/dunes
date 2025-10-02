@@ -21,6 +21,8 @@ namespace DUNES.Shared.DTOs.Inventory
         public WMSTransactionTm? ListTransactions { get; set; }
 
         public TorderRepairTm? OrderRepair { get; set; }
+
+        public List<TzebB2bReplacementPartsInventoryLogDto>? ListInvMovZebra { get; set; }
         
     }
 

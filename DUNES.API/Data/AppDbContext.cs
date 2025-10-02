@@ -248,6 +248,20 @@ namespace DUNES.API.Data
         /// Zebra inventory log transactions
         /// </summary>
         public virtual DbSet<TzebB2bReplacementPartsInventoryLog> TzebB2bReplacementPartsInventoryLog { get; set; }
+
+
+        /// <summary>
+        /// XML Files PICK_REPONSE LOGS
+        /// </summary>
+        public virtual DbSet<TzebB2bOutBoundResponsesLogFullXmls> TzebB2bOutBoundResponsesLogFullXmls { get; set; }
+
+
+        /// <summary>
+        /// XML Files PICK_REPONSE
+        /// </summary>
+        public virtual DbSet<TzebB2bInbConsReqsFullXmls> TzebB2bInbConsReqsFullXmls { get; set; }
+
+
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
@@ -257,6 +271,32 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TzebB2bInbConsReqsFullXmls>(entity =>
+            {
+                entity.ToTable("_TZEB_B2B_Inb_Cons_Reqs_fullXMLs");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+                entity.Property(e => e.DateTimeInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.FullXml).HasColumnName("fullXML");
+            });
+
+            modelBuilder.Entity<TzebB2bOutBoundResponsesLogFullXmls>(entity =>
+            {
+                entity.ToTable("_TZEB_B2B_OutBound_Responses_Log_fullXMLs");
+
+                entity.Property(e => e.Id)
+                    .ValueGeneratedNever()
+                    .HasColumnName("id");
+                entity.Property(e => e.DateTimeInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime");
+                entity.Property(e => e.FullXml).HasColumnName("fullXML");
+            });
 
             modelBuilder.Entity<TzebB2bReplacementPartsInventoryLog>(entity =>
             {

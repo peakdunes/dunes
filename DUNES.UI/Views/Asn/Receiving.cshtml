@@ -13,6 +13,12 @@
     .derecha {
         text-align: right;
     }
+
+    .table-responsive .dropdown-menu {
+        position: absolute !important;
+        z-index: 1055 !important; /* más alto que la card y datatables */
+        transform: translate3d(0, 0, 0) !important;
+    }
 </style>
 
 <div class="modal fade" id="modalBinsDistribution" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
@@ -215,7 +221,7 @@
 
     <div class="card shadow-sm mb-2">
         <div class="card-header bg-white">
-            <h6 class="mb-0 subtitleDunes">ASN Header</h6>
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">ASN Header</h6>
         </div>
 
 
@@ -267,18 +273,77 @@
 
     </div>
 
+    <div class="card shadow-sm mb-2">
 
 
-   
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Information to process in WMS </h6>
+            <a href="#" class="text-decoration-none" onclick="hidedetail()">
+                <i id="ocultarDetail" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+
+        <div class="row gx-3 gy-2 px-3 mb-3" id="detail1">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Location</label>
+                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
+                    <option disabled selected>Select Location</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="companyclient" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Division</label>
+                <select id="divisionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Tracking Number ASN</label>
+                <input ID="trackingnumberid" disabled class="form-control" />
+            </div>
+
+
+
+        </div>
+        <div class="row gx-3 gy-2 px-3 mb-3" id="detail2">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Concept</label>
+                <select id="conceptid" disabled class="form-control">
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Input Transfer Transaction Type</label>
+                <select id="transactionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Observations (500)</label>
+                <input ID="observations" disabled maxlength="500" class="form-control" />
+
+            </div>
+
+        </div>
+
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-header bg-white">
-            <h6 class="mb-0 subtitleDunes">Part Number Detail</h6>
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Part Number Detail</h6>
         </div>
 
         <div class="card-body p-2">
             <div class="table-responsive">
                 <table id="tableuser" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap;">
-
                     <thead class="table-light">
                         <tr>
                             <th>Actions</th>
@@ -302,20 +367,28 @@
                             {
                                 <tr>
                                     <td class="text-center">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Actions
+                                        <div class="btn-group" role="group" aria-label="Actions">
+                                            <!-- Delete -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-danger me-1 btn-icon"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Delete"
+                                                    onclick="deleteAllBinsDistribution(@item.LineId)">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                                <span class="visually-hidden">Delete</span>
                                             </button>
-                                            <ul class="dropdown-menu">
-                                              
-                                                <li>
-                                                    <a class="dropdown-item" onclick="deleteAllBinsDistribution(@item.LineId)">🗑 Delete</a>
-                                                </li>
 
-                                                <li>
-                                                    <a class="dropdown-item" onclick="openmodal(@item.LineId,@item.QuantityPending,'@item.ItemNumber' )"> 📦 Bins</a>
-                                                </li>
-                                            </ul>
+                                            <!-- Bins -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-icon"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Bins"
+                                                    onclick="openmodal(@item.LineId, @item.QuantityPending, '@item.ItemNumber')">
+                                                <i class="fa-solid fa-box-open"></i>
+                                                <span class="visually-hidden">Bins</span>
+                                            </button>
                                         </div>
                                     </td>
                                     <td>@item.Id</td>
@@ -337,6 +410,115 @@
             </div>
         </div>
     </div>
+
+
+    <div class="card shadow-sm mt-2">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Pick Process Calls Information</h6>
+            <a href="#" class="text-decoration-none" onclick="hidecalls()">
+                <i id="ocultarCalls" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+        <div class="card-body" id="divbody1">
+            <div class="row">
+                <table id="tableuserinputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        ZEBRA TO PEAKTECH CALLS
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>Id</th>
+                            <th>TransactionCode</th>
+                            <th>DateTimeInserted</th>
+                            <th>Error</th>
+                            <th>Processed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.CallsRead != null)
+                        {
+                            foreach (var item in Model.CallsRead.inputCallsList)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.Id</td>
+                                    <td>@item.TransactionCode</td>
+                                    <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.Error</td>
+                                    <td>@item.Processed</td>
+
+                                </tr>
+
+                            }
+                        }
+                 
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+
+        <div class="card-body" id="divbody2">
+            <div class="row">
+                <table id="tableuseroutputcalls" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        PEAKTECH TO ZEBRA CALLS
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>Id</th>
+                            <th>TypeOfCallId</th>
+                            <th>TypeOfCallDescription</th>
+                            <th>DateTimeInserted</th>
+                            <th>AckReceived</th>
+                            <th>Result</th>
+                            <th>DateTimeSent</th>
+                            <th>InProcess</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       @*  @if (Model?.CallsRead.outputCallsList != null)
+                        {
+
+
+                            foreach (var item in Model.CallsRead.outputCallsList)
+                            {
+                                <tr>
+                                    <td>
+                                    </td>
+                                    <td>@item.Id</td>
+                                    <td>@item.TypeOfCallId</td>
+                                    <td>@item.TypeOfCallDescription</td>
+                                    <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.AckReceived</td>
+                                    <td>@item.Result</td>
+                                    <td>@Convert.ToDateTime(@item.DateTimeSent).ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.InProcess</td>
+
+
+                                </tr>
+
+                            }
+                        }
+ *@
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+    </div>
+
+
+    
 
     <form id="af" style="display:none">
         @Html.AntiForgeryToken()
@@ -428,11 +610,108 @@
             });
         });
 
+          let currentRequest = null;
 
+           $('#locationid').change(async function(){
+
+            if (currentRequest) {
+                currentRequest.abort();
+            }
+
+            var $companyClient = $('#companyclient');
+
+            var locationid = $(this).val();
+
+            clearComboBox();
+
+             $companyClient.empty()
+            .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+
+             if (!locationid) return;
+
+
+              // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            showSpinner();
+
+            alert('pasando');
+
+            currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
+                    data: { __RequestVerificationToken: token,  locationid: locationid }})
+            .done(function (res)
+            {
+
+                if (res.message == "OK")
+                {
+                    var list = (res && res.data) ? res.data : [];
+
+                    if (Array.isArray(list) && list.length)
+                    {
+                        $.each(list, function (_, it) {
+                        var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                        var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                        $companyClient.append($('<option>', { value: id, text: name }));
+                        });
+                        $companyClient.prop('disabled', false);
+                    }
+                }
+                else
+                {
+                      $('#locationid option').prop('selected', function () {
+                                return this.defaultSelected;
+                      });
+
+                    errorAction(res.message);
+                }
+
+            })
+            .fail(function (xhr, status) {
+                 if (status !== "abort") {
+                    errorAction("Error:", status);
+                }
+            }).always(function(){
+
+                hideSpinner();
+            });
+
+        })
+
+          function clearComboBox()
+          {
+
+            var $bin = $('#binselid');
+            var $concepts = $('#conceptid');
+            var $transactions = $('#transactionid');
+            var $division = $('#divisionid');
+
+            $bin.empty()
+            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+            // reset select concepts
+            $concepts.empty()
+            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+            // reset select transactions
+            $transactions.empty()
+            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+            $division.empty()
+            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
+            .prop('disabled', true);
+
+          }
 
         $('#companyclient').change(function()
         {
 
+            
 
             var companyClient = $(this).val();
 
@@ -442,9 +721,10 @@
             var $inventorytypes = $('#inventorytypeid');
             var $itemstatus = $('#statusid');
             var $wmsinventorytypes = $('#typeid');
-            var $itemstatusdefault = $('#itemstatusdefault');
+            var $division = $('#divisionid');
+            // var $itemstatusdefault = $('#itemstatusdefault');
 
-            itemstatusdefault
+            // itemstatusdefault
 
             // reset select bins
             $bin.empty()
@@ -471,9 +751,14 @@
             .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
             .prop('disabled', true);
 
-            $itemstatusdefault.empty()
-            .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
+
+               $division.empty()
+            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
             .prop('disabled', true);
+
+            // $itemstatusdefault.empty()
+            // .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
+            // .prop('disabled', true);
 
 
             $wmsinventorytypes.empty()
@@ -548,16 +833,16 @@
                     $itemstatus.append($('<option>', { value: id, text: name }));
                     });
                     $itemstatus.prop('disabled', false);
-
-
-                     $.each(lists, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $itemstatusdefault.append($('<option>', { value: id, text: name }));
-                    });
-                    $itemstatusdefault.prop('disabled', false);
-
                 }
+
+                //     //  $.each(lists, function (_, it) {
+                //     // var id = (it.id !== undefined) ? it.id : it.Id;
+                //     // var name = (it.Name !== undefined) ? it.name : it.name;
+                //     // $itemstatusdefault.append($('<option>', { value: id, text: name }));
+                //     // });
+                //     // $itemstatusdefault.prop('disabled', false);
+
+                // }
 
                   var listw = (res && res.data.listwmsinventorytype) ? res.data.listwmsinventorytype : [];
                 if (Array.isArray(listw) && list.length)
@@ -570,9 +855,21 @@
                     $wmsinventorytypes.prop('disabled', false);
                 }
 
+                var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+                    
+                if (Array.isArray(lisdiv) && lisdiv.length)
+                    {
+                        $.each(lisdiv, function (_, it) {
 
+                        var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                        var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                        $division.append($('<option>', { value: id, text: name }));
+                        });
+                        $division.prop('disabled', false);
+                    }
 
-
+                   $('#trackingnumberid').prop('disabled', false);
+                   $('#observations').prop('disabled', false);
             })
             .fail(function (xhr) {
                 console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
@@ -608,7 +905,7 @@
 
         function openmodal(id, qtypending, partnumber)
         {
-
+            alert(qtypending);
           
             $('#lineid').val(id);
             $('#qtyreceive').val(qtypending);
@@ -1071,21 +1368,46 @@
             var qtypendind = item.qtyshipped - item.qtypending;
                     
 
-            return `
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Actions
-                </button>
-                <ul class="dropdown-menu">
+            // return `
+            // <div class="dropdown">
+            //     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            //         Actions
+            //     </button>
+            //     <ul class="dropdown-menu">
                    
-                    <li>
-                        <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')"> 📦 Bins</a>
-                    </li>
-                </ul>
-            </div>`;
+            //         <li>
+            //             <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
+            //         </li>
+            //         <li>
+            //             <a class="dropdown-item" onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')"> 📦 Bins</a>
+            //         </li>
+            //     </ul>
+            // </div>`;
+
+
+              return `<button type="button"
+                                                    class="btn btn-sm btn-outline-danger me-1 btn-icon"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Delete"
+                                                    onclick="deleteAllBinsDistribution(${item.line})">
+                                                <i class="fa-solid fa-trash-can"></i>
+                                                <span class="visually-hidden">Delete</span>
+                                            </button>
+
+                                            <!-- Bins -->
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary btn-icon"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="Bins"
+                                                    onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')">
+                                                <i class="fa-solid fa-box-open"></i>
+                                                <span class="visually-hidden">Bins</span>
+                                            </button>`;
+
+
+
         }
 
         async function distributionByDefault()
@@ -1429,6 +1751,139 @@
 
                        }).fail(function () { }).always(function () { hideSpinner(); });
               }
+
+
+
+        async function processPick()
+        {
+
+            const ok = await confirmAction("¿Do you want to proccess this delivery ?");
+
+            if (!ok) return;
+
+
+            var DeliveryId = $('#PickProcessHdr_DeliveryId').val();
+
+            if (DeliveryId == null || DeliveryId == '')
+            {
+            errorAction("Pick Process Number is required");
+            return;
+            }
+
+
+
+            let table = $('#tableuser').DataTable();
+
+            var continueP = true;
+
+            table.rows({ search: 'applied' }).every(function () {
+            let data = this.data();  // obtienes el objeto por fila
+
+            let val1 = Number(data.requestquantity);
+            let val2 = Number(data.quantityprocess);
+
+
+            if (val1 !== val2)
+            {
+            continueP = false
+            }
+            });
+
+            if (!continueP)
+            {
+            errorAction("You must receive all items");
+            return;
+            }
+
+            const locationid = document.getElementById("locationid").value;
+
+            if (locationid === "") {
+            errorAction("Location is required");
+            return;
+            }
+
+
+            const companyclient = document.getElementById("companyclient").value;
+
+            if (companyclient === "") {
+            errorAction("Company client is required");
+            return;
+            }
+
+            const conceptid = document.getElementById("conceptid").value;
+
+            if (conceptid === "") {
+            errorAction("Concept ID client is required");
+            return;
+            }
+
+            const transactionid = document.getElementById("transactionid").value;
+
+            if (transactionid === "") {
+            errorAction("Transaction ID client is required");
+            return;
+            }
+
+            const division = document.getElementById("divisionid").value;
+
+            if (division === "") {
+            errorAction("Division ID is required");
+            return;
+            }
+
+            var lpnid = $('#lpnid').val();pickprocessnumber
+            if (lpnid === "")
+            {
+            errorAction("LPN is required");
+            return;
+            }
+
+            var documentReference = DeliveryId;
+
+            var token = $('input[name="__RequestVerificationToken"]').val();
+
+            var observations = $('#observations').val();
+
+            alert('todo validado');
+
+            showSpinner();
+
+            $.ajax({url:"@Url.Action("processAsn", "ASN")",
+                data:{DeliveryId:DeliveryId,
+                companyclient: companyclient,
+                conceptid: conceptid,
+                transactionid : transactionid,
+                division : division,
+                lpnid : lpnid,
+                observations:observations,
+                locationid:locationid
+                }, type:"post", headers: { 'RequestVerificationToken': token }})
+                .done(function(data){
+
+                    if (data.status == "OK")
+                    {
+                    loadDataDetail(data.lista);
+
+                    }
+                    else
+                    {
+                    errorAction(data.status);
+                    }
+
+                    })
+                .fail(function(jqXHR, textStatus, errorThrown){
+
+                    if (jqXHR.status === 500) {
+                        errorAction('Error interno del servidor. Intenta más tarde.');
+                    } else {
+                        errorAction('Error inesperado: ' + jqXHR.status);
+                    }
+                    })
+                .always(function()
+                    {
+                        hideSpinner();
+                        });
+        }
 
     </script>
 }

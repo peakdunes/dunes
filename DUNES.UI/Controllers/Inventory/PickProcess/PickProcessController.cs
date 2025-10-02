@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.UI.Controllers.Inventory.PickProcess
 {
@@ -29,6 +30,8 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
+
+        private readonly string _typeDocument = "PICKPROCESS";
 
 
         public PickProcessController(IHttpClientFactory httpClientFactory, IConfiguration config,
@@ -131,7 +134,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                     //pick process input and output calls
 
-                    var infocall = await _service.GetPickProcessAllCalls(pickprocessnumber, token, ct);
+                    var infocall = await _CommonINVService.GetAllCalls(pickprocessnumber, _typeDocument, token, ct);
 
                     if (infocall.Data != null)
                     {
@@ -177,8 +180,30 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 //ZEBRA inventory movement
 
-                var infozebramov = await _CommonINVService.GetAllInventoryTransactionsByDocumentStartDate(pickprocessnumber, Convert.ToDateTime("09/30/2525 11:00:00"), token, ct);
+                DateTime DateMovInventory = DateTime.Now;
 
+                if (infopickProcess.Data.PickProcessHdr.OutConsReqsId > 0)
+                {
+                    if (infopickProcess.Data.PickProcessHdr.DateTimeConfirmed != null)
+                    {
+                        DateMovInventory = infopickProcess.Data.PickProcessHdr.DateTimeConfirmed;
+
+                        DateMovInventory = Convert.ToDateTime("09/20/2025");
+                    }
+
+                    var infozebramov = await _CommonINVService.GetAllInventoryTransactionsByDocumentStartDate(pickprocessnumber, DateMovInventory, token, ct);
+
+                    if (infozebramov.Data != null)
+                    {
+                        objresult.ListInvMovZebra = infozebramov.Data;
+                    }
+
+
+                    //ZEBRA Pick Response CALL
+
+
+
+                }
                 HttpContext.Session.SetString("pickProcessDetail", JsonConvert.SerializeObject(infopickProcess.Data.ListItems));
 
                 HttpContext.Session.SetString("distributiondetail", JsonConvert.SerializeObject(listdistribution));

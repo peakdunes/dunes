@@ -12,7 +12,7 @@ namespace DUNES.UI.Services.Inventory.PickProcess
       
         Task<ApiResponse<PickProcessRequestDto>>  GetPickProcessAllInfo(string DeliveryId, string token, CancellationToken ct);
 
-        Task<ApiResponse<PickProcessCallsReadDto>> GetPickProcessAllCalls(string DeliveryId, string token, CancellationToken ct);
+       
 
         Task<ApiResponse<WMSTransactionTm>> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, string token, CancellationToken ct);
 

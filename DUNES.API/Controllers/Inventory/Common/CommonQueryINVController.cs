@@ -56,19 +56,22 @@ namespace DUNES.API.Controllers.Inventory.Common
         /// </summary>
         /// <param name="DocumentNumber"></param>
         /// <param name="ct"></param>
-        /// <param name="StartDate"></param>
+        /// <param name="startDate"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<List<TzebB2bReplacementPartsInventoryLogDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        [HttpGet("inv-transactions-by-document-date/{DocumentNumber}/{StartDate}")]
-        public async Task<IActionResult> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, DateTime StartDate, CancellationToken ct)
+        [HttpGet("inv-transactions-by-document-date/{DocumentNumber}")]
+        public async Task<IActionResult> GetAllInventoryTransactionsByDocumentStartDate(string DocumentNumber, [FromQuery] DateTime startDate, CancellationToken ct)
         {
             return await HandleApi(async ct =>
             {
 
-                return await _commonQueryINVService.GetAllInventoryTransactionsByDocumentStartDate(DocumentNumber, StartDate, ct);
+                return await _commonQueryINVService.GetAllInventoryTransactionsByDocumentStartDate(DocumentNumber, startDate, ct);
             }, ct);
         }
+
+       
+
 
         /// <summary>
         /// Get all inventory transactions for a Part Number ID
@@ -103,6 +106,27 @@ namespace DUNES.API.Controllers.Inventory.Common
             {
 
                 return await _commonQueryINVService.GetDivisionByCompanyClient(CompanyClient, ct);
+            }, ct);
+        }
+
+        /// <summary>
+        /// Get all input - output call for a ASN - Pick Process Document
+        /// </summary>
+        /// <param name="DocumentId"></param>
+        /// <param name="processtype"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpGet("all-calls/{DocumentId}/{processtype}")]
+        public async Task<IActionResult> GetAllCalls(string DocumentId, string processtype, CancellationToken ct)
+        {
+            return await HandleApi(async ct =>
+            {
+                return await _commonQueryINVService.GetAllCalls(DocumentId, processtype, ct);
+
+
             }, ct);
         }
 

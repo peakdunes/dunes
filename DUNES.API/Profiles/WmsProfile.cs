@@ -20,6 +20,10 @@ namespace DUNES.API.Profiles
             CreateMap<TdivisionCompany, TdivisionCompanyDto>().ReverseMap();
             CreateMap<TzebB2bMasterPartDefinition,TzebB2bMasterPartDefinitionDto>().ReverseMap();
 
+            CreateMap<TzebB2bInbConsReqs,TzebB2bInbConsReqsDto>().ReverseMap();
+
+            CreateMap <TzebB2bInventoryType, TzebB2bInventoryTypeDto>().ReverseMap();
+
         }
 
     }
