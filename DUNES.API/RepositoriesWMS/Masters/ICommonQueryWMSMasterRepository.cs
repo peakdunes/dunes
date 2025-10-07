@@ -1,5 +1,4 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
-using DUNES.API.ModelWMS.Masters;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.RepositoriesWMS.Masters

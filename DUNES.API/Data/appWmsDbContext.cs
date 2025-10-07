@@ -1,6 +1,5 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
-using DUNES.API.ModelWMS.Masters;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Data

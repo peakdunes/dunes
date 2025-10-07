@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Inventory.ASN;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Data;
@@ -16,7 +16,7 @@ public partial class context400 : DbContext
     {
     }
 
-    public virtual DbSet<TdivisionCompany> TdivisionCompany { get; set; }
+    public virtual DbSet<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog> TzebB2bIrReceiptLineItemTblItemInbConsReqsLog { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -24,37 +24,33 @@ public partial class context400 : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TdivisionCompany>(entity =>
+        modelBuilder.Entity<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog>(entity =>
         {
-            entity.HasKey(e => new { e.DivisionDsc, e.CompanyDsc })
-                .IsClustered(false)
-                .HasFillFactor(90);
+            entity.ToTable("_TZEB_B2B_IR_RECEIPT_LINE_ITEM_TBL_ITEM_Inb_Cons_Reqs_Log");
 
-            entity.ToTable("_TDivision_Company");
-
-            entity.HasIndex(e => e.CanBeOrdersPartiallyShipped, "IX__TDivision_Company").HasFillFactor(90);
-
-            entity.HasIndex(e => new { e.DivisionDsc, e.CanBeOrdersPartiallyShipped }, "IX__TDivision_Company_1").HasFillFactor(90);
-
-            entity.HasIndex(e => new { e.DivisionDsc, e.CompanyDsc, e.CanBeOrdersPartiallyShipped }, "IX__TDivision_Company_2").HasFillFactor(90);
-
-            entity.HasIndex(e => e.DivisionDsc, "_dta_index__TDivision_Company_8_116247519__K1_9987").HasFillFactor(90);
-
-            entity.HasIndex(e => e.CompanyDsc, "_dta_index__TDivision_Company_8_116247519__K2").HasFillFactor(90);
-
-            entity.HasIndex(e => e.CompanyDsc, "_dta_index__TDivision_Company_c_8_116247519__K2")
-                .IsClustered()
-                .HasFillFactor(90);
-
-            entity.Property(e => e.DivisionDsc)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasColumnName("Division_Dsc");
-            entity.Property(e => e.CompanyDsc)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("Company_Dsc");
-            entity.Property(e => e.Active).HasDefaultValue(true);
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DateTimeInserted)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("DateTime_Inserted");
+            entity.Property(e => e.InventoryItemId).HasColumnName("INVENTORY_ITEM_ID");
+            entity.Property(e => e.IrReceiptOutHdrDetItemId).HasColumnName("IR_RECEIPT_OUT_HDR_DET_ITEM_ID");
+            entity.Property(e => e.IsCePart).HasColumnName("Is_CE_Part");
+            entity.Property(e => e.IsRtvPart).HasColumnName("Is_RTV_Part");
+            entity.Property(e => e.ItemNumber)
+                .HasMaxLength(40)
+                .HasColumnName("ITEM_NUMBER");
+            entity.Property(e => e.LineNum).HasColumnName("LINE_NUM");
+            entity.Property(e => e.Quantity).HasColumnName("QUANTITY");
+            entity.Property(e => e.ReceiptDate).HasColumnName("RECEIPT_DATE");
+            entity.Property(e => e.ShipmentLineId).HasColumnName("SHIPMENT_LINE_ID");
+            entity.Property(e => e.To3plLocatorStatus)
+                .HasMaxLength(10)
+                .HasColumnName("TO_3PL_LOCATOR_STATUS");
+            entity.Property(e => e.TransactionDate).HasColumnName("TRANSACTION_DATE");
+            entity.Property(e => e.UnitOfMeasure)
+                .HasMaxLength(25)
+                .HasColumnName("UNIT_OF_MEASURE");
         });
 
         OnModelCreatingPartial(modelBuilder);

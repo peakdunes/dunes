@@ -207,6 +207,7 @@ builder.Services.AddSwaggerGen(c =>
 
 //AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 builder.Services.AddHttpContextAccessor();
 

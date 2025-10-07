@@ -39,6 +39,13 @@
 
                         </div>
                     </div>
+                    <div class="col-md-3" style="display:display">
+                        <div class="form-group">
+                            <label class="control-label">ASN Line Id</label>
+                            <input id="asnlineid" readonly="readonly" class="form-control" />
+
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
 
@@ -385,7 +392,7 @@
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
                                                     title="Bins"
-                                                    onclick="openmodal(@item.LineId, @item.QuantityPending, '@item.ItemNumber')">
+                                                    onclick="openmodal(@item.LineId, @item.QuantityPending, '@item.ItemNumber', @item.Id)">
                                                 <i class="fa-solid fa-box-open"></i>
                                                 <span class="visually-hidden">Bins</span>
                                             </button>
@@ -407,6 +414,11 @@
                         }
                     </tbody>
                 </table>
+            </div>
+            <div class="row justify-content-end">
+                <div class="col-3 col-md-auto d-grid">
+                    <button type="button" onclick="processASN()" class="btn btn-primary">Process</button>
+                </div>
             </div>
         </div>
     </div>
@@ -903,14 +915,15 @@
         });
 
 
-        function openmodal(id, qtypending, partnumber)
+        function openmodal(id, qtypending, partnumber, asnlineid)
         {
-            alert(qtypending);
+            alert(asnlineid);
           
             $('#lineid').val(id);
             $('#qtyreceive').val(qtypending);
             $('#qtypending').val(qtypending);
             $('#partnoid').val(partnumber);
+            $('#asnlineid').val(asnlineid);
 
             var lineid = id;
             
@@ -1088,11 +1101,13 @@
 
              var partno = $('#partnoid').val();
 
+             var asnlineid = $('#asnlineid').val();
+
               showSpinner();
 
              $.ajax({
                  url: "@Url.Action("addqtybin", "ASN")",
-                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid, statusname : statusname }, type: "post"
+                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid, statusname : statusname, asnlineid:asnlineid }, type: "post"
              })
                  .done(function (data) {
 
@@ -1168,7 +1183,7 @@
                                 {
                                     showbuttonprocess = true;
                                     //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
                                 }
 
                                 
@@ -1401,7 +1416,7 @@
                                                     data-bs-toggle="tooltip"
                                                     data-bs-placement="top"
                                                     title="Bins"
-                                                    onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')">
+                                                    onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}', ${item.id})">
                                                 <i class="fa-solid fa-box-open"></i>
                                                 <span class="visually-hidden">Bins</span>
                                             </button>`;
@@ -1452,7 +1467,7 @@
                                     {
                                     showbuttonprocess = true;
                                     //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
                                     }
 
                                     JsonArrayShipList.push({
@@ -1754,23 +1769,21 @@
 
 
 
-        async function processPick()
+        async function processASN()
         {
 
-            const ok = await confirmAction("¿Do you want to proccess this delivery ?");
+            const ok = await confirmAction("¿Do you want to proccess this ASN ?");
 
             if (!ok) return;
 
 
-            var DeliveryId = $('#PickProcessHdr_DeliveryId').val();
+            var AsnId = $('#asdDto_asnHdr_ShipmentNum').val();
 
-            if (DeliveryId == null || DeliveryId == '')
+            if (AsnId == null || AsnId == '')
             {
-            errorAction("Pick Process Number is required");
+            errorAction("ASN Number is required");
             return;
             }
-
-
 
             let table = $('#tableuser').DataTable();
 
@@ -1778,12 +1791,12 @@
 
             table.rows({ search: 'applied' }).every(function () {
             let data = this.data();  // obtienes el objeto por fila
-
-            let val1 = Number(data.requestquantity);
-            let val2 = Number(data.quantityprocess);
-
-
-            if (val1 !== val2)
+                   
+            let val1 = Number(data.qtyshipped);
+            let val2 = Number(data.qtyreceived);
+            let val3 = Number(data.qtypending);
+                        
+            if ((val1 + val2)  !== val3)
             {
             continueP = false
             }
@@ -1831,15 +1844,13 @@
             return;
             }
 
-            var lpnid = $('#lpnid').val();pickprocessnumber
-            if (lpnid === "")
+            var trackingnumberid = $('#trackingnumberid').val();
+            if (trackingnumberid === "")
             {
-            errorAction("LPN is required");
+            errorAction("Tracking Number is required");
             return;
             }
-
-            var documentReference = DeliveryId;
-
+            
             var token = $('input[name="__RequestVerificationToken"]').val();
 
             var observations = $('#observations').val();
@@ -1849,12 +1860,12 @@
             showSpinner();
 
             $.ajax({url:"@Url.Action("processAsn", "ASN")",
-                data:{DeliveryId:DeliveryId,
+                data:{AsnId:AsnId,
                 companyclient: companyclient,
                 conceptid: conceptid,
                 transactionid : transactionid,
                 division : division,
-                lpnid : lpnid,
+                trackingnumberid : trackingnumberid,
                 observations:observations,
                 locationid:locationid
                 }, type:"post", headers: { 'RequestVerificationToken': token }})

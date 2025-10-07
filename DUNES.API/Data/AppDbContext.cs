@@ -4,6 +4,7 @@ using DUNES.API.Models.Auth;
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
 using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Masters;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
@@ -263,6 +264,22 @@ namespace DUNES.API.Data
 
 
         /// <summary>
+        /// Record for each ASN Receive Transaction
+        /// </summary>
+        public virtual DbSet<TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog> TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog { get; set; }
+
+        /// <summary>
+        /// Record for each line in ASN Receive Transaction
+        /// </summary>
+        public virtual DbSet<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog> TzebB2bIrReceiptLineItemTblItemInbConsReqsLog { get; set; }
+
+        /// <summary>
+        /// Item detail for each Receive Transaction
+        /// </summary>
+        public virtual DbSet<TzebB2bAsnLineItemTblItemPartialInbConsReqs> TzebB2bAsnLineItemTblItemPartialInbConsReqs { get; set; }
+
+
+        /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
         /// but before the model has been locked down and used to initialize the context.
@@ -271,6 +288,29 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__TZEB_B2B_Inbound_IR_RECEIPT_Consignment_Requests_Log");
+
+                entity.ToTable("_TZEB_B2B_IR_RECEIPT_OUT_HDR_DET_ITEM_Inb_Cons_Reqs_Log");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.ConsignDbkrequestId).HasColumnName("Consign_DBKRequestID");
+                entity.Property(e => e.DateTimeInserted)
+                    .HasDefaultValueSql("(getdate())")
+                    .HasColumnType("datetime")
+                    .HasColumnName("DateTime_Inserted");
+                entity.Property(e => e.OrgSystemId3pl)
+                    .HasMaxLength(150)
+                    .HasColumnName("ORG_SYSTEM_ID_3PL");
+                entity.Property(e => e.ShipmentNum)
+                    .HasMaxLength(30)
+                    .HasColumnName("SHIPMENT_NUM");
+                entity.Property(e => e.TransactionType)
+                    .HasMaxLength(30)
+                    .HasColumnName("TRANSACTION_TYPE");
+            });
 
             modelBuilder.Entity<TzebB2bInbConsReqsFullXmls>(entity =>
             {

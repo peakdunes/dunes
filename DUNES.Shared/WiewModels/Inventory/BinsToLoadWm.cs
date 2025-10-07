@@ -37,5 +37,7 @@ namespace DUNES.Shared.WiewModels.Inventory
 
         [MaxLength(100)]
         public string statusname { get; set; } = string.Empty;
+
+        public int asnlineid { get; set; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DUNES.API.ModelWMS.Masters;
+namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
 /// WMS Warehouse organization
 /// </summary>

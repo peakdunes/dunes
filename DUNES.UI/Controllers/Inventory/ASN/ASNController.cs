@@ -2,6 +2,7 @@
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Helpers;
 using DUNES.UI.Services.Admin;
@@ -205,7 +206,11 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             List<WMSInventoryTypeDto> listwmsinventorytypesresult = new List<WMSInventoryTypeDto>();
 
             if (_companyDefault <= 0 || string.IsNullOrWhiteSpace(companyclient))
-                return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
+            {
+                MessageHelper.SetMessage(this, "danger", "there is not parameter for company defailt", MessageDisplay.Inline);
+                return View(objinformation);
+            }
+            //return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
 
             // 2) Token (estándar de tu BaseController)
             var token = GetToken();
@@ -423,7 +428,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
 
         [HttpPost]
-        public IActionResult addqtybin(int binid, int typeid, int qtybin, string partno, string tagname, string typename, int lineid, int statusid, string statusname)
+        public IActionResult addqtybin(int binid, int typeid, int qtybin, string partno, string tagname, string typename, int lineid, int statusid, string statusname, int asnlineid)
 
 
         {
@@ -457,6 +462,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     objdet.statusid = statusid;
                     objdet.binid = binid;
                     objdet.statusname = statusname;
+                    objdet.asnlineid = asnlineid;
 
                     totalqty += objdet.qty;
 
@@ -492,6 +498,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                         objdet.statusid = statusid;
                         objdet.binid = binid;
                         objdet.statusname = statusname;
+                        objdet.asnlineid = asnlineid;
 
                         lista.Add(objdet);
                     }
@@ -855,5 +862,216 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             //   return new ObjectResult(new { status = errormessage, listbines = lista.Where(x => x.lineid == lineid), totalqty = totalqty, thereisdata = thereisdata, listapartnumber = listaPartNumber });
 
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProcessASN(string AsnId, string companyclient, int conceptid,
+                         int transactionid, string division, string trackingnumberid, string observations, int locationid, CancellationToken ct)
+        {
+
+
+            var listdist1 = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
+
+
+            var imad = string.Empty;
+
+            return await HandleAsync(async ct =>
+            {
+
+                var token = GetToken();
+                if (token == null)
+                    return RedirectToLogin();
+
+                int IdCompanyClient = 0;
+
+                var infocompanyclient = await _CommonINVService.GetClientCompanyInformationByName(companyclient, token, ct);
+
+                if (infocompanyclient.Data == null)
+                {
+                    return Ok(new { status = $"{companyclient} this Company client don't have information in our system " });
+                }
+
+                IdCompanyClient = infocompanyclient.Data.Id;
+
+                var infotraninput = await _CommonINVService.GetTransactionsTypeById(_companyDefault, companyclient, transactionid, token, ct);
+
+                if (infotraninput == null)
+                {
+                    return Ok(new { status = $"Transction type Id {transactionid} not found " });
+                }
+
+                int OutPutTransactionId = 0;
+
+                var infotranoutput = await _CommonINVService.GetAllActiveTransferTransactionsOutputType(_companyDefault, companyclient, token, ct);
+
+                if (infotranoutput.Data == null || infotranoutput.Data.Count <= 0)
+                {
+                    return Ok(new { status = "Output Transfer transaction not found " });
+                }
+
+                foreach (var info in infotranoutput.Data)
+                {
+                    if (info.match.ToUpper().Trim() == infotraninput.Data!.match.ToUpper().Trim())
+                    {
+                        OutPutTransactionId = info.Id;
+
+                    }
+                }
+                if (OutPutTransactionId == 0)
+                {
+                    return Ok(new { status = "Output Transfer transaction match not found " });
+                }
+
+
+
+                WMSCreateHeaderTransactionDTO hdr = new WMSCreateHeaderTransactionDTO();
+
+                hdr.Idcompany = _companyDefault;
+                hdr.Idtransactionconcept = conceptid;
+                hdr.IdUser = string.Empty; //toma el usuario en el API al momento de consumir el endpoint
+                hdr.IdUserprocess = string.Empty;
+                hdr.Idcompanyclient = IdCompanyClient;
+                hdr.Codecompanyclient = companyclient.Trim();
+                hdr.Documentreference = AsnId.Trim();
+                hdr.Observations = string.IsNullOrEmpty(observations) ? "" : observations.Trim();
+                hdr.Iddivision = division;
+
+                var organizationlist = await _CommonINVService.GetAllWareHouseOrganizationByCompanyClient(_companyDefault, companyclient, token, ct);
+
+                if (organizationlist.Data == null || organizationlist.Data.Count <= 0)
+                {
+                    return Ok(new { status = $"There is not WareHouse Orgnanization for this company client {companyclient} " });
+
+                }
+
+                var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
+
+                if (listdist == null)
+                {
+                    return Ok(new { status = $"There is not Bin distribution for this pick process {AsnId} " });
+                }
+
+                List<WMSCreateDetailTransactionDTO> Listdetails = new List<WMSCreateDetailTransactionDTO>();
+
+                foreach (var info in listdist)
+                {
+
+
+                    int iditemsel = 0;
+                    //search item information
+
+                    string partnumberzeb = info.partnumber.Contains("ZEBRA") ? info.partnumber.Trim() : "ZEBRA-" + info.partnumber.Trim();
+
+                    var itemInfo = await _CommonINVService.GetByPartNumber(partnumberzeb, token, ct);
+
+                    if (itemInfo == null || itemInfo.Data == null)
+                    {
+                        return Ok(new { status = $"There is not information for this part number {info.partnumber} " });
+                    }
+
+
+                    iditemsel = itemInfo.Data.Id;
+
+                    WMSCreateDetailTransactionDTO objdetinput = new WMSCreateDetailTransactionDTO();
+
+                    //we need to create one output transaction another input transaction
+
+                    int rackIdInput = 0;
+                    int levelIdInput = 0;
+
+                    int rackIdOutput = 0;
+                    int levelIdOutput = 0;
+
+                    foreach (var item in organizationlist.Data)
+                    {
+                        if (item.Idbin == info.binidin)
+                        {
+                            rackIdInput = item.Idrack;
+                            levelIdInput = item.Level;
+                        }
+                        if (item.Idbin == info.binidout)
+                        {
+                            rackIdOutput = item.Idrack;
+                            levelIdOutput = item.Level;
+                        }
+                    }
+
+                    if (rackIdInput == 0 || rackIdOutput == 0)
+                    {
+                        return Ok(new { status = $"There is not WareHouse Orgnanization for bin {info.binidout} " });
+
+                    }
+
+                    ////ouput transaction
+                    objdetinput.Idtypetransaction = OutPutTransactionId;
+                    objdetinput.Idlocation = locationid;
+                    objdetinput.Idtype = info.typereserveid;
+                    objdetinput.Idrack = rackIdInput;
+                    objdetinput.Level = levelIdInput;
+                    objdetinput.Codeitem = partnumberzeb;
+                    objdetinput.Iditem = iditemsel;
+                    objdetinput.TotalQty = info.qty;
+                    objdetinput.Idbin = info.binidout;
+                    objdetinput.Idstatus = info.statusid;
+                    objdetinput.Serialid = "";
+                    objdetinput.Idcompany = _companyDefault;
+                    objdetinput.Idcompanyclient = companyclient;
+                    objdetinput.Iddivision = division;
+                    objdetinput.Idenctransaction = 0;
+
+                    Listdetails.Add(objdetinput);
+
+
+                    WMSCreateDetailTransactionDTO objdetoutput = new WMSCreateDetailTransactionDTO();
+
+
+                    ////input transaction
+                    objdetoutput.Idtypetransaction = transactionid;
+                    objdetoutput.Idlocation = locationid;
+                    objdetoutput.Idtype = info.inventorytypeid;
+                    objdetoutput.Idrack = rackIdOutput;
+                    objdetoutput.Level = levelIdOutput;
+                    objdetoutput.Codeitem = partnumberzeb;
+                    objdetoutput.Iditem = iditemsel;
+                    objdetoutput.TotalQty = info.qty;
+                    objdetoutput.Idbin = info.binidin;
+                    objdetoutput.Idstatus = info.statusid;
+                    objdetoutput.Serialid = "";
+                    objdetoutput.Idcompany = _companyDefault;
+                    objdetoutput.Idcompanyclient = companyclient;
+                    objdetoutput.Iddivision = division;
+                    objdetoutput.Idenctransaction = 0;
+
+                    Listdetails.Add(objdetoutput);
+
+                }
+
+
+                NewInventoryTransactionTm objInfoTran = new NewInventoryTransactionTm
+                {
+                    hdr = hdr,
+                    Listdetails = Listdetails
+                };
+
+                return Ok("");
+
+                //var infotran = = await _ASNService.CreatePickProccessTransaction(DeliveryId, objInfoTran, lpnid, token, ct);
+
+
+                //if (!infotran.Success)
+                //{
+                //    return Ok(new { status = infotran.Error, infotran = infotran });
+                //}
+                //else
+                //{
+                //    return Ok(new { status = "OK", infotran = infotran });
+                //}
+            }, ct);
+
+
+        }
+
     }
 }
