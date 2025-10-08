@@ -180,6 +180,8 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             {
                 await using var tx = await _context.Database.BeginTransactionAsync(ct);
 
+                //create IrReceip hdr and detail transction
+
                 var infoIrReceipt = await _transactionsASNINVRepository.CreateIrReceiptHdrAndDetailLog(RequestASNData, detaillist, ct);
 
                 if (infoIrReceipt <= 0)
@@ -253,9 +255,15 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
 
                 }
 
+                //create inventory movement log and update inventory table 
+
                 var infotran = _transactionsCommonINVRepository.createInventoryTransactionLog(listItemDetail, _currentUser.UserId!, ct);
 
 
+                //update HDR ASN table with processed true
+
+
+                //update receive ASN call with process true
 
                 await tx.CommitAsync(ct);
 
