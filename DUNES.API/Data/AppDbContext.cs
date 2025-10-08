@@ -3,8 +3,9 @@ using DUNES.API.Models;
 using DUNES.API.Models.Auth;
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
-using DUNES.API.Models.Inventory;
 using DUNES.API.Models.Inventory.ASN;
+using DUNES.API.Models.Inventory.Common;
+using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.Models.Masters;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
@@ -278,6 +279,10 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<TzebB2bAsnLineItemTblItemPartialInbConsReqs> TzebB2bAsnLineItemTblItemPartialInbConsReqs { get; set; }
 
+        /// <summary>
+        /// General Transaction Parameters
+        /// </summary>
+        public virtual DbSet<MvcGeneralParameters> MvcGeneralParameters { get; set; }
 
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
@@ -288,6 +293,28 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<MvcGeneralParameters>(entity =>
+            {
+                entity.HasKey(e => e.Id).HasName("PK__mvcGener__3213E83FA1C83C08");
+
+                entity.ToTable("mvcGeneralParameters");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.ParameterArea)
+                    .HasMaxLength(100)
+                    .IsUnicode(false)
+                    .HasColumnName("parameterArea");
+                entity.Property(e => e.ParameterDescription)
+                    .HasMaxLength(500)
+                    .IsUnicode(false)
+                    .HasColumnName("parameterDescription");
+                entity.Property(e => e.ParameterNumber).HasColumnName("parameterNumber");
+                entity.Property(e => e.ParameterValue)
+                    .HasMaxLength(50)
+                    .IsUnicode(false)
+                    .HasColumnName("parameterValue");
+            });
 
             modelBuilder.Entity<TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog>(entity =>
             {

@@ -1,5 +1,5 @@
 ﻿using DUNES.API.Data;
-using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Masters;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;

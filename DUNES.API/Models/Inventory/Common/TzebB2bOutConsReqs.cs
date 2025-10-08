@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DUNES.API.Models.Inventory;
+namespace DUNES.API.Models.Inventory.Common;
 
 /// <summary>
 /// Inventory calls Peak to ZEBRA

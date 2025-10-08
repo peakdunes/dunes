@@ -1,4 +1,4 @@
-﻿using DUNES.API.Models.Inventory;
+﻿using DUNES.API.Models.Inventory.PickProcess;
 
 namespace DUNES.API.ReadModels.Inventory
 {

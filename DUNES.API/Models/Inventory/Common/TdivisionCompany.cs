@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DUNES.API.Models.Inventory;
+namespace DUNES.API.Models.Inventory.Common;
 /// <summary>
 /// Company Division 
 /// </summary>

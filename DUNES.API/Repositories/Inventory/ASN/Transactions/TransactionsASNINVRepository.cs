@@ -5,6 +5,7 @@ using DUNES.API.Services.Auth;
 using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using System.Data;
 using System.Linq;
 
 namespace DUNES.API.Repositories.Inventory.ASN.Transactions
@@ -31,155 +32,103 @@ namespace DUNES.API.Repositories.Inventory.ASN.Transactions
 
         }
 
+        /// <summary>
+        /// UPdate IrReceiptHdr table (_TZEB_B2B_IR_RECEIPT_OUT_HDR_DET_ITEM_Inb_Cons_Reqs_Log) with the Id output call id
+        /// </summary>
+        /// <param name="Consign_DBKRequestID"></param>
+        /// <param name="IRReceiptHDR"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateIrReceiptWithOutPutCallId(int Consign_DBKRequestID, int IRReceiptHDR)
+        {
+            var infotable = await _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.FirstOrDefaultAsync(x => x.Id == IRReceiptHDR);
+
+
+            if (infotable == null)
+            {
+                return false;
+            }
+            else
+            {
+                infotable.ConsignDbkrequestId = Consign_DBKRequestID;
+
+                _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.Update(infotable);
+                await _context.SaveChangesAsync();
+
+                return true;
+
+            }
+        }
+
+
+
 
 
         /// <summary>
-        /// Create a start Receiving process for a ASN and return record id
+        /// Create the first transaction in receiving ASN Process
         /// </summary>
-        /// <param name="dataLog"></param>
+        /// <param name="DataLog"></param>
+        /// <param name="detaillist"></param>
         /// <param name="ct"></param>
-        /// <param name="detailList"></param>
         /// <returns></returns>
-        /// 
-
-        //public async Task<int> CreateIrReceiptHdrAndDetailLog(AsnReceivedHdrLogRead dataLog, List<BinsToLoadWm> detailList, CancellationToken ct)
-        //{
-        //    1) Transacción
-        //   await using var tx = await _context.Database.BeginTransactionAsync(ct);
-
-        //    try
-        //    {
-        //        2) Header
-        //       var header = new TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog
-        //       {
-        //             No asignes Id, EF lo llena
-        //            ConsignDbkrequestId = 0,
-        //            OrgSystemId3pl = dataLog.org3pl,
-        //            TransactionType = dataLog.TransactionType,
-        //            ShipmentNum = dataLog.ShipmentNum,  // <--- FIX: antes te auto-asignabas
-        //            DateTimeInserted = DateTime.Now
-        //       };
-
-        //        _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.Add(header);
-        //        await _context.SaveChangesAsync(ct); // Necesario si vas a usar header.Id como FK (si no usas navegación)
-
-        //        3) Prepara detalles(sin SaveChanges dentro del loop)
-        //        var grouped = detailList
-        //            .GroupBy(x => x.asnlineid)
-        //            .Select(g => new { lineid = g.Key, qty = g.Sum(x => x.qty) })
-        //            .ToList();
-
-        //        Evita N+1: trae todas las líneas necesarias de una vez
-        //        var lineIds = grouped.Select(g => g.lineid).Distinct().ToList();
-        //        var infoLines = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
-        //            .Where(x => lineIds.Contains(x.LineNum))
-        //            .ToListAsync(ct);
-
-        //        var infoByLine = infoLines.ToDictionary(x => x.LineNum);
-
-        //        var detailEntities = new List<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog>();
-
-        //        foreach (var g in grouped)
-        //        {
-        //            if (!infoByLine.TryGetValue(g.lineid, out var infoline)) continue;
-
-        //            var det = new TzebB2bIrReceiptLineItemTblItemInbConsReqsLog
-        //            {
-        //                IrReceiptOutHdrDetItemId = header.Id, // FK al header
-        //                ShipmentLineId = infoline.ShipmentLineId,
-        //                LineNum = infoline.LineNum,
-        //                Quantity = g.qty,
-        //                UnitOfMeasure = infoline.UnitOfMeasure,
-        //                InventoryItemId = infoline.InventoryItemId,
-        //                ItemNumber = infoline.ItemNumber,
-        //                ReceiptDate = DateOnly.FromDateTime(DateTime.Now),
-        //                TransactionDate = DateOnly.FromDateTime(DateTime.Now),
-        //                DateTimeInserted = DateTime.Now,
-        //                To3plLocatorStatus = dataLog.locator3pl,
-        //                IsRtvPart = dataLog.IsRtvPart,
-        //                IsCePart = dataLog.IsCePart
-        //            };
-
-        //            detailEntities.Add(det);
-        //        }
-
-        //        _context.TzebB2bIrReceiptLineItemTblItemInbConsReqsLog.AddRange(detailEntities);
-
-        //        4) Un solo guardado para todos los detalles
-        //       await _context.SaveChangesAsync(ct);
-
-        //        5) Commit
-        //       await tx.CommitAsync(ct);
-
-        //        return header.Id; // Devuelve el Id del maestro creado
-        //    }
-        //    catch
-        //    {
-        //        await tx.RollbackAsync(ct);
-        //        throw;
-        //    }
-        //}
-
         public async Task<int> CreateIrReceiptHdrAndDetailLog(AsnReceivedHdrLogRead DataLog, List<BinsToLoadWm> detaillist, CancellationToken ct)
         {
-            //_TZEB_B2B_IR_RECEIPT_OUT_HDR_DET_ITEM_Inb_Cons_Reqs_Log
 
-            TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog objlog = new TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog();
-
-
-            objlog.Id = 0;
-            objlog.ConsignDbkrequestId = 0;
-            objlog.OrgSystemId3pl = DataLog.org3pl;
-            objlog.TransactionType = DataLog.TransactionType;
-            objlog.ShipmentNum = objlog.ShipmentNum;
-            objlog.DateTimeInserted = DateTime.Now;
-
-
-            _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.Add(objlog);
-            await _context.SaveChangesAsync();
-
-            //receipt detail
-
-            var listgroup = detaillist.GroupBy(x => x.asnlineid)
-           .Select(g => new { lineid = g.Key, qty = g.Sum(x => x.qty) }).ToList();
-
-            foreach (var item in listgroup)
+            var header = new TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog
             {
+                ConsignDbkrequestId = 0,
+                OrgSystemId3pl = DataLog.org3pl,
+                TransactionType = DataLog.TransactionType,
+                ShipmentNum = DataLog.asnNumber,
+                DateTimeInserted = DateTime.Now,
+            };
 
-                var infoline = await _context.TzebB2bAsnLineItemTblItemInbConsReqs.FirstOrDefaultAsync(x => x.LineNum == item.lineid);
+            _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.Add(header);
 
 
-                if (infoline != null)
+            var grouped = detaillist
+               .GroupBy(x => x.asnlineid)
+               .Select(g => new { lineid = g.Key, qty = g.Sum(x => x.qty) })
+               .ToList();
+
+            var lineIds = grouped.Select(g => g.lineid).ToList();
+
+            var infoByLine = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
+                .Where(x => lineIds.Contains(x.Id))
+                .ToDictionaryAsync(x => x.LineNum, ct);
+
+            foreach (var g in grouped)
+            {
+                if (!infoByLine.TryGetValue(g.lineid, out var infoline)) continue;
+
+                var det = new TzebB2bIrReceiptLineItemTblItemInbConsReqsLog
                 {
+                    // Relación por navegación (si la tienes):
+                    // Header = header,
 
-                    TzebB2bIrReceiptLineItemTblItemInbConsReqsLog objlogdet = new TzebB2bIrReceiptLineItemTblItemInbConsReqsLog();
+                    // O por FK (EF resuelve el Id real en SaveChanges):
+                    IrReceiptOutHdrDetItemId = header.Id,
 
-                    objlog.Id = 0;
+                    ShipmentLineId = infoline.ShipmentLineId,
+                    LineNum = infoline.LineNum,
+                    Quantity = g.qty,
+                    UnitOfMeasure = infoline.UnitOfMeasure,
+                    InventoryItemId = infoline.InventoryItemId,
+                    ItemNumber = infoline.ItemNumber,
+                    ReceiptDate = DateOnly.FromDateTime(DateTime.Now),
+                    TransactionDate = DateOnly.FromDateTime(DateTime.Now),
+                    DateTimeInserted = DateTime.Now,
+                    To3plLocatorStatus = DataLog.locator3pl,
+                    IsRtvPart = DataLog.IsRtvPart,
+                    IsCePart = DataLog.IsCePart
+                };
 
-                    objlogdet.IrReceiptOutHdrDetItemId = objlog.Id;
-                    objlogdet.ShipmentLineId = infoline.ShipmentLineId;
-                    objlogdet.LineNum = infoline.LineNum;
-                    objlogdet.Quantity = item.qty;
-                    objlogdet.UnitOfMeasure = infoline.UnitOfMeasure;
-                    objlogdet.InventoryItemId = infoline.InventoryItemId;
-                    objlogdet.ItemNumber = infoline.ItemNumber;
-                    objlogdet.ReceiptDate = DateOnly.FromDateTime(DateTime.Now);
-                    objlogdet.TransactionDate = DateOnly.FromDateTime(DateTime.Now);
-                    objlogdet.DateTimeInserted = DateTime.Now;
-                    objlogdet.To3plLocatorStatus = DataLog.locator3pl;
-                    objlogdet.IsRtvPart = DataLog.IsRtvPart;
-                    objlogdet.IsCePart = DataLog.IsCePart;
-
-                    _context.TzebB2bIrReceiptLineItemTblItemInbConsReqsLog.Add(objlogdet);
-                    await _context.SaveChangesAsync();
-
-                }
-
+                _context.TzebB2bIrReceiptLineItemTblItemInbConsReqsLog.Add(det);
             }
 
+            await _context.SaveChangesAsync(ct); // EF usa una transacción interna
+            return header.Id;
 
-
-            return objlog.Id;
+           
 
         }
 

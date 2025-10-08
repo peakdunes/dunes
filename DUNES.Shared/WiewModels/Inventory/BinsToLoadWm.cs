@@ -39,5 +39,7 @@ namespace DUNES.Shared.WiewModels.Inventory
         public string statusname { get; set; } = string.Empty;
 
         public int asnlineid { get; set; }
+
+        public string serialnumber { get; set; } = string.Empty;
     }
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DUNES.API.Models.Inventory;
+namespace DUNES.API.Models.Inventory.Common;
 
-public partial class TzebB2bOutBoundResponsesLogFullXmls
+public partial class TzebB2bInbConsReqsFullXmls
 {
     public int Id { get; set; }
 

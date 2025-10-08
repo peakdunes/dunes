@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Data;
+using DUNES.API.Models.Inventory.Common;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -23,6 +24,35 @@ namespace DUNES.API.Repositories.Inventory.Common.Transactions
         {
             _context = context;
         }
+
+
+        /// <summary>
+        /// Create a new cons output call
+        /// </summary>
+        /// <param name="callInfo"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<int> createConsOutPutCall(TzebB2bOutConsReqsInsertDto callInfo, CancellationToken ct)
+        {
+            TzebB2bOutConsReqs objdet = new TzebB2bOutConsReqs();
+
+
+            objdet.TypeOfCallId = callInfo.TypeOfCallId;
+            objdet.AdditionalInfo = callInfo.AdditionalInfo;
+            objdet.TransactionCode = callInfo.TransactionCode;
+            objdet.InProcess = callInfo.InProcess;
+            objdet.Additional = callInfo.Additional;
+
+            _context.TzebB2bOutConsReqs.Add(objdet);
+            await _context.SaveChangesAsync(ct);
+
+            return objdet.Id;
+
+
+
+        }
+
         /// <summary>
         /// create a new inventory transction log and update inventory table 
         /// </summary>
@@ -64,5 +94,37 @@ namespace DUNES.API.Repositories.Inventory.Common.Transactions
             return true;
         }
 
+        /// <summary>
+        /// Leave a call ready to process
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<bool> updateConsOutPutCallReadyToProcess(int id, CancellationToken ct)
+        {
+            var infocall = await _context.TzebB2bOutConsReqs.FirstOrDefaultAsync(x => x.Id == id);
+
+
+            if (infocall == null)
+            {
+                return false;
+            }
+            else
+            {
+                infocall.FullXmlsent = null;
+                infocall.AckReceived = false;
+                infocall.ResponseXml = null;
+                infocall.Result = null;
+                infocall.Failure = null;
+                infocall.SentTimestamp = null;
+                infocall.DateTimeSent = null;
+                infocall.InProcess = false;
+
+                _context.TzebB2bOutConsReqs.Update(infocall);
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+        }
     }
 }

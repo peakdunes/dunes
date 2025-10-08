@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Masters;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;

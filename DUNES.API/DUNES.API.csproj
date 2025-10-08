@@ -30,7 +30,6 @@
   
     <Folder Include="Logs\" />
     <Folder Include="Models\B2B\" />
-    <Folder Include="Models\Inventory\ASN\" />
     <Folder Include="ReadModels\WMS\" />
    
    
