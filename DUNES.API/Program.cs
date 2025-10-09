@@ -1,7 +1,9 @@
 ﻿
 
+using AutoMapper;
 using DUNES.API.Data;
 using DUNES.API.Models.Masters;
+using DUNES.API.Profiles;
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
@@ -24,6 +26,7 @@ using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
+using DUNES.Shared.Interfaces.RequestInfo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebSockets;
@@ -33,13 +36,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System;
-
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using AutoMapper;
-using System.Reflection;
-using DUNES.API.Profiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -202,7 +202,9 @@ builder.Services.AddSwaggerGen(c =>
 
 //SERVICES
 
-//Mapper
+//GET HTTP Information SERVICE
+
+builder.Services.AddScoped<IRequestInfo, RequestInfo>();
 
 
 //AUTHENTICATION SERVICES
@@ -263,6 +265,8 @@ builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepo
 builder.Services.AddOpenApi();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -277,6 +281,29 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+
+// Middleware: asegura uno TRACE-ID por request y respeta el entrante
+
+app.Use(async (ctx, next) =>
+{
+    var incoming = ctx.Request.Headers["X-Trace-Id"].FirstOrDefault();
+    var traceId = string.IsNullOrWhiteSpace(incoming)
+        ? ctx.TraceIdentifier ?? Guid.NewGuid().ToString("N")
+        : incoming.Trim();
+
+    ctx.Items["__TraceId"] = traceId;
+    ctx.Response.Headers["X-Trace-Id"] = traceId;
+    await next();
+});
+// Middleware: obtiene informacion de la transaccion 
+app.Use(async (ctx, next) =>
+{
+    var reqInfo = ctx.RequestServices.GetRequiredService<IRequestInfo>();
+    reqInfo.Path = ctx.Request.Path.Value;
+    reqInfo.Method = ctx.Request.Method;
+    reqInfo.Query = ctx.Request.QueryString.Value;
+    await next();
+});
 
 app.UseSwagger();
 app.UseSwaggerUI();

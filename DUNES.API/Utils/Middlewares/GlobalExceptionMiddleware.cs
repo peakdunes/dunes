@@ -15,6 +15,13 @@ namespace DUNES.API.Utils.Middlewares
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<GlobalExceptionMiddleware> _logger;
 
+
+        /// <summary>
+        /// dependency injection
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="scopeFactory"></param>
+        /// <param name="logger"></param>
         public GlobalExceptionMiddleware(RequestDelegate next, IServiceScopeFactory scopeFactory, ILogger<GlobalExceptionMiddleware> logger)
         {
             _next = next;

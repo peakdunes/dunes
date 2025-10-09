@@ -102,6 +102,7 @@ namespace DUNES.API.Repositories.Inventory.Common.Transactions
         /// <returns></returns>
         public async Task<bool> updateConsOutPutCallReadyToProcess(int id, CancellationToken ct)
         {
+                                         
             var infocall = await _context.TzebB2bOutConsReqs.FirstOrDefaultAsync(x => x.Id == id);
 
 
