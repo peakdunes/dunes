@@ -1,14 +1,19 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
+using DUNES.API.Services.Auth;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
+using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Responses;
+using DUNES.API.Utils.TraceProvider;
 using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.Interfaces.RequestInfo;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
+using System.Diagnostics;
 using System.Net;
 using System.Transactions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -21,13 +26,17 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
     public class TransactionsPickProcessINVService : ITransactionsPickProcessINVService
     {
 
+        private readonly LogHelper _logHelper;
+        private readonly IRequestInfo _requestInfo;
+        private readonly ITraceProvider _trace;
+        private readonly ICurrentUser _currentUser;
 
         private readonly AppDbContext _context;
         private readonly appWmsDbContext _wmscontext;
-
+      
         private readonly ITransactionsPickProcessINVRepository _transactionPickProcessINVRepository;
         private readonly ITransactionsWMSINVService _transactionsWMSINVService;
-       
+
 
         /// <summary>
         /// dependency injection
@@ -36,19 +45,26 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="wmscontext"></param>
         /// <param name="transactionPickProcessINVRepository"></param>
         /// <param name="transactionsWMSINVService"></param>
-        
+        /// <param name="requestInfo"></param>
+        /// <param name="logHelper"></param>
+        /// <param name="trace"></param>
+        /// <param name="currentUser"></param>
         public TransactionsPickProcessINVService(AppDbContext context, appWmsDbContext wmscontext,
             ITransactionsPickProcessINVRepository transactionPickProcessINVRepository,
-            ITransactionsWMSINVService transactionsWMSINVService)
+            ITransactionsWMSINVService transactionsWMSINVService, IRequestInfo requestInfo,
+            LogHelper logHelper, ITraceProvider trace, ICurrentUser currentUser)
         {
             _context = context;
             _wmscontext = wmscontext;
             _transactionPickProcessINVRepository = transactionPickProcessINVRepository;
             _transactionsWMSINVService = transactionsWMSINVService;
-          
+            _requestInfo = requestInfo;
+            _logHelper = logHelper;
+            _trace = trace;
+            _currentUser = currentUser;
         }
 
-       
+
 
         /// <summary>
         /// Create a servtrack order from delivery id
@@ -107,7 +123,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// - Si todas las operaciones son exitosas, se hace <c>Commit</c> confirmando todos los cambios.  
         /// </remarks>
 
-        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId,NewInventoryTransactionTm objInvData,
+        public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData,
                                                 string lpnid, CancellationToken ct)
         {
             var objresponse = new PickProcessResponseDto();
@@ -161,117 +177,59 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             }
             catch (Exception ex)
             {
-                // rollback zebra + compensar wms
-                await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
-                return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.Message}");
+
+                // Compensación WMS si algo explota en Zebra
+                await TryCompensateWmsAsync(objresponse.WMSTransactionNumber, ct);
+                return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.GetBaseException().Message}");
+
+            }
+        }
+
+        /// <summary>
+        /// cuando un proceso implica dos bases de datos se hace primero el proceso mas corto el la base de datos
+        /// correspondiente y luego todo el resto se hace en una transaccion, si esta transaccion falla
+        /// este metodo hace rollback al proceso mas corto inicial
+        ///
+        /// </summary>
+        /// <param name="wmsTxNumber"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        private async Task TryCompensateWmsAsync(int wmsTxNumber, CancellationToken ct)
+        {
+            if (wmsTxNumber == 0) return;
+            try
+            {
+                await _transactionsWMSINVService.DeleteInventoryTransaction(wmsTxNumber, ct);
+            }
+            catch (Exception ex)
+            {
+
+                var svcName = GetType().Name;
+
+
+                //_requestInfo?.Method is { } m significa: “si _requestInfo?.Method no es null, asígnalo a la variable m”
+                //_requestInfo?.Path is { } p significa: “si _requestInfo?.Method no es null, asígnalo a la variable p”
+                // && exige que ambos (Method y Path) existan.
+                //? $"{m} {p}" : null → si ambos existen, arma la cadena "METHOD PATH"; si no, deja null.
+                var httpRoute = (_requestInfo?.Method is { } m && _requestInfo?.Path is { } p) ? $"{m} {p}" : null;
+                var targetOp = $"WMSINV.{nameof(ITransactionsWMSINVService.DeleteInventoryTransaction)}(txId={wmsTxNumber})";
+                var ruta = httpRoute ?? targetOp;
+
+
+                await _logHelper.SaveLogAsync(
+                       traceId: _trace.TraceId,
+                       message: $"WMS compensation failed for WMS Transaction Number {wmsTxNumber}",
+                       exception: ex.GetBaseException().Message,
+                       level: "Error",
+                       usuario: _currentUser.UserId,
+                       origen: GetType().Name,
+                       ruta: ruta
+                       );
+
             }
         }
 
 
-        //public async Task<ApiResponse<PickProcessResponseDto>> CreatePickProccessTransaction(string DeliveryId, NewInventoryTransactionTm objInvData, string lpnid, CancellationToken ct)
-        //{
-        //    // throw new NotImplementedException();
-
-        //    bool TransactionNumber = false;
-
-        //    PickProcessResponseDto objresponse = new PickProcessResponseDto();
-
-
-        //    await using var txwms = await _context.Database.BeginTransactionAsync();
-
-        //    try 
-        //    {
-        //        //Create WMS Transaction
-
-        //        var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData, ct);
-
-
-        //        if (!wmsTransaction.Success)
-        //        {
-        //            await txwms.RollbackAsync();
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //          $"Error creating WMS Inventory transaction. Error {wmsTransaction.Error} .");
-        //        }
-
-        //        objresponse.WMSTransactionNumber = wmsTransaction.Data;
-
-        //        TransactionNumber = true;
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // ❌ Rollback
-        //        await txwms.RollbackAsync();
-        //        return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.Message}");
-        //    }
-
-
-        //    if (TransactionNumber)
-        //    {
-        //        await using var tx = await _context.Database.BeginTransactionAsync();
-
-        //        try
-        //        {
-
-
-        //            // 1. Order Repair ServTrack (4 tablas)
-        //            var servTrackResult = await CreateServTrackOrderFromPickProcess(DeliveryId);
-
-        //            if (!servTrackResult.Success)
-        //            {
-        //                await tx.RollbackAsync();
-        //                return ApiResponseFactory.NotFound<PickProcessResponseDto>(
-        //              $"Pick Process {DeliveryId} does not exist in the system .");
-
-        //            }
-
-        //            objresponse.ServTrackOrder = servTrackResult.Data.RefNum;
-
-
-        //            var call13info = await CreatePickProcessCall(DeliveryId);
-
-        //            if (!call13info.Success)
-        //            {
-        //                await tx.RollbackAsync();
-        //                return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //              $"Error creating Pick Process call(10). Error {wmsTransaction.Message} .");
-        //            }
-
-
-        //            objresponse.Call13Number = call13info.Data;
-
-
-        //            //Update pick process tables
-
-        //            var UpdateTablesOk = await UpdatePickProcessTables(DeliveryId, objresponse.Call13Number, lpnid);
-
-        //            if (!UpdateTablesOk.Success)
-        //            {
-        //                await tx.RollbackAsync();
-        //                return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //            $"Error updatein Pick Process tables. Error {UpdateTablesOk.Message} .");
-
-        //            }
-
-
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            // ❌ Rollback
-        //            await tx.RollbackAsync();
-
-        //            //eliminar la transaccion de WMS
-
-        //            return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.Message}");
-        //        }
-
-        //    }
-
-        //    return ApiResponseFactory.Ok(objresponse, "Pick process completed successfully");
-        //}
-        /////// <summary>
-        ///// create call (13) for pick process
         /// </summary>
         /// <param name="DeliveryId"></param>
         /// <returns></returns>
@@ -307,6 +265,6 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             };
         }
 
-       
+
     }
 }

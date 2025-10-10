@@ -1,9 +1,13 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.Models;
 using Microsoft.Data.SqlClient;
+using System.Data;
 
 namespace DUNES.API.Utils.Logging
 {
+    /// <summary>
+    /// Transaction Logs
+    /// </summary>
     public class LogHelper
     {
         private readonly IConfiguration _config;
@@ -13,51 +17,71 @@ namespace DUNES.API.Utils.Logging
             _config = config;
         }
 
+        /// <summary>
+        /// Guarda un log en la tabla dbk_mvc_logs_api
+        /// </summary>
         public async Task SaveLogAsync(
             string traceId,
             string message,
-            string exception,
+            string? exception,
             string level,
-            string usuario,
+            string? usuario,
             string origen,
-            string ruta)
+            string? ruta,
+            CancellationToken ct = default)
         {
-            var connectionString = _config.GetConnectionString("DefaultConnection");
+            try
+            {
+                var cs = _config.GetConnectionString("DefaultConnection");
+                using var conn = new SqlConnection(cs);
+                await conn.OpenAsync(ct);
 
-            using var conn = new SqlConnection(connectionString);
-            await conn.OpenAsync();
+                // Sanitiza 1 línea clara y limita longitud
+                string cleanMessage = string.IsNullOrWhiteSpace(message)
+                    ? string.Empty
+                    : message.Split('\n')[0].Trim();
 
-            // 🔹 Sanitizamos el mensaje y la excepción para evitar errores por longitud
-            string cleanMessage = string.IsNullOrEmpty(message)
-                ? string.Empty
-                : message.Split('\n')[0].Trim();  // Solo la primera línea clara
+                if (cleanMessage.Length > 500)
+                    cleanMessage = cleanMessage[..500];
 
-            if (cleanMessage.Length > 500)
-                cleanMessage = cleanMessage.Substring(0, 500);  // Cortamos a 500 si es muy largo
+                string? cleanException = string.IsNullOrWhiteSpace(exception)
+                    ? null
+                    : exception.Split('\n')[0].Trim();
 
-            string cleanException = string.IsNullOrEmpty(exception)
-                ? string.Empty
-                : exception.Split('\n')[0].Trim();  // Solo la primera línea clara
+                if (cleanException is { Length: > 1000 })
+                    cleanException = cleanException[..1000];
 
-            if (cleanException.Length > 1000)
-                cleanException = cleanException.Substring(0, 1000);  // Cortamos a 1000 si es muy largo
+                const string sql = @"
+                        INSERT INTO dbk_mvc_logs_api (Message, Exception, Level, Usuario, Origen, Ruta, TimeStamp, TraceId)
+                        VALUES (@Message, @Exception, @Level, @Usuario, @Origen, @Ruta, GETUTCDATE(), @TraceId);";
 
+                using var cmd = new SqlCommand(sql, conn);
 
+                // Parámetros tipados y con tamaño
+                cmd.Parameters.Add(new SqlParameter("@TraceId", SqlDbType.NVarChar, 100) { Value = traceId });
+                cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.NVarChar, 500) { Value = (object)cleanMessage ?? DBNull.Value });
+                cmd.Parameters.Add(new SqlParameter("@Exception", SqlDbType.NVarChar, 1000) { Value = (object?)cleanException ?? DBNull.Value });
+                cmd.Parameters.Add(new SqlParameter("@Level", SqlDbType.NVarChar, 20) { Value = level });
+                cmd.Parameters.Add(new SqlParameter("@Usuario", SqlDbType.NVarChar, 100) { Value = (object?)usuario ?? DBNull.Value });
+                cmd.Parameters.Add(new SqlParameter("@Origen", SqlDbType.NVarChar, 200) { Value = origen });
+                cmd.Parameters.Add(new SqlParameter("@Ruta", SqlDbType.NVarChar, 500) { Value = (object?)ruta ?? DBNull.Value });
 
-            var query = @"
-            INSERT INTO dbk_mvc_logs_api (Message, Exception, Level, Usuario, Origen, Ruta, TimeStamp, TraceId)
-            VALUES (@Message, @Exception, @Level, @Usuario, @Origen, @Ruta, GETDATE(), @TraceId)";
-
-            using var cmd = new SqlCommand(query, conn);
-            cmd.Parameters.AddWithValue("@TraceId", traceId);
-            cmd.Parameters.AddWithValue("@Message", cleanMessage);
-            cmd.Parameters.AddWithValue("@Exception", (object?)cleanException ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@Level", level);
-            cmd.Parameters.AddWithValue("@Usuario", (object?)usuario ?? DBNull.Value);
-            cmd.Parameters.AddWithValue("@Origen", origen);
-            cmd.Parameters.AddWithValue("@Ruta", (object?)ruta ?? DBNull.Value);
-
-            await cmd.ExecuteNonQueryAsync();
+                await cmd.ExecuteNonQueryAsync(ct);
+            }
+            catch (Exception ex)
+            {
+                // Fallback: escribe el fallo del logger en el archivo de Serilog (no re-lanzar)
+                try
+                {
+                    Serilog.Log.Error(ex,
+                        "[LOGHELPER] Falló guardando log en DB (se ignora). TraceId={TraceId} Origen={Origen} Ruta={Ruta}",
+                        traceId, origen, ruta);
+                }
+                catch
+                {
+                    // Última línea de defensa: nunca dejes que el logger rompa el flujo
+                }
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
     {
 
 
-
+        private readonly LogHelper _logHelper;
         private readonly appWmsDbContext _wmscontext;
         private readonly AppDbContext _context;
         private readonly ICurrentUser _currentUser;
@@ -49,10 +49,11 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
         /// <param name="transactionsCommonINVRepository"></param>
         /// <param name="trace"></param>
         /// <param name="requestInfo"></param>
+        /// <param name="logHelper"></param>
         public TransactionsASNINVService(appWmsDbContext wmscontext, ITransactionsWMSINVService transactionsWMSINVService,
             ITransactionsASNINVRepository transactionsASNINVRepository, AppDbContext context,
             ITransactionsCommonINVRepository transactionsCommonINVRepository,
-            ICurrentUser currentUser, ITraceProvider trace, IRequestInfo requestInfo)
+            ICurrentUser currentUser, ITraceProvider trace, IRequestInfo requestInfo, LogHelper logHelper)
         {
             _context = context;
             _transactionsWMSINVService = transactionsWMSINVService;
@@ -62,7 +63,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             _currentUser = currentUser;
             _trace = trace;
             _requestInfo = requestInfo;
-
+            _logHelper = logHelper;
         }
         /// <summary>
         /// Perform ASN Receiving Transaction
@@ -179,7 +180,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             };
 
             // 2) Paso WMS (EXTERNO) —> luego compensamos si falla Zebra
-            string wmsTxNumber = null!;
+            int wmsTxNumber = 0;
             {
                 var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData, ct);
                 if (!wmsTransaction.Success)
@@ -187,7 +188,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                     return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
                         $"Error creating WMS Inventory transaction. Error {wmsTransaction.Error}.");
                 }
-                wmsTxNumber = wmsTransaction.Data?.TransactionNumber ?? wmsTransaction.Message; // ajusta según tu DTO de WMS
+                wmsTxNumber = Convert.ToInt32(wmsTransaction);
             }
 
             // 3) Transacción local (Zebra) — TODO lo de EF dentro del BeginTransaction
@@ -330,14 +331,14 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             {
                 // Compensación WMS si algo explota en Zebra
                 await TryCompensateWmsAsync(wmsTxNumber, ct);
-                return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.GetBaseException().Message}");
+                return ApiResponseFactory.Error<PickProcessResponseDto>($"ASN process failed: {ex.GetBaseException().Message}");
             }
         }
 
         // Helper de compensación (best-effort)
-        private async Task TryCompensateWmsAsync(string? wmsTxNumber, CancellationToken ct)
+        private async Task TryCompensateWmsAsync(int wmsTxNumber, CancellationToken ct)
         {
-            if (string.IsNullOrWhiteSpace(wmsTxNumber)) return;
+            if (wmsTxNumber == 0) return;
             try
             {
                 await _transactionsWMSINVService.DeleteInventoryTransaction(Convert.ToInt32(wmsTxNumber), ct);
@@ -345,323 +346,32 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             catch (Exception ex)
             {
 
-                //var path = _requestInfo.Path ?? $"{nameof(AsnService)}.{nameof(TryCompensateWmsAsync)}";
-                //var method = _requestInfo.Method ?? "N/A";
-                //var fullRoute = $"{method} {path}";
+                var svcName = GetType().Name;
 
-                // No relanzar: solo loguea; podrías guardar en tabla Outbox/CompensationPending
-                await LogHelper.SaveLogAsync(
-                    traceId: _trace.TraceId,
-                    message: $"WMS compensation failed for {wmsTxNumber}",
-                    exception: ex.ToString(),
-                    level: "Error",
-                    usuario: _currentUser.UserId,
-                    origen: "GlobalExceptionMiddleware",
-                    ruta: _requestInfo.Path.Request.Path
-                );
+
+                //_requestInfo?.Method is { } m significa: “si _requestInfo?.Method no es null, asígnalo a la variable m”
+                //_requestInfo?.Path is { } p significa: “si _requestInfo?.Method no es null, asígnalo a la variable p”
+                // && exige que ambos (Method y Path) existan.
+                //? $"{m} {p}" : null → si ambos existen, arma la cadena "METHOD PATH"; si no, deja null.
+                var httpRoute = (_requestInfo?.Method is { } m && _requestInfo?.Path is { } p) ? $"{m} {p}" : null;
+                var targetOp = $"WMSINV.{nameof(ITransactionsWMSINVService.DeleteInventoryTransaction)}(txId={wmsTxNumber})";
+                var ruta = httpRoute ?? targetOp;
+
+
+                await _logHelper.SaveLogAsync(
+                       traceId: _trace.TraceId,
+                       message: $"WMS compensation failed for WMS Transaction Number {wmsTxNumber}",
+                       exception: ex.GetBaseException().Message,
+                       level: "Error",
+                       usuario: _currentUser.UserId,
+                       origen: GetType().Name,
+                       ruta: ruta
+                       );
 
             }
         }
 
 
-        //public async Task<ApiResponse<PickProcessResponseDto>> CreateASNReceivingTransaction(string AsnId,
-        //    NewInventoryTransactionTm objInvData, string trackingNumber, List<BinsToLoadWm> detaillist, CancellationToken ct)
-        //{
-
-        //    AsnReceivedHdrLogRead RequestASNData = new AsnReceivedHdrLogRead();
-
-
-        //    if (!_currentUser.IsAuthenticated)
-        //        return ApiResponseFactory.Unauthorized<PickProcessResponseDto>(
-        //            $"User Unauthorized");
-
-        //    //check ASN Head info
-        //    var infoAsn = await _context.TzebB2bAsnOutHdrDetItemInbConsReqs.FirstOrDefaultAsync(x => x.ShipmentNum == AsnId);
-
-        //    if (infoAsn == null)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //           $"ASN Information not found {AsnId}.");
-        //    }
-
-        //    //check if this ASN already processed
-
-        //    if (infoAsn.Processed == true)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //          $"ASN  {AsnId} already processed.");
-        //    }
-
-
-        //    //check if exit input call 
-
-        //    var infocallreceiving = await _context.TzebB2bInbConsReqs.FirstOrDefaultAsync(x => x.Id == infoAsn.ConsignRequestId);
-
-        //    if (infocallreceiving == null)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //        $"This ASN  {AsnId} have not a input call.");
-        //    }
-
-        //    RequestASNData.asnNumber = AsnId;
-        //    RequestASNData.TransactionCode = "SRA";
-        //    RequestASNData.TransactionType = "IR RECEIPT";
-        //    RequestASNData.ProcessName = "Receiving Tool";
-        //    RequestASNData.org3pl = infoAsn.OrgSystemId3pl;
-        //    RequestASNData.locator3pl = string.Empty;
-        //    RequestASNData.IsRtvPart = false;
-        //    RequestASNData.IsCePart = false;
-
-
-        //    //check ASN Detail info
-
-        //    var listgroup = detaillist.GroupBy(x => x.asnlineid)
-        //  .Select(g => new { lineid = g.Key, qty = g.Sum(x => x.qty) }).ToList();
-
-        //    foreach (var item in listgroup)
-        //    {
-
-        //        var infoline = _context.TzebB2bAsnLineItemTblItemPartialInbConsReqs.FirstOrDefaultAsync(x => x.Id == item.lineid);
-
-        //        if (infoline == null)
-        //        {
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //                              $"ASN line {item.lineid} not found.");
-        //        }
-
-        //    }
-
-
-        //    var grouped = detaillist
-        //      .GroupBy(x => x.asnlineid)
-        //      .Select(g => new { lineid = g.Key, qty = g.Sum(x => x.qty) })
-        //      .ToList();
-
-        //    var lineIds = grouped.Select(g => g.lineid).ToList();
-
-        //    var infoByLine = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
-        //        .Where(x => lineIds.Contains(x.Id)).ToListAsync();
-
-        //    //validating all items exist in item master
-
-        //    bool IsMissing = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
-        //    .Where(l => lineIds.Contains(l.Id))
-        //    .AnyAsync(l => !_context.TzebB2bMasterPartDefinition.Any(i => i.PartNo == "ZEBRA-" + l.ItemNumber), ct);
-
-        //    if (IsMissing)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //                             $"Not all items are in Item Master Table.");
-        //    }
-
-        //    //validating parameters
-
-        //    var infoparam = await _context.MvcGeneralParameters.Where(x => x.ParameterNumber <= 4).ToListAsync();
-
-        //    if (infoparam != null)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //            $"There is not Inventory Transactions parameters.");
-        //    }
-
-        //    int InvSource = 0;
-        //    int InvDest = 0;
-        //    string TransactionCode = string.Empty;
-        //    int TypeCallId = 0;
-
-        //    foreach (var info in infoparam!)
-        //    {
-        //        if (info.ParameterNumber == 1)
-        //        {
-        //            InvSource = Convert.ToInt32(info.ParameterValue);
-        //        }
-        //        if (info.ParameterNumber == 2)
-        //        {
-        //            InvDest = Convert.ToInt32(info.ParameterValue);
-        //        }
-        //        if (info.ParameterNumber == 3)
-        //        {
-        //            TransactionCode = string.IsNullOrEmpty(info.ParameterValue) ? "" : info.ParameterValue.Trim();
-        //        }
-        //        if (info.ParameterNumber == 4)
-        //        {
-        //            TypeCallId = Convert.ToInt32(info.ParameterValue);
-        //        }
-
-
-        //    }
-
-        //    if (InvSource == 0 || InvDest == 0 || string.IsNullOrEmpty(TransactionCode) || TypeCallId == 0)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //            $"There is not Inventory Transactions parameters.");
-        //    }
-
-        //    // Paso 1: Transacción en WMS (header + detail)
-        //    var wmsTransaction = await _transactionsWMSINVService.CreateInventoryTransaction(objInvData, ct);
-        //    if (!wmsTransaction.Success)
-        //    {
-        //        return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //            $"Error creating WMS Inventory transaction. Error {wmsTransaction.Error}.");
-        //    }
-        //    // Paso 2: Transacción en Zebra
-        //    try
-        //    {
-        //        await using var tx = await _context.Database.BeginTransactionAsync(ct);
-
-        //        //create IrReceip hdr and detail transction
-
-        //        var infoIrReceipt = await _transactionsASNINVRepository.CreateIrReceiptHdrAndDetailLog(RequestASNData, detaillist, ct);
-
-        //        if (infoIrReceipt <= 0)
-        //        {
-        //            await tx.RollbackAsync(ct);
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //           $"Error creating Receipt Transaction for this ASN :{AsnId}.");
-        //        }
-
-        //        var groupedByItemSerial = detaillist
-        //           .Where(d => !string.IsNullOrWhiteSpace(d.partnumber)
-        //                    && !string.IsNullOrWhiteSpace(d.serialnumber))
-        //           .GroupBy(d => new
-        //           {
-        //               Part = "ZEBRA-" + d.partnumber.Trim().ToUpperInvariant(),
-        //               Serial = d.serialnumber.Trim().ToUpperInvariant()
-        //           })
-        //           .Select(g => new
-        //           {
-        //               PartNumber = g.Key.Part,
-        //               SerialNumber = g.Key.Serial,
-        //               Qty = g.Sum(x => x.qty)
-        //           })
-        //           .ToList();
-
-
-        //        var partNumbers = groupedByItemSerial.Select(x => x.PartNumber).Distinct().ToList();
-
-
-        //        var items = await _context.TzebB2bMasterPartDefinition
-        //                .Where(i => partNumbers.Contains(i.PartNo))
-        //                .Select(i => new { i.Id, i.PartNo })
-        //                .ToListAsync(ct);
-
-        //        var idByPart = items.ToDictionary(x => x.PartNo, x => x.Id, StringComparer.OrdinalIgnoreCase);
-
-        //        var result = (
-        //            from g in groupedByItemSerial                   // { PartNumber, SerialNumber, Qty }
-        //            join i in items on g.PartNumber equals i.PartNo // items: { Id, PartNo }
-        //            select new
-        //            {
-        //                ItemId = i.Id,
-        //                PartNumber = g.PartNumber,   // con "ZEBRA-"
-        //                SerialNumber = g.SerialNumber,
-        //                Qty = g.Qty
-        //            }
-        //        ).ToList(); // List<anon>
-
-
-
-        //        List<TzebB2bReplacementPartsInventoryLogDto> listItemDetail = new List<TzebB2bReplacementPartsInventoryLogDto>();
-
-        //        foreach (var item in result)
-        //        {
-
-        //            var datalog = new TzebB2bReplacementPartsInventoryLogDto
-        //            {
-
-        //                PartDefinitionId = item.ItemId,
-        //                InventoryTypeIdSource = InvSource,
-        //                InventoryTypeIdDest = InvDest,
-        //                SerialNo = item.SerialNumber,
-        //                Qty = item.Qty,
-        //                Notes = AsnId,
-        //                RepairNo = null,
-        //                DateInserted = DateTime.Now
-
-        //            };
-
-        //            listItemDetail.Add(datalog);
-
-        //        }
-
-        //        //create inventory movement log and update inventory table 
-
-        //        var infotran = _transactionsCommonINVRepository.createInventoryTransactionLog(listItemDetail, _currentUser.UserId!, ct);
-
-
-        //        //update HDR ASN table with processed true
-
-        //        infoAsn.Processed = true;
-
-        //        _context.TzebB2bAsnOutHdrDetItemInbConsReqs.Update(infoAsn);
-        //        await _context.SaveChangesAsync(ct);
-
-        //        //update receive ASN call with process true
-
-        //        infocallreceiving.Processed = true;
-
-        //        _context.TzebB2bInbConsReqs.Update(infocallreceiving);
-        //        await _context.SaveChangesAsync(ct);
-
-        //        //create out put consigment call
-
-        //        TzebB2bOutConsReqsInsertDto objcallout = new TzebB2bOutConsReqsInsertDto();
-
-        //        objcallout.TypeOfCallId = TypeCallId;
-        //        objcallout.TransactionCode = TransactionCode;
-
-
-        //        var outputCallNUmber = await _transactionsCommonINVRepository.createConsOutPutCall(objcallout, ct);
-
-        //        if (outputCallNUmber <= 0)
-        //        {
-        //            await tx.RollbackAsync(ct);
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //           $"Error creating ASN OutPut Call Transaction for this ASN :{AsnId}.");
-        //        }
-
-        //        //update IRecepit Hdr with ID output call
-
-        //        var infoRECEIPT = await _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.FirstOrDefaultAsync(x => x.Id == infoIrReceipt);
-
-        //        if (infoRECEIPT == null) {
-        //            await tx.RollbackAsync(ct);
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //           $"Receipt Transaction for this ASN :{AsnId} not found .");
-        //        }
-
-
-        //        infoRECEIPT.ConsignDbkrequestId = outputCallNUmber;
-
-        //        _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.Update(infoRECEIPT);
-        //        await _context.SaveChangesAsync(ct);
-
-        //        var updatecall = await _transactionsCommonINVRepository.updateConsOutPutCallReadyToProcess(outputCallNUmber, ct);
-
-
-        //        if (!updatecall)
-        //        {
-        //            await tx.RollbackAsync(ct);
-        //            return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-        //           $"Error updating Output call {outputCallNUmber} for this ASN :{AsnId}.");
-
-        //        }
-
-
-        //        await tx.CommitAsync(ct);
-
-        //        PickProcessResponseDto objres = new PickProcessResponseDto();
-
-
-        //        return ApiResponseFactory.Ok(objres, "Pick process completed successfully");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // rollback zebra + compensar wms
-        //        //await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
-        //        return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.Message}");
-        //    }
-        //}
 
 
     }

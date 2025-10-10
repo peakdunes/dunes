@@ -17,5 +17,7 @@ namespace DUNES.UI.Services.Inventory.ASN
         Task<ApiResponse<ASNWm>> GetAsnInfo(string asnNumber, string token,CancellationToken ct);
 
        
+
+       // Task<ApiResponse<int>> ProcessASNTransaction(string asnNumber, string token, CancellationToken ct);
     }
 }

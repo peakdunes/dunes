@@ -282,33 +282,64 @@ if (app.Environment.IsDevelopment())
 }
 
 
-// Middleware: asegura uno TRACE-ID por request y respeta el entrante
-
-app.Use(async (ctx, next) =>
-{
-    var incoming = ctx.Request.Headers["X-Trace-Id"].FirstOrDefault();
-    var traceId = string.IsNullOrWhiteSpace(incoming)
-        ? ctx.TraceIdentifier ?? Guid.NewGuid().ToString("N")
-        : incoming.Trim();
-
-    ctx.Items["__TraceId"] = traceId;
-    ctx.Response.Headers["X-Trace-Id"] = traceId;
-    await next();
-});
 // Middleware: obtiene informacion de la transaccion 
 app.Use(async (ctx, next) =>
 {
+    //esta variable "reqInfo" toma los datos claves del request 
+    //(Method, Path, Query) para dejarlos en un servicio scoped (IRequestInfo)
+    //para que por ID podamos mostrarlos en cualquier parte del API
+
     var reqInfo = ctx.RequestServices.GetRequiredService<IRequestInfo>();
     reqInfo.Path = ctx.Request.Path.Value;
     reqInfo.Method = ctx.Request.Method;
     reqInfo.Query = ctx.Request.QueryString.Value;
+
+    // TraceId: toma del header o genera
+    var traceId = ctx.Request.Headers["X-Trace-Id"].FirstOrDefault() ?? Guid.NewGuid().ToString();
+    ctx.Items["TraceId"] = traceId; // disponible para el resto del pipeline
+
+    // Escribir el header justo antes de enviar la respuesta (evita el error de headers read-only)
+    ctx.Response.OnStarting(() =>
+    {
+        if (!ctx.Response.Headers.ContainsKey("X-Trace-Id"))
+            ctx.Response.Headers.Append("X-Trace-Id", traceId);
+        return Task.CompletedTask;
+    });
+
+
     await next();
 });
+
+//escribe log de transacciones usando Serilog, y aqui en opts adicionamos 
+//TraceId UserName CLienteIp y queryString al archivo de log
+app.UseSerilogRequestLogging(opts =>
+{
+
+    //este es el formato del log que muestra en cada linea del archivo.
+    opts.MessageTemplate =
+        "HTTP {RequestMethod} {RequestPath}{QueryString} responded {StatusCode} in {Elapsed:0.0000} ms | TraceId={TraceId} User={UserName} Ip={ClientIp}";
+
+    opts.EnrichDiagnosticContext = (diag, http) =>
+    {
+        var traceId = http.Items.TryGetValue("TraceId", out var t) ? t as string : null;
+        var user = http.User?.Identity?.Name ?? "anonymous";
+        var ip = http.Connection.RemoteIpAddress?.ToString() ?? "n/a";
+        var qs = http.Request.QueryString.HasValue ? http.Request.QueryString.Value : "";
+
+        diag.Set("TraceId", traceId ?? "n/a");
+        diag.Set("UserName", user);
+        diag.Set("ClientIp", ip);
+        diag.Set("QueryString", qs);
+    };
+});
+
+
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
-app.UseSerilogRequestLogging();
+
+
 app.UseRouting();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();

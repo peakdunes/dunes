@@ -1,6 +1,8 @@
 ﻿using DUNES.API.Services.Inventory.ASN.Queries;
+using DUNES.API.Services.Inventory.ASN.Transactions;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -17,14 +19,16 @@ namespace DUNES.API.Controllers.Inventory.ASN
     {
 
         private readonly ICommonQueryASNINVService _service;
-
+        private readonly ITransactionsASNINVService _transactionASNService;
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="service"></param>
-        public CommonQueryASNINVController(ICommonQueryASNINVService service)
+        /// <param name="transactionASNService"></param>
+        public CommonQueryASNINVController(ICommonQueryASNINVService service, ITransactionsASNINVService transactionASNService)
         {
             _service = service;
+            _transactionASNService = transactionASNService;
         }
 
         /// <summary>
@@ -46,6 +50,25 @@ namespace DUNES.API.Controllers.Inventory.ASN
         {
             return await HandleApi(ct => _service.GetASNAllInfo(ShipmentNum, ct), ct);
         }
-        
+
+
+        /// <summary>
+        /// Process ASN Transaction
+        /// </summary>
+        /// <param name="AsnId">ID Transaction NUmber</param>
+        /// <param name="WmsTran">WMS Transaction (Header and Detail)</param>
+        /// <param name="TrackingNumber">Tracking Number ASN Receiving</param>
+        /// <param name="listdetail">ASN Bins distribution</param>
+        /// <param name="ct">Cancelation TOken</param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<ASNWm>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpGet("asn-process/{ShipmentNum}")]
+        public async Task<IActionResult> ProcessASNTransaction(string AsnId, NewInventoryTransactionTm WmsTran, string TrackingNumber , List<BinsToLoadWm> listdetail, CancellationToken ct)
+        {
+            return await HandleApi(ct => _transactionASNService.CreateASNReceivingTransaction(AsnId, WmsTran, TrackingNumber, listdetail, ct), ct);
+        }
+
+
     }
 }
