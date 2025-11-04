@@ -2,6 +2,7 @@
 using DUNES.API.ReadModels.Inventory;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 
 namespace DUNES.API.Repositories.Inventory.ASN.Queries
 {
@@ -33,6 +34,8 @@ namespace DUNES.API.Repositories.Inventory.ASN.Queries
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ASNRead?> GetASNAllInfo(string ShipmentNum)
         {
+            
+
 
             var infoHdr = _context.TzebB2bAsnOutHdrDetItemInbConsReqs.FirstOrDefault(x => x.ShipmentNum == ShipmentNum);
 
@@ -52,9 +55,25 @@ namespace DUNES.API.Repositories.Inventory.ASN.Queries
             {
                 asnheader = infoHdr,
                 asnlistdetail = infodetail
-            
+
             };
 
+            //we check if there is information about ASN receiving process
+
+            var inforeceivingAsn = await _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.FirstOrDefaultAsync(x => x.ShipmentNum == ShipmentNum);
+
+            if (inforeceivingAsn != null)
+            {
+                objdet.receivingHdr = inforeceivingAsn;
+
+                var inforeceivingAsnDetail = await _context.TzebB2bIrReceiptLineItemTblItemInbConsReqsLog.Where(x => x.IrReceiptOutHdrDetItemId == inforeceivingAsn.Id).ToListAsync();
+
+                if (inforeceivingAsnDetail.Count > 0)
+                {
+                    objdet.receiveingListDetail = inforeceivingAsnDetail;
+                }
+            }
+            
             
             return objdet;
 

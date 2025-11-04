@@ -1,9 +1,13 @@
 ﻿using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Infrastructure;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 
 namespace DUNES.UI.Services.Inventory.ASN
@@ -39,16 +43,22 @@ namespace DUNES.UI.Services.Inventory.ASN
             return await resp.ReadAsApiResponseAsync<ASNWm>(ct);
         }
 
-    
+        public async Task<ApiResponse<ASNResponseDto>> ProcessASNTransaction(string asnNumber, ProcessAsnRequestTm objInvData, string trackingNumber,  string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var json = JsonConvert.SerializeObject(objInvData);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
 
-
-     
+            var respapi = await _httpClient.PostAsync(
+                $"/api/CommonQueryASNINV/asn-process/{asnNumber}/{trackingNumber}",
+                content
+            );
+                       
+            return await respapi.ReadAsApiResponseAsync<ASNResponseDto>(ct);
+        }
 
       
-     
-
-      
-
     }
 }

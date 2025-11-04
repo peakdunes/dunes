@@ -21,7 +21,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
         /// <param name="ct"></param>
         /// <param name="detaillist"></param>
         /// <returns></returns>
-        Task<ApiResponse<PickProcessResponseDto>> CreateASNReceivingTransaction(string AsnId, NewInventoryTransactionTm objInvData, string trackingNumber, List<BinsToLoadWm> detaillist, CancellationToken ct);
+        Task<ApiResponse<ASNResponseDto>> CreateASNReceivingTransaction(string AsnId, NewInventoryTransactionTm objInvData, string trackingNumber, List<BinsToLoadWm> detaillist, CancellationToken ct);
 
 
     }

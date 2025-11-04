@@ -280,70 +280,9 @@
 
     </div>
 
+   
+
     <div class="card shadow-sm mb-2">
-
-
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Information to process in WMS </h6>
-            <a href="#" class="text-decoration-none" onclick="hidedetail()">
-                <i id="ocultarDetail" class="fa-solid fa-eye"></i>
-            </a>
-        </div>
-
-
-        <div class="row gx-3 gy-2 px-3 mb-3" id="detail1">
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Location</label>
-                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
-                    <option disabled selected>Select Location</option>
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Company Client</label>
-                <select id="companyclient" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">Division</label>
-                <select id="divisionid" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">Tracking Number ASN</label>
-                <input ID="trackingnumberid" disabled class="form-control" />
-            </div>
-
-
-
-        </div>
-        <div class="row gx-3 gy-2 px-3 mb-3" id="detail2">
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Concept</label>
-                <select id="conceptid" disabled class="form-control">
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Input Transfer Transaction Type</label>
-                <select id="transactionid" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label">Observations (500)</label>
-                <input ID="observations" disabled maxlength="500" class="form-control" />
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="card shadow-sm">
         <div class="card-header bg-white">
             <h6 class="mb-0 display-6 fs-4 text-primary ms2">Part Number Detail</h6>
         </div>
@@ -423,11 +362,10 @@
         </div>
     </div>
 
-
-    <div class="card shadow-sm mt-2">
+    <div class="card shadow-sm mb-2">
 
         <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Pick Process Calls Information</h6>
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">ASN Calls Information</h6>
             <a href="#" class="text-decoration-none" onclick="hidecalls()">
                 <i id="ocultarCalls" class="fa-solid fa-eye"></i>
             </a>
@@ -467,7 +405,7 @@
 
                             }
                         }
-                 
+
                     </tbody>
                 </table>
 
@@ -496,7 +434,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                       @*  @if (Model?.CallsRead.outputCallsList != null)
+                        @*  @if (Model?.CallsRead.outputCallsList != null)
                         {
 
 
@@ -529,8 +467,171 @@
 
     </div>
 
+    <div class="card shadow-sm mb-2">
+
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Information to process in WMS </h6>
+            <a href="#" class="text-decoration-none" onclick="hideWMS()">
+                <i id="ocultarWMS" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Location</label>
+                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
+                    <option disabled selected>Select Location</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="companyclient" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Division</label>
+                <select id="divisionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Tracking Number ASN</label>
+                <input ID="trackingnumberid" disabled class="form-control" />
+            </div>
+
+
+
+        </div>
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS2">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Concept</label>
+                <select id="conceptid" disabled class="form-control">
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Input Transfer Transaction Type</label>
+                <select id="transactionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Observations (500)</label>
+                <input ID="observations" disabled maxlength="500" class="form-control" />
+
+            </div>
+
+        </div>
+
+    </div>
 
     
+
+    <div class="card shadow-sm mt-2">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">ASN Receiving Information</h6>
+            <a href="#" class="text-decoration-none" onclick="hideReceipt()">
+                <i id="ocultarReceipt" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+        <div class="card-body" id="divbodyreceiving">
+
+            <div class="row mt-2">
+                <div class="col-12 col-md-2">
+                    <label class="form-label" asp-for="asdDto.asnReceiptHdr.Id"></label>
+                    <input asp-for="asdDto.asnReceiptHdr.Id" disabled class="form-control" />
+                </div>
+                <div class="col-12 col-md-2">
+                    <label class="form-label" asp-for="asdDto.asnReceiptHdr.ConsignDbkrequestId"></label>
+                    <input asp-for="asdDto.asnReceiptHdr.ConsignDbkrequestId" disabled class="form-control" />
+                </div>
+
+                <div class="col-12 col-md-2">
+                    <label class="form-label" asp-for="asdDto.asnReceiptHdr.OrgSystemId3pl"></label>
+                    <input asp-for="asdDto.asnReceiptHdr.OrgSystemId3pl" disabled class="form-control" />
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label" asp-for="asdDto.asnReceiptHdr.ShipmentNum"></label>
+                    <input asp-for="asdDto.asnReceiptHdr.ShipmentNum" disabled class="form-control" />
+                </div>
+
+                <div class="col-12 col-md-3">
+                    <label class="form-label" asp-for="asdDto.asnReceiptHdr.DateTimeInserted"></label>
+                    <input asp-for="asdDto.asnReceiptHdr.DateTimeInserted" disabled class="form-control" />
+                </div>
+
+            </div>
+            <div class="row mt-2">
+                <table id="tableuserreceiptDetail" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        ASN RECEIVING PROCESS DETAIL
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Id</th>
+                            <th>Receipt Id</th>
+                            <th>Shipment Line Id</th>
+                            <th>Line Number</th>
+                            <th>Quantity</th>
+                            <th>Unit Of Measure</th>
+                            <th>Inventory Item Id</th>
+                            <th>Item Id</th>
+                            <th>Receipt Date</th>
+                            <th>Transaction Date</th>
+                            <th>Inserted Date</th>
+                            <th>3pl Locator Status</th>
+                            <th>Is Rtv Part</th>
+                            <th>Is CE Part</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.asdDto.asnReceiptList != null)
+                        {
+                            foreach (var item in Model.asdDto.asnReceiptList)
+                            {
+                                <tr>
+
+                                    <td>@item.Id</td>
+                                    <td>@item.IrReceiptOutHdrDetItemId</td>
+                                    <td>@item.ShipmentLineId</td>
+                                    <td>@item.LineNum</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.UnitOfMeasure</td>
+                                    <td>@item.InventoryItemId</td>
+                                    <td>@item.ItemNumber</td>
+                                    <td>@item.ReceiptDate.ToString()</td>
+                                    <td>@item.TransactionDate.ToString()</td>
+                                    <td>@item.DateTimeInserted.ToString()</td>
+                                    <td>@item.To3plLocatorStatus</td>
+                                    <td>@item.IsRtvPart</td>
+                                    <td>@item.IsCePart</td>
+
+
+                                </tr>
+
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+   
+
+
+
 
     <form id="af" style="display:none">
         @Html.AntiForgeryToken()
@@ -540,32 +641,731 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function ()
-        {
+          $(document).ready(function ()
+          {
 
 
-            $('#tableuserbinitems').DataTable({
+                $('#tableuserreceiptDetail').DataTable({
+                    scrollX: true,
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
 
-                 processing: true,
-                  deferRender: true,
-                  stateSave: true,
-                  autoWidth: false,
-                  responsive: false,
-                  pageLength: 10,
-                  "bPaginate": false,
-                  "bLengthChange": false,
-                  "bFilter": true,
-                  "bInfo": false,
-                  "bAutoWidth": false,
-                  "searching": false
+
+              });
 
 
-            });
+              $('#tableuserbinitems').DataTable({
 
-            $('#tableuserbines').DataTable({
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
 
-                 processing: true,
-                 scrollX:true,
+
+              });
+
+              $('#tableuserbines').DataTable({
+
+                   processing: true,
+                   scrollX:true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: true,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "searching": false,
+
+              });
+
+              $('#tableuser').DataTable
+              ({
+                    processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    scrollX: true, // ✅ Habilita scroll horizontal
+                    responsive: false, // ✅ Evita que se escondan columnas
+                    pageLength: 25,
+
+                    order: [[11, 'desc']],
+
+                    columnDefs: [
+                      { targets: [5, 6,7], className: 'text-end' },
+                      { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                      { targets: '_all', className: 'align-middle' }
+                    ],
+
+                    dom:
+                      "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                      "<'row'<'col-12'tr>>" +
+                      "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+
+                    language: {
+                      search: "",
+                      searchPlaceholder: "Search...",
+                      lengthMenu: "_MENU_ entries per page",
+                      info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                      infoEmpty: "Showing 0 to 0 of 0 entries",
+                      infoFiltered: "(filtered from _MAX_ total entries)",
+                      zeroRecords: "No data available in table",
+                      paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                    }
+              });
+
+              $(function () {
+                    const $form = $('#asn-form');
+                    $form.on('submit', function (e) {
+                      showSpinner();
+                    });
+              });
+          });
+
+            let currentRequest = null;
+
+             $('#locationid').change(async function(){
+
+              if (currentRequest) {
+                  currentRequest.abort();
+              }
+
+              var $companyClient = $('#companyclient');
+
+              var locationid = $(this).val();
+
+              clearComboBox();
+
+               $companyClient.empty()
+              .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+
+               if (!locationid) return;
+
+
+                // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+              var token = $('input[name="__RequestVerificationToken"]').val();
+
+              showSpinner();
+
+              alert('pasando');
+
+              currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
+                      data: { __RequestVerificationToken: token,  locationid: locationid }})
+              .done(function (res)
+              {
+
+                  if (res.message == "OK")
+                  {
+                      var list = (res && res.data) ? res.data : [];
+
+                      if (Array.isArray(list) && list.length)
+                      {
+                          $.each(list, function (_, it) {
+                          var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                          var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                          $companyClient.append($('<option>', { value: id, text: name }));
+                          });
+                          $companyClient.prop('disabled', false);
+                      }
+                  }
+                  else
+                  {
+                        $('#locationid option').prop('selected', function () {
+                                  return this.defaultSelected;
+                        });
+
+                      errorAction(res.message);
+                  }
+
+              })
+              .fail(function (xhr, status) {
+                   if (status !== "abort") {
+                      errorAction("Error:", status);
+                  }
+              }).always(function(){
+
+                  hideSpinner();
+              });
+
+          })
+
+            function clearComboBox()
+            {
+
+              var $bin = $('#binselid');
+              var $concepts = $('#conceptid');
+              var $transactions = $('#transactionid');
+              var $division = $('#divisionid');
+
+              $bin.empty()
+              .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // reset select concepts
+              $concepts.empty()
+              .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // reset select transactions
+              $transactions.empty()
+              .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              $division.empty()
+              .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+            }
+
+          $('#companyclient').change(function()
+          {
+
+
+
+              var companyClient = $(this).val();
+
+              var $bin = $('#binselid');
+              var $concepts = $('#conceptid');
+              var $transactions = $('#transactionid');
+              var $inventorytypes = $('#inventorytypeid');
+              var $itemstatus = $('#statusid');
+              var $wmsinventorytypes = $('#typeid');
+              var $division = $('#divisionid');
+              // var $itemstatusdefault = $('#itemstatusdefault');
+
+              // itemstatusdefault
+
+              // reset select bins
+              $bin.empty()
+              .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // reset select concepts
+              $concepts.empty()
+              .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // reset select transactions
+              $transactions.empty()
+              .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // reset select inventorytypes
+              $inventorytypes.empty()
+              .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true}))
+              .prop('disabled', true);
+
+
+                $itemstatus.empty()
+              .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+
+                 $division.empty()
+              .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              // $itemstatusdefault.empty()
+              // .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
+              // .prop('disabled', true);
+
+
+              $wmsinventorytypes.empty()
+              .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
+              .prop('disabled', true);
+
+              if (!companyClient) return;
+
+              // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+              var token = $('input[name="__RequestVerificationToken"]').val();
+
+              showSpinner();
+
+              $.ajax({url: '@Url.Action("getAllAditionalInformation", "ASN")',type: 'POST',
+                      data: { __RequestVerificationToken: token,  companyclient: companyClient }})
+              .done(function (res)
+              {
+                  var list = (res && res.data.listbines) ? res.data.listbines : [];
+                  if (Array.isArray(list) && list.length)
+                  {
+                      $.each(list, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
+                      $bin.append($('<option>', { value: id, text: name }));
+                      });
+                      $bin.prop('disabled', false);
+                  }
+
+                  var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
+                  if (Array.isArray(listc) && list.length)
+                  {
+                      $.each(listc, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.Name !== undefined) ? it.name : it.name;
+                      $concepts.append($('<option>', { value: id, text: name }));
+                      });
+                      $concepts.prop('disabled', false);
+                  }
+
+
+                    var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
+                  if (Array.isArray(listt) && list.length)
+                  {
+                      $.each(listt, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.Name !== undefined) ? it.name : it.name;
+                      $transactions.append($('<option>', { value: id, text: name }));
+                      });
+                      $transactions.prop('disabled', false);
+                  }
+
+
+
+
+                     var listi = (res && res.data.listinventorytype) ? res.data.listinventorytype : [];
+                  if (Array.isArray(listi) && list.length)
+                  {
+                      $.each(listi, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.Name !== undefined) ? it.name : it.name;
+                      $inventorytypes.append($('<option>', { value: id, text: name.trim() }));
+                      });
+                      $inventorytypes.prop('disabled', false);
+                  }
+
+                  var lists = (res && res.data.listitemstatus) ? res.data.listitemstatus : [];
+                  if (Array.isArray(lists) && list.length)
+                  {
+                      $.each(lists, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.Name !== undefined) ? it.name : it.name;
+                      $itemstatus.append($('<option>', { value: id, text: name }));
+                      });
+                      $itemstatus.prop('disabled', false);
+                  }
+
+                  //     //  $.each(lists, function (_, it) {
+                  //     // var id = (it.id !== undefined) ? it.id : it.Id;
+                  //     // var name = (it.Name !== undefined) ? it.name : it.name;
+                  //     // $itemstatusdefault.append($('<option>', { value: id, text: name }));
+                  //     // });
+                  //     // $itemstatusdefault.prop('disabled', false);
+
+                  // }
+
+                    var listw = (res && res.data.listwmsinventorytype) ? res.data.listwmsinventorytype : [];
+                  if (Array.isArray(listw) && list.length)
+                  {
+                      $.each(listw, function (_, it) {
+                      var id = (it.id !== undefined) ? it.id : it.Id;
+                      var name = (it.Name !== undefined) ? it.name : it.name;
+                      $wmsinventorytypes.append($('<option>', { value: id, text: name.trim() }));
+                      });
+                      $wmsinventorytypes.prop('disabled', false);
+                  }
+
+                  var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+
+                  if (Array.isArray(lisdiv) && lisdiv.length)
+                      {
+                          $.each(lisdiv, function (_, it) {
+
+                          var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                          var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                          $division.append($('<option>', { value: id, text: name }));
+                          });
+                          $division.prop('disabled', false);
+                      }
+
+                     $('#trackingnumberid').prop('disabled', false);
+                     $('#observations').prop('disabled', false);
+              })
+              .fail(function (xhr) {
+                  console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                  alert('Could not load bins.');
+              }).always(function(){
+
+                  hideSpinner();
+              });
+          })
+
+          $('#inventorytypeid').change(function(){
+
+                  const selectedText = $(this).find('option:selected').text();
+
+                      $('#typeid option').filter(function () {
+                          return $(this).text().trim() === selectedText;
+                      }).prop('selected', true);
+
+          });
+
+
+           $('#itemstatusdefault').change(function(){
+
+                  const selectedText = $(this).find('option:selected').text();
+
+                      $('#statusid option').filter(function () {
+                          return $(this).text().trim() === selectedText;
+                      }).prop('selected', true);
+
+                     $('#divdist').removeClass("d-none");
+          });
+
+
+          function openmodal(id, qtypending, partnumber, asnlineid)
+          {
+              alert(asnlineid);
+
+              $('#lineid').val(id);
+              $('#qtyreceive').val(qtypending);
+              $('#qtypending').val(qtypending);
+              $('#partnoid').val(partnumber);
+              $('#asnlineid').val(asnlineid);
+
+              var lineid = id;
+
+              var companyclient = $('#companyclient option:selected').val();
+
+              //we search all inventory cuantity for this companyclient and part number
+               showSpinner();
+
+              $.ajax({url:"@Url.Action("checkInventoryByPartNumber", "ASN")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid},type:"post"})
+              .done(function(data){
+
+                  if (data != null)
+                  {
+
+                      if (data.status == null)
+                      {
+                          if (data.listinventory != null)
+                          {
+
+                              JsonArrayInventory = [];
+
+                              for (var i = 0; i < data.listinventory.length; i++)
+                              {
+
+                                  var f = data.listinventory[i];
+
+                                  JsonArrayInventory.push({
+                                          binname: f.binname,
+                                          typename: f.inventoryname,
+                                          statusname :f.statusname,
+                                          qty: f.qty
+                                  });
+                               }
+
+                               $('#tableuserbinitems').DataTable({
+                                   data: JsonArrayInventory,
+                                   destroy: true,
+                                   //scrollX: true,
+                                   processing: true,
+                                   deferRender: true,
+                                   stateSave: true,
+                                   autoWidth: false,
+                                   responsive: false,
+                                   pageLength: 10,
+                                   "bPaginate": false,
+                                   "bLengthChange": false,
+                                   "bFilter": true,
+                                   "bInfo": false,
+                                   "bAutoWidth": false,
+                                   "searching": false,
+                                   columns: [
+                                       { "data": "binname" },
+                                       { "data": "typename" },
+                                       { "data": "statusname" },
+                                       { "data": "qty", "class":"derecha" },
+                                   ]
+                               });
+                          }
+
+                          if (data.listbines != null) {
+
+                               var JsonArrayBines = [];
+
+                               for (var i = 0; i < data.listbines.length; i++) {
+
+                                   var f = data.listbines[i];
+
+                                   JsonArrayBines.push({
+                                       actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                       id: f.id,
+                                       partno: f.partnumber,
+                                       qty: f.qty,
+                                       type: f.inventorytype,
+                                       typename: f.typename,
+                                       binid : f.binid,
+                                       binname: f.tagname,
+                                       statusid : f.statusid,
+                                       statusname :f.statusname
+                                   });
+                               }
+
+                               showbinDistribution(JsonArrayBines);
+                           }
+
+
+
+                      }
+                      else
+                      {
+                           showToast("info", data.status);
+                      }
+                  }
+
+              })
+              .fail(function(){})
+              .always(function(){
+               hideSpinner();
+              });
+              // Mostrar el modal
+              const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+              modal.show();
+
+          }
+
+
+            async function addqtybin() {
+
+
+              const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
+
+              if (!ok) return;
+
+
+              var binid = $('#binselid option:selected').val();
+
+
+
+               if (binid == '-- Select bin --' || binid == null || binid == '')
+               {
+
+                   alert('Bin is required');
+                   return false;
+               }
+
+               var typeid = $('#typeid option:selected').val();
+
+               if (typeid == '-- Select Type --' || typeid == null || typeid == '')
+               {
+
+                   alert('Inventory Type is required');
+                   return false;
+               }
+
+               var statusid = $('#statusid option:selected').val();
+
+
+               if (statusid == '-- Select Status --' || statusid == null || statusid == '')
+               {
+
+                   alert('Item status is required');
+                   return false;
+               }
+
+
+               var qtybin = $('#qtyreceive').val();
+
+               var lineid = $('#lineid').val();
+
+               var totalacum = $('#qtybintotal').val();
+
+               var totalpending = $('#qtypending').val();
+
+               if (qtybin <= 0) {
+                   alert('Qty must be greater than zero');
+                   return false;
+
+               }
+
+               var tagname = $('#binselid option:selected').text();
+
+               var typename = $('#typeid option:selected').text();
+
+               var statusname = $('#statusid option:selected').text();
+
+
+
+               if (parseInt(totalpending) < parseInt(qtybin)) {
+
+                   alert('amount received is greater than the amount pending');
+                   $('#qtyreceive').focus();
+                   $('#qtyreceive').select();
+                   return false;
+
+               }
+
+               var partno = $('#partnoid').val();
+
+               var asnlineid = $('#asnlineid').val();
+
+                showSpinner();
+
+               $.ajax({
+                   url: "@Url.Action("addqtybin", "ASN")",
+                   data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid, statusname : statusname, asnlineid:asnlineid }, type: "post"
+               })
+                   .done(function (data) {
+
+                       if (data.status == "OK") {
+
+                           if (data.thereisdata)
+                           {
+                               $('#divprocess').show();
+                           }
+
+                          // $('#qtyreceive').val("0");
+
+                             $('#qtyreceive').val(data.totalpendind);
+
+                             $('#qtypending').val(data.totalpendind);
+
+
+                           //se reinician los select de bines y tipos de inventario
+
+                           $('#binselid option').prop('selected', function () {
+                               return this.defaultSelected;
+                           });
+
+                           $('#typeid option').prop('selected', function () {
+                               return this.defaultSelected;
+                           });
+
+                           $('#qtybintotal').val(data.totalqty);
+
+                           var lineid = $('#lineid').val();
+
+
+                           $('#lab-' + lineid).text(data.totalqty);
+
+
+                           if (data.listbines != null) {
+
+                               var JsonArrayBines = [];
+
+                               for (var i = 0; i < data.listbines.length; i++) {
+
+                                   var f = data.listbines[i];
+
+                                   JsonArrayBines.push({
+                                       actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                       id: f.id,
+                                       partno: f.partnumber,
+                                       qty: f.qty,
+                                       type: f.inventorytype,
+                                       typename: f.typename,
+                                       binid : f.binid,
+                                       binname: f.tagname,
+                                       statusid : f.statusid,
+                                       statusname :f.statusname
+                                   });
+                               }
+
+                               showbinDistribution(JsonArrayBines);
+                           }
+
+
+                           if (data.listapartnumber != null) {
+
+                               var JsonArrayShipList = [];
+
+                               for (var i = 0; i < data.listapartnumber.length; i++) {
+
+                                   var f = data.listapartnumber[i];
+
+                                  var textaction = '';
+
+                                  if (!f.processed)
+                                  {
+                                      showbuttonprocess = true;
+                                      //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                      textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                  }
+
+
+
+                                  JsonArrayShipList.push({
+                                       actions: textaction,
+                                       id : f.id,
+                                       itemid : f.itemId,
+                                       partnumber : f.itemNumber,
+                                       line: f.lineId,
+                                       qtyshipped: f.quantityShipped,
+                                       qtyreceived: f.quantityReceived,
+                                       qtypending: f.quantityPending,
+                                       itemdescription: f.itemDescription,
+                                       attribute2 : f.attributte2,
+                                       datetimeinserted : f.dateTimeInserted,
+                                       processed : f.processed,
+                                       thereisdistribution : f.thereisdistribution
+                                   });
+                               }
+
+
+                               showbindetail(JsonArrayShipList);
+
+                           }
+                           ///////////////
+
+                       }
+                       else {
+
+
+
+                           swal({
+                               title: "Warning!",
+                               text: data.status,
+                               icon: "warning",
+                               button: "OK",
+                           }).then((value) => {
+
+                               $("#spinner").fadeOut();
+                               $("#contenedor").removeClass("disabledbutton");
+
+
+                               $("#asnidusps").focus();
+
+                           });
+                       }
+
+                   }).fail(function () { }).always(function () { hideSpinner(); });
+
+           }
+
+
+           function showbinDistribution(JsonArrayBines)
+           {
+
+
+              $('#tableuserbines').DataTable({
+                  data: JsonArrayBines,
+                  destroy: true,
+                  processing: true,
+                  scrollX:true,
                   deferRender: true,
                   stateSave: true,
                   autoWidth: true,
@@ -576,1325 +1376,728 @@
                   "bFilter": true,
                   "bInfo": false,
                   "searching": false,
-
-            });
-
-            $('#tableuser').DataTable
-            ({
-                  processing: true,
-                  deferRender: true,
-                  stateSave: true,
-                  autoWidth: false,
-                  scrollX: true, // ✅ Habilita scroll horizontal
-                  responsive: false, // ✅ Evita que se escondan columnas
-                  pageLength: 25,
-
-                  order: [[11, 'desc']],
-
-                  columnDefs: [
-                    { targets: [5, 6,7], className: 'text-end' },
-                    { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
-                    { targets: '_all', className: 'align-middle' }
-                  ],
-
-                  dom:
-                    "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
-                    "<'row'<'col-12'tr>>" +
-                    "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
-
-                  language: {
-                    search: "",
-                    searchPlaceholder: "Search...",
-                    lengthMenu: "_MENU_ entries per page",
-                    info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                    infoEmpty: "Showing 0 to 0 of 0 entries",
-                    infoFiltered: "(filtered from _MAX_ total entries)",
-                    zeroRecords: "No data available in table",
-                    paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                  columns: [
+                      { "data": "actions" },
+                      { "data": "id" },
+                      { "data": "partno" },
+                      { "data": "qty", "class":"derecha" },
+                      { "data": "type","class":"ocultar"},
+                      { "data": "typename" },
+                      { "data": "binid","class":"ocultar"},
+                      { "data": "binname" },
+                      { "data": "statusid","class":"ocultar"},
+                      { "data": "statusname" },
+                      ],
+                      "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                          $(nRow).attr('id', "ln-" + aData.id);
                   }
-            });
 
-            $(function () {
-                  const $form = $('#asn-form');
-                  $form.on('submit', function (e) {
-                    showSpinner();
-                  });
-            });
-        });
-
-          let currentRequest = null;
-
-           $('#locationid').change(async function(){
-
-            if (currentRequest) {
-                currentRequest.abort();
-            }
-
-            var $companyClient = $('#companyclient');
-
-            var locationid = $(this).val();
-
-            clearComboBox();
-
-             $companyClient.empty()
-            .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
-            .prop('disabled', true);
+              });
 
 
-             if (!locationid) return;
+           }
 
-
-              // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            showSpinner();
-
-            alert('pasando');
-
-            currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
-                    data: { __RequestVerificationToken: token,  locationid: locationid }})
-            .done(function (res)
-            {
-
-                if (res.message == "OK")
-                {
-                    var list = (res && res.data) ? res.data : [];
-
-                    if (Array.isArray(list) && list.length)
-                    {
-                        $.each(list, function (_, it) {
-                        var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
-                        var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
-
-                        $companyClient.append($('<option>', { value: id, text: name }));
-                        });
-                        $companyClient.prop('disabled', false);
-                    }
-                }
-                else
-                {
-                      $('#locationid option').prop('selected', function () {
-                                return this.defaultSelected;
-                      });
-
-                    errorAction(res.message);
-                }
-
-            })
-            .fail(function (xhr, status) {
-                 if (status !== "abort") {
-                    errorAction("Error:", status);
-                }
-            }).always(function(){
-
-                hideSpinner();
-            });
-
-        })
-
-          function clearComboBox()
+           function showbindetail(jsondata)
           {
 
-            var $bin = $('#binselid');
-            var $concepts = $('#conceptid');
-            var $transactions = $('#transactionid');
-            var $division = $('#divisionid');
+               $('#tableuser').DataTable({
 
-            $bin.empty()
-            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
-            .prop('disabled', true);
+                  data: jsondata,
+                  destroy: true,
+                  scrollX: true,
+                  columns: [
+                     {
+                      data: null,
+                          render: function (data, type, row) {
+                              return buildDropdown(row);
+                          }
+                      },
+                      { "data": "id" },
+                      { "data": "itemid"},
+                      { "data": "partnumber" },
+                      { "data": "line" },
+                      { "data": "qtyshipped", "class":"derecha" },
+                      { "data": "qtyreceived", "class":"derecha" },
+                      { "data": "qtypending", "class":"derecha" },
+                      { "data": "itemdescription" },
+                      { "data": "attribute2" },
+                      { "data": "datetimeinserted" },
+                      { "data": "processed" },
+                  ],
 
-            // reset select concepts
-            $concepts.empty()
-            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
-            .prop('disabled', true);
+                      createdRow: function (row, data, dataIndex) {
+                      if (data.qtyshipped !== undefined && data.qtyreceived !== undefined) {
+                          // Seleccionamos las celdas de qtyshipped y qtyreceived
+                          let $qtyShippedCell = $('td', row).eq(5);
+                          let $qtyReceivedCell = $('td', row).eq(6);
+                          let $qtyPendingCell = $('td', row).eq(7);
 
-            // reset select transactions
-            $transactions.empty()
-            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
-            .prop('disabled', true);
+                          // Primero limpiamos clases previas por si la fila se vuelve a redibujar
+                          $qtyShippedCell.removeClass('text-success text-danger fw-bold');
+                          $qtyReceivedCell.removeClass('text-success text-danger fw-bold');
+                          $qtyPendingCell.removeClass('text-success text-danger fw-bold');
 
-            $division.empty()
-            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
-            .prop('disabled', true);
+
+                         if (data.qtypending == 0)
+                         {
+                              if (data.qtyreceived == 0)
+                              {
+                               $qtyPendingCell.addClass('text-danger fw-bold')
+                              }
+                          }
+                         else
+                         {
+                              if (data.thereisdistribution)
+                              {
+                                  if (data.qtypending > 0 && data.qtypending <  (data.qtyreceived + data.qtyshipped)) {
+                                      //  Ambos > 0 y qtyreceived < qtyshipped → Azul
+                                     // $qtyShippedCell.addClass('text-primary fw-bold');
+                                      $qtyPendingCell.addClass('text-primary fw-bold');
+                                  }
+                                  else
+                                  {
+                                      // Igual → Verde
+                                      $qtyPendingCell.addClass('text-success fw-bold');
+
+                                  }
+                              }
+                              else
+                              {
+                                   //  Cualquier otro caso → Rojo
+                                  $qtyPendingCell.addClass('text-danger fw-bold');
+                              }
+                         }
+                          // // Asignamos color dependiendo de la condición
+                          // if (data.qtyshipped == data.qtyreceived) {
+                          //     // Igual → Verde
+                          //     $qtyShippedCell.addClass('text-success fw-bold');
+                          //     $qtyReceivedCell.addClass('text-success fw-bold');
+                          // }
+                          // else if (data.qtyshipped > 0 && data.qtyreceived > 0 && data.qtyreceived < data.qtyshipped) {
+                          //     //  Ambos > 0 y qtyreceived < qtyshipped → Azul
+                          //     $qtyShippedCell.addClass('text-primary fw-bold');
+                          //     $qtyReceivedCell.addClass('text-primary fw-bold');
+                          // }
+                          // else {
+                          //     //  Cualquier otro caso → Rojo
+                          //     $qtyShippedCell.addClass('text-danger fw-bold');
+                          //     $qtyReceivedCell.addClass('text-danger fw-bold');
+                          // }
+
+                          // // if (data.qtyshipped > 0 && data.qtyreceived > 0 && data.qtyreceived < data.qtyshipped) {
+
+                          // if (data.qtypending > 0 && data.qtypending <  (data.qtyreceived + data.qtyshipped)) {
+                          //     //  Ambos > 0 y qtyreceived < qtyshipped → Azul
+                          //    // $qtyShippedCell.addClass('text-primary fw-bold');
+                          //     $qtyPendingCell.addClass('text-primary fw-bold');
+                          // }
+                      }
+                  }
+              });
 
           }
 
-        $('#companyclient').change(function()
-        {
+          function buildDropdown(item) {
 
-            
 
-            var companyClient = $(this).val();
+              var qtypendind = item.qtyshipped - item.qtypending;
 
-            var $bin = $('#binselid');
-            var $concepts = $('#conceptid');
-            var $transactions = $('#transactionid');
-            var $inventorytypes = $('#inventorytypeid');
-            var $itemstatus = $('#statusid');
-            var $wmsinventorytypes = $('#typeid');
-            var $division = $('#divisionid');
-            // var $itemstatusdefault = $('#itemstatusdefault');
 
-            // itemstatusdefault
+              // return `
+              // <div class="dropdown">
+              //     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              //         Actions
+              //     </button>
+              //     <ul class="dropdown-menu">
 
-            // reset select bins
-            $bin.empty()
-            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
-            .prop('disabled', true);
+              //         <li>
+              //             <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
+              //         </li>
+              //         <li>
+              //             <a class="dropdown-item" onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')"> 📦 Bins</a>
+              //         </li>
+              //     </ul>
+              // </div>`;
 
-            // reset select concepts
-            $concepts.empty()
-            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
-            .prop('disabled', true);
 
-            // reset select transactions
-            $transactions.empty()
-            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
-            .prop('disabled', true);
+                return `<button type="button"
+                                                      class="btn btn-sm btn-outline-danger me-1 btn-icon"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      title="Delete"
+                                                      onclick="deleteAllBinsDistribution(${item.line})">
+                                                  <i class="fa-solid fa-trash-can"></i>
+                                                  <span class="visually-hidden">Delete</span>
+                                              </button>
 
-            // reset select inventorytypes
-            $inventorytypes.empty()
-            .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true}))
-            .prop('disabled', true);
+                                              <!-- Bins -->
+                                              <button type="button"
+                                                      class="btn btn-sm btn-outline-primary btn-icon"
+                                                      data-bs-toggle="tooltip"
+                                                      data-bs-placement="top"
+                                                      title="Bins"
+                                                      onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}', ${item.id})">
+                                                  <i class="fa-solid fa-box-open"></i>
+                                                  <span class="visually-hidden">Bins</span>
+                                              </button>`;
 
 
-              $itemstatus.empty()
-            .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
-            .prop('disabled', true);
 
+          }
 
-               $division.empty()
-            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
-            .prop('disabled', true);
+          async function distributionByDefault()
+          {
 
-            // $itemstatusdefault.empty()
-            // .append($('<option>', { value: '', text: '-- Select Status --', disabled:true, selected:true }))
-            // .prop('disabled', true);
 
+               const ok = await confirmAction("¿Do you want to create bin distribution default for this RMA ? , Remember : this action will remove all existing distribution");
 
-            $wmsinventorytypes.empty()
-            .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
-            .prop('disabled', true);
+               if (!ok) return;
 
-            if (!companyClient) return;
+               var companyclientid = $('#companyclient option:selected').val();
 
-            // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
-            var token = $('input[name="__RequestVerificationToken"]').val();
+               var typeid = $('#inventorytypeid option:selected').val();
 
-            showSpinner();
+               var typename = $('#inventorytypeid option:selected').text();
 
-            $.ajax({url: '@Url.Action("getAllAditionalInformation", "ASN")',type: 'POST',
-                    data: { __RequestVerificationToken: token,  companyclient: companyClient }})
-            .done(function (res)
-            {
-                var list = (res && res.data.listbines) ? res.data.listbines : [];
-                if (Array.isArray(list) && list.length)
-                {
-                    $.each(list, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
-                    $bin.append($('<option>', { value: id, text: name }));
-                    });
-                    $bin.prop('disabled', false);
-                }
+               var statusid = $('#itemstatusdefault option:selected').val();
 
-                var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
-                if (Array.isArray(listc) && list.length)
-                {
-                    $.each(listc, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $concepts.append($('<option>', { value: id, text: name }));
-                    });
-                    $concepts.prop('disabled', false);
-                }
+                var statusname = $('#itemstatusdefault option:selected').text();
 
+                showSpinner();
 
-                  var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
-                if (Array.isArray(listt) && list.length)
-                {
-                    $.each(listt, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $transactions.append($('<option>', { value: id, text: name }));
-                    });
-                    $transactions.prop('disabled', false);
-                }
+               $.ajax({url:"@Url.Action("BinDistributionDefault", "ASN")",
+                  data:{companyclientid:companyclientid,typeid:typeid,typename:typename, statusid:statusid, statusname:statusname},type:"post"})
+                  .done(function(data){
 
+                      if (data.status == 'OK')
+                      {
+                           successAction("Bin distribution created");
 
+                          if (data.listapartnumber != null) {
 
+                              var JsonArrayShipList = [];
 
-                   var listi = (res && res.data.listinventorytype) ? res.data.listinventorytype : [];
-                if (Array.isArray(listi) && list.length)
-                {
-                    $.each(listi, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $inventorytypes.append($('<option>', { value: id, text: name.trim() }));
-                    });
-                    $inventorytypes.prop('disabled', false);
-                }
+                              for (var i = 0; i < data.listapartnumber.length; i++) {
 
-                var lists = (res && res.data.listitemstatus) ? res.data.listitemstatus : [];
-                if (Array.isArray(lists) && list.length)
-                {
-                    $.each(lists, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $itemstatus.append($('<option>', { value: id, text: name }));
-                    });
-                    $itemstatus.prop('disabled', false);
-                }
-
-                //     //  $.each(lists, function (_, it) {
-                //     // var id = (it.id !== undefined) ? it.id : it.Id;
-                //     // var name = (it.Name !== undefined) ? it.name : it.name;
-                //     // $itemstatusdefault.append($('<option>', { value: id, text: name }));
-                //     // });
-                //     // $itemstatusdefault.prop('disabled', false);
-
-                // }
-
-                  var listw = (res && res.data.listwmsinventorytype) ? res.data.listwmsinventorytype : [];
-                if (Array.isArray(listw) && list.length)
-                {
-                    $.each(listw, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $wmsinventorytypes.append($('<option>', { value: id, text: name.trim() }));
-                    });
-                    $wmsinventorytypes.prop('disabled', false);
-                }
-
-                var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
-                    
-                if (Array.isArray(lisdiv) && lisdiv.length)
-                    {
-                        $.each(lisdiv, function (_, it) {
-
-                        var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                        var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                        $division.append($('<option>', { value: id, text: name }));
-                        });
-                        $division.prop('disabled', false);
-                    }
-
-                   $('#trackingnumberid').prop('disabled', false);
-                   $('#observations').prop('disabled', false);
-            })
-            .fail(function (xhr) {
-                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
-                alert('Could not load bins.');
-            }).always(function(){
-
-                hideSpinner();
-            });
-        })
-
-        $('#inventorytypeid').change(function(){
-
-                const selectedText = $(this).find('option:selected').text();
-
-                    $('#typeid option').filter(function () {
-                        return $(this).text().trim() === selectedText;
-                    }).prop('selected', true);
-
-        });
-
-
-         $('#itemstatusdefault').change(function(){
-
-                const selectedText = $(this).find('option:selected').text();
-
-                    $('#statusid option').filter(function () {
-                        return $(this).text().trim() === selectedText;
-                    }).prop('selected', true);
-
-                   $('#divdist').removeClass("d-none");
-        });
-
-
-        function openmodal(id, qtypending, partnumber, asnlineid)
-        {
-            alert(asnlineid);
-          
-            $('#lineid').val(id);
-            $('#qtyreceive').val(qtypending);
-            $('#qtypending').val(qtypending);
-            $('#partnoid').val(partnumber);
-            $('#asnlineid').val(asnlineid);
-
-            var lineid = id;
-            
-            var companyclient = $('#companyclient option:selected').val();
-
-            //we search all inventory cuantity for this companyclient and part number
-             showSpinner();
-
-            $.ajax({url:"@Url.Action("checkInventoryByPartNumber", "ASN")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid},type:"post"})
-            .done(function(data){
-
-                if (data != null)
-                {
-
-                    if (data.status == null)
-                    {
-                        if (data.listinventory != null)
-                        {
-
-                            JsonArrayInventory = [];
-
-                            for (var i = 0; i < data.listinventory.length; i++)
-                            {
-
-                                var f = data.listinventory[i];
-
-                                JsonArrayInventory.push({
-                                        binname: f.binname,
-                                        typename: f.inventoryname,
-                                        statusname :f.statusname,
-                                        qty: f.qty
-                                });
-                             }
-
-                             $('#tableuserbinitems').DataTable({
-                                 data: JsonArrayInventory,
-                                 destroy: true,
-                                 //scrollX: true,
-                                 processing: true,
-                                 deferRender: true,
-                                 stateSave: true,
-                                 autoWidth: false,
-                                 responsive: false,
-                                 pageLength: 10,
-                                 "bPaginate": false,
-                                 "bLengthChange": false,
-                                 "bFilter": true,
-                                 "bInfo": false,
-                                 "bAutoWidth": false,
-                                 "searching": false,
-                                 columns: [
-                                     { "data": "binname" },
-                                     { "data": "typename" },
-                                     { "data": "statusname" },
-                                     { "data": "qty", "class":"derecha" },
-                                 ]
-                             });
-                        }
-
-                        if (data.listbines != null) {
-
-                             var JsonArrayBines = [];
-
-                             for (var i = 0; i < data.listbines.length; i++) {
-
-                                 var f = data.listbines[i];
-                                                              
-                                 JsonArrayBines.push({
-                                     actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-                                     id: f.id,
-                                     partno: f.partnumber,
-                                     qty: f.qty,
-                                     type: f.inventorytype,
-                                     typename: f.typename,
-                                     binid : f.binid,
-                                     binname: f.tagname,
-                                     statusid : f.statusid,
-                                     statusname :f.statusname
-                                 });
-                             }
-
-                             showbinDistribution(JsonArrayBines);
-                         }
-
-
-                       
-                    }
-                    else
-                    {
-                         showToast("info", data.status);
-                    }
-                }
-
-            })
-            .fail(function(){})
-            .always(function(){
-             hideSpinner();
-            });
-            // Mostrar el modal
-            const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
-            modal.show();
-
-        }
-
-
-          async function addqtybin() {
-
-
-            const ok = await confirmAction("¿Do you want to add this Bin/PartNumber/Quantity ?");
-
-            if (!ok) return;
-
-
-            var binid = $('#binselid option:selected').val();
-
-         
-
-             if (binid == '-- Select bin --' || binid == null || binid == '') 
-             {
-
-                 alert('Bin is required');
-                 return false;
-             }
-                        
-             var typeid = $('#typeid option:selected').val();
-                         
-             if (typeid == '-- Select Type --' || typeid == null || typeid == '') 
-             {
-
-                 alert('Inventory Type is required');
-                 return false;
-             }
-
-             var statusid = $('#statusid option:selected').val();
-
-           
-             if (statusid == '-- Select Status --' || statusid == null || statusid == '') 
-             {
-
-                 alert('Item status is required');
-                 return false;
-             }
-
-
-             var qtybin = $('#qtyreceive').val();
-
-             var lineid = $('#lineid').val();
-
-             var totalacum = $('#qtybintotal').val();
-
-             var totalpending = $('#qtypending').val();
-
-             if (qtybin <= 0) {
-                 alert('Qty must be greater than zero');
-                 return false;
-
-             }
-
-             var tagname = $('#binselid option:selected').text();
-
-             var typename = $('#typeid option:selected').text();
-
-             var statusname = $('#statusid option:selected').text();
-
-           
-
-             if (parseInt(totalpending) < parseInt(qtybin)) {
-
-                 alert('amount received is greater than the amount pending');
-                 $('#qtyreceive').focus();
-                 $('#qtyreceive').select();
-                 return false;
-
-             }
-
-             var partno = $('#partnoid').val();
-
-             var asnlineid = $('#asnlineid').val();
-
-              showSpinner();
-
-             $.ajax({
-                 url: "@Url.Action("addqtybin", "ASN")",
-                 data: { binid: binid, typeid: typeid, qtybin: qtybin, partno: partno, tagname: tagname, typename: typename, lineid:lineid, statusid:statusid, statusname : statusname, asnlineid:asnlineid }, type: "post"
-             })
-                 .done(function (data) {
-
-                     if (data.status == "OK") {
-
-                         if (data.thereisdata)
-                         {
-                             $('#divprocess').show();
-                         }
-
-                        // $('#qtyreceive').val("0");
-
-                           $('#qtyreceive').val(data.totalpendind);
-
-                           $('#qtypending').val(data.totalpendind);
-                           
-
-                         //se reinician los select de bines y tipos de inventario
-
-                         $('#binselid option').prop('selected', function () {
-                             return this.defaultSelected;
-                         });
-
-                         $('#typeid option').prop('selected', function () {
-                             return this.defaultSelected;
-                         });
-
-                         $('#qtybintotal').val(data.totalqty);
-
-                         var lineid = $('#lineid').val();
-
-
-                         $('#lab-' + lineid).text(data.totalqty);
-
-
-                         if (data.listbines != null) {
-
-                             var JsonArrayBines = [];
-
-                             for (var i = 0; i < data.listbines.length; i++) {
-
-                                 var f = data.listbines[i];
-
-                                 JsonArrayBines.push({
-                                     actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-                                     id: f.id,
-                                     partno: f.partnumber,
-                                     qty: f.qty,
-                                     type: f.inventorytype,
-                                     typename: f.typename,
-                                     binid : f.binid,
-                                     binname: f.tagname,
-                                     statusid : f.statusid,
-                                     statusname :f.statusname
-                                 });
-                             }
-
-                             showbinDistribution(JsonArrayBines);
-                         }
-
-
-                         if (data.listapartnumber != null) {
-
-                             var JsonArrayShipList = [];
-
-                             for (var i = 0; i < data.listapartnumber.length; i++) {
-
-                                 var f = data.listapartnumber[i];
-
-                                var textaction = '';
-
-                                if (!f.processed)
-                                {
-                                    showbuttonprocess = true;
-                                    //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                }
-
-                                
-
-                                JsonArrayShipList.push({
-                                     actions: textaction,
-                                     id : f.id,
-                                     itemid : f.itemId,
-                                     partnumber : f.itemNumber,
-                                     line: f.lineId,
-                                     qtyshipped: f.quantityShipped,
-                                     qtyreceived: f.quantityReceived,
-                                     qtypending: f.quantityPending,
-                                     itemdescription: f.itemDescription,
-                                     attribute2 : f.attributte2,
-                                     datetimeinserted : f.dateTimeInserted,
-                                     processed : f.processed,
-                                     thereisdistribution : f.thereisdistribution
-                                 });
-                             }
-
-
-                             showbindetail(JsonArrayShipList);
-
-                         }
-                         ///////////////
-
-                     }
-                     else {
-
-
-
-                         swal({
-                             title: "Warning!",
-                             text: data.status,
-                             icon: "warning",
-                             button: "OK",
-                         }).then((value) => {
-
-                             $("#spinner").fadeOut();
-                             $("#contenedor").removeClass("disabledbutton");
-
-
-                             $("#asnidusps").focus();
-
-                         });
-                     }
-
-                 }).fail(function () { }).always(function () { hideSpinner(); });
-
-         }
-
-
-         function showbinDistribution(JsonArrayBines)
-         {
-
-             
-            $('#tableuserbines').DataTable({
-                data: JsonArrayBines,
-                destroy: true,
-                processing: true,
-                scrollX:true,
-                deferRender: true,
-                stateSave: true,
-                autoWidth: true,
-                responsive: false,
-                pageLength: 10,
-                "bPaginate": false,
-                "bLengthChange": false,
-                "bFilter": true,
-                "bInfo": false,
-                "searching": false,
-                columns: [
-                    { "data": "actions" },
-                    { "data": "id" },
-                    { "data": "partno" },
-                    { "data": "qty", "class":"derecha" },
-                    { "data": "type","class":"ocultar"},
-                    { "data": "typename" },
-                    { "data": "binid","class":"ocultar"},
-                    { "data": "binname" },
-                    { "data": "statusid","class":"ocultar"},
-                    { "data": "statusname" },
-                    ],
-                    "fnRowCallback": function (nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                        $(nRow).attr('id', "ln-" + aData.id);
-                }
-
-            });
-
-
-         }
-
-         function showbindetail(jsondata)
-        {
-            
-             $('#tableuser').DataTable({
-
-                data: jsondata,
-                destroy: true,
-                scrollX: true,
-                columns: [
-                   {
-                    data: null,
-                        render: function (data, type, row) {
-                            return buildDropdown(row);
-                        }
-                    },
-                    { "data": "id" },
-                    { "data": "itemid"},
-                    { "data": "partnumber" },
-                    { "data": "line" },
-                    { "data": "qtyshipped", "class":"derecha" },
-                    { "data": "qtyreceived", "class":"derecha" },
-                    { "data": "qtypending", "class":"derecha" },
-                    { "data": "itemdescription" },
-                    { "data": "attribute2" },
-                    { "data": "datetimeinserted" },
-                    { "data": "processed" },
-                ],
-
-                    createdRow: function (row, data, dataIndex) {
-                    if (data.qtyshipped !== undefined && data.qtyreceived !== undefined) {
-                        // Seleccionamos las celdas de qtyshipped y qtyreceived
-                        let $qtyShippedCell = $('td', row).eq(5);
-                        let $qtyReceivedCell = $('td', row).eq(6);
-                        let $qtyPendingCell = $('td', row).eq(7);
-
-                        // Primero limpiamos clases previas por si la fila se vuelve a redibujar
-                        $qtyShippedCell.removeClass('text-success text-danger fw-bold');
-                        $qtyReceivedCell.removeClass('text-success text-danger fw-bold');
-                        $qtyPendingCell.removeClass('text-success text-danger fw-bold');
-
-
-                       if (data.qtypending == 0)
-                       {
-                            if (data.qtyreceived == 0)
-                            {
-                             $qtyPendingCell.addClass('text-danger fw-bold')
-                            }
-                        }
-                       else
-                       {
-                            if (data.thereisdistribution)
-                            {
-                                if (data.qtypending > 0 && data.qtypending <  (data.qtyreceived + data.qtyshipped)) {
-                                    //  Ambos > 0 y qtyreceived < qtyshipped → Azul
-                                   // $qtyShippedCell.addClass('text-primary fw-bold');
-                                    $qtyPendingCell.addClass('text-primary fw-bold');
-                                }
-                                else
-                                {
-                                    // Igual → Verde
-                                    $qtyPendingCell.addClass('text-success fw-bold');
-
-                                }
-                            }
-                            else
-                            {
-                                 //  Cualquier otro caso → Rojo
-                                $qtyPendingCell.addClass('text-danger fw-bold');
-                            }
-                       }
-                        // // Asignamos color dependiendo de la condición
-                        // if (data.qtyshipped == data.qtyreceived) {
-                        //     // Igual → Verde
-                        //     $qtyShippedCell.addClass('text-success fw-bold');
-                        //     $qtyReceivedCell.addClass('text-success fw-bold');
-                        // }
-                        // else if (data.qtyshipped > 0 && data.qtyreceived > 0 && data.qtyreceived < data.qtyshipped) {
-                        //     //  Ambos > 0 y qtyreceived < qtyshipped → Azul
-                        //     $qtyShippedCell.addClass('text-primary fw-bold');
-                        //     $qtyReceivedCell.addClass('text-primary fw-bold');
-                        // }
-                        // else {
-                        //     //  Cualquier otro caso → Rojo
-                        //     $qtyShippedCell.addClass('text-danger fw-bold');
-                        //     $qtyReceivedCell.addClass('text-danger fw-bold');
-                        // }
-
-                        // // if (data.qtyshipped > 0 && data.qtyreceived > 0 && data.qtyreceived < data.qtyshipped) {
-
-                        // if (data.qtypending > 0 && data.qtypending <  (data.qtyreceived + data.qtyshipped)) {
-                        //     //  Ambos > 0 y qtyreceived < qtyshipped → Azul
-                        //    // $qtyShippedCell.addClass('text-primary fw-bold');
-                        //     $qtyPendingCell.addClass('text-primary fw-bold');
-                        // }
-                    }
-                }
-            });
-
-        }
-
-        function buildDropdown(item) {
-
-           
-            var qtypendind = item.qtyshipped - item.qtypending;
-                    
-
-            // return `
-            // <div class="dropdown">
-            //     <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            //         Actions
-            //     </button>
-            //     <ul class="dropdown-menu">
-                   
-            //         <li>
-            //             <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
-            //         </li>
-            //         <li>
-            //             <a class="dropdown-item" onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}')"> 📦 Bins</a>
-            //         </li>
-            //     </ul>
-            // </div>`;
-
-
-              return `<button type="button"
-                                                    class="btn btn-sm btn-outline-danger me-1 btn-icon"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    title="Delete"
-                                                    onclick="deleteAllBinsDistribution(${item.line})">
-                                                <i class="fa-solid fa-trash-can"></i>
-                                                <span class="visually-hidden">Delete</span>
-                                            </button>
-
-                                            <!-- Bins -->
-                                            <button type="button"
-                                                    class="btn btn-sm btn-outline-primary btn-icon"
-                                                    data-bs-toggle="tooltip"
-                                                    data-bs-placement="top"
-                                                    title="Bins"
-                                                    onclick="openmodal(${item.line}, ${qtypendind}, '${item.partnumber}', ${item.id})">
-                                                <i class="fa-solid fa-box-open"></i>
-                                                <span class="visually-hidden">Bins</span>
-                                            </button>`;
-
-
-
-        }
-
-        async function distributionByDefault()
-        {
-
-
-             const ok = await confirmAction("¿Do you want to create bin distribution default for this RMA ? , Remember : this action will remove all existing distribution");
-
-             if (!ok) return;
-
-             var companyclientid = $('#companyclient option:selected').val();
-
-             var typeid = $('#inventorytypeid option:selected').val();
-
-             var typename = $('#inventorytypeid option:selected').text();
-
-             var statusid = $('#itemstatusdefault option:selected').val();
-
-              var statusname = $('#itemstatusdefault option:selected').text();
-
-              showSpinner();
-
-             $.ajax({url:"@Url.Action("BinDistributionDefault", "ASN")",
-                data:{companyclientid:companyclientid,typeid:typeid,typename:typename, statusid:statusid, statusname:statusname},type:"post"})
-                .done(function(data){
-
-                    if (data.status == 'OK')
-                    {
-                         successAction("Bin distribution created");
-
-                        if (data.listapartnumber != null) {
-
-                            var JsonArrayShipList = [];
-
-                            for (var i = 0; i < data.listapartnumber.length; i++) {
-
-                                    var f = data.listapartnumber[i];
-
-                                    var textaction = '';
-
-                                    if (!f.processed)
-                                    {
-                                    showbuttonprocess = true;
-                                    //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    }
-
-                                    JsonArrayShipList.push({
-                                    actions: textaction,
-                                    id : f.id,
-                                    itemid : f.itemId,
-                                    partnumber : f.itemNumber,
-                                    line: f.lineId,
-                                    qtyshipped: f.quantityShipped,
-                                    qtyreceived: f.quantityReceived,
-                                    qtypending: f.quantityPending,
-                                    itemdescription: f.itemDescription,
-                                    attribute2 : f.attributte2,
-                                    datetimeinserted : f.dateTimeInserted,
-                                    processed : f.processed,
-                                    thereisdistribution : f.thereisdistribution
-                                });
-                            }
-
-
-                            showbindetail(JsonArrayShipList);
-
-                        }
-                    }
-
-                }).fail().always(function(){
-
-                    hideSpinner();
-                });
-
-        }
-
-
-
-
-        async function deleteAllDetailBin(id)
-        {
-
-           const ok = await confirmAction('Do you want to delete this distribution detail : ' + id + ' ?')
-
-           if(!ok) return;
-
-
-
-        }
-
-
-        async function deleteBinDetail(id)
-        {
-
-           const ok = await confirmAction('Do you want to delete this distribution detail : ' + id + ' ?')
-
-           if(!ok) return;
-
-
-            showSpinner();
-
-             $.ajax({
-                 url: "@Url.Action("deleteqtybin", "ASN")",
-                 data: { id:id }, type: "post"
-             })
-                 .done(function (data) {
-
-                     if (data.status == "OK") {
-
-                         if (data.thereisdata)
-                         {
-                             $('#divprocess').show();
-                         }
-
-                         $('#qtyreceive').val("0");
-
-                         //se reinician los select de bines y tipos de inventario
-
-                         $('#binselid option').prop('selected', function () {
-                             return this.defaultSelected;
-                         });
-
-                         $('#typeid option').prop('selected', function () {
-                             return this.defaultSelected;
-                         });
-
-
-                         $('#qtyreceive').val(data.totalinbins);
-                         
-                         $('#qtypending').val(data.totalinbins);
-
-                         $('#qtybintotal').val(data.totalqty);
-
-                         var lineid = $('#lineid').val();
-
-
-                         $('#lab-' + lineid).text(data.totalqty);
-
-
-                         if (data.listbines != null) {
-
-                             var JsonArrayBines = [];
-
-                             for (var i = 0; i < data.listbines.length; i++) {
-
-                                 var f = data.listbines[i];
-
-                                 JsonArrayBines.push({
-                                     actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-                                     id: f.id,
-                                     partno: f.partnumber,
-                                     qty: f.qty,
-                                     type: f.inventorytype,
-                                     typename: f.typename,
-                                     binid : f.binid,
-                                     binname: f.tagname,
-                                     statusid : f.statusid,
-                                     statusname :f.statusname
-                                 });
-                             }
-
-                             showbinDistribution(JsonArrayBines);
-                         }
-
-
-                         if (data.listapartnumber != null) {
-
-                             var JsonArrayShipList = [];
-
-                             for (var i = 0; i < data.listapartnumber.length; i++) {
-
-                                 var f = data.listapartnumber[i];
-
-                                var textaction = '';
-
-                                if (!f.processed)
-                                {
-                                    showbuttonprocess = true;
-                                    //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                    textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                }
-
-                                JsonArrayShipList.push({
-                                     actions: textaction,
-                                     id : f.id,
-                                     itemid : f.itemId,
-                                     partnumber : f.itemNumber,
-                                     line: f.lineId,
-                                     qtyshipped: f.quantityShipped,
-                                     qtyreceived: f.quantityReceived,
-                                     qtypending: f.quantityPending,
-                                     itemdescription: f.itemDescription,
-                                     attribute2 : f.attributte2,
-                                     datetimeinserted : f.dateTimeInserted,
-                                     processed : f.processed,
-                                     thereisdistribution : f.thereisdistribution
-                                 });
-                             }
-
-
-                             showbindetail(JsonArrayShipList);
-
-                         }
-                         ///////////////
-
-                     }
-                     else {
-
-                         errorAction(data.status);
-
-                     
-                     }
-
-                 }).fail(function () { }).always(function () { hideSpinner(); });
-        }
-
-
-
-        async function deleteAllBinsDistribution(lineid)
-        {
-
-                 const ok = await confirmAction('Do you want to delete all bins  distribution for this line : ' + lineid + ' ?')
-
-                 if(!ok) return;
-
-
-                  showSpinner();
-
-                   $.ajax({
-                       url: "@Url.Action("deleteAllBinsDistribution", "ASN")",
-                       data: { lineid:lineid }, type: "post"
-                   })
-                       .done(function (data) {
-
-                           if (data.status == "OK") {
-
-                               if (data.thereisdata)
-                               {
-                                   $('#divprocess').show();
-                               }
-
-                               $('#qtyreceive').val("0");
-
-                               //se reinician los select de bines y tipos de inventario
-
-                               $('#binselid option').prop('selected', function () {
-                                   return this.defaultSelected;
-                               });
-
-                               $('#typeid option').prop('selected', function () {
-                                   return this.defaultSelected;
-                               });
-
-
-                               $('#qtyreceive').val(data.totalinbins);
-
-                               $('#qtypending').val(data.totalinbins);
-
-                               $('#qtybintotal').val(data.totalqty);
-
-                               var lineid = $('#lineid').val();
-
-
-                               $('#lab-' + lineid).text(data.totalqty);
-
-
-                               if (data.listbines != null) {
-
-                                   var JsonArrayBines = [];
-
-                                   for (var i = 0; i < data.listbines.length; i++) {
-
-                                       var f = data.listbines[i];
-
-                                       JsonArrayBines.push({
-                                           actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-                                           id: f.id,
-                                           partno: f.partnumber,
-                                           qty: f.qty,
-                                           type: f.inventorytype,
-                                           typename: f.typename,
-                                           binid : f.binid,
-                                           binname: f.tagname,
-                                           statusid : f.statusid,
-                                           statusname :f.statusname
-                                       });
-                                   }
-
-                                   showbinDistribution(JsonArrayBines);
-                               }
-
-
-                               if (data.listapartnumber != null) {
-
-                                   var JsonArrayShipList = [];
-
-                                   for (var i = 0; i < data.listapartnumber.length; i++) {
-
-                                       var f = data.listapartnumber[i];
+                                      var f = data.listapartnumber[i];
 
                                       var textaction = '';
 
                                       if (!f.processed)
                                       {
-                                          showbuttonprocess = true;
-                                          //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
-                                          textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                      showbuttonprocess = true;
+                                      //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                      textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ',' + f.id + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
                                       }
 
                                       JsonArrayShipList.push({
-                                           actions: textaction,
-                                           id : f.id,
-                                           itemid : f.itemId,
-                                           partnumber : f.itemNumber,
-                                           line: f.lineId,
-                                           qtyshipped: f.quantityShipped,
-                                           qtyreceived: f.quantityReceived,
-                                           qtypending: f.quantityPending,
-                                           itemdescription: f.itemDescription,
-                                           attribute2 : f.attributte2,
-                                           datetimeinserted : f.dateTimeInserted,
-                                           processed : f.processed,
-                                           thereisdistribution : f.thereisdistribution
-                                       });
-                                   }
+                                      actions: textaction,
+                                      id : f.id,
+                                      itemid : f.itemId,
+                                      partnumber : f.itemNumber,
+                                      line: f.lineId,
+                                      qtyshipped: f.quantityShipped,
+                                      qtyreceived: f.quantityReceived,
+                                      qtypending: f.quantityPending,
+                                      itemdescription: f.itemDescription,
+                                      attribute2 : f.attributte2,
+                                      datetimeinserted : f.dateTimeInserted,
+                                      processed : f.processed,
+                                      thereisdistribution : f.thereisdistribution
+                                  });
+                              }
 
 
-                                   showbindetail(JsonArrayShipList);
+                              showbindetail(JsonArrayShipList);
 
+                          }
+                      }
+
+                  }).fail().always(function(){
+
+                      hideSpinner();
+                  });
+
+          }
+
+
+
+
+          async function deleteAllDetailBin(id)
+          {
+
+             const ok = await confirmAction('Do you want to delete this distribution detail : ' + id + ' ?')
+
+             if(!ok) return;
+
+
+
+          }
+
+
+          async function deleteBinDetail(id)
+          {
+
+             const ok = await confirmAction('Do you want to delete this distribution detail : ' + id + ' ?')
+
+             if(!ok) return;
+
+
+              showSpinner();
+
+               $.ajax({
+                   url: "@Url.Action("deleteqtybin", "ASN")",
+                   data: { id:id }, type: "post"
+               })
+                   .done(function (data) {
+
+                       if (data.status == "OK") {
+
+                           if (data.thereisdata)
+                           {
+                               $('#divprocess').show();
+                           }
+
+                           $('#qtyreceive').val("0");
+
+                           //se reinician los select de bines y tipos de inventario
+
+                           $('#binselid option').prop('selected', function () {
+                               return this.defaultSelected;
+                           });
+
+                           $('#typeid option').prop('selected', function () {
+                               return this.defaultSelected;
+                           });
+
+
+                           $('#qtyreceive').val(data.totalinbins);
+
+                           $('#qtypending').val(data.totalinbins);
+
+                           $('#qtybintotal').val(data.totalqty);
+
+                           var lineid = $('#lineid').val();
+
+
+                           $('#lab-' + lineid).text(data.totalqty);
+
+
+                           if (data.listbines != null) {
+
+                               var JsonArrayBines = [];
+
+                               for (var i = 0; i < data.listbines.length; i++) {
+
+                                   var f = data.listbines[i];
+
+                                   JsonArrayBines.push({
+                                       actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                       id: f.id,
+                                       partno: f.partnumber,
+                                       qty: f.qty,
+                                       type: f.inventorytype,
+                                       typename: f.typename,
+                                       binid : f.binid,
+                                       binname: f.tagname,
+                                       statusid : f.statusid,
+                                       statusname :f.statusname
+                                   });
                                }
-                               ///////////////
 
-                           }
-                           else {
-
-                               errorAction(data.status);
-
-
+                               showbinDistribution(JsonArrayBines);
                            }
 
-                       }).fail(function () { }).always(function () { hideSpinner(); });
+
+                           if (data.listapartnumber != null) {
+
+                               var JsonArrayShipList = [];
+
+                               for (var i = 0; i < data.listapartnumber.length; i++) {
+
+                                   var f = data.listapartnumber[i];
+
+                                  var textaction = '';
+
+                                  if (!f.processed)
+                                  {
+                                      showbuttonprocess = true;
+                                      //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                      textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                  }
+
+                                  JsonArrayShipList.push({
+                                       actions: textaction,
+                                       id : f.id,
+                                       itemid : f.itemId,
+                                       partnumber : f.itemNumber,
+                                       line: f.lineId,
+                                       qtyshipped: f.quantityShipped,
+                                       qtyreceived: f.quantityReceived,
+                                       qtypending: f.quantityPending,
+                                       itemdescription: f.itemDescription,
+                                       attribute2 : f.attributte2,
+                                       datetimeinserted : f.dateTimeInserted,
+                                       processed : f.processed,
+                                       thereisdistribution : f.thereisdistribution
+                                   });
+                               }
+
+
+                               showbindetail(JsonArrayShipList);
+
+                           }
+                           ///////////////
+
+                       }
+                       else {
+
+                           errorAction(data.status);
+
+
+                       }
+
+                   }).fail(function () { }).always(function () { hideSpinner(); });
+          }
+
+
+
+          async function deleteAllBinsDistribution(lineid)
+          {
+
+                   const ok = await confirmAction('Do you want to delete all bins  distribution for this line : ' + lineid + ' ?')
+
+                   if(!ok) return;
+
+
+                    showSpinner();
+
+                     $.ajax({
+                         url: "@Url.Action("deleteAllBinsDistribution", "ASN")",
+                         data: { lineid:lineid }, type: "post"
+                     })
+                         .done(function (data) {
+
+                             if (data.status == "OK") {
+
+                                 if (data.thereisdata)
+                                 {
+                                     $('#divprocess').show();
+                                 }
+
+                                 $('#qtyreceive').val("0");
+
+                                 //se reinician los select de bines y tipos de inventario
+
+                                 $('#binselid option').prop('selected', function () {
+                                     return this.defaultSelected;
+                                 });
+
+                                 $('#typeid option').prop('selected', function () {
+                                     return this.defaultSelected;
+                                 });
+
+
+                                 $('#qtyreceive').val(data.totalinbins);
+
+                                 $('#qtypending').val(data.totalinbins);
+
+                                 $('#qtybintotal').val(data.totalqty);
+
+                                 var lineid = $('#lineid').val();
+
+
+                                 $('#lab-' + lineid).text(data.totalqty);
+
+
+                                 if (data.listbines != null) {
+
+                                     var JsonArrayBines = [];
+
+                                     for (var i = 0; i < data.listbines.length; i++) {
+
+                                         var f = data.listbines[i];
+
+                                         JsonArrayBines.push({
+                                             actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                             id: f.id,
+                                             partno: f.partnumber,
+                                             qty: f.qty,
+                                             type: f.inventorytype,
+                                             typename: f.typename,
+                                             binid : f.binid,
+                                             binname: f.tagname,
+                                             statusid : f.statusid,
+                                             statusname :f.statusname
+                                         });
+                                     }
+
+                                     showbinDistribution(JsonArrayBines);
+                                 }
+
+
+                                 if (data.listapartnumber != null) {
+
+                                     var JsonArrayShipList = [];
+
+                                     for (var i = 0; i < data.listapartnumber.length; i++) {
+
+                                         var f = data.listapartnumber[i];
+
+                                        var textaction = '';
+
+                                        if (!f.processed)
+                                        {
+                                            showbuttonprocess = true;
+                                            //textaction =  '<a href="#" onclick="marcarparaproceso(' + f.lineNum + ')"><i id="btt-' + f.lineNum + '" class="fa-regular  fa-lg fa-square-check fa-xl"></i></a> | <a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                            textaction =  '<a href="#" onclick="distribution(\'' + f.itemNumber + '\',' + f.quantityShipped + ',' + f.lineNum + ')"><i class="fa-solid fa-boxes-stacked fa-xl"></i></a> | <a href="#" onclick="deletedetailbin(' + f.lineNum + ')"><i class="fa-solid fa-eraser fa-lg"></i></a>';
+                                        }
+
+                                        JsonArrayShipList.push({
+                                             actions: textaction,
+                                             id : f.id,
+                                             itemid : f.itemId,
+                                             partnumber : f.itemNumber,
+                                             line: f.lineId,
+                                             qtyshipped: f.quantityShipped,
+                                             qtyreceived: f.quantityReceived,
+                                             qtypending: f.quantityPending,
+                                             itemdescription: f.itemDescription,
+                                             attribute2 : f.attributte2,
+                                             datetimeinserted : f.dateTimeInserted,
+                                             processed : f.processed,
+                                             thereisdistribution : f.thereisdistribution
+                                         });
+                                     }
+
+
+                                     showbindetail(JsonArrayShipList);
+
+                                 }
+                                 ///////////////
+
+                             }
+                             else {
+
+                                 errorAction(data.status);
+
+
+                             }
+
+                         }).fail(function () { }).always(function () { hideSpinner(); });
+                }
+
+
+
+          async function processASN()
+          {
+
+              const ok = await confirmAction("¿Do you want to proccess this ASN ?");
+
+              if (!ok) return;
+
+
+              var AsnId = $('#asdDto_asnHdr_ShipmentNum').val();
+
+              if (AsnId == null || AsnId == '')
+              {
+              errorAction("ASN Number is required");
+              return;
+              }
+
+              let table = $('#tableuser').DataTable();
+
+              var continueP = true;
+
+              table.rows({ search: 'applied' }).every(function () {
+              let data = this.data();  // obtienes el objeto por fila
+
+              let val1 = Number(data.qtyshipped);
+              let val2 = Number(data.qtyreceived);
+              let val3 = Number(data.qtypending);
+
+              if ((val1 + val2)  !== val3)
+              {
+              continueP = false
+              }
+              });
+
+              if (!continueP)
+              {
+              errorAction("You must receive all items");
+              return;
+              }
+
+              const locationid = document.getElementById("locationid").value;
+
+              if (locationid === "") {
+              errorAction("Location is required");
+              return;
               }
 
 
+              const companyclient = document.getElementById("companyclient").value;
 
-        async function processASN()
-        {
+              if (companyclient === "") {
+              errorAction("Company client is required");
+              return;
+              }
 
-            const ok = await confirmAction("¿Do you want to proccess this ASN ?");
+              const conceptid = document.getElementById("conceptid").value;
 
-            if (!ok) return;
+              if (conceptid === "") {
+              errorAction("Concept ID client is required");
+              return;
+              }
+
+              const transactionid = document.getElementById("transactionid").value;
+
+              if (transactionid === "") {
+              errorAction("Transaction ID client is required");
+              return;
+              }
+
+              const division = document.getElementById("divisionid").value;
+
+              if (division === "") {
+              errorAction("Division ID is required");
+              return;
+              }
+
+              var trackingnumberid = $('#trackingnumberid').val();
+              if (trackingnumberid === "")
+              {
+              errorAction("Tracking Number is required");
+              return;
+              }
+
+              var token = $('input[name="__RequestVerificationToken"]').val();
+
+              var observations = $('#observations').val();
+
+              alert('todo validado');
+
+              showSpinner();
+
+              $.ajax({url:"@Url.Action("processAsn", "ASN")",
+                  data:{AsnId:AsnId,
+                  companyclient: companyclient,
+                  conceptid: conceptid,
+                  transactionid : transactionid,
+                  division : division,
+                  trackingnumberid : trackingnumberid,
+                  observations:observations,
+                  locationid:locationid
+                  }, type:"post", headers: { 'RequestVerificationToken': token }})
+                  .done(function(data){
+
+                      if (data.status == "OK")
+                      {
+                          successAction("Process completed successfully")
+
+                            //showToast("info", "ASN processed successfully");
+
+                      //loadDataDetail(data.lista);
+
+                      }
+                      else
+                      {
+                      errorAction(data.status);
+                      }
+
+                      })
+                  .fail(function(jqXHR, textStatus, errorThrown){
+
+                      if (jqXHR.status === 500) {
+                          errorAction('Error interno del servidor. Intenta más tarde.');
+                      } else {
+                          errorAction('Error inesperado: ' + jqXHR.status);
+                      }
+                      })
+                  .always(function()
+                      {
+                          hideSpinner();
+                          });
+          }
 
 
-            var AsnId = $('#asdDto_asnHdr_ShipmentNum').val();
 
-            if (AsnId == null || AsnId == '')
-            {
-            errorAction("ASN Number is required");
-            return;
-            }
+         function hideReceipt()
+          {
 
-            let table = $('#tableuser').DataTable();
+             const icono = document.getElementById("ocultarReceipt");
+               const $div = $('#divbodyreceiving');
 
-            var continueP = true;
+              if (icono.classList.contains("fa-eye")) {
+                   $('#ocultarReceipt').removeClass("fa-eye");
+                   $('#ocultarReceipt').addClass("fa-eye-slash");
+                 $div.animate({ opacity: 0, height: "toggle" }, 400);
 
-            table.rows({ search: 'applied' }).every(function () {
-            let data = this.data();  // obtienes el objeto por fila
-                   
-            let val1 = Number(data.qtyshipped);
-            let val2 = Number(data.qtyreceived);
-            let val3 = Number(data.qtypending);
-                        
-            if ((val1 + val2)  !== val3)
-            {
-            continueP = false
-            }
-            });
+              } else {
+                   $('#ocultarReceipt').addClass("fa-eye");
+                   $('#ocultarReceipt').removeClass("fa-eye-slash");
 
-            if (!continueP)
-            {
-            errorAction("You must receive all items");
-            return;
-            }
+                  $div.animate({ opacity: 1, height: "toggle" }, 400);
+              }
 
-            const locationid = document.getElementById("locationid").value;
-
-            if (locationid === "") {
-            errorAction("Location is required");
-            return;
-            }
+          }
 
 
-            const companyclient = document.getElementById("companyclient").value;
 
-            if (companyclient === "") {
-            errorAction("Company client is required");
-            return;
-            }
+        function hidecalls()
+           {
 
-            const conceptid = document.getElementById("conceptid").value;
+                const icono = document.getElementById("ocultarCalls");
+                const $div = $('#divbody1');
+                const $div2 = $('#divbody2');
 
-            if (conceptid === "") {
-            errorAction("Concept ID client is required");
-            return;
-            }
+               if (icono.classList.contains("fa-eye")) {
+                  $('#ocultarCalls').removeClass("fa-eye");
+                  $('#ocultarCalls').addClass("fa-eye-slash");
 
-            const transactionid = document.getElementById("transactionid").value;
+                  $div.animate({ opacity: 0, height: "toggle" }, 400);
+                  $div2.animate({ opacity: 0, height: "toggle" }, 400);
 
-            if (transactionid === "") {
-            errorAction("Transaction ID client is required");
-            return;
-            }
+               } else {
 
-            const division = document.getElementById("divisionid").value;
+                  $('#ocultarCalls').addClass("fa-eye");
+                  $('#ocultarCalls').removeClass("fa-eye-slash");
 
-            if (division === "") {
-            errorAction("Division ID is required");
-            return;
-            }
 
-            var trackingnumberid = $('#trackingnumberid').val();
-            if (trackingnumberid === "")
-            {
-            errorAction("Tracking Number is required");
-            return;
-            }
-            
-            var token = $('input[name="__RequestVerificationToken"]').val();
+                   $div.animate({ opacity: 1, height: "toggle" }, 400);
+                   $div2.animate({ opacity: 1, height: "toggle" }, 400);
+               }
 
-            var observations = $('#observations').val();
+           }
 
-            alert('todo validado');
+        
 
-            showSpinner();
+         function hideWMS()
+           {
 
-            $.ajax({url:"@Url.Action("processAsn", "ASN")",
-                data:{AsnId:AsnId,
-                companyclient: companyclient,
-                conceptid: conceptid,
-                transactionid : transactionid,
-                division : division,
-                trackingnumberid : trackingnumberid,
-                observations:observations,
-                locationid:locationid
-                }, type:"post", headers: { 'RequestVerificationToken': token }})
-                .done(function(data){
+                const icono = document.getElementById("ocultarWMS");
+                const $div = $('#divWMS');
+                const $div2 = $('#divWMS2');
+               divWMS2
 
-                    if (data.status == "OK")
-                    {
-                    loadDataDetail(data.lista);
+               if (icono.classList.contains("fa-eye")) {
+                  $('#ocultarWMS').removeClass("fa-eye");
+                  $('#ocultarWMS').addClass("fa-eye-slash");
 
-                    }
-                    else
-                    {
-                    errorAction(data.status);
-                    }
+                  $div.animate({ opacity: 0, height: "toggle" }, 400);
+                 $div2.animate({ opacity: 0, height: "toggle" }, 400);
 
-                    })
-                .fail(function(jqXHR, textStatus, errorThrown){
+               } else {
 
-                    if (jqXHR.status === 500) {
-                        errorAction('Error interno del servidor. Intenta más tarde.');
-                    } else {
-                        errorAction('Error inesperado: ' + jqXHR.status);
-                    }
-                    })
-                .always(function()
-                    {
-                        hideSpinner();
-                        });
-        }
+                  $('#ocultarWMS').addClass("fa-eye");
+                  $('#ocultarWMS').removeClass("fa-eye-slash");
+
+
+                   $div.animate({ opacity: 1, height: "toggle" }, 400);
+                    $div2.animate({ opacity: 1, height: "toggle" }, 400);
+               }
+
+           }
 
     </script>
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.Inventory
 {
-    public class ASNHdr
+    public class ASNHdrDto
     {
         [Display(Name = "ASN Id")]
         public int Id { get; set; }

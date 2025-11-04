@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,8 +17,9 @@ namespace DUNES.UI.Services.Inventory.ASN
         /// <returns></returns>
         Task<ApiResponse<ASNWm>> GetAsnInfo(string asnNumber, string token,CancellationToken ct);
 
-       
 
-       // Task<ApiResponse<int>> ProcessASNTransaction(string asnNumber, string token, CancellationToken ct);
+        Task<ApiResponse<ASNResponseDto>> ProcessASNTransaction(string asnNumber, ProcessAsnRequestTm objInvData, string trackingNumber, string token, CancellationToken ct);
+
+       
     }
 }

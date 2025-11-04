@@ -34,7 +34,8 @@ namespace DUNES.API.Controllers.Inventory.ASN
         /// <summary>
         /// get all ASN information
         /// </summary>
-        /// <param name="ShipmentNum"></param>
+        /// <param name="ASNnumber"></param>
+        /// <param name="ct"></param>
         /// <remarks>Returns header plus one or more detail lines.</remarks>
         /// <response code="200">Successful; returns data.</response>
         /// <response code="404">Not found if the delivery does not exist.</response>
@@ -45,10 +46,10 @@ namespace DUNES.API.Controllers.Inventory.ASN
         [ProducesResponseType(typeof(ApiResponse<ASNWm>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
 
-        [HttpGet("asn-info/{ShipmentNum}")]
-        public async Task<IActionResult> GetASNAllInfo (string ShipmentNum, CancellationToken ct)
+        [HttpGet("asn-info/{ASNnumber}")]
+        public async Task<IActionResult> GetASNAllInfo (string ASNnumber, CancellationToken ct)
         {
-            return await HandleApi(ct => _service.GetASNAllInfo(ShipmentNum, ct), ct);
+            return await HandleApi(ct => _service.GetASNAllInfo(ASNnumber, ct), ct);
         }
 
 
@@ -56,17 +57,16 @@ namespace DUNES.API.Controllers.Inventory.ASN
         /// Process ASN Transaction
         /// </summary>
         /// <param name="AsnId">ID Transaction NUmber</param>
-        /// <param name="WmsTran">WMS Transaction (Header and Detail)</param>
+        /// <param name="AsnInfo">WMS Transaction (Header and Detail)</param>
         /// <param name="TrackingNumber">Tracking Number ASN Receiving</param>
-        /// <param name="listdetail">ASN Bins distribution</param>
         /// <param name="ct">Cancelation TOken</param>
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<ASNWm>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        [HttpGet("asn-process/{ShipmentNum}")]
-        public async Task<IActionResult> ProcessASNTransaction(string AsnId, NewInventoryTransactionTm WmsTran, string TrackingNumber , List<BinsToLoadWm> listdetail, CancellationToken ct)
+        [HttpPost("asn-process/{AsnId}/{TrackingNumber}")]
+        public async Task<IActionResult> ProcessASNTransaction(string AsnId, [FromBody] ProcessAsnRequestTm AsnInfo, string TrackingNumber , CancellationToken ct)
         {
-            return await HandleApi(ct => _transactionASNService.CreateASNReceivingTransaction(AsnId, WmsTran, TrackingNumber, listdetail, ct), ct);
+            return await HandleApi(ct => _transactionASNService.CreateASNReceivingTransaction(AsnId, AsnInfo.wmsInfo, TrackingNumber, AsnInfo.listdetail, ct), ct);
         }
 
 

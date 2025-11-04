@@ -10,9 +10,13 @@ namespace DUNES.Shared.WiewModels.Inventory
 {
     public class ASNWm
     {
-        public ASNHdr asnHdr { get; set; } = new();
+        public ASNHdrDto asnHdr { get; set; } = new();
 
-        public List<ASNItemDetail> itemDetail { get; set; } = new();
+        public List<ASNItemDetailDto> itemDetail { get; set; } = new();
+
+        public TzebB2bIrReceiptOutHdrDetItemInbConsReqsLogDto asnReceiptHdr { get; set; } = new();
+
+        public List<TzebB2bIrReceiptLineItemTblItemInbConsReqsLogDto> asnReceiptList { get; set; } = new();
 
     }
 

@@ -7,7 +7,9 @@ using DUNES.API.Profiles;
 using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
+using DUNES.API.Repositories.Inventory.ASN.Transactions;
 using DUNES.API.Repositories.Inventory.Common.Queries;
+using DUNES.API.Repositories.Inventory.Common.Transactions;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
@@ -17,6 +19,7 @@ using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
+using DUNES.API.Services.Inventory.ASN.Transactions;
 using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Transactions;
@@ -26,6 +29,7 @@ using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
+using DUNES.API.Utils.TraceProvider;
 using DUNES.Shared.Interfaces.RequestInfo;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -212,6 +216,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ITraceProvider, TraceProvider>();
+
 
 
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
@@ -233,9 +239,18 @@ builder.Services.AddScoped<ICommonQueryASNINVService, CommonQueryASNINVService>(
 
 builder.Services.AddScoped<ICommonQueryPickProcessINVRepository, CommonQueryPickProcessINVRepository>();
 builder.Services.AddScoped<ICommonQueryPickProcessINVService, CommonQueryPickProcessINVService>();
+                             
 
 builder.Services.AddScoped<ITransactionsPickProcessINVRepository, TransactionsPickProcessINVRepository>();
 builder.Services.AddScoped<ITransactionsPickProcessINVService, TransactionsPickProcessINVService>();
+
+
+builder.Services.AddScoped<ITransactionsASNINVRepository, TransactionsASNINVRepository>();
+builder.Services.AddScoped<ITransactionsASNINVService, TransactionsASNINVService>();
+
+builder.Services.AddScoped<ITransactionsCommonINVRepository, TransactionsCommonINVRepository>();
+
+
 
 builder.Services.AddScoped<ICommonQueryINVRepository, CommonQueryINVRepository>();
 builder.Services.AddScoped<ICommonQueryINVService, CommonQueryINVService>();

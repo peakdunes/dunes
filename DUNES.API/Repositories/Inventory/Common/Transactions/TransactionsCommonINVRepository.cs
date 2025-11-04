@@ -3,6 +3,7 @@ using DUNES.API.Models.Inventory.Common;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace DUNES.API.Repositories.Inventory.Common.Transactions
 {
@@ -68,24 +69,31 @@ namespace DUNES.API.Repositories.Inventory.Common.Transactions
             foreach (var logdata in listItemDetail)
             {
                 {
-                    var p1 = new SqlParameter("@Part_Definition_id", logdata.PartDefinitionId);
-                    var p2 = new SqlParameter("@Inventory_Type_id_Source", logdata.InventoryTypeIdSource);
-                    var p3 = new SqlParameter("@Inventory_Type_id_Dest", logdata.InventoryTypeIdDest);
-                    var p4 = new SqlParameter("@Serial_No", logdata.SerialNo);
-                    var p5 = new SqlParameter("@Qty", logdata.Qty);
-                    var p6 = new SqlParameter("@Notes", logdata.Notes);
-                    var p7 = new SqlParameter("@Repair_No", logdata.RepairNo);
-                    var p8 = new SqlParameter("@User", User);
-                    var p9 = new SqlParameter("@Manual", "");
-                    var p10 = new SqlParameter("@isCE", false);
+                    var p1 = new SqlParameter("@Part_Definition_id", SqlDbType.Int) { Value = logdata.PartDefinitionId };
+                    var p2 = new SqlParameter("@Inventory_Type_id_Source", SqlDbType.Int) { Value = logdata.InventoryTypeIdSource };
+                    var p3 = new SqlParameter("@Inventory_Type_id_Dest", SqlDbType.Int) { Value = logdata.InventoryTypeIdDest };
 
-                    var result = await _context.TzebB2bReplacementPartsInventoryLog
-                        .FromSqlRaw("EXEC _SPZEB_B2B_Insert_New_Replacement_Parts_Inventory_Log" +
-                        " @Part_Definition_id,@Inventory_Type_id_Source,@Inventory_Type_id_Dest," +
-                        " @Serial_No,@Qty,@Notes,@Repair_No,@User,@Manual,@isCE", p1, p2, p3, p4, p5,
-                        p6, p7, p8, p9, p10)
-                        .AsNoTracking()
-                        .FirstOrDefaultAsync(ct);
+                    var p4 = new SqlParameter("@Serial_No", SqlDbType.NVarChar, 50) { Value = (object?)logdata.SerialNo ?? DBNull.Value };
+                    var p5 = new SqlParameter("@Qty", SqlDbType.Int) { Value = logdata.Qty };
+                    var p6 = new SqlParameter("@Notes", SqlDbType.NVarChar, 250) { Value = (object?)logdata.Notes ?? DBNull.Value };
+
+                    // <-- ESTE es el que te falla si viene null: mándalo como DBNull.Value
+                    var p7 = new SqlParameter("@Repair_No", SqlDbType.Int) { Value = (object?)logdata.RepairNo ?? DBNull.Value };
+
+                    var p8 = new SqlParameter("@User", SqlDbType.NVarChar, 10) { Value = User ?? (object)DBNull.Value };
+
+                    // SP espera bit, no string:
+                    var p9 = new SqlParameter("@Manual", SqlDbType.Bit) { Value = false };   // o logdata.Manual
+                    var p10 = new SqlParameter("@isCE", SqlDbType.Bit) { Value = false };
+
+                    await _context.Database.ExecuteSqlRawAsync(
+                        "EXEC dbo._SPZEB_B2B_Insert_New_Replacement_Parts_Inventory_Log " +
+                        "@Part_Definition_id,@Inventory_Type_id_Source,@Inventory_Type_id_Dest," +
+                        "@Serial_No,@Qty,@Notes,@Repair_No,@User,@Manual,@isCE",
+                        parameters: new[] { p1, p2, p3, p4, p5, p6, p7, p8, p9, p10 },
+                        cancellationToken: ct);
+
+
                 }
 
 

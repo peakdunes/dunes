@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Masters;
 using DUNES.Shared.DTOs.Inventory;
@@ -23,6 +24,16 @@ namespace DUNES.API.Profiles
             CreateMap<TzebB2bInbConsReqs,TzebB2bInbConsReqsDto>().ReverseMap();
 
             CreateMap <TzebB2bInventoryType, TzebB2bInventoryTypeDto>().ReverseMap();
+
+            //ASN MAP
+
+            CreateMap<TzebB2bAsnOutHdrDetItemInbConsReqs, ASNHdrDto>().ReverseMap();
+
+            CreateMap<TzebB2bAsnLineItemTblItemInbConsReqs, ASNItemDetailDto>().ReverseMap();
+
+            CreateMap<TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog, TzebB2bIrReceiptOutHdrDetItemInbConsReqsLogDto>().ReverseMap();
+
+            CreateMap<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog, TzebB2bIrReceiptLineItemTblItemInbConsReqsLogDto>().ReverseMap();
 
         }
 

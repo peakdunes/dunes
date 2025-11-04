@@ -19,10 +19,11 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection.Metadata;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.UI.Controllers.Inventory.ASN
 {
-    public class AsnController : BaseController
+    public class ASNController : BaseController
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
@@ -33,7 +34,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         private readonly string _typeDocument = "ASN";
 
 
-        public AsnController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService,
+        public ASNController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService,
             ICommonINVService CommonINVService)
         {
             _httpClientFactory = httpClientFactory;
@@ -62,7 +63,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             return await HandleAsync(async ct =>
             {
-                ASNWm objdto = new ASNWm { asnHdr = new ASNHdr(), itemDetail = new List<ASNItemDetail>() };
+                ASNWm objdto = new ASNWm { asnHdr = new ASNHdrDto(), itemDetail = new List<ASNItemDetailDto>() };
 
 
                 AsnCompanyClientsWm objresult = new AsnCompanyClientsWm
@@ -381,7 +382,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 //we check if the items list have a assigned bin in WMS system
 
-                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetailDto>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
 
                 var listItemsBinsByProcess = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
@@ -524,7 +525,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 }
 
 
-                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetailDto>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
                 foreach (var detail in listaPartNumber)
                 {
@@ -610,7 +611,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     }
                 }
 
-                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetailDto>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
                 foreach (var detail in listaPartNumber)
                 {
@@ -691,7 +692,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     }
                 }
 
-                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetailDto>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
                 foreach (var detail in listaPartNumber)
                 {
@@ -792,7 +793,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return await HandleAsync(async ct =>
             {
 
-                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetail>>(HttpContext.Session.GetString("listPartNumberDetail"));
+                var listaPartNumber = JsonConvert.DeserializeObject<List<ASNItemDetailDto>>(HttpContext.Session.GetString("listPartNumberDetail"));
 
                 foreach (var detail in listaPartNumber!)
                 {
@@ -875,6 +876,12 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             var listdist1 = JsonConvert.DeserializeObject<List<BinsToLoadWm>>(HttpContext.Session.GetString("listbinesdistribution"));
 
 
+            if (listdist1 == null)
+            {
+                return Ok(new { status = $"There is not Bin distribution for this ASN process {AsnId} " });
+            }
+
+
             var imad = string.Empty;
 
             return await HandleAsync(async ct =>
@@ -897,32 +904,38 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 var infotraninput = await _CommonINVService.GetTransactionsTypeById(_companyDefault, companyclient, transactionid, token, ct);
 
-                if (infotraninput == null)
+                if (infotraninput == null || infotraninput.Data is null)
                 {
                     return Ok(new { status = $"Transction type Id {transactionid} not found " });
                 }
 
-                int OutPutTransactionId = 0;
-
-                var infotranoutput = await _CommonINVService.GetAllActiveTransferTransactionsOutputType(_companyDefault, companyclient, token, ct);
-
-                if (infotranoutput.Data == null || infotranoutput.Data.Count <= 0)
+                if (!infotraninput.Data.isInput)
                 {
-                    return Ok(new { status = "Output Transfer transaction not found " });
+                    return Ok(new { status = $"Transction type Id {transactionid} is not valid (you need a input type transaction " });
                 }
 
-                foreach (var info in infotranoutput.Data)
-                {
-                    if (info.match.ToUpper().Trim() == infotraninput.Data!.match.ToUpper().Trim())
-                    {
-                        OutPutTransactionId = info.Id;
 
-                    }
-                }
-                if (OutPutTransactionId == 0)
-                {
-                    return Ok(new { status = "Output Transfer transaction match not found " });
-                }
+                //int OutPutTransactionId = 0;
+
+                //var infotranoutput = await _CommonINVService.GetAllActiveTransferTransactionsOutputType(_companyDefault, companyclient, token, ct);
+
+                //if (infotranoutput.Data == null || infotranoutput.Data.Count <= 0)
+                //{
+                //    return Ok(new { status = "Output Transfer transaction not found " });
+                //}
+
+                //foreach (var info in infotranoutput.Data)
+                //{
+                //    if (info.match.ToUpper().Trim() == infotraninput.Data!.match.ToUpper().Trim())
+                //    {
+                //        OutPutTransactionId = info.Id;
+
+                //    }
+                //}
+                //if (OutPutTransactionId == 0)
+                //{
+                //    return Ok(new { status = "Output Transfer transaction match not found " });
+                //}
 
 
 
@@ -946,16 +959,16 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 }
 
-                var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
+                //var listdist = JsonConvert.DeserializeObject<List<BinPickWm>>(HttpContext.Session.GetString("distributiondetail"));
 
-                if (listdist == null)
-                {
-                    return Ok(new { status = $"There is not Bin distribution for this pick process {AsnId} " });
-                }
+                //if (listdist == null)
+                //{
+                //    return Ok(new { status = $"There is not Bin distribution for this pick process {AsnId} " });
+                //}
 
                 List<WMSCreateDetailTransactionDTO> Listdetails = new List<WMSCreateDetailTransactionDTO>();
 
-                foreach (var info in listdist)
+                foreach (var info in listdist1)
                 {
 
 
@@ -986,42 +999,21 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                     foreach (var item in organizationlist.Data)
                     {
-                        if (item.Idbin == info.binidin)
+                        if (item.Idbin == info.binid)
                         {
                             rackIdInput = item.Idrack;
                             levelIdInput = item.Level;
                         }
-                        if (item.Idbin == info.binidout)
-                        {
-                            rackIdOutput = item.Idrack;
-                            levelIdOutput = item.Level;
-                        }
+                      
                     }
 
-                    if (rackIdInput == 0 || rackIdOutput == 0)
+                    if (rackIdInput == 0 )
                     {
-                        return Ok(new { status = $"There is not WareHouse Orgnanization for bin {info.binidout} " });
+                        return Ok(new { status = $"There is not WareHouse Orgnanization for bin {info.binid} " });
 
                     }
 
-                    ////ouput transaction
-                    objdetinput.Idtypetransaction = OutPutTransactionId;
-                    objdetinput.Idlocation = locationid;
-                    objdetinput.Idtype = info.typereserveid;
-                    objdetinput.Idrack = rackIdInput;
-                    objdetinput.Level = levelIdInput;
-                    objdetinput.Codeitem = partnumberzeb;
-                    objdetinput.Iditem = iditemsel;
-                    objdetinput.TotalQty = info.qty;
-                    objdetinput.Idbin = info.binidout;
-                    objdetinput.Idstatus = info.statusid;
-                    objdetinput.Serialid = "";
-                    objdetinput.Idcompany = _companyDefault;
-                    objdetinput.Idcompanyclient = companyclient;
-                    objdetinput.Iddivision = division;
-                    objdetinput.Idenctransaction = 0;
-
-                    Listdetails.Add(objdetinput);
+                 
 
 
                     WMSCreateDetailTransactionDTO objdetoutput = new WMSCreateDetailTransactionDTO();
@@ -1030,13 +1022,13 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     ////input transaction
                     objdetoutput.Idtypetransaction = transactionid;
                     objdetoutput.Idlocation = locationid;
-                    objdetoutput.Idtype = info.inventorytypeid;
-                    objdetoutput.Idrack = rackIdOutput;
-                    objdetoutput.Level = levelIdOutput;
+                    objdetoutput.Idtype = info.inventorytype;
+                    objdetoutput.Idrack = rackIdInput;
+                    objdetoutput.Level = levelIdInput;
                     objdetoutput.Codeitem = partnumberzeb;
                     objdetoutput.Iditem = iditemsel;
                     objdetoutput.TotalQty = info.qty;
-                    objdetoutput.Idbin = info.binidin;
+                    objdetoutput.Idbin = info.binid;
                     objdetoutput.Idstatus = info.statusid;
                     objdetoutput.Serialid = "";
                     objdetoutput.Idcompany = _companyDefault;
@@ -1047,27 +1039,44 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     Listdetails.Add(objdetoutput);
 
                 }
-
-
                 NewInventoryTransactionTm objInfoTran = new NewInventoryTransactionTm
                 {
                     hdr = hdr,
                     Listdetails = Listdetails
                 };
 
-                return Ok("");
+                ProcessAsnRequestTm objInfoASN = new ProcessAsnRequestTm
+                {
+                    wmsInfo = objInfoTran,
+                    listdetail = listdist1 // new List<BinsToLoadWm>() //listdist
 
-                //var infotran = = await _ASNService.CreatePickProccessTransaction(DeliveryId, objInfoTran, lpnid, token, ct);
+                };
+                          
+
+               
+
+                var infotran = await _ASNService.ProcessASNTransaction(AsnId, objInfoASN, trackingnumberid, token, ct);
 
 
-                //if (!infotran.Success)
-                //{
-                //    return Ok(new { status = infotran.Error, infotran = infotran });
-                //}
-                //else
-                //{
-                //    return Ok(new { status = "OK", infotran = infotran });
-                //}
+                if (infotran != null)
+                {
+                    if (infotran.Success)
+                    {
+
+                        return new ObjectResult(new { status = "OK" });
+                    }
+                    else
+                    {
+                        return new ObjectResult(new { status = $"ASN :{AsnId } do not processed. Error :{infotran.Message}"  });
+                    }
+                }
+                else
+                {
+                    return new ObjectResult(new { status = $"ASN :{AsnId} do not processed. Error :{infotran.Message}" });
+
+
+                }
+               
             }, ct);
 
 

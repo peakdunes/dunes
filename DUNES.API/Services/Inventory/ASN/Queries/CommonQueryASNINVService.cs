@@ -1,4 +1,5 @@
-﻿using DUNES.API.DTOs.B2B;
+﻿using AutoMapper;
+using DUNES.API.DTOs.B2B;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Utils.Responses;
 using DUNES.Shared.DTOs.Inventory;
@@ -20,14 +21,17 @@ namespace DUNES.API.Services.Inventory.ASN.Queries
 
        
         private readonly ICommonQueryASNINVRepository _repository;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// Dependency Injection
         /// </summary>
         /// <param name="repository"></param>
-        public CommonQueryASNINVService(ICommonQueryASNINVRepository repository)
+        /// <param name="mapper"></param>
+        public CommonQueryASNINVService(ICommonQueryASNINVRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -51,49 +55,70 @@ namespace DUNES.API.Services.Inventory.ASN.Queries
             }
 
 
-            ASNHdr objenc = new ASNHdr();
+            //assig model data to dto data
+            var objenc = _mapper.Map<ASNHdrDto>(info.asnheader);
 
-            objenc.Id = info.asnheader.Id;
-            objenc.ConsignRequestID = info.asnheader.ConsignRequestId;
-            objenc.BatchId = info.asnheader.BatchId;
-            objenc.ShipmentNum = info.asnheader.ShipmentNum;
-            objenc.ShipToLocationId = Convert.ToInt32(info.asnheader.ShipToLocationId);
-            objenc.DateTimeInserted = info.asnheader.DateTimeInserted;
-            objenc.Processed = info.asnheader.Processed;
+            var listDetail = _mapper.Map<List<ASNItemDetailDto>>(info.asnlistdetail ?? new());
 
-            List<ASNItemDetail> listDetail = new List<ASNItemDetail>();
+
+            //ASNHdrDto objenc = new ASNHdrDto();
+
+            //objenc.Id = info.asnheader.Id;
+            //objenc.ConsignRequestID = info.asnheader.ConsignRequestId;
+            //objenc.BatchId = info.asnheader.BatchId;
+            //objenc.ShipmentNum = info.asnheader.ShipmentNum;
+            //objenc.ShipToLocationId = Convert.ToInt32(info.asnheader.ShipToLocationId);
+            //objenc.DateTimeInserted = info.asnheader.DateTimeInserted;
+            //objenc.Processed = info.asnheader.Processed;
+
+            //List<ASNItemDetailDto> listDetail = new List<ASNItemDetailDto>();
             
 
-            foreach (var item in info.asnlistdetail)
-            {
+            //foreach (var item in info.asnlistdetail)
+            //{
 
-                ASNItemDetail objdet = new ASNItemDetail();
+            //    ASNItemDetailDto objdet = new ASNItemDetailDto();
 
-                objdet.Id = item.Id;
-                objdet.ItemId = Convert.ToInt32(item.InventoryItemId);
-                objdet.ItemNumber = item.ItemNumber;
-                objdet.LineId = Convert.ToInt32(item.LineNum);
-                objdet.QuantityShipped = Convert.ToInt32(item.QuantityShipped);
-                objdet.ItemDescription = item.ItemDescription;
-                objdet.QuantityReceived = Convert.ToInt32(item.QuantityReceived);
-                objdet.DateTimeInserted = item.DateTimeInserted;
-                objdet.Attributte2 = item.Attribute2;
-                objdet.QuantityPending = 0;// objdet.QuantityShipped - objdet.QuantityReceived;
-                objdet.thereisdistribution = false;
-                objdet.processed = item.Processed;
+            //    objdet.Id = item.Id;
+            //    objdet.ItemId = Convert.ToInt32(item.InventoryItemId);
+            //    objdet.ItemNumber = item.ItemNumber;
+            //    objdet.LineId = Convert.ToInt32(item.LineNum);
+            //    objdet.QuantityShipped = Convert.ToInt32(item.QuantityShipped);
+            //    objdet.ItemDescription = item.ItemDescription;
+            //    objdet.QuantityReceived = Convert.ToInt32(item.QuantityReceived);
+            //    objdet.DateTimeInserted = item.DateTimeInserted;
+            //    objdet.Attributte2 = item.Attribute2;
+            //    objdet.QuantityPending = 0;// objdet.QuantityShipped - objdet.QuantityReceived;
+            //    objdet.thereisdistribution = false;
+            //    objdet.processed = item.Processed;
              
 
-                listDetail.Add(objdet);
+            //    listDetail.Add(objdet);
 
-            }
+            //}
 
             ASNWm objreturn = new ASNWm
             {
                 asnHdr = objenc,
-                itemDetail = listDetail
+                itemDetail = listDetail,
+                
             };
 
-           
+            if (info.receivingHdr != null)
+            {
+                var objencrec = _mapper.Map<TzebB2bIrReceiptOutHdrDetItemInbConsReqsLogDto>(info.receivingHdr);
+
+                objreturn.asnReceiptHdr = objencrec;
+
+                
+                if (info.receiveingListDetail != null && info.receiveingListDetail.Count > 0)
+                {
+                    var listDetailrec = _mapper.Map<List<TzebB2bIrReceiptLineItemTblItemInbConsReqsLogDto>>(info.receiveingListDetail);
+
+                    objreturn.asnReceiptList = listDetailrec;
+                }
+            }
+
             return ApiResponseFactory.Ok(objreturn, "OK");
 
         }

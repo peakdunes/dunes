@@ -3,6 +3,7 @@ using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Services.Auth;
 using DUNES.Shared.WiewModels.Inventory;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using System.Data;
@@ -92,13 +93,35 @@ namespace DUNES.API.Repositories.Inventory.ASN.Transactions
 
             var lineIds = grouped.Select(g => g.lineid).ToList();
 
-            var infoByLine = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
-                .Where(x => lineIds.Contains(x.Id))
-                .ToDictionaryAsync(x => x.LineNum, ct);
+            var parms = lineIds
+            .Select((id, i) => {
+                var p = new SqlParameter($"@p{i}", SqlDbType.BigInt);
+                p.Value = id;
+                return p;
+            })
+            .ToArray();
+
+            var values = string.Join(",", lineIds.Select((_, i) => $"(@p{i})"));
+
+            var sql = $@"
+                SELECT t.*
+                FROM dbo._TZEB_B2B_ASN_LINE_ITEM_TBL_ITEM_Inb_Cons_Reqs AS t
+                JOIN (VALUES {values}) AS v(Id) ON v.Id = t.Id";
+
+            var rows = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
+                .FromSqlRaw(sql, parms)    // composable
+                .AsNoTracking()
+                .ToListAsync(ct);
+
+            var infoById = rows.ToDictionary(x => x.Id);  // clave = Id
+
+            //var infoByLine = await _context.TzebB2bAsnLineItemTblItemInbConsReqs
+            //    .Where(x => lineIds.Contains(x.Id))
+            //    .ToDictionaryAsync(x => x.LineNum, ct);
 
             foreach (var g in grouped)
             {
-                if (!infoByLine.TryGetValue(g.lineid, out var infoline)) continue;
+                if (!infoById.TryGetValue(g.lineid, out var infoline)) continue;
 
                 var det = new TzebB2bIrReceiptLineItemTblItemInbConsReqsLog
                 {
@@ -122,7 +145,10 @@ namespace DUNES.API.Repositories.Inventory.ASN.Transactions
                     IsCePart = DataLog.IsCePart
                 };
 
+            //SqlException: Invalid object name 'TzebB2bIrReceiptLineItemTblItemInbConsReqsLog'.
+
                 _context.TzebB2bIrReceiptLineItemTblItemInbConsReqsLog.Add(det);
+               
             }
 
             await _context.SaveChangesAsync(ct); // EF usa una transacción interna
