@@ -3,6 +3,7 @@ using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 
 namespace DUNES.UI.Services.Inventory.Common
@@ -198,7 +199,16 @@ namespace DUNES.UI.Services.Inventory.Common
 
         Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItem(int companyid, string companyClient, string parnumber, string token, CancellationToken ct);
 
-
+        /// <summary>
+        /// Get All Item inventory by Inventory Type  for a item company client
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="parnumber"></param>
+        /// <param name="typeid"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
         Task<ApiResponse<List<WMSInventoryDetailByPartNumberDto>>> GetInventoryByItemInventoryType(int companyid, string companyClient, string parnumber, int typeid, string token,  CancellationToken ct);
                 
 
@@ -237,7 +247,7 @@ namespace DUNES.UI.Services.Inventory.Common
 
 
         /// <summary>
-        /// Get all inventory transactions for a Document Number and a search Start Date
+        /// Get all inventory transactions ZEBRA Database for a Document Number and a search Start Date
         /// </summary>
         /// <param name="DocumentNumber"></param>
         /// <param name="startDate"></param>
@@ -256,5 +266,17 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<PickProcessCallsReadDto>> GetAllCalls(string DocumentId, string processtype, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all WMS Transaction for a document
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WMSTransactionTm>> GetAllWMSTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, string token, CancellationToken ct);
     }
 }

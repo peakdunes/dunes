@@ -280,7 +280,68 @@
 
     </div>
 
-   
+    <div class="card shadow-sm mb-2">
+
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Information to process in WMS </h6>
+            <a href="#" class="text-decoration-none" onclick="hideWMS()">
+                <i id="ocultarWMS" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Location</label>
+                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
+                    <option disabled selected>Select Location</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="companyclient" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Division</label>
+                <select id="divisionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Tracking Number ASN</label>
+                <input ID="trackingnumberid" disabled class="form-control" />
+            </div>
+
+
+
+        </div>
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS2">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Concept</label>
+                <select id="conceptid" disabled class="form-control">
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Input Transfer Transaction Type</label>
+                <select id="transactionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Observations (500)</label>
+                <input ID="observations" disabled maxlength="500" class="form-control" />
+
+            </div>
+
+        </div>
+
+    </div>
 
     <div class="card shadow-sm mb-2">
         <div class="card-header bg-white">
@@ -380,11 +441,11 @@
                     <thead class="table-light">
                         <tr>
                             <th>Actions</th>
-                            <th>Id</th>
-                            <th>TransactionCode</th>
-                            <th>DateTimeInserted</th>
-                            <th>Error</th>
-                            <th>Processed</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.inputCallsList.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.inputCallsList.First().TransactionCode)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.inputCallsList.First().DateTimeInserted)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.inputCallsList.First().Error)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.inputCallsList.First().Processed)</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -423,41 +484,44 @@
                     <thead class="table-light">
                         <tr>
                             <th>Actions</th>
-                            <th>Id</th>
-                            <th>TypeOfCallId</th>
-                            <th>TypeOfCallDescription</th>
-                            <th>DateTimeInserted</th>
-                            <th>AckReceived</th>
-                            <th>Result</th>
-                            <th>DateTimeSent</th>
-                            <th>InProcess</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().TypeOfCallId)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().TypeOfCallDescription)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().DateTimeInserted)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().AckReceived)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().Result)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().DateTimeSent)</th>
+                            <th>@Html.DisplayNameFor(m => m.CallsRead.outputCallsList.First().InProcess)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @*  @if (Model?.CallsRead.outputCallsList != null)
+                        @if (Model?.CallsRead != null)
                         {
-
-
-                            foreach (var item in Model.CallsRead.outputCallsList)
+                            @if (Model?.CallsRead.outputCallsList != null || Model?.CallsRead.outputCallsList.Count > 0)
                             {
-                                <tr>
-                                    <td>
-                                    </td>
-                                    <td>@item.Id</td>
-                                    <td>@item.TypeOfCallId</td>
-                                    <td>@item.TypeOfCallDescription</td>
-                                    <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td>@item.AckReceived</td>
-                                    <td>@item.Result</td>
-                                    <td>@Convert.ToDateTime(@item.DateTimeSent).ToString("yyyy-MM-dd HH:mm")</td>
-                                    <td>@item.InProcess</td>
 
 
-                                </tr>
+                                foreach (var item in Model.CallsRead.outputCallsList)
+                                {
+                                    <tr>
+                                        <td>
+                                        </td>
+                                        <td>@item.Id</td>
+                                        <td>@item.TypeOfCallId</td>
+                                        <td>@item.TypeOfCallDescription</td>
+                                        <td>@item.DateTimeInserted.ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>@item.AckReceived</td>
+                                        <td>@item.Result</td>
+                                        <td>@Convert.ToDateTime(@item.DateTimeSent).ToString("yyyy-MM-dd HH:mm")</td>
+                                        <td>@item.InProcess</td>
 
+
+                                    </tr>
+
+                                }
                             }
                         }
- *@
+
                     </tbody>
                 </table>
 
@@ -467,70 +531,9 @@
 
     </div>
 
-    <div class="card shadow-sm mb-2">
-
-
-        <div class="card-header bg-white d-flex justify-content-between align-items-center">
-            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Information to process in WMS </h6>
-            <a href="#" class="text-decoration-none" onclick="hideWMS()">
-                <i id="ocultarWMS" class="fa-solid fa-eye"></i>
-            </a>
-        </div>
-
-
-        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS">
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Location</label>
-                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
-                    <option disabled selected>Select Location</option>
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Company Client</label>
-                <select id="companyclient" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">Division</label>
-                <select id="divisionid" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-3">
-                <label class="form-label">Tracking Number ASN</label>
-                <input ID="trackingnumberid" disabled class="form-control" />
-            </div>
 
 
 
-        </div>
-        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS2">
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Concept</label>
-                <select id="conceptid" disabled class="form-control">
-                </select>
-            </div>
-
-
-            <div class="col-12 col-md-3">
-                <label class="form-label">Input Transfer Transaction Type</label>
-                <select id="transactionid" disabled class="form-control">
-                </select>
-            </div>
-            <div class="col-12 col-md-6">
-                <label class="form-label">Observations (500)</label>
-                <input ID="observations" disabled maxlength="500" class="form-control" />
-
-            </div>
-
-        </div>
-
-    </div>
-
-    
 
     <div class="card shadow-sm mt-2">
 
@@ -628,14 +631,315 @@
         </div>
     </div>
 
-   
+
+    <div class="card shadow-sm mt-2">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">ASN WMS Transactions</h6>
+            <a href="#" class="text-decoration-none" onclick="hideWmsTran()">
+                <i id="ocultarWmsTran" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+        <div class="card-body" id="divWmsTran1">
+            <div class="row">
+                <table id="tableuserwmstran" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        HEADER WMS Transactions
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Idcompany)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().CompanyName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Idtransactionconcept)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().conceptName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().IdUser)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Datecreated)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Processed)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().IdUserprocess)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Idcompanyclient)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Dateprocessed)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Documentreference)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Observations)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListHdr.First().Iddivision)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.wmstransactions != null)
+                        {
+                            foreach (var item in Model.wmstransactions.ListHdr)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@item.Id</td>
+                                    <td>@item.Idcompany</td>
+                                    <td>@item.CompanyName</td>
+                                    <td>@item.Idtransactionconcept</td>
+                                    <td>@item.conceptName</td>
+                                    <td>@item.IdUser</td>
+                                    <td>@item.Datecreated.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.Processed</td>
+                                    <td>@item.IdUserprocess</td>
+                                    <td>@item.Idcompanyclient</td>
+                                    <td>@item.Dateprocessed.ToString("yyyy-MM-dd HH:mm")</td>
+                                    <td>@item.Documentreference</td>
+                                    <td>@item.Observations</td>
+                                    <td>@item.Iddivision</td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+        <div class="card-body" id="divWmsTran2">
+            <div class="row">
+                <table id="tableuserwmstranDet" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        DETAIL WMS Transactions
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idtypetransaction)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().typetransactionName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idlocation)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().locationName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idtype)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().typeName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idrack)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().rackName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Level)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Iditem)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().TotalQty)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idbin)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().binName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idstatus)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().statusName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Serialid)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idcompany)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().companyName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idcompanyclient)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Iddivision)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListDetail.First().Idenctransaction)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.wmstransactions != null)
+                        {
+                            @if (Model?.wmstransactions != null || Model?.wmstransactions.ListDetail.Count > 0)
+                            {
+                                foreach (var item in Model.wmstransactions.ListDetail)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <th>@item.Id</th>
+                                        <th>@item.Idtypetransaction</th>
+                                        <th>@item.typetransactionName</th>
+                                        <th>@item.Idlocation</th>
+                                        <th>@item.locationName</th>
+                                        <th>@item.Idtype</th>
+                                        <th>@item.typeName</th>
+                                        <th>@item.Idrack</th>
+                                        <th>@item.rackName</th>
+                                        <th>@item.Level</th>
+                                        <th>@item.Iditem</th>
+                                        <th>@item.TotalQty</th>
+                                        <th>@item.Idbin</th>
+                                        <th>@item.binName</th>
+                                        <th>@item.Idstatus</th>
+                                        <th>@item.statusName</th>
+                                        <th>@item.Serialid</th>
+                                        <th>@item.Idcompany</th>
+                                        <th>@item.companyName</th>
+                                        <th>@item.Idcompanyclient</th>
+                                        <th>@item.Iddivision</th>
+                                        <th>@item.Idenctransaction</th>
+                                    </tr>
+
+                                }
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+        <div class="card-body" id="divWmsTran3">
+            <div class="row">
+                <table id="tableuserwmstranInv" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                        WMS Inventory Movement
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idtransactiontype)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().transactionTypeName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idlocation)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().locationName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idtype)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().inventoryTypeName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idrack)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Level)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idbin)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().binName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Iditem)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idstatus)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().statusName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Serialid)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Datecreated)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Qtyinput)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Qtyoutput)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Qtybalance)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idcompany)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().companyName)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idcompanyclient)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().IdtransactionHead)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().IdtransactionDetail)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Iddivision)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Createdby)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().Idtransactionconcept)</th>
+                            <th>@Html.DisplayNameFor(m => m.wmstransactions.ListInventoryMovement.First().conceptName)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.wmstransactions != null)
+                        {
+                            @if (Model?.wmstransactions.ListInventoryMovement != null || Model?.wmstransactions.ListInventoryMovement.Count > 0)
+                            {
+
+
+                                foreach (var item in Model.wmstransactions.ListInventoryMovement)
+                                {
+                                    <tr>
+                                        <td></td>
+                                        <td>@item.Id</td>
+                                        <td>@item.Idtransactiontype</td>
+                                        <td>@item.transactionTypeName</td>
+                                        <td>@item.Idlocation</td>
+                                        <td>@item.locationName</td>
+                                        <td>@item.Idtype</td>
+                                        <td>@item.inventoryTypeName</td>
+                                        <td>@item.Idrack</td>
+                                        <td>@item.Level</td>
+                                        <td>@item.Idbin</td>
+                                        <td>@item.binName</td>
+                                        <td>@item.Iditem</td>
+                                        <td>@item.Idstatus</td>
+                                        <td>@item.statusName</td>
+                                        <td>@item.Serialid</td>
+                                        <td>@item.Datecreated</td>
+                                        <td>@item.Qtyinput</td>
+                                        <td>@item.Qtyoutput</td>
+                                        <td>@item.Qtybalance</td>
+                                        <td>@item.Idcompany</td>
+                                        <td>@item.companyName</td>
+                                        <td>@item.Idcompanyclient</td>
+                                        <td>@item.IdtransactionHead</td>
+                                        <td>@item.IdtransactionDetail</td>
+                                        <td>@item.Iddivision</td>
+                                        <td>@item.Createdby</td>
+                                        <td>@item.Idtransactionconcept</td>
+                                        <td>@item.conceptName</td>
 
 
 
+                                    </tr>
 
-    <form id="af" style="display:none">
-        @Html.AntiForgeryToken()
-    </form>
+                                }
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+
+
+    </div>
+
+
+    <div class="card shadow-sm mt-2">
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">ZEBRA Inventory Transactions</h6>
+            <a href="#" class="text-decoration-none" onclick="hideZebraInvTran()">
+                <i id="ocultarZebraInvTran" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+        <div class="card-body" id="divZebraInvTran">
+            <div class="row">
+                <table id="tableuserZebraInvTran" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+                    <caption style="caption-side: top; text-align: left; font-weight: bold;">
+                       Log Transactions
+                    </caption>
+                    <thead class="table-light">
+                        <tr>
+                            <th>Actions</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().Id)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().PartDefinitionId)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().PartNumberName)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().InventoryTypeIdSource)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().InvSourceName)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().InventoryTypeIdDest)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().InvDestName)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().SerialNo)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().Qty)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().Notes)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().RepairNo)</th>
+                            <th>@Html.DisplayNameFor(m => m.listinvtran.First().DateInserted)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.listinvtran != null)
+                        {
+                            foreach (var item in Model.listinvtran)
+                            {
+                                <tr>
+                                    <td></td>
+                                    <td>@item.Id</td>
+
+                                    <td>@item.PartDefinitionId</td>
+                                    <td>@item.PartNumberName</td>
+                                    <td>@item.InventoryTypeIdSource</td>
+                                    <td>@item.InvSourceName</td>
+                                    <td>@item.InventoryTypeIdDest</td>
+                                    <td>@item.InvDestName</td>
+                                    <td>@item.SerialNo</td>
+                                    <td>@item.Qty</td>
+                                    <td>@item.Notes</td>
+                                    <td>@item.RepairNo</td>
+                                    <td>@item.DateInserted</td>
+                                </tr>
+                            }
+                        }
+
+                    </tbody>
+                </table>
+
+
+            </div>
+        </div>
+    </div>
+
+<form id="af" style="display:none">
+    @Html.AntiForgeryToken()
+</form>
 
 </div>
 
@@ -644,6 +948,75 @@
           $(document).ready(function ()
           {
 
+
+               $('#tableuserZebraInvTran').DataTable({
+                    scrollX: true,
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
+              });
+
+
+
+              $('#tableuserwmstranInv').DataTable({
+                    scrollX: true,
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
+              });
+
+
+                $('#tableuserwmstranDet').DataTable({
+                    scrollX: true,
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
+              });
+
+               $('#tableuserwmstran').DataTable({
+                    scrollX: true,
+                   processing: true,
+                    deferRender: true,
+                    stateSave: true,
+                    autoWidth: false,
+                    responsive: false,
+                    pageLength: 10,
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": true,
+                    "bInfo": false,
+                    "bAutoWidth": false,
+                    "searching": false
+
+
+              });
 
                 $('#tableuserreceiptDetail').DataTable({
                     scrollX: true,
@@ -2070,7 +2443,7 @@
 
            }
 
-        
+
 
          function hideWMS()
            {
@@ -2078,7 +2451,7 @@
                 const icono = document.getElementById("ocultarWMS");
                 const $div = $('#divWMS');
                 const $div2 = $('#divWMS2');
-               divWMS2
+
 
                if (icono.classList.contains("fa-eye")) {
                   $('#ocultarWMS').removeClass("fa-eye");
@@ -2098,6 +2471,62 @@
                }
 
            }
+
+
+
+
+          function hideWmsTran()
+           {
+
+                const icono = document.getElementById("ocultarWmsTran");
+                const $div = $('#divWmsTran1');
+                const $div2 = $('#divWmsTran2');
+                 const $div3 = $('#divWmsTran3');
+
+               if (icono.classList.contains("fa-eye")) {
+                  $('#ocultarWmsTran').removeClass("fa-eye");
+                  $('#ocultarWmsTran').addClass("fa-eye-slash");
+
+                  $div.animate({ opacity: 0, height: "toggle" }, 400);
+                  $div2.animate({ opacity: 0, height: "toggle" }, 400);
+                  $div3.animate({ opacity: 0, height: "toggle" }, 400);
+               }
+               else {
+
+                  $('#ocultarWmsTran').addClass("fa-eye");
+                  $('#ocultarWmsTran').removeClass("fa-eye-slash");
+
+
+                   $div.animate({ opacity: 1, height: "toggle" }, 400);
+                   $div2.animate({ opacity: 1, height: "toggle" }, 400);
+                   $div3.animate({ opacity: 1, height: "toggle" }, 400);
+               }
+
+           }
+
+        
+
+         function hideZebraInvTran()
+           {
+
+                const icono = document.getElementById("ocultarZebraInvTran");
+                const $div = $('#divZebraInvTran');
+
+               if (icono.classList.contains("fa-eye")) {
+                  $('#ocultarZebraInvTran').removeClass("fa-eye");
+                  $('#ocultarZebraInvTran').addClass("fa-eye-slash");
+                  $div.animate({ opacity: 0, height: "toggle" }, 400);
+                 
+               }
+               else {
+
+                  $('#ocultarZebraInvTran').addClass("fa-eye");
+                  $('#ocultarZebraInvTran').removeClass("fa-eye-slash");
+                  $div.animate({ opacity: 1, height: "toggle" }, 400);
+               }
+
+           }
+
 
     </script>
 }

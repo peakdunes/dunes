@@ -177,6 +177,27 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 }
 
 
+                //search WMS Inventory transactions
+
+                var infowmstran = await _CommonINVService.GetAllWMSTransactionByDocumentNumber(_companyDefault, "ZEBRA PAR1", asnnumber, token, ct);
+
+               if (infowmstran.Data != null)
+                {
+
+                    objresult.wmstransactions = infowmstran.Data;
+                }
+
+                //search ZEBRA Inventory movement
+
+
+                var infoinvmov = await _CommonINVService.GetAllInventoryTransactionsByDocumentStartDate( asnnumber, infoasn.Data.asnHdr.DateTimeInserted, token, ct);
+
+                if (infoinvmov.Data != null)
+                {
+                    objresult.listinvtran = infoinvmov.Data;
+
+                }
+
                 return View(objresult);
 
             }, ct);

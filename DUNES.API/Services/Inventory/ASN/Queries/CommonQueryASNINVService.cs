@@ -61,41 +61,6 @@ namespace DUNES.API.Services.Inventory.ASN.Queries
             var listDetail = _mapper.Map<List<ASNItemDetailDto>>(info.asnlistdetail ?? new());
 
 
-            //ASNHdrDto objenc = new ASNHdrDto();
-
-            //objenc.Id = info.asnheader.Id;
-            //objenc.ConsignRequestID = info.asnheader.ConsignRequestId;
-            //objenc.BatchId = info.asnheader.BatchId;
-            //objenc.ShipmentNum = info.asnheader.ShipmentNum;
-            //objenc.ShipToLocationId = Convert.ToInt32(info.asnheader.ShipToLocationId);
-            //objenc.DateTimeInserted = info.asnheader.DateTimeInserted;
-            //objenc.Processed = info.asnheader.Processed;
-
-            //List<ASNItemDetailDto> listDetail = new List<ASNItemDetailDto>();
-            
-
-            //foreach (var item in info.asnlistdetail)
-            //{
-
-            //    ASNItemDetailDto objdet = new ASNItemDetailDto();
-
-            //    objdet.Id = item.Id;
-            //    objdet.ItemId = Convert.ToInt32(item.InventoryItemId);
-            //    objdet.ItemNumber = item.ItemNumber;
-            //    objdet.LineId = Convert.ToInt32(item.LineNum);
-            //    objdet.QuantityShipped = Convert.ToInt32(item.QuantityShipped);
-            //    objdet.ItemDescription = item.ItemDescription;
-            //    objdet.QuantityReceived = Convert.ToInt32(item.QuantityReceived);
-            //    objdet.DateTimeInserted = item.DateTimeInserted;
-            //    objdet.Attributte2 = item.Attribute2;
-            //    objdet.QuantityPending = 0;// objdet.QuantityShipped - objdet.QuantityReceived;
-            //    objdet.thereisdistribution = false;
-            //    objdet.processed = item.Processed;
-             
-
-            //    listDetail.Add(objdet);
-
-            //}
 
             ASNWm objreturn = new ASNWm
             {

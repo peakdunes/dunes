@@ -3,6 +3,7 @@ using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Infrastructure;
 using Microsoft.VisualBasic;
@@ -330,5 +331,15 @@ namespace DUNES.UI.Services.Inventory.Common
             return await resp.ReadAsApiResponseAsync<PickProcessCallsReadDto>(ct);
         }
 
+        public async Task<ApiResponse<WMSTransactionTm>> GetAllWMSTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/CommonQueryWMSINV/all-transactions/{companyid}/{companyClient}/{DocumentNumber}");
+
+            return await resp.ReadAsApiResponseAsync<WMSTransactionTm>(ct);
+        }
     }
 }

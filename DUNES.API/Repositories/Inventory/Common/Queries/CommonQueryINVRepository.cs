@@ -250,6 +250,10 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
 
                     var infoasn = await _context.TzebB2bAsnOutHdrDetItemInbConsReqs.FirstOrDefaultAsync(x => x.ShipmentNum == DocumentId);
 
+
+                    var infoasnReceiving = await _context.TzebB2bIrReceiptOutHdrDetItemInbConsReqsLog.FirstOrDefaultAsync(x => x.ShipmentNum == DocumentId);
+
+
                     if (infoasn == null)
                     {
                         return null;
@@ -264,7 +268,13 @@ namespace DUNES.API.Repositories.Inventory.Common.Queries
                     }
 
 
-                  
+                    if (infoasnReceiving != null)
+                    {
+
+                        listOutputCalls = await _context.TzebB2bOutConsReqs.Where(x => x.Id == infoasnReceiving.ConsignDbkrequestId).ToListAsync();
+
+
+                    }
 
                     //we check if there is pick-reponse call
 
