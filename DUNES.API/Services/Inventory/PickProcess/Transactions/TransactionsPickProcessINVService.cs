@@ -1,7 +1,9 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ReadModels.Inventory;
+using DUNES.API.Repositories.Inventory.Common.Transactions;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Auth;
+using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Responses;
@@ -10,8 +12,10 @@ using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Interfaces.RequestInfo;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using DUNES.Shared.WiewModels.Inventory;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.VisualBasic;
 using System;
 using System.Diagnostics;
 using System.Net;
@@ -33,10 +37,11 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
 
         private readonly AppDbContext _context;
         private readonly appWmsDbContext _wmscontext;
-      
+
         private readonly ITransactionsPickProcessINVRepository _transactionPickProcessINVRepository;
         private readonly ITransactionsWMSINVService _transactionsWMSINVService;
-
+        private readonly ICommonQueryWMSINVService _commonQueryWMSINVService;
+        private readonly ITransactionsCommonINVRepository _transactionsCommonINVRepository;
 
         /// <summary>
         /// dependency injection
@@ -49,10 +54,13 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="logHelper"></param>
         /// <param name="trace"></param>
         /// <param name="currentUser"></param>
+        /// <param name="transactionsCommonINVRepository"></param>
+        /// <param name="commonQueryWMSINVService"></param>
         public TransactionsPickProcessINVService(AppDbContext context, appWmsDbContext wmscontext,
             ITransactionsPickProcessINVRepository transactionPickProcessINVRepository,
             ITransactionsWMSINVService transactionsWMSINVService, IRequestInfo requestInfo,
-            LogHelper logHelper, ITraceProvider trace, ICurrentUser currentUser)
+            LogHelper logHelper, ITraceProvider trace, ICurrentUser currentUser,
+            ITransactionsCommonINVRepository transactionsCommonINVRepository, ICommonQueryWMSINVService commonQueryWMSINVService)
         {
             _context = context;
             _wmscontext = wmscontext;
@@ -62,6 +70,8 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             _logHelper = logHelper;
             _trace = trace;
             _currentUser = currentUser;
+            _transactionsCommonINVRepository = transactionsCommonINVRepository;
+            _commonQueryWMSINVService = commonQueryWMSINVService;
         }
 
 
@@ -166,6 +176,145 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                     await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
                     return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
                         $"Error updating Pick Process tables. Error {updateTablesOk.Message}.");
+                }
+
+                //ZEBRA Inventory transactionbs
+
+
+                List<PickProcessWm> listInvProcess = new List<PickProcessWm>();
+
+
+                var infoTransacInput = await _commonQueryWMSINVService.GetAllActiveTransactionsInputType(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient, ct);
+
+                if (infoTransacInput == null || infoTransacInput.Data == null)
+                {
+                    await tx.RollbackAsync(ct);
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                       $"Error active input transactions type not found. Error {updateTablesOk.Message}.");
+                }
+
+                var infoTransacOutput = await _commonQueryWMSINVService.GetAllActiveTransactionsOutputType(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient, ct);
+
+                if (infoTransacOutput == null || infoTransacOutput.Data == null)
+                {
+                    await tx.RollbackAsync(ct);
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                       $"Error active output transactions type not found. Error {updateTablesOk.Message}.");
+                }
+
+
+
+                var infoInvType = await _commonQueryWMSINVService.GetAllActiveInventoryType(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient, ct);
+
+                if (infoInvType == null || infoInvType.Data == null)
+                {
+                    await tx.RollbackAsync(ct);
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                       $"Error active inventory type not found. Error {updateTablesOk.Message}.");
+                }
+                //input transactions
+                foreach (var tran in infoTransacInput.Data)
+                {
+                    
+
+
+                    foreach (var info in objInvData.Listdetails)
+                    {
+                        if (tran.Id == info.Idtypetransaction)
+                        {
+                            PickProcessWm objdet = new PickProcessWm();
+
+                            if (tran.isInput)
+                            {
+                                foreach (var type in infoInvType.Data)
+                                {
+                                    if (type.Id == info.Idtype)
+                                    {
+                                        objdet.InvSource = type.Zebrainvassociated;
+                                        objdet.sourcename = type.Name;
+
+
+                                    }
+                                }
+                            }
+
+                            objdet.itemid = info.Iditem;
+                            objdet.itemname = info.Codeitem;
+                           
+                            objdet.InvDest = 0;
+                            objdet.qty = info.TotalQty;
+                            objdet.typetransactionid = info.Idtypetransaction;
+                            objdet.match = tran.match;
+                            objdet.notes = DeliveryId.ToString().Trim();
+                            objdet.serialnumber = info.Serialid ?? "";
+                            listInvProcess.Add(objdet);
+                        }
+
+                    }
+                }
+
+
+                //output transactions
+
+                foreach (var listp in listInvProcess)
+                {
+                    foreach (var tran in infoTransacOutput.Data)
+                    {
+                        if (tran.match == listp.match)
+                        {
+                            foreach (var info in objInvData.Listdetails)
+                            {
+                                if (tran.Id == info.Idtypetransaction)
+                                {
+                                    foreach (var type in infoInvType.Data)
+                                    {
+                                        if (type.Id == info.Idtype)
+                                        {
+                                            listp.InvDest = type.Zebrainvassociated;
+                                            listp.destname = type.Name;
+                                            continue;
+                                        }
+                                    }
+                                    continue;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                List<TzebB2bReplacementPartsInventoryLogDto> listlogs = new List<TzebB2bReplacementPartsInventoryLogDto>();
+
+                foreach (var listp in listInvProcess)
+                {
+
+                    TzebB2bReplacementPartsInventoryLogDto infodetmov = new TzebB2bReplacementPartsInventoryLogDto();
+
+
+                    infodetmov.PartDefinitionId = listp.itemid;
+                    infodetmov.PartNumberName = listp.itemname;
+                    infodetmov.InventoryTypeIdSource = listp.InvSource;
+                    infodetmov.InvSourceName = listp.sourcename;
+                    infodetmov.InventoryTypeIdDest = listp.InvDest;
+                    infodetmov.InvDestName = listp.destname;
+                    infodetmov.SerialNo = listp.serialnumber;
+                    infodetmov.Qty = listp.qty;
+                    infodetmov.Notes = listp.notes.Trim();
+                    infodetmov.RepairNo = 0; ;
+                    infodetmov.DateInserted = DateTime.Now;
+
+                    listlogs.Add(infodetmov);
+
+                    
+                }
+
+                var infotranInv = await _transactionsCommonINVRepository
+                        .createInventoryTransactionLog(listlogs, _currentUser.UserId!, ct);
+
+                if (!infotranInv)
+                {
+                    await tx.RollbackAsync(ct);
+                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                       $"Error creating ZEBRA Inventory transaction log. Error {updateTablesOk.Message}.");
                 }
 
                 await tx.CommitAsync(ct);

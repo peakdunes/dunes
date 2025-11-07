@@ -1,0 +1,221 @@
+﻿<div class="container mt-4">
+
+
+    <div class="card shadow-sm mb-2">
+
+
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0 display-6 fs-4 text-primary ms2">Company Client Information</h6>
+            <a href="#" class="text-decoration-none" onclick="hideWMS()">
+                <i id="ocultarWMS" class="fa-solid fa-eye"></i>
+            </a>
+        </div>
+
+
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Location</label>
+                <select id="locationid" class="form-control" asp-items="@ViewBag.locations">
+                    <option disabled selected>Select Location</option>
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Company Client</label>
+                <select id="companyclient" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Division</label>
+                <select id="divisionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-3">
+                <label class="form-label">Tracking Number ASN</label>
+                <input ID="trackingnumberid" disabled class="form-control" />
+            </div>
+
+
+
+        </div>
+        <div class="row gx-3 gy-2 px-3 mb-3" id="divWMS2">
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Concept</label>
+                <select id="conceptid" disabled class="form-control">
+                </select>
+            </div>
+
+
+            <div class="col-12 col-md-3">
+                <label class="form-label">Input Transfer Transaction Type</label>
+                <select id="transactionid" disabled class="form-control">
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label class="form-label">Observations (500)</label>
+                <input ID="observations" disabled maxlength="500" class="form-control" />
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+@section Scripts{
+
+
+@{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial"); 
+    }
+
+    <script>
+
+        let currentRequest = null;
+
+            $('#locationid').change(async function(){
+
+             if (currentRequest) {
+                 currentRequest.abort();
+             }
+
+             var $companyClient = $('#companyclient');
+
+             var locationid = $(this).val();
+
+            
+
+              $companyClient.empty()
+             .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+             .prop('disabled', true);
+
+
+              if (!locationid) return;
+
+
+               // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+             var token = $('input[name="__RequestVerificationToken"]').val();
+
+             showSpinner();
+
+
+
+             currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
+                     data: { __RequestVerificationToken: token,  locationid: locationid }})
+             .done(function (res)
+             {
+
+                 if (res.message == "OK")
+                 {
+                     var list = (res && res.data) ? res.data : [];
+
+                     if (Array.isArray(list) && list.length)
+                     {
+                         $.each(list, function (_, it) {
+                         var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                         var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                         $companyClient.append($('<option>', { value: id, text: name }));
+                         });
+                         $companyClient.prop('disabled', false);
+                     }
+                 }
+                 else
+                 {
+                       $('#locationid option').prop('selected', function () {
+                                 return this.defaultSelected;
+                       });
+
+                     errorAction(res.message);
+                 }
+
+             })
+             .fail(function (xhr, status) {
+                  if (status !== "abort") {
+                     errorAction("Error:", status);
+                 }
+             }).always(function(){
+
+                 hideSpinner();
+             });
+
+         })
+
+
+
+
+
+
+         $('#companyclient').change(async function(){
+
+             if (currentRequest) {
+                 currentRequest.abort();
+             }
+
+             var $companyClient = $('#companyclient');
+
+             var locationid = $(this).val();
+
+
+
+              $companyClient.empty()
+             .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+             .prop('disabled', true);
+
+
+              if (!locationid) return;
+
+
+               // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+             var token = $('input[name="__RequestVerificationToken"]').val();
+
+             showSpinner();
+
+
+
+             currentRequest = $.ajax({url: '@Url.Action("getAllInventoryTypeAndItems", "CurrentInventory")',type: 'POST',
+                     data: { __RequestVerificationToken: token,  locationid: locationid }})
+             .done(function (res)
+             {
+
+                 if (res.message == "OK")
+                 {
+                     var list = (res && res.data) ? res.data : [];
+
+                     if (Array.isArray(list) && list.length)
+                     {
+                         $.each(list, function (_, it) {
+                         var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                         var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                         $companyClient.append($('<option>', { value: id, text: name }));
+                         });
+                         $companyClient.prop('disabled', false);
+                     }
+                 }
+                 else
+                 {
+                       $('#locationid option').prop('selected', function () {
+                                 return this.defaultSelected;
+                       });
+
+                     errorAction(res.message);
+                 }
+
+             })
+             .fail(function (xhr, status) {
+                  if (status !== "abort") {
+                     errorAction("Error:", status);
+                 }
+             }).always(function(){
+
+                 hideSpinner();
+             });
+
+         })
+    </script>
+
+}
