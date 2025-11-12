@@ -224,5 +224,19 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <param name="DocumentNumber"></param>
         /// <returns></returns>
         Task<WmsTransactionsRead?> GetAllTransactionByDocumentNumber(int companyid, string companyClient, string DocumentNumber, CancellationToken ct);
+
+
+        /// <summary>
+        /// get a inventory transaction by id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="transactionId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WmsTransactionsRead?> GetInventoryTransactionById(int companyid, string companyClient, int transactionId, CancellationToken ct);
+
+
+
     }
 }

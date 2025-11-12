@@ -300,12 +300,49 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
 
             return ApiResponseFactory.Ok(transactionId, "OK");
         }
-
-        public Task<ApiResponse<bool>> DeleteInventoryTransaction(int transactionNumber, CancellationToken ct)
+        /// <summary>
+        /// delete a inventory transaction if it is not processed
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="transactionNumber"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<bool>> DeleteInventoryTransaction(int companyId, string companyClientId, int transactionNumber, CancellationToken ct)
         {
-            throw new NotImplementedException();
+
+            var infotran = await _commonQueryWMSService.GetInventoryTransactionById(companyId, companyClientId, transactionNumber, ct);
+
+            if (infotran.Data == null)
+            {
+                return ApiResponseFactory.BadRequest<bool>($"Transaction  {transactionNumber} not found");
+            }
+
+            bool isProcessed = false;
+            foreach(var data in infotran.Data.ListHdr)
+            {
+
+                if (data.Processed)
+                {
+                    isProcessed = true;
+                }
+            }
+
+            if (isProcessed)
+            {
+                return ApiResponseFactory.BadRequest<bool>($"Transaction  {transactionNumber} already processed. It can not deleted");
+            }
+
+
+            var infodel = await _repository.DeleteInventoryTransaction(transactionNumber);
+
+            return ApiResponseFactory.Ok(Convert.ToBoolean(infodel), "OK");
+
+            // throw new NotImplementedException();
         }
 
+      
         /// <summary>
         /// Asocia el <see cref="DbContext"/> actual a una transacción existente.
         /// </summary>

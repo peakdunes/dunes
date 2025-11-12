@@ -261,7 +261,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                 {
                     await tx.RollbackAsync(ct);
                     // Compensar WMS
-                    await TryCompensateWmsAsync(wmsTxNumber, ct);
+                    await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,  wmsTxNumber, ct);
                     return ApiResponseFactory.BadRequest<ASNResponseDto>(
                         $"Error creating Receipt Transaction for this ASN: {AsnId}.");
                 }
@@ -401,7 +401,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                         if (!idByPart.TryGetValue(it.PartNumber, out var itemId))
                         {
                             await tx.RollbackAsync(ct);
-                            await TryCompensateWmsAsync(wmsTxNumber, ct);
+                            await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!, wmsTxNumber, ct);
                             return ApiResponseFactory.BadRequest<ASNResponseDto>($"Part not found: {it.PartNumber}.");
                         }
 
@@ -425,7 +425,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                     if (!invLogOk)
                     {
                         await tx.RollbackAsync(ct);
-                        await TryCompensateWmsAsync(wmsTxNumber, ct);
+                        await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,wmsTxNumber, ct);
                         return ApiResponseFactory.BadRequest<ASNResponseDto>(
                             $"Error creating Inventory movement log for ASN: {AsnId}.");
                     }
@@ -451,7 +451,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                     if (outputCallNumber <= 0)
                     {
                         await tx.RollbackAsync(ct);
-                        await TryCompensateWmsAsync(wmsTxNumber, ct);
+                        await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,wmsTxNumber, ct);
                         return ApiResponseFactory.BadRequest<ASNResponseDto>(
                             $"Error creating ASN OutPut Call Transaction for this ASN: {AsnId}.");
                     }
@@ -463,7 +463,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                     if (infoRECEIPT == null)
                     {
                         await tx.RollbackAsync(ct);
-                        await TryCompensateWmsAsync(wmsTxNumber, ct);
+                        await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,wmsTxNumber, ct);
                         return ApiResponseFactory.BadRequest<ASNResponseDto>(
                             $"Receipt Transaction for this ASN: {AsnId} not found.");
                     }
@@ -479,7 +479,7 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
                     if (!updatecall)
                     {
                         await tx.RollbackAsync(ct);
-                        await TryCompensateWmsAsync(wmsTxNumber, ct);
+                        await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,wmsTxNumber, ct);
                         return ApiResponseFactory.BadRequest<ASNResponseDto>(
                             $"Error updating Output call {outputCallNumber} for ASN: {AsnId}.");
                     }
@@ -500,18 +500,18 @@ namespace DUNES.API.Services.Inventory.ASN.Transactions
             catch (Exception ex)
             {
                 // Compensación WMS si algo explota en Zebra
-                await TryCompensateWmsAsync(wmsTxNumber, ct);
+                await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,wmsTxNumber, ct);
                 return ApiResponseFactory.Error<ASNResponseDto>($"ASN process failed: {ex.GetBaseException().Message}");
             }
         }
 
         // Helper de compensación (best-effort)
-        private async Task TryCompensateWmsAsync(int wmsTxNumber, CancellationToken ct)
+        private async Task TryCompensateWmsAsync(int companyid, string companyClientId, int wmsTxNumber, CancellationToken ct)
         {
             if (wmsTxNumber == 0) return;
             try
             {
-                await _transactionsWMSINVService.DeleteInventoryTransaction(Convert.ToInt32(wmsTxNumber), ct);
+                await _transactionsWMSINVService.DeleteInventoryTransaction(companyid, companyClientId, Convert.ToInt32(wmsTxNumber), ct);
             }
             catch (Exception ex)
             {

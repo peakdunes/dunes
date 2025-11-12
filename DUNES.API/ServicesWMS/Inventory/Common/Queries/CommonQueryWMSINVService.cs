@@ -728,5 +728,27 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(objdet, "OK");
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="transactionId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<WmsTransactionsRead>> GetInventoryTransactionById(int companyid, string companyClient, int transactionId, CancellationToken ct)
+        {
+            var info = await _repository.GetInventoryTransactionById(companyid, companyClient, transactionId, ct);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<WmsTransactionsRead>($"there is not transaction for this company client {companyClient} and this transaction id {transactionId}");
+            }
+
+
+            return ApiResponseFactory.Ok(info, "OK");
+            //throw new NotImplementedException();
+        }
     }
 }

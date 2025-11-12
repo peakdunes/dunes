@@ -23,10 +23,12 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
         /// <summary>
         /// Delete inventory transaction NO Processed (Header and details)
         /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
         /// <param name="transactionNumber"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> DeleteInventoryTransaction(int transactionNumber, CancellationToken ct);
+        Task<ApiResponse<bool>> DeleteInventoryTransaction(int companyId, string companyClientId, int transactionNumber, CancellationToken ct);
 
     }
 }

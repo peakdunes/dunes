@@ -485,5 +485,72 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             return uniquetransaction;
         }
+
+
+
+        /// <summary>
+        /// Get all transaction associated to Document Number (ASN, Pick Process, Repair ID)
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="DocumentNumber"></param>
+        /// <returns></returns>
+        public async Task<WmsTransactionsRead?> GetInventoryTransactionById(int companyid, string companyClient, int transactionId, CancellationToken ct)
+        {
+
+
+            WmsTransactionsRead objresponse = new WmsTransactionsRead();
+
+            var infoenctran = await _wmscontext.InventorytransactionHdr
+                .Include(x => x.IdcompanyNavigation)
+                .Include(x => x.IdtransactionconceptNavigation)
+                .Where(x => x.Idcompany == companyid
+                && x.Idcompanyclient == companyClient 
+                && x.Id == transactionId).ToListAsync(ct);
+
+
+            if (infoenctran.Count == 0)
+                return null;
+
+            List<int> listenc = new List<int>();
+
+
+            if (infoenctran.Count > 0)
+            {
+                objresponse.ListHdr = infoenctran;
+
+                foreach (var item in objresponse.ListHdr)
+                {
+                    listenc.Add(item.Id);
+                }
+
+
+                var infodetail = await _wmscontext.InventorytransactionDetail
+                    .Include(x => x.IdtypetransactionNavigation)
+                    .Include(x => x.IdlocationNavigation)
+                    .Include(x => x.IdtypeNavigation)
+                    .Include(x => x.IdrackNavigation)
+                    .Include(x => x.IdbinNavigation)
+                    .Include(x => x.IdstatusNavigation)
+                    .Include(x => x.IdcompanyNavigation)
+                    .Where(x => listenc.Contains(x.Idenctransaction)).ToListAsync();
+
+                if (infodetail.Count > 0)
+                {
+                    objresponse.ListDetail = infodetail;
+                }
+
+                var infomov = await _wmscontext.Inventorymovement.Where(x => listenc.Contains(x.IdtransactionHead)).ToListAsync();
+
+                if (infomov.Count > 0)
+                {
+                    objresponse.ListMovement = infomov;
+                }
+            }
+
+            return objresponse;
+        }
+
+
     }
 }

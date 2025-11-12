@@ -13,6 +13,8 @@ using DUNES.API.Repositories.Inventory.Common.Transactions;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
+using DUNES.API.Repositories.WebService.Queries;
+using DUNES.API.Repositories.WebService.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
@@ -24,6 +26,8 @@ using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
+using DUNES.API.Services.WebService.Queries;
+using DUNES.API.Services.WebService.Transactions;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
@@ -193,7 +197,7 @@ builder.Services.AddSwaggerGen(c =>
             "CommonQueryB2B" => new[] { "B2B - Common queries" },
             "CommonQueryWMSMaster" => new[] { "WMS Master Tables - Common queries" },
 
-            
+           
 
 
             "CommonQueryWMSINV" => new[] { "WMS Inventory - Common queries" },
@@ -265,6 +269,15 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 
 builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
 builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterService>();
+
+//WEB SERVCE SERVICES
+
+builder.Services.AddScoped<ICommonQueryWebServiceRepository, CommonQueryWebServiceRepository>();
+builder.Services.AddScoped<ITransactionsWebServiceRepository, TransactionsWebServiceRepository>();
+
+
+builder.Services.AddScoped<ICommonQueryWebServiceService, CommonQueryWebServiceService>();
+builder.Services.AddScoped<ITransactionsWebServiceService, TransactionsWebServiceService>();
 
 
 

@@ -129,22 +129,22 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 objresult.PickProcessHdr = infopickProcess.Data!.PickProcessHdr;
                 objresult.ListItems = infopickProcess.Data.ListItems;
 
-                if (objresult.PickProcessHdr.OutConsReqsId > 0)
+                //if (objresult.PickProcessHdr.OutConsReqsId > 0)
+                //{
+
+                //pick process input and output calls
+
+                var infocall = await _CommonINVService.GetAllCalls(pickprocessnumber, _typeDocument, token, ct);
+
+                if (infocall.Data != null)
                 {
-
-                    //pick process input and output calls
-
-                    var infocall = await _CommonINVService.GetAllCalls(pickprocessnumber, _typeDocument, token, ct);
-
-                    if (infocall.Data != null)
-                    {
-                        objresult.CallsRead = infocall.Data;
-                    }
+                    objresult.CallsRead = infocall.Data;
                 }
+                //}
 
                 //pick process WMS Inventory transctions
 
-               
+
 
                 var infoWMSTransactions = await _service.GetAllTransactionByDocumentNumber(_companyDefault, "abc", pickprocessnumber, token, ct);
 
@@ -442,8 +442,11 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 if (listbines.Data == null || listbines.Data.Count <= 0)
                 {
-                    MessageHelper.SetMessage(this, "danger", "there is not bins created for this  company", MessageDisplay.Inline);
-                    return View(listbines);
+                    return Ok(new
+                    {
+                        status = $"there is not bins created for this  company {companyclient}",
+                        data = string.Empty
+                    });
                 }
 
                 foreach (var b in listbines.Data)
@@ -464,8 +467,11 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 if (listconcepts.Data == null || listconcepts.Data.Count <= 0)
                 {
-                    MessageHelper.SetMessage(this, "danger", "there is not WMS transactions concept created for this  company", MessageDisplay.Inline);
-                    return View(listbines);
+                    return Ok(new
+                    {
+                        status = $"there is not WMS transactions concept created for this company {companyclient}",
+                        data = string.Empty
+                    });
                 }
 
                 foreach (var b in listconcepts.Data)
@@ -486,8 +492,13 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 if (listdivision.Data == null || listdivision.Data.Count <= 0)
                 {
-                    MessageHelper.SetMessage(this, "danger", $"there is not Division for this for this  company client {companyclient}", MessageDisplay.Inline);
-                    return View(listbines);
+                    return Ok(new
+                    {
+                        status = $"there is not Division for this for this  company client {companyclient}",
+                        data = string.Empty
+                    });
+
+                    //return View(listbines);
                 }
 
                 foreach (var b in listdivision.Data)
@@ -507,15 +518,18 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 if (listtransactions.Data == null || listtransactions.Data.Count <= 0)
                 {
-                    MessageHelper.SetMessage(this, "danger", "there is not WMS output transactions created for this  company", MessageDisplay.Inline);
-                    return View(listbines);
+                    return Ok(new
+                    {
+                        status = $"there is not WMS output transactions created for this  company {companyclient}",
+                        data = string.Empty
+                    });
                 }
 
                 objinformation.listinputtransactions = listtransactions.Data;
 
                 return Ok(new
                 {
-                    message = "OK",
+                    status = "OK",
                     data = objinformation
                 });
 
@@ -645,7 +659,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                     return Ok(new { status = "Output Transfer transaction match not found " });
                 }
 
-              
+
 
                 WMSCreateHeaderTransactionDTO hdr = new WMSCreateHeaderTransactionDTO();
 
@@ -656,7 +670,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 hdr.Idcompanyclient = IdCompanyClient;
                 hdr.Codecompanyclient = companyclient.Trim();
                 hdr.Documentreference = DeliveryId.Trim();
-                hdr.Observations = string.IsNullOrEmpty(observations)?"":observations.Trim();
+                hdr.Observations = string.IsNullOrEmpty(observations) ? "" : observations.Trim();
                 hdr.Iddivision = division;
 
                 var organizationlist = await _CommonINVService.GetAllWareHouseOrganizationByCompanyClient(_companyDefault, companyclient, token, ct);

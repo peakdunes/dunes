@@ -444,5 +444,25 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
 
 
         }
+
+        /// <summary>
+        /// Get WMS Inventory transaction by id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="transactionid"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(WMSTransactionTm), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("inventory-transaction-by-id/{companyid}/{companyClient}/{transactionid}")]
+        public async Task<IActionResult> GetInventoryTransactionById(int companyid, string companyClient, int transactionid, CancellationToken ct)
+        {
+            return await HandleApi(ct => _service.GetInventoryTransactionById(companyid, companyClient, transactionid, ct), ct);
+
+
+        }
+
     }
 }

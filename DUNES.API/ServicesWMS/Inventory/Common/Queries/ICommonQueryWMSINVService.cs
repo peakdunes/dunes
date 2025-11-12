@@ -245,12 +245,18 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
         Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct);
-       
 
 
 
-
-
+        /// <summary>
+        /// Get a transaction by id
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="companyClient"></param>
+        /// <param name="transactionId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WmsTransactionsRead>> GetInventoryTransactionById(int companyid, string companyClient, int transactionId, CancellationToken ct);
 
 
 

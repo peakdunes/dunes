@@ -84,7 +84,47 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Transactions
                 throw; // se lo pasas al middleware
             }
         }
+        /// <summary>
+        /// Delete a inventory transaction by id (no processed)
+        /// </summary>
+        /// <param name="transactionId"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteInventoryTransaction(int transactionId)
+        {
+
+            var infotran = await _wmscontext.InventorytransactionHdr.FirstOrDefaultAsync((x => x.Id ==  transactionId));
+
+            List<InventorytransactionDetail> listdetail = new List<InventorytransactionDetail>();
+
+            if (infotran != null)
+            {
+
+                listdetail = _wmscontext.InventorytransactionDetail.Where(x => x.Idenctransaction == infotran.Id).ToList();
+            }
+
+            await using var transaction = await _wmscontext.Database.BeginTransactionAsync();
+            try
+            {
+                {
+                   
+
+                    _wmscontext.InventorytransactionDetail.RemoveRange(listdetail);
 
 
+                    _wmscontext.InventorytransactionHdr.Remove(infotran!);
+
+                    await _wmscontext.SaveChangesAsync();
+                }
+
+                await transaction.CommitAsync();
+
+                return true;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw; // se lo pasas al middleware
+            }
+        }
     }
 }

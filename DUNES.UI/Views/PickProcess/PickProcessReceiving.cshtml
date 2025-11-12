@@ -247,6 +247,11 @@
             <input asp-for="PickProcessHdr.OutConsReqsId" readonly class="form-control" />
         </div>
 
+        <div class="col-12 col-md-3">
+            <label asp-for="PickProcessHdr.DateTimeProcessed" class="form-label"></label>
+            <input asp-for="PickProcessHdr.DateTimeProcessed" readonly class="form-control" />
+        </div>
+
     </div>
 </div>
 
@@ -1659,55 +1664,64 @@
                     data: { __RequestVerificationToken: token,  companyClient: companyClient }})
             .done(function (res)
             {
-                var list = (res && res.data.listbines) ? res.data.listbines : [];
-                if (Array.isArray(list) && list.length)
+                if (res.status == "OK")
                 {
-                    $.each(list, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
-                    $bin.append($('<option>', { value: id, text: name }));
-                    });
-                    $bin.prop('disabled', false);
-                }
 
-                var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
-                if (Array.isArray(listc) && listc.length)
-                {
-                    $.each(listc, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $concepts.append($('<option>', { value: id, text: name }));
-                    });
-                    $concepts.prop('disabled', false);
-                }
+                    var list = (res && res.data.listbines) ? res.data.listbines : [];
+                    if (Array.isArray(list) && list.length)
+                    {
+                        $.each(list, function (_, it) {
+                        var id = (it.id !== undefined) ? it.id : it.Id;
+                        var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
+                        $bin.append($('<option>', { value: id, text: name }));
+                        });
+                        $bin.prop('disabled', false);
+                    }
+
+                    var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
+                    if (Array.isArray(listc) && listc.length)
+                    {
+                        $.each(listc, function (_, it) {
+                        var id = (it.id !== undefined) ? it.id : it.Id;
+                        var name = (it.Name !== undefined) ? it.name : it.name;
+                        $concepts.append($('<option>', { value: id, text: name }));
+                        });
+                        $concepts.prop('disabled', false);
+                    }
 
 
-                  var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
-                if (Array.isArray(listt) && listt.length)
-                {
-                    $.each(listt, function (_, it) {
-                    var id = (it.id !== undefined) ? it.id : it.Id;
-                    var name = (it.Name !== undefined) ? it.name : it.name;
-                    $transactions.append($('<option>', { value: id, text: name }));
-                    });
-                    $transactions.prop('disabled', false);
-                }
+                      var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
+                    if (Array.isArray(listt) && listt.length)
+                    {
+                        $.each(listt, function (_, it) {
+                        var id = (it.id !== undefined) ? it.id : it.Id;
+                        var name = (it.Name !== undefined) ? it.name : it.name;
+                        $transactions.append($('<option>', { value: id, text: name }));
+                        });
+                        $transactions.prop('disabled', false);
+                    }
 
-                var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+                    var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
 
-                if (Array.isArray(lisdiv) && lisdiv.length)
-                {
-                    $.each(lisdiv, function (_, it) {
+                    if (Array.isArray(lisdiv) && lisdiv.length)
+                    {
+                        $.each(lisdiv, function (_, it) {
 
-                    var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                    var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                    $division.append($('<option>', { value: id, text: name }));
-                    });
-                    $division.prop('disabled', false);
-                }
+                        var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                        var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                        $division.append($('<option>', { value: id, text: name }));
+                        });
+                        $division.prop('disabled', false);
+                    }
 
-                $('#lpnid').prop('disabled', false);
-                 $('#observations').prop('disabled', false);
+                    $('#lpnid').prop('disabled', false);
+                     $('#observations').prop('disabled', false);
+
+                 }
+                 else
+                 {
+                     errorAction(res.status);
+                 }
             })
             .fail(function (xhr) {
                 console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
@@ -2015,18 +2029,18 @@
            const icono = document.getElementById("ocultarZebraMov");
 
            const $div1 = $('#divzebramov1');
-           
+
 
             if (icono.classList.contains("fa-eye")) {
                 $('#ocultarZebraMov').removeClass("fa-eye");
                 $('#ocultarZebraMov').addClass("fa-eye-slash");
                 $div1.animate({ opacity: 0, height: "toggle" }, 400);
-              
+
             } else {
                 $('#ocultarZebraMov').addClass("fa-eye");
                 $('#ocultarZebraMov').removeClass("fa-eye-slash");
                 $div1.animate({ opacity: 1, height: "toggle" }, 400);
-            
+
             }
 
         }
@@ -2162,7 +2176,7 @@
 
             var observations = $('#observations').val();
 
-            alert('todo validado');
+
 
             showSpinner();
 
@@ -2180,6 +2194,9 @@
 
                    if (data.status == "OK")
                        {
+
+                           successAction("Process completed successfully")
+
                            loadDataDetail(data.lista);
 
                        }

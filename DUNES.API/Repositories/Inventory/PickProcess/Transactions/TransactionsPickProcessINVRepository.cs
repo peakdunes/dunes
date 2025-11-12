@@ -125,6 +125,12 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             if (infoEncPickProcess == null)
                 return -1;
 
+            infoEncPickProcess.DateTimeProcessed = DateTime.Now;
+            infoEncPickProcess.OutConsReqsId = call13id;
+            _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.Update(infoEncPickProcess);
+            await _context.SaveChangesAsync();
+
+
             var infoDetPickProcess = await _context.TzebB2bPSoLineItemTblItemInbConsReqsLog
                 .Where(x => x.PSoWoHdrTblItemId == infoEncPickProcess.Id)
                 .ToListAsync();
@@ -132,10 +138,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Transactions
             if (infoDetPickProcess == null || !infoDetPickProcess.Any())
                 return -2;
 
-            infoEncPickProcess.DateTimeProcessed = DateTime.Now;
-            infoEncPickProcess.OutConsReqsId = call13id;
-            _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.Update(infoEncPickProcess);
-            await _context.SaveChangesAsync();
+           
 
             foreach (var infodet in infoDetPickProcess)
             {

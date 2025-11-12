@@ -7,6 +7,7 @@ using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.Models.Masters;
+using DUNES.API.Models.WebService;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
 using Microsoft.EntityFrameworkCore;
@@ -284,6 +285,17 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<MvcGeneralParameters> MvcGeneralParameters { get; set; }
 
+
+        /// <summary>
+        /// Daily RMA call records (ZEBRA - PEAK) 
+        /// </summary>
+        public virtual DbSet<MvcWebServiceDailySummary> MvcWebServiceDailySummary { get; set; }
+        /// <summary>
+        /// Hourly RMA call records (ZEBRA - PEAK) 
+        /// </summary>
+        public virtual DbSet<MvcWebServiceHourlySummary> MvcWebServiceHourlySummary { get; set; }
+
+
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
         /// This method is called when the model for a derived context has been initialized,
@@ -294,6 +306,36 @@ namespace DUNES.API.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<MvcWebServiceDailySummary>(entity =>
+            {
+                entity.HasKey(e => new { e.Year, e.Month, e.Day }).HasName("PK_WebServiceDailySummary");
+
+                entity.ToTable("mvcWebServiceDailySummary");
+
+                entity.HasIndex(e => new { e.Year, e.Month, e.Day }, "IX_WebServiceDailySummary_YMD");
+
+                entity.Property(e => e.ErrorRate).HasColumnType("decimal(5, 2)");
+                entity.Property(e => e.LastUpdatedUtc)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysutcdatetime())");
+            });
+
+            modelBuilder.Entity<MvcWebServiceHourlySummary>(entity =>
+            {
+                entity.HasKey(e => new { e.Year, e.Month, e.Day, e.Hour }).HasName("PK_WebServiceHourlySummary");
+
+                entity.ToTable("mvcWebServiceHourlySummary");
+
+                entity.HasIndex(e => new { e.Year, e.Month, e.Day }, "IX_WebServiceHourlySummary_YMD");
+
+                entity.Property(e => e.ErrorRate).HasColumnType("decimal(5, 2)");
+                entity.Property(e => e.LastUpdatedUtc)
+                    .HasPrecision(0)
+                    .HasDefaultValueSql("(sysutcdatetime())");
+                entity.Property(e => e.Source)
+                    .HasMaxLength(64)
+                    .IsUnicode(false);
+            });
 
             modelBuilder.Entity<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog>(entity =>
             {

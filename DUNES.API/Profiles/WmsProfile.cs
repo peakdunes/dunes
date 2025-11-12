@@ -2,8 +2,10 @@
 using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Masters;
+using DUNES.API.Models.WebService;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WebService;
 
 namespace DUNES.API.Profiles
 {
@@ -35,6 +37,10 @@ namespace DUNES.API.Profiles
 
             CreateMap<TzebB2bIrReceiptLineItemTblItemInbConsReqsLog, TzebB2bIrReceiptLineItemTblItemInbConsReqsLogDto>().ReverseMap();
 
+
+            CreateMap<MvcWebServiceHourlySummary, MvcWebServiceHourlySummaryDto>().ReverseMap();
+
+            
         }
 
     }

@@ -153,10 +153,19 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                 await using var tx = await _context.Database.BeginTransactionAsync(ct);
 
                 var servTrackResult = await CreateServTrackOrderFromPickProcess(DeliveryId);
+
+                if (servTrackResult.Data == null || servTrackResult.Data.RefNum <= 0)
+                {
+                    await tx.RollbackAsync(ct);
+                    await _transactionsWMSINVService.DeleteInventoryTransaction(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,objresponse.WMSTransactionNumber, ct);
+                    return ApiResponseFactory.NotFound<PickProcessResponseDto>($"Pick Process {DeliveryId} Error :{servTrackResult.Data.ErrorMessage}");
+
+                }
+
                 if (!servTrackResult.Success)
                 {
                     await tx.RollbackAsync(ct);
-                    await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
+                    await _transactionsWMSINVService.DeleteInventoryTransaction(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,objresponse.WMSTransactionNumber, ct);
                     return ApiResponseFactory.NotFound<PickProcessResponseDto>($"Pick Process {DeliveryId} does not exist.");
                 }
 
@@ -164,7 +173,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                 if (!call13info.Success)
                 {
                     await tx.RollbackAsync(ct);
-                    await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
+                    await _transactionsWMSINVService.DeleteInventoryTransaction(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,objresponse.WMSTransactionNumber, ct);
                     return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
                         $"Error creating Pick Process call(10). Error {call13info.Message}.");
                 }
@@ -173,7 +182,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                 if (!updateTablesOk.Success)
                 {
                     await tx.RollbackAsync(ct);
-                    await _transactionsWMSINVService.DeleteInventoryTransaction(objresponse.WMSTransactionNumber, ct);
+                    await _transactionsWMSINVService.DeleteInventoryTransaction(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!,objresponse.WMSTransactionNumber, ct);
                     return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
                         $"Error updating Pick Process tables. Error {updateTablesOk.Message}.");
                 }
@@ -307,15 +316,19 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                     
                 }
 
-                var infotranInv = await _transactionsCommonINVRepository
-                        .createInventoryTransactionLog(listlogs, _currentUser.UserId!, ct);
 
-                if (!infotranInv)
-                {
-                    await tx.RollbackAsync(ct);
-                    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
-                       $"Error creating ZEBRA Inventory transaction log. Error {updateTablesOk.Message}.");
-                }
+                //esto lo crea automaticamente el retorno de la llamada 13
+
+                //var infotranInv = await _transactionsCommonINVRepository
+                //        .createInventoryTransactionLog(listlogs, _currentUser.UserId!, ct);
+
+                //if (!infotranInv)
+                //{
+                //    await tx.RollbackAsync(ct);
+                //    return ApiResponseFactory.BadRequest<PickProcessResponseDto>(
+                //       $"Error creating ZEBRA Inventory transaction log. Error {updateTablesOk.Message}.");
+                //}
+                //fin llamada 13
 
                 await tx.CommitAsync(ct);
 
@@ -328,7 +341,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
             {
 
                 // Compensación WMS si algo explota en Zebra
-                await TryCompensateWmsAsync(objresponse.WMSTransactionNumber, ct);
+                await TryCompensateWmsAsync(objInvData.hdr.Idcompany, objInvData.hdr.Codecompanyclient!, objresponse.WMSTransactionNumber, ct);
                 return ApiResponseFactory.Error<PickProcessResponseDto>($"Pick process failed: {ex.GetBaseException().Message}");
 
             }
@@ -343,12 +356,12 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
         /// <param name="wmsTxNumber"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        private async Task TryCompensateWmsAsync(int wmsTxNumber, CancellationToken ct)
+        private async Task TryCompensateWmsAsync(int companyid, string companyclientid, int wmsTxNumber, CancellationToken ct)
         {
             if (wmsTxNumber == 0) return;
             try
             {
-                await _transactionsWMSINVService.DeleteInventoryTransaction(wmsTxNumber, ct);
+                await _transactionsWMSINVService.DeleteInventoryTransaction(companyid, companyclientid, wmsTxNumber, ct);
             }
             catch (Exception ex)
             {
