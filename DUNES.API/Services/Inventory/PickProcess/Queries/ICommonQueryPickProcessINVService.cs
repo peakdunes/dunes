@@ -1,4 +1,5 @@
-﻿using DUNES.API.ReadModels.B2B;
+﻿using DUNES.API.Models.Inventory.PickProcess;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
@@ -19,7 +20,16 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
         /// <returns></returns>
         Task<ApiResponse<PickProcessRequestDto>> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct);
 
-      
+
+        /// <summary>
+        ///  get all pick process from a start date
+        /// </summary>
+        /// <param name="dateSearch"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<PickProcessHdrDto>>> GetAllPickProcessByStartDate(DateTime dateSearch, CancellationToken ct);
+
+
 
         /// <summary>
         /// Displays the 4 tables associated with an Pick Process in Servtrack.

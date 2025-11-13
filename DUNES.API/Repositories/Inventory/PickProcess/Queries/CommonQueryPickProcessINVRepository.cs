@@ -1,7 +1,11 @@
-﻿using DUNES.API.Data;
+﻿using AutoMapper;
+using DUNES.API.Data;
 using DUNES.API.Models.Inventory;
+using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
+using DUNES.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
@@ -16,17 +20,34 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
 
         private readonly AppDbContext _context;
         private readonly appWmsDbContext _wmscontext;
-
+      
         /// <summary>
         /// initialize dbcontext
         /// </summary>
         /// <param name="context"></param>
         /// <param name="wmscontext"></param>
-        public CommonQueryPickProcessINVRepository(AppDbContext context, appWmsDbContext wmscontext)
+        /// 
+        public CommonQueryPickProcessINVRepository(AppDbContext context,
+            appWmsDbContext wmscontext)
         {
             _context = context;
             _wmscontext = wmscontext;
+            
         }
+        /// <summary>
+        /// get all pick process from a start date
+        /// </summary>
+        /// <param name="dateSearch"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<TzebB2bPSoWoHdrTblItemInbConsReqsLog>> GetAllPickProcessByStartDate(DateTime dateSearch, CancellationToken ct)
+        {
+            var picklist = await _context.TzebB2bPSoWoHdrTblItemInbConsReqsLog.Where(x => x.DateTimeInserted >=  dateSearch).ToListAsync();
+
+            return picklist;
+        }
+
 
         /// <summary>
         /// Displays the 4 tables associated with an Pick Process in Servtrack.
@@ -91,5 +112,7 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
 
             return objdet;
         }
+
+       
     }
 }

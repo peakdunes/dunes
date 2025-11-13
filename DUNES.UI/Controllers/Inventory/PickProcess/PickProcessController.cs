@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Transactions;
@@ -66,7 +67,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 allcalls.outputCallsList = listoutput;
                 allcalls.inputCallsList = listinput;
 
-                PickProcessHdr objhdr = new PickProcessHdr();
+                PickProcessHdrDto objhdr = new PickProcessHdrDto();
                 List<PickProcessItemDetail> objlist = new List<PickProcessItemDetail>();
 
                 List<WMSHdrTransactionDTO> listenctran = new List<WMSHdrTransactionDTO>();
@@ -850,5 +851,30 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             }, ct);
         }
 
+
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> searchAllPickProcess(DateTime dateSearch, CancellationToken ct)
+        {
+
+            var token = GetToken();
+            if (token == null)
+                return RedirectToLogin();
+
+            return await HandleAsync(async ct =>
+            {
+                dateSearch = DateTime.Now.AddDays(-300);
+
+                var infolist = await _service.GetAllPickProcessByStartDate(dateSearch,token, ct);
+
+                return Ok(new { status = "OK", lista = infolist.Data });
+            }, ct);
+        }
+
+       
+        
     }
 }

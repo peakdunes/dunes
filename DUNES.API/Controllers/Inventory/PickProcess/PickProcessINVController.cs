@@ -55,8 +55,27 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
                 return await _service.GetPickProcessAllInfo(DeliveryId, ct);
             }, ct);
         }
-      
 
+        /// <summary>
+        /// get all pick process (header) from a start date
+        /// </summary>
+        /// <param name="startDate"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<List<PickProcessHdrDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpGet("list-pickprocess-startdate/{startDate:datetime}")]
+        public async Task<IActionResult> GetAllPickProcessByStartDate([FromRoute] DateTime startDate, CancellationToken ct)
+        {
+            return await HandleApi(async ct =>
+            {
+
+                return await _service.GetAllPickProcessByStartDate(startDate, ct);
+            }, ct);
+        }
+
+
+        
 
         /// <summary>
         ///  /// Displays the 4 tables associated with an Pick Process in Servtrack.

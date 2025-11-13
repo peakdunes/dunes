@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Inventory.Common;
+using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.Models.Masters;
 using DUNES.API.Models.WebService;
 using DUNES.Shared.DTOs.Inventory;
@@ -40,6 +41,7 @@ namespace DUNES.API.Profiles
 
             CreateMap<MvcWebServiceHourlySummary, MvcWebServiceHourlySummaryDto>().ReverseMap();
 
+            CreateMap<TzebB2bPSoWoHdrTblItemInbConsReqsLog, PickProcessHdrDto>().ReverseMap();
             
         }
 

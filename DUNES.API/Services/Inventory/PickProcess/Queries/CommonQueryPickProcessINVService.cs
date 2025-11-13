@@ -1,5 +1,7 @@
 ﻿
+using AutoMapper;
 using DUNES.API.Models.B2b;
+using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
@@ -22,15 +24,42 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
 
 
         private readonly ICommonQueryPickProcessINVRepository _repository;
-
+        private readonly IMapper _mapper;
         /// <summary>
         /// Dependency Injection
         /// </summary>
         /// <param name="repository"></param>
-        public CommonQueryPickProcessINVService(ICommonQueryPickProcessINVRepository repository)
+        /// <param name="mapper"></param>
+        public CommonQueryPickProcessINVService(ICommonQueryPickProcessINVRepository repository, IMapper mapper)
         {
             _repository = repository;
+            _mapper = mapper;
         }
+
+        /// <summary>
+        /// get all pick process from a start date
+        /// </summary>
+        /// <param name="dateSearch"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<List<PickProcessHdrDto>>> GetAllPickProcessByStartDate(DateTime dateSearch, CancellationToken ct)
+        {
+            
+
+            var info = await _repository.GetAllPickProcessByStartDate(dateSearch, ct);
+
+            if (info == null)
+            {
+                return ApiResponseFactory.NotFound<List<PickProcessHdrDto>>(
+                    $"Pick process was found since  ({dateSearch}).");
+            }
+            var listPick = _mapper.Map<List<PickProcessHdrDto>>(info ?? new());
+
+            return ApiResponseFactory.Ok(listPick, "OK");
+
+        }
+
         /// <summary>
         /// Displays the 4 tables associated with an Pick Process in Servtrack.
         /// _TOrderRepair_Hdr
@@ -155,7 +184,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Queries
             }
 
 
-            PickProcessHdr objenc = new PickProcessHdr();
+            PickProcessHdrDto objenc = new PickProcessHdrDto();
 
             objenc.Id = info.pickHdr.Id;
             objenc.ConsignRequestID = info.pickHdr.ConsignRequestId;

@@ -12,7 +12,7 @@ namespace DUNES.Shared.DTOs.Inventory
     public class PickProcessRequestDto
     {
 
-        public required PickProcessHdr PickProcessHdr { get; set; }
+        public required PickProcessHdrDto PickProcessHdr { get; set; }
 
         public required List<PickProcessItemDetail> ListItems { get; set; }
 

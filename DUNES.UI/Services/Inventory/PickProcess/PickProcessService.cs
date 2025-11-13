@@ -77,18 +77,10 @@ namespace DUNES.UI.Services.Inventory.PickProcess
         {
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            HttpResponseMessage resp;
-
-
+                      
             var json = JsonConvert.SerializeObject(objInvData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-          
-
-
-            //resp = await _httpClient.PostAsync($"/api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{objInvData}/{lpnid}/{token}");
-
+            
             var respapi = await _httpClient.PostAsync(
                 $"api/PickProcessINV/create-pickprocess-transaction/{DeliveryId}/{lpnid}",
                 content
@@ -97,6 +89,18 @@ namespace DUNES.UI.Services.Inventory.PickProcess
             return await respapi.ReadAsApiResponseAsync<PickProcessResponseDto>(ct);
 
 
+        }
+
+        public async Task<ApiResponse<List<PickProcessHdrDto>>> GetAllPickProcessByStartDate(DateTime dateSearch, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+ 
+            resp = await _httpClient.GetAsync($"/api/PickProcessINV/list-pickprocess-startdate/{dateSearch:yyyy-MM-dd}");
+
+            return await resp.ReadAsApiResponseAsync<List<PickProcessHdrDto>>(ct);
+          
         }
     }
 }

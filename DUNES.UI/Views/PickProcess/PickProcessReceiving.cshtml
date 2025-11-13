@@ -5,6 +5,93 @@
     ViewData["Title"] = "Receiving";
 }
 
+<div class="modal fade" id="modalPickProcess" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
+    <div class="modal-dialog  modal-xl">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="brand-subtitle" id="miModalLabel">Pick Process List</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3" style="display:display">
+                        <div class="form-group">
+                            <label class="control-label">New Date</label>
+                            <input type="date" id="datesearch" class="form-control" />
+
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <button type="button" class="btn btn-outline-primar" value="Search"></button>
+
+                        </div>
+                    </div>
+
+                </div>
+
+
+
+                <div class="row mt-2">
+                    <div class="col-md-12">
+                        <h4 class="brand-subtitle">Part Number Qty in WMS Bins</h4>
+                        <table id="tablepickprocess" class="table table-bordered no-wrap table-striped table-hover table-sm align-middle w-100" style="width:100%;font-size:small">
+
+                            <thead>
+                                <tr>
+                                    <th>
+                                        Actions
+                                    </th>
+                                    <th>
+                                        Delivery ID
+                                    </th>
+                                    <th>
+                                        Date Created
+                                    </th>
+                                    <th>
+                                        Ship To Address 1
+                                    </th>
+                                    <th>
+                                        Ship To Address 2
+                                    </th>
+                                    <th>
+                                        Date Time Processed
+                                    </th>
+                                    <th>
+                                        Pick Call
+                                    </th>
+                                    <th>
+                                        Ship Date
+                                    </th>
+
+                                    <th>
+                                        Ship Call
+                                    </th>
+
+
+                                </tr>
+                            </thead>
+
+                        </table>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <input type="button" onclick="transferPickProcess()" class="btn btn-outline-primary" value="Save" />
+
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                @* <button type="button" class="btn btn-primary">Guardar</button> *@
+            </div>
+
+        </div>
+    </div>
+</div>
 
 
 <div class="modal fade" id="modalBinsDistribution" tabindex="-1" aria-labelledby="miModalLabel" aria-hidden="true">
@@ -128,14 +215,23 @@
         <div class="row g-3 align-items-end">
             <div class="col-12 col-md-6">
                 <label for="pickprocessnumber" class="form-label">Pick Process Number</label>
-                <input type="text"
-                       id="pickprocessnumber"
-                       name="pickprocessnumber"
-                       class="form-control"
-                       oninput="clearform()"
-                       placeholder="Scan or type your Pick Process..."
-                       required
-                       autofocus />
+
+                <div class="input-group">
+                    <button type="button" onclick="openpickprocessmodal('@DateTime.Now.ToString("yyyy-MM-dd")')" class="btn btn-outline-secondary" title="Print">
+                        <i class="bi bi-search"></i>
+                    </button>
+
+
+
+                    <input type="text"
+                           id="pickprocessnumber"
+                           name="pickprocessnumber"
+                           class="form-control"
+                           oninput="clearform()"
+                           placeholder="Scan or type your Pick Process..."
+                           required
+                           autofocus />
+                </div>
             </div>
 
             <div class="col-12 col-md-auto d-grid">
@@ -172,7 +268,9 @@
 
         <div class="col-12 col-md-2">
             <label asp-for="PickProcessHdr.Id" class="form-label"></label>
+
             <input asp-for="PickProcessHdr.Id" readonly class="form-control" />
+
         </div>
 
         <div class="col-12 col-md-2">
@@ -182,7 +280,12 @@
 
         <div class="col-12 col-md-2">
             <label asp-for="PickProcessHdr.ConsignRequestID" class="form-label"></label>
-            <input asp-for="PickProcessHdr.ConsignRequestID" readonly class="form-control" />
+            <div class="input-group">
+                <input asp-for="PickProcessHdr.ConsignRequestID" readonly class="form-control" />
+                <button type="button" class="btn btn-outline-secondary" title="Print">
+                    <i class="bi bi-printer"></i>
+                </button>
+            </div>
         </div>
 
         <div class="col-12 col-md-3">
@@ -1076,1184 +1179,1285 @@
     <script>
 
 
-          $(document).ready(function(){
+                 $(document).ready(function(){
 
 
 
-                $('#tableuserwmshdr').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
+                      $('#tablepickprocess').DataTable({
 
-
-
-                 $('#tableuserzebramovinv').DataTable({
-                    scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-
-               });
-
-
-                $('#tableuserwmsdetail').DataTable({
-                    scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-
-               });
-
-
-                 $('#tableuserwmsinv').DataTable({
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-                 $('#tableuseritemsservtrack').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-
-
-                 $('#tableuserreceivingservtrack').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-
-                  $('#tableusershippingservtrack').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   scrollX:true,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-
-               $('#tableuseroutputcalls').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-
-
-
-                  $('#tableuserinputcalls').DataTable({
-                   processing: true,
-                   deferRender: true,
-                   stateSave: true,
-                   autoWidth: false,
-                   responsive: true,
-                   pageLength: 10,
-                   "bPaginate": false,
-                   "bLengthChange": false,
-                   "bFilter": true,
-                   "bInfo": false,
-                   "bAutoWidth": false,
-                   "searching": false
-               });
-
-
-            $('#tableuserbinitems').DataTable({
-
-                   processing: true,
-                    deferRender: true,
-                    stateSave: true,
-                    autoWidth: false,
-                    responsive: true,
-                    pageLength: 10,
-                    "bPaginate": false,
-                    "bLengthChange": false,
-                    "bFilter": true,
-                    "bInfo": false,
-                    "bAutoWidth": false,
-                    "searching": false
-
-
-              });
-
-
-            $('#tableuser').DataTable
-            ({
-              processing: true,
-              deferRender: true,
-              stateSave: true,
-              autoWidth: false,
-              scrollX: true, // ✅ Habilita scroll horizontal
-              responsive: false, // ✅ Evita que se escondan columnas
-              pageLength: 10,
-
-              order: [[9, 'desc']],
-
-              columnDefs: [
-                { targets: [6], className: 'text-end' },
-                { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
-                { targets: '_all', className: 'align-middle' }
-              ],
-
-              dom:
-                "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
-                "<'row'<'col-12'tr>>" +
-                "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
-
-              language: {
-                search: "",
-                searchPlaceholder: "Search...",
-                lengthMenu: "_MENU_ entries per page",
-                info: "Showing _START_ to _END_ of _TOTAL_ entries",
-                infoEmpty: "Showing 0 to 0 of 0 entries",
-                infoFiltered: "(filtered from _MAX_ total entries)",
-                zeroRecords: "No data available in table",
-                paginate: { first: "«", previous: "‹", next: "›", last: "»" }
-              }
-            });
-
-
-                 $(function () {
-                  const $form = $('#pick-form');
-                  $form.on('submit', function (e) {
-                    showSpinner();
-                  });
-            });
-
-          })
-
-
-
-          function clearform()
-          {
-
-            $('#tableuserwmshdr').DataTable().clear().draw();
-            $('#tableuserwmsdetail').DataTable().clear().draw();
-            $('#tableuserwmsinv').DataTable().clear().draw();
-            $('#tableuseritemsservtrack').DataTable().clear().draw();
-            $('#tableuserreceivingservtrack').DataTable().clear().draw();
-            $('#tableusershippingservtrack').DataTable().clear().draw();
-            $('#tableuseroutputcalls').DataTable().clear().draw();
-            $('#tableuserinputcalls').DataTable().clear().draw();
-            $('#tableuserbinitems').DataTable().clear().draw();
-            $('#tableuser').DataTable().clear().draw();
-
-
-            $('#PickProcessHdr_Id').val('');
-            $('#PickProcessHdr_DeliveryId').val('');
-            $('#PickProcessHdr_ConsignRequestID').val('');
-            $('#PickProcessHdr_Batchid').val('');
-            $('#PickProcessHdr_DateCreated').val('');
-            $('#PickProcessHdr_Address1').val('');
-            $('#PickProcessHdr_Address2').val('');
-            $('#PickProcessHdr_City').val('');
-            $('#PickProcessHdr_State').val('');
-            $('#PickProcessHdr_ZipCode').val('');
-            $('#PickProcessHdr_Country').val('');
-            $('#PickProcessHdr_Carrier').val('');
-            $('#PickProcessHdr_ShipMethod').val('');
-            $('#PickProcessHdr_OutConsReqsId').val('');
-
-
-            $('#title').text('Pick Process Header');
-
-            $('#lpnid').val('');
-            $('#observations').val('');
-
-            $('#lpnid').prop('disabled', true);
-            $('#observations').prop('disabled', true);
-
-            $('#locationid option').prop('selected', function () {
-            return this.defaultSelected;
-            });
-
-            $('#companyclient').empty();
-            $('#divisionid').empty();
-            $('#conceptid').empty();
-            $('#transactionid').empty();
-
-            $('#companyclient').prop('disabled', true);
-            $('#divisionid').prop('disabled', true);
-            $('#conceptid').prop('disabled', true);
-            $('#transactionid').prop('disabled', true);
-
-
-            $('#OrderRepair_repairHdr_RefNo').val('');
-            $('#OrderRepair_repairHdr_TcustNo').val('');
-            $('#OrderRepair_repairHdr_CustRef').val('');
-            $('#OrderRepair_repairHdr_CustName').val('');
-            $('#OrderRepair_repairHdr_TstatusId').val('');
-            $('#OrderRepair_repairHdr_ShipToAddr').val('');
-            $('#OrderRepair_repairHdr_ShipToAddr1').val('');
-            $('#OrderRepair_repairHdr_TcityId').val('');
-            $('#OrderRepair_repairHdr_TstateId').val('');
-            $('#OrderRepair_repairHdr_ZipCode').val('');
-            $('#OrderRepair_repairHdr_DateInserted').val('');
-            $('#OrderRepair_repairHdr_DateCreated').val('');
-
-
-          }
-
-          //Abort or cancelation by user
-          let currentRequest = null;
-
-
-        async  function openmodal(lineid, partnumber, qty, typeidst)
-          {
-
-
-
-              $('#partnoid').val(partnumber);
-              $('#lineid').val(lineid);
-              $('#qtyreceive').val(qty);
-
-
-              var lineid = lineid;
-
-              const valsel = $('#companyclient').val();
-
-              if (valsel == 0 || valsel == null)
-              {
-                   errorAction("Company client is required");
-                   return;
-              }
-
-              var companyclient = $('#companyclient option:selected').val();
-
-              //we search all inventory cuantity for this companyclient and part number
-               showSpinner();
-
-              $.ajax({url:"@Url.Action("checkInventoryByPartNumberInvType", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid, typeidst:typeidst},type:"post"})
-              .done(function(data){
-
-                    var $typeNoHand = $('#typereserveid');
-
-                    $typeNoHand.empty()
-                        .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
-                        .prop('disabled', true);
-
-                      if (data.status == null || data.status == "OK")
-                      {
-
-                          if (data.listinvnohand != null)
-                          {
-
-                                var list = (data && data.listinvnohand) ? data.listinvnohand : [];
-                                if (Array.isArray(list) && list.length)
-                                {
-                                    $.each(list, function (_, it) {
-
-                                    var id = (it.id !== undefined) ? it.id : it.id;
-                                    var name = (it.name !== undefined) ? it.name : it.name;
-                                    $typeNoHand.append($('<option>', { value: id, text: name }));
-                                    });
-                                    $typeNoHand.prop('disabled', false);
-                                }
-
-                          }
-
-                          if (data.listinventory != null)
-                          {
-
-                              JsonArrayInventory = [];
-
-                              for (var i = 0; i < data.listinventory.length; i++)
-                              {
-
-                                  var f = data.listinventory[i];
-
-                                  JsonArrayInventory.push({
-                                          binid: f.binid,
-                                          binname: f.binname,
-                                          rackid : f.rackid,
-                                          rackname : f.rackname,
-                                          inventorytypeid : f.inventorytypeid,
-                                          typename: f.inventoryname,
-                                          statusid: f.statusid,
-                                          statusname :f.statusname,
-                                          qty: f.qty,
-                                          qtypick : `<input type="number"
-                                             class="form-control form-control-sm qty-input"
-                                             value="${f.qtyreserved}"
-                                             min="0" step="1"
-                                             data-binid="${f.binid}" data-rackid="${f.rackid}" data-invtype = "${f.inventorytypeid}" data-statusname="${f.statusid}">`
-                                  });
-                               }
-
-                               $('#tableuserbinitems').DataTable({
-                                   data: JsonArrayInventory,
-                                   destroy: true,
-                                   processing: true,
-                                    deferRender: true,
-                                    stateSave: true,
-                                    autoWidth: false,
-                                    responsive: true,
-                                    pageLength: 10,
-                                    "bPaginate": false,
-                                    "bLengthChange": false,
-                                    "bFilter": true,
-                                    "bInfo": false,
-                                    "bAutoWidth": false,
-                                    "searching": false,
-                                   columns: [
-                                       { "data": "binid" },
-                                       { "data": "binname" },
-                                       { "data": "rackid" },
-                                       { "data": "rackname" },
-                                       { "data": "inventorytypeid" },
-                                       { "data": "typename" },
-                                       { "data": "statusid"},
-                                       { "data": "statusname" },
-                                       { "data": "qty", "class":"derecha" },
-                                       { "data": "qtypick", "class":"derecha" },
-                                   ]
-                               });
-                          }
-                          else
-                          {
-
-                              showToast("info", "There is not inventory available for this type  : " + typeid);
-
-                          }
-
-                          if (data.listbines != null) {
-
-                               var JsonArrayBines = [];
-
-                               for (var i = 0; i < data.listbines.length; i++) {
-
-                                   var f = data.listbines[i];
-
-                                   JsonArrayBines.push({
-                                       actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
-                                       id: f.id,
-                                       partno: f.partnumber,
-                                       qty: f.qty,
-                                       type: f.inventorytype,
-                                       typename: f.typename,
-                                       binid : f.binid,
-                                       binname: f.tagname,
-                                       statusid : f.statusid,
-                                       statusname :f.statusname
-                                   });
-                               }
-
-                               showbinDistribution(JsonArrayBines);
-                           }
-
-                               const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
-                            modal.show();
-
-                      }
-                      else
-                      {
-                          if (data.continueprocess)
-                          {
-                              //if continueprocess is true, the processing can to continue
-                                showToast("info",data.status);
-
-                                const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
-                                modal.show();
-                          }
-                          else
-                          {
-                           errorAction(data.status);
-                          }
-
-                      }
-
-
-              })
-              .fail(function(){})
-              .always(function(){
-               hideSpinner();
-              });
-
-
-
-
-          }
-
-          function closemodal()
-          {
-
-                     const el = document.getElementById('modalBinsDistribution');
-        const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
-        inst.hide();
-
-          }
-
-          function clearComboBox()
-          {
-
-            var $bin = $('#binselid');
-            var $concepts = $('#conceptid');
-            var $transactions = $('#transactionid');
-            var $division = $('#divisionid');
-
-            $bin.empty()
-            .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
-            .prop('disabled', true);
-
-            // reset select concepts
-            $concepts.empty()
-            .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
-            .prop('disabled', true);
-
-            // reset select transactions
-            $transactions.empty()
-            .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
-            .prop('disabled', true);
-
-            $division.empty()
-            .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
-            .prop('disabled', true);
-
-          }
-
-        $('#locationid').change(async function(){
-
-            if (currentRequest) {
-                currentRequest.abort();
-            }
-
-            var $companyClient = $('#companyclient');
-
-            var locationid = $(this).val();
-
-            clearComboBox();
-
-             $companyClient.empty()
-            .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
-            .prop('disabled', true);
-
-
-             if (!locationid) return;
-
-
-              // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            showSpinner();
-
-            currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
-                    data: { __RequestVerificationToken: token,  locationid: locationid }})
-            .done(function (res)
-            {
-
-                if (res.message == "OK")
-                {
-
-                    var list = (res && res.data) ? res.data : [];
-
-
-
-                    if (Array.isArray(list) && list.length)
-                    {
-                        $.each(list, function (_, it) {
-                        var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
-                        var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
-
-                        $companyClient.append($('<option>', { value: id, text: name }));
-                        });
-                        $companyClient.prop('disabled', false);
-                    }
-                }
-                else
-                {
-                      $('#locationid option').prop('selected', function () {
-                                return this.defaultSelected;
+                          "scrollX":true
                       });
 
-                    errorAction(res.message);
-                }
+                       $('#tableuserwmshdr').DataTable({
+                          processing: true,
+                          deferRender: true,
+                          stateSave: true,
+                          autoWidth: false,
+                          responsive: true,
+                          pageLength: 10,
+                          scrollX:true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
 
 
 
-            })
-            .fail(function (xhr, status) {
-                 if (status !== "abort") {
-                    errorAction("Error:", status);
-                }
-            }).always(function(){
+                        $('#tableuserzebramovinv').DataTable({
+                           scrollX:true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
 
-                hideSpinner();
-            });
-
-        })
-
-
-        $('#companyclient').change(function()
-        {
+                      });
 
 
-            var companyClient = $(this).val();
-            var $bin = $('#binselid');
-            var $concepts = $('#conceptid');
-            var $transactions = $('#transactionid');
-            var $division = $('#divisionid');
+                       $('#tableuserwmsdetail').DataTable({
+                           scrollX:true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
 
-             clearComboBox();
-
-                // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            if (!companyClient) return;
-
-               $.ajax({url: '@Url.Action("getAllAditionalInformation", "PickProcess")',type: 'POST',
-                    data: { __RequestVerificationToken: token,  companyClient: companyClient }})
-            .done(function (res)
-            {
-                if (res.status == "OK")
-                {
-
-                    var list = (res && res.data.listbines) ? res.data.listbines : [];
-                    if (Array.isArray(list) && list.length)
-                    {
-                        $.each(list, function (_, it) {
-                        var id = (it.id !== undefined) ? it.id : it.Id;
-                        var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
-                        $bin.append($('<option>', { value: id, text: name }));
-                        });
-                        $bin.prop('disabled', false);
-                    }
-
-                    var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
-                    if (Array.isArray(listc) && listc.length)
-                    {
-                        $.each(listc, function (_, it) {
-                        var id = (it.id !== undefined) ? it.id : it.Id;
-                        var name = (it.Name !== undefined) ? it.name : it.name;
-                        $concepts.append($('<option>', { value: id, text: name }));
-                        });
-                        $concepts.prop('disabled', false);
-                    }
+                      });
 
 
-                      var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
-                    if (Array.isArray(listt) && listt.length)
-                    {
-                        $.each(listt, function (_, it) {
-                        var id = (it.id !== undefined) ? it.id : it.Id;
-                        var name = (it.Name !== undefined) ? it.name : it.name;
-                        $transactions.append($('<option>', { value: id, text: name }));
-                        });
-                        $transactions.prop('disabled', false);
-                    }
+                        $('#tableuserwmsinv').DataTable({
+                          scrollX:true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
 
-                    var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+                        $('#tableuseritemsservtrack').DataTable({
+                          processing: true,
+                          deferRender: true,
+                          stateSave: true,
+                          autoWidth: false,
+                          responsive: true,
+                          pageLength: 10,
+                          scrollX:true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
 
-                    if (Array.isArray(lisdiv) && lisdiv.length)
-                    {
-                        $.each(lisdiv, function (_, it) {
 
-                        var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                        var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
-                        $division.append($('<option>', { value: id, text: name }));
-                        });
-                        $division.prop('disabled', false);
-                    }
 
-                    $('#lpnid').prop('disabled', false);
-                     $('#observations').prop('disabled', false);
+                        $('#tableuserreceivingservtrack').DataTable({
 
-                 }
-                 else
+                          processing: true,
+                          deferRender: true,
+                          stateSave: true,
+                          autoWidth: false,
+                          responsive: true,
+                          pageLength: 10,
+                          "scrollX":true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
+
+
+                         $('#tableusershippingservtrack').DataTable({
+
+                           "scrollX":true,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                          // "processing": true,
+                          // "deferRender": true,
+                          // "stateSave": true,
+                          // "autoWidth": false,
+                          // "responsive": true,
+                          // "pageLength": 10,
+                          // "scrollX":true,
+                          // "bPaginate": false,
+                          // "bLengthChange": false,
+                          // "bFilter": true,
+                          // "bInfo": false,
+                          // "bAutoWidth": false,
+                          // "searching": false
+                      });
+
+
+                      $('#tableuseroutputcalls').DataTable({
+                          processing: true,
+                          deferRender: true,
+                          stateSave: true,
+                          autoWidth: false,
+                          responsive: true,
+                          pageLength: 10,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
+
+
+
+
+                         $('#tableuserinputcalls').DataTable({
+                          processing: true,
+                          deferRender: true,
+                          stateSave: true,
+                          autoWidth: false,
+                          responsive: true,
+                          pageLength: 10,
+                          "bPaginate": false,
+                          "bLengthChange": false,
+                          "bFilter": true,
+                          "bInfo": false,
+                          "bAutoWidth": false,
+                          "searching": false
+                      });
+
+
+                   $('#tableuserbinitems').DataTable({
+
+                          processing: true,
+                           deferRender: true,
+                           stateSave: true,
+                           autoWidth: false,
+                           responsive: true,
+                           pageLength: 10,
+                           "bPaginate": false,
+                           "bLengthChange": false,
+                           "bFilter": true,
+                           "bInfo": false,
+                           "bAutoWidth": false,
+                           "searching": false
+
+
+                     });
+
+
+                   $('#tableuser').DataTable
+                   ({
+                     processing: true,
+                     deferRender: true,
+                     stateSave: true,
+                     autoWidth: false,
+                     scrollX: true, // ✅ Habilita scroll horizontal
+                     responsive: false, // ✅ Evita que se escondan columnas
+                     pageLength: 10,
+
+                     order: [[9, 'desc']],
+
+                     columnDefs: [
+                       { targets: [6], className: 'text-end' },
+                       { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                       { targets: '_all', className: 'align-middle' }
+                     ],
+
+                     dom:
+                       "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                       "<'row'<'col-12'tr>>" +
+                       "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+
+                     language: {
+                       search: "",
+                       searchPlaceholder: "Search...",
+                       lengthMenu: "_MENU_ entries per page",
+                       info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                       infoEmpty: "Showing 0 to 0 of 0 entries",
+                       infoFiltered: "(filtered from _MAX_ total entries)",
+                       zeroRecords: "No data available in table",
+                       paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                     }
+                   });
+
+
+                        $(function () {
+                         const $form = $('#pick-form');
+                         $form.on('submit', function (e) {
+                           showSpinner();
+                         });
+                   });
+
+                 })
+
+
+
+                 function clearform()
                  {
-                     errorAction(res.status);
+
+                   $('#tableuserwmshdr').DataTable().clear().draw();
+                   $('#tableuserwmsdetail').DataTable().clear().draw();
+                   $('#tableuserwmsinv').DataTable().clear().draw();
+                   $('#tableuseritemsservtrack').DataTable().clear().draw();
+                   $('#tableuserreceivingservtrack').DataTable().clear().draw();
+                   $('#tableusershippingservtrack').DataTable().clear().draw();
+                   $('#tableuseroutputcalls').DataTable().clear().draw();
+                   $('#tableuserinputcalls').DataTable().clear().draw();
+                   $('#tableuserbinitems').DataTable().clear().draw();
+                   $('#tableuser').DataTable().clear().draw();
+
+
+                   $('#PickProcessHdr_Id').val('');
+                   $('#PickProcessHdr_DeliveryId').val('');
+                   $('#PickProcessHdr_ConsignRequestID').val('');
+                   $('#PickProcessHdr_Batchid').val('');
+                   $('#PickProcessHdr_DateCreated').val('');
+                   $('#PickProcessHdr_Address1').val('');
+                   $('#PickProcessHdr_Address2').val('');
+                   $('#PickProcessHdr_City').val('');
+                   $('#PickProcessHdr_State').val('');
+                   $('#PickProcessHdr_ZipCode').val('');
+                   $('#PickProcessHdr_Country').val('');
+                   $('#PickProcessHdr_Carrier').val('');
+                   $('#PickProcessHdr_ShipMethod').val('');
+                   $('#PickProcessHdr_OutConsReqsId').val('');
+
+
+                   $('#title').text('Pick Process Header');
+
+                   $('#lpnid').val('');
+                   $('#observations').val('');
+
+                   $('#lpnid').prop('disabled', true);
+                   $('#observations').prop('disabled', true);
+
+                   $('#locationid option').prop('selected', function () {
+                   return this.defaultSelected;
+                   });
+
+                   $('#companyclient').empty();
+                   $('#divisionid').empty();
+                   $('#conceptid').empty();
+                   $('#transactionid').empty();
+
+                   $('#companyclient').prop('disabled', true);
+                   $('#divisionid').prop('disabled', true);
+                   $('#conceptid').prop('disabled', true);
+                   $('#transactionid').prop('disabled', true);
+
+
+                   $('#OrderRepair_repairHdr_RefNo').val('');
+                   $('#OrderRepair_repairHdr_TcustNo').val('');
+                   $('#OrderRepair_repairHdr_CustRef').val('');
+                   $('#OrderRepair_repairHdr_CustName').val('');
+                   $('#OrderRepair_repairHdr_TstatusId').val('');
+                   $('#OrderRepair_repairHdr_ShipToAddr').val('');
+                   $('#OrderRepair_repairHdr_ShipToAddr1').val('');
+                   $('#OrderRepair_repairHdr_TcityId').val('');
+                   $('#OrderRepair_repairHdr_TstateId').val('');
+                   $('#OrderRepair_repairHdr_ZipCode').val('');
+                   $('#OrderRepair_repairHdr_DateInserted').val('');
+                   $('#OrderRepair_repairHdr_DateCreated').val('');
+
+
                  }
-            })
-            .fail(function (xhr) {
-                console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
-                alert('Could not load bins.');
-            }).always(function(){
 
-                hideSpinner();
-            });
-
-        })
+                 //Abort or cancelation by user
+                 let currentRequest = null;
 
 
-        function buildDropdown(item) {
-
-
-            var qtypendind = item.qtyshipped - item.qtypending;
-
-
-            return `
-            <div class="dropdown">
-                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    Actions
-                </button>
-                <ul class="dropdown-menu">
-
-                    <li>
-                        <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" onclick="openmodal(${item.lineid}, '${item.partnubmer}', ${item.requestquantity})"> 📦 Bins</a>
-                    </li>
-                </ul>
-            </div>`;
-        }
-
-        function addqtybinPickProcess()
-        {
-              const binidin = $('#binselid').val();
-
-              const partnumber = $('#partnoid').val();
+               async  function openmodal(lineid, partnumber, qty, typeidst)
+                 {
 
 
 
-              const typereserveid = $('#typereserveid').val();
-
-              const token = $('input[name="__RequestVerificationToken"]').val();
-
-              var lineid = $('#lineid').val();
-
-              if (partnumber == '' || partnumber == null)
-              {
-                   errorAction("Part Number is required");
-                   return;
-              }
+                     $('#partnoid').val(partnumber);
+                     $('#lineid').val(lineid);
+                     $('#qtyreceive').val(qty);
 
 
-              if (binidin == 0 || binidin == null)
-              {
-                   errorAction("Bin reserve is required");
-                   return;
-              }
+                     var lineid = lineid;
+
+                     const valsel = $('#companyclient').val();
+
+                     if (valsel == 0 || valsel == null)
+                     {
+                          errorAction("Company client is required");
+                          return;
+                     }
+
+                     var companyclient = $('#companyclient option:selected').val();
+
+                     //we search all inventory cuantity for this companyclient and part number
+                      showSpinner();
+
+                     $.ajax({url:"@Url.Action("checkInventoryByPartNumberInvType", "PickProcess")",data:{companyclient:companyclient, partnumber:partnumber, lineid: lineid, typeidst:typeidst},type:"post"})
+                     .done(function(data){
+
+                           var $typeNoHand = $('#typereserveid');
+
+                           $typeNoHand.empty()
+                               .append($('<option>', { value: '', text: '-- Select Type --', disabled:true, selected:true }))
+                               .prop('disabled', true);
+
+                             if (data.status == null || data.status == "OK")
+                             {
+
+                                 if (data.listinvnohand != null)
+                                 {
+
+                                       var list = (data && data.listinvnohand) ? data.listinvnohand : [];
+                                       if (Array.isArray(list) && list.length)
+                                       {
+                                           $.each(list, function (_, it) {
+
+                                           var id = (it.id !== undefined) ? it.id : it.id;
+                                           var name = (it.name !== undefined) ? it.name : it.name;
+                                           $typeNoHand.append($('<option>', { value: id, text: name }));
+                                           });
+                                           $typeNoHand.prop('disabled', false);
+                                       }
+
+                                 }
+
+                                 if (data.listinventory != null)
+                                 {
+
+                                     JsonArrayInventory = [];
+
+                                     for (var i = 0; i < data.listinventory.length; i++)
+                                     {
+
+                                         var f = data.listinventory[i];
+
+                                         JsonArrayInventory.push({
+                                                 binid: f.binid,
+                                                 binname: f.binname,
+                                                 rackid : f.rackid,
+                                                 rackname : f.rackname,
+                                                 inventorytypeid : f.inventorytypeid,
+                                                 typename: f.inventoryname,
+                                                 statusid: f.statusid,
+                                                 statusname :f.statusname,
+                                                 qty: f.qty,
+                                                 qtypick : `<input type="number"
+                                                    class="form-control form-control-sm qty-input"
+                                                    value="${f.qtyreserved}"
+                                                    min="0" step="1"
+                                                    data-binid="${f.binid}" data-rackid="${f.rackid}" data-invtype = "${f.inventorytypeid}" data-statusname="${f.statusid}">`
+                                         });
+                                      }
+
+                                      $('#tableuserbinitems').DataTable({
+                                          data: JsonArrayInventory,
+                                          destroy: true,
+                                          processing: true,
+                                           deferRender: true,
+                                           stateSave: true,
+                                           autoWidth: false,
+                                           responsive: true,
+                                           pageLength: 10,
+                                           "bPaginate": false,
+                                           "bLengthChange": false,
+                                           "bFilter": true,
+                                           "bInfo": false,
+                                           "bAutoWidth": false,
+                                           "searching": false,
+                                          columns: [
+                                              { "data": "binid" },
+                                              { "data": "binname" },
+                                              { "data": "rackid" },
+                                              { "data": "rackname" },
+                                              { "data": "inventorytypeid" },
+                                              { "data": "typename" },
+                                              { "data": "statusid"},
+                                              { "data": "statusname" },
+                                              { "data": "qty", "class":"derecha" },
+                                              { "data": "qtypick", "class":"derecha" },
+                                          ]
+                                      });
+                                 }
+                                 else
+                                 {
+
+                                     showToast("info", "There is not inventory available for this type  : " + typeid);
+
+                                 }
+
+                                 if (data.listbines != null) {
+
+                                      var JsonArrayBines = [];
+
+                                      for (var i = 0; i < data.listbines.length; i++) {
+
+                                          var f = data.listbines[i];
+
+                                          JsonArrayBines.push({
+                                              actions: '<a href="#"onclick="deleteBinDetail(' + f.id + ')"><i id="btt - ' + f.id + '" class="fa-solid fa-eraser fa-lg"></i></a>',
+                                              id: f.id,
+                                              partno: f.partnumber,
+                                              qty: f.qty,
+                                              type: f.inventorytype,
+                                              typename: f.typename,
+                                              binid : f.binid,
+                                              binname: f.tagname,
+                                              statusid : f.statusid,
+                                              statusname :f.statusname
+                                          });
+                                      }
+
+                                      showbinDistribution(JsonArrayBines);
+                                  }
+
+                                      const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+                                   modal.show();
+
+                             }
+                             else
+                             {
+                                 if (data.continueprocess)
+                                 {
+                                     //if continueprocess is true, the processing can to continue
+                                       showToast("info",data.status);
+
+                                       const modal = new bootstrap.Modal(document.getElementById('modalBinsDistribution'));
+                                       modal.show();
+                                 }
+                                 else
+                                 {
+                                  errorAction(data.status);
+                                 }
+
+                             }
 
 
-                if (typereserveid == 0 || typereserveid == null)
-              {
-                   errorAction("Reserve type inventory  is required");
-                   return;
-              }
+                     })
+                     .fail(function(){})
+                     .always(function(){
+                      hideSpinner();
+                     });
 
 
-              const valsel = $('#companyclient').val();
 
 
-              if (valsel == 0 || valsel == null)
-              {
-                   errorAction("Company client is required");
-                   return;
-              }
+                 }
+
+                 function closemodal()
+                 {
+
+                            const el = document.getElementById('modalBinsDistribution');
+               const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
+               inst.hide();
+
+                 }
+
+                 function clearComboBox()
+                 {
+
+                   var $bin = $('#binselid');
+                   var $concepts = $('#conceptid');
+                   var $transactions = $('#transactionid');
+                   var $division = $('#divisionid');
+
+                   $bin.empty()
+                   .append($('<option>', { value: '', text: '-- Select bin --', disabled:true, selected:true }))
+                   .prop('disabled', true);
+
+                   // reset select concepts
+                   $concepts.empty()
+                   .append($('<option>', { value: '', text: '-- Select Concept --', disabled:true, selected:true }))
+                   .prop('disabled', true);
+
+                   // reset select transactions
+                   $transactions.empty()
+                   .append($('<option>', { value: '', text: '-- Select Transaction --', disabled:true, selected:true }))
+                   .prop('disabled', true);
+
+                   $division.empty()
+                   .append($('<option>', { value: '', text: '-- Select Division --', disabled:true, selected:true }))
+                   .prop('disabled', true);
+
+                 }
+
+               $('#locationid').change(async function(){
+
+                   if (currentRequest) {
+                       currentRequest.abort();
+                   }
+
+                   var $companyClient = $('#companyclient');
+
+                   var locationid = $(this).val();
+
+                   clearComboBox();
+
+                    $companyClient.empty()
+                   .append($('<option>', { value: '', text: '-- Select Company --', disabled:true, selected:true }))
+                   .prop('disabled', true);
 
 
-              var companyclient = $('#companyclient option:selected').val();
+                    if (!locationid) return;
 
 
-                const table = $('#tableuserbinitems').DataTable();
+                     // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+                   var token = $('input[name="__RequestVerificationToken"]').val();
 
-                const res = [];
+                   showSpinner();
 
-                table.$('.qty-input', { page: 'all' }).each(function () {
-                const binidout = Number($(this).data('binid'));
-                const statusid = $(this).data('statusname');
-                const inventorytypeid = $(this).data('invtype');
-                const rackid = $(this).data('rackid');
-                const qty   = Number($(this).val() || 0);
+                   currentRequest = $.ajax({url: '@Url.Action("getAllCompanyActiveByLocation", "PickProcess")',type: 'POST',
+                           data: { __RequestVerificationToken: token,  locationid: locationid }})
+                   .done(function (res)
+                   {
 
-                if (qty > 0)
-                    {
-                    res.push({lineid, binidout, qty, typereserveid, binidin, statusid, inventorytypeid , rackid, partnumber});
-                    }
-                });
-
-                const payload = {
-                    companyclient: companyclient,
-                    lineid: lineid,
-                    itemslist: res
-                };
-
-                showSpinner();
-
-                $.ajax({
-                      url: '@Url.Action("UpdateQuantityPickProcess", "PickProcess")',
-                      type: 'POST',
-                      contentType: 'application/json; charset=utf-8',
-                      data: JSON.stringify(payload),
-                      headers: { 'RequestVerificationToken': token } // Anti-forgery en header
-                    })
-                    .done(function (data)
-                    {
-
-
-                       if (data.status == "OK")
+                       if (res.message == "OK")
                        {
-                           loadDataDetail(data.lista);
 
+                           var list = (res && res.data) ? res.data : [];
+
+
+
+                           if (Array.isArray(list) && list.length)
+                           {
+                               $.each(list, function (_, it) {
+                               var id = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+                               var name = (it.idcompanyclient !== undefined) ? it.idcompanyclient : it.idcompanyclient;
+
+                               $companyClient.append($('<option>', { value: id, text: name }));
+                               });
+                               $companyClient.prop('disabled', false);
+                           }
                        }
                        else
                        {
-                            errorAction(data.status);
+                             $('#locationid option').prop('selected', function () {
+                                       return this.defaultSelected;
+                             });
+
+                           errorAction(res.message);
                        }
-                    })
-                    .fail(function (xhr) {
-                        console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
-                        alert('Could not load bins.');
-                    }).always(function(){
-
-                        hideSpinner();
-
-                         closemodal();
-                    });
-        }
 
 
-        function loadDataDetail(data)
-        {
 
-             if (data != null) {
+                   })
+                   .fail(function (xhr, status) {
+                        if (status !== "abort") {
+                           errorAction("Error:", status);
+                       }
+                   }).always(function(){
 
-                var JsonArrayBines = [];
+                       hideSpinner();
+                   });
 
-                for (var i = 0; i < data.length; i++) {
+               })
 
-                    var f = data[i];
 
-                    JsonArrayBines.push({
-                        action:'<a href="#" onclick="openmodal(' + f.lindId + ',\'' + f.itemNumber + '\',' + f.requestQuantity +',\'' + f.frm3plLocatorStatus + '\')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(' + f.lindId + ')"><i class="fa-solid fa-eraser"></i></a>',
-                        id:f.id,
-                        headid:f.idPickProcessHdr,
-                        lineid:f.lindId,
-                        partnubmer:f.itemNumber,
-                        requestquantity:f.requestQuantity,
-                        quantityprocess:f.quantityProcess,
-                        locator:f.frm3plLocatorStatus,
-                        picklpn:f.pickLPN,
-                        qtyonhand:f.qtyOnHand,
-                        partdesc:f.itemDescription,
-                        dateinserted:f.dateTimeInserted
-                    });
-                }
+               $('#companyclient').change(function()
+               {
 
-                $('#tableuser').DataTable({
-                    data: JsonArrayBines,
-                    destroy: true,
-                    scrollX: true,
-                    processing: true,
-                    deferRender: true,
-                    stateSave: true,
-                    autoWidth: false,
-                    responsive: false,
-                    pageLength: 10,
-                    "bPaginate": false,
-                    "bLengthChange": false,
-                    "bFilter": true,
-                    "bInfo": false,
-                    "bAutoWidth": false,
-                    "searching": false,
-                    columns: [
-                            { "data": "action" },
-                        { "data": "id" },
-                        { "data": "headid" },
-                        { "data": "lineid" },
-                        { "data": "partnubmer" },
-                        { "data": "requestquantity" },
-                        { "data": "quantityprocess" },
-                        { "data": "locator" },
-                        { "data": "picklpn" },
-                        { "data": "qtyonhand" },
-                        { "data": "partdesc" },
-                        { "data": "dateinserted" },
-                    ],
-                    createdRow: function (row, data, dataIndex) {
-                        // índices según tus columnas: requestquantity=4, quantityprocess=5
-                        const $qtyProcessCell = $('td', row).eq(6);
 
-                        // limpiar clases previas
-                        $qtyProcessCell.removeClass('text-success text-danger text-primary fw-bold');
+                   var companyClient = $(this).val();
+                   var $bin = $('#binselid');
+                   var $concepts = $('#conceptid');
+                   var $transactions = $('#transactionid');
+                   var $division = $('#divisionid');
 
-                        // tomar valores numéricos seguros
-                        const req  = Number(data.requestquantity ?? 0);
-                        const proc = Number(data.quantityprocess ?? 0);
+                    clearComboBox();
 
-                        if (Number.isNaN(req) || Number.isNaN(proc)) return; // nada que pintar si vienen malos
+                       // antiforgery token (busca el input generado por @Html.AntiForgeryToken())
+                   var token = $('input[name="__RequestVerificationToken"]').val();
 
-                        if (proc === 0) {
-                        // rojo
-                        $qtyProcessCell.addClass('text-danger fw-bold');
-                        } else if (proc === req) {
-                        // verde
-                        $qtyProcessCell.addClass('text-success fw-bold');
-                        } else if (proc > 0 && proc < req) {
-                        // azul
-                        $qtyProcessCell.addClass('text-primary fw-bold');
+                   if (!companyClient) return;
+
+                      $.ajax({url: '@Url.Action("getAllAditionalInformation", "PickProcess")',type: 'POST',
+                           data: { __RequestVerificationToken: token,  companyClient: companyClient }})
+                   .done(function (res)
+                   {
+                       if (res.status == "OK")
+                       {
+
+                           var list = (res && res.data.listbines) ? res.data.listbines : [];
+                           if (Array.isArray(list) && list.length)
+                           {
+                               $.each(list, function (_, it) {
+                               var id = (it.id !== undefined) ? it.id : it.Id;
+                               var name = (it.tagName !== undefined) ? it.tagName : it.tagName;
+                               $bin.append($('<option>', { value: id, text: name }));
+                               });
+                               $bin.prop('disabled', false);
+                           }
+
+                           var listc = (res && res.data.listconcepts) ? res.data.listconcepts : [];
+                           if (Array.isArray(listc) && listc.length)
+                           {
+                               $.each(listc, function (_, it) {
+                               var id = (it.id !== undefined) ? it.id : it.Id;
+                               var name = (it.Name !== undefined) ? it.name : it.name;
+                               $concepts.append($('<option>', { value: id, text: name }));
+                               });
+                               $concepts.prop('disabled', false);
+                           }
+
+
+                             var listt = (res && res.data.listinputtransactions) ? res.data.listinputtransactions : [];
+                           if (Array.isArray(listt) && listt.length)
+                           {
+                               $.each(listt, function (_, it) {
+                               var id = (it.id !== undefined) ? it.id : it.Id;
+                               var name = (it.Name !== undefined) ? it.name : it.name;
+                               $transactions.append($('<option>', { value: id, text: name }));
+                               });
+                               $transactions.prop('disabled', false);
+                           }
+
+                           var lisdiv = (res && res.data.listtdivisioncompany) ? res.data.listtdivisioncompany : [];
+
+                           if (Array.isArray(lisdiv) && lisdiv.length)
+                           {
+                               $.each(lisdiv, function (_, it) {
+
+                               var id = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                               var name = (it.divisionDsc !== undefined) ? it.divisionDsc : it.divisionDsc;
+                               $division.append($('<option>', { value: id, text: name }));
+                               });
+                               $division.prop('disabled', false);
+                           }
+
+                           $('#lpnid').prop('disabled', false);
+                            $('#observations').prop('disabled', false);
+
                         }
-                    }
+                        else
+                        {
+                            errorAction(res.status);
+                        }
+                   })
+                   .fail(function (xhr) {
+                       console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                       alert('Could not load bins.');
+                   }).always(function(){
 
-                });
-            }
+                       hideSpinner();
+                   });
 
+               })
 
 
-        }
+               function buildDropdown(item) {
 
-        function hideheader()
-        {
 
-           const icono = document.getElementById("ocultarHdr");
-            const $div1 = $('#header1');
-            const $div2 = $('#header2');
-            const $div3 = $('#header3');
+                   var qtypendind = item.qtyshipped - item.qtypending;
 
-            if (icono.classList.contains("fa-eye")) {
-                $('#ocultarHdr').removeClass("fa-eye");
-                $('#ocultarHdr').addClass("fa-eye-slash");
-                $div1.animate({ opacity: 0, height: "toggle" }, 400);
-                $div2.animate({ opacity: 0, height: "toggle" }, 400);
-                $div3.animate({ opacity: 0, height: "toggle" }, 400);
 
-            } else {
-                $('#ocultarHdr').addClass("fa-eye");
-                $('#ocultarHdr').removeClass("fa-eye-slash");
-                $div1.animate({ opacity: 1, height: "toggle" }, 400);
-                $div2.animate({ opacity: 1, height: "toggle" }, 400);
-                $div3.animate({ opacity: 1, height: "toggle" }, 400);
-            }
+                   return `
+                   <div class="dropdown">
+                       <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                           Actions
+                       </button>
+                       <ul class="dropdown-menu">
 
-        }
+                           <li>
+                               <a class="dropdown-item"  onclick="deleteAllBinsDistribution(${item.line})">🗑 Delete</a>
+                           </li>
+                           <li>
+                               <a class="dropdown-item" onclick="openmodal(${item.lineid}, '${item.partnubmer}', ${item.requestquantity})"> 📦 Bins</a>
+                           </li>
+                       </ul>
+                   </div>`;
+               }
 
+               function addqtybinPickProcess()
+               {
+                     const binidin = $('#binselid').val();
 
-        function hidedetail()
-        {
+                     const partnumber = $('#partnoid').val();
 
-           const icono = document.getElementById("ocultarDetail");
-           const $div1 = $('#detail1');
-           const $div2 = $('#detail2');
 
-           if (icono.classList.contains("fa-eye")) {
-                $('#ocultarDetail').removeClass("fa-eye");
-                $('#ocultarDetail').addClass("fa-eye-slash");
-                 $div1.animate({ opacity: 0, height: "toggle" }, 400);
-                 $div2.animate({ opacity: 0, height: "toggle" }, 400);
-            } else {
-                $('#ocultarDetail').addClass("fa-eye");
-                $('#ocultarDetail').removeClass("fa-eye-slash");
-                 $div1.animate({ opacity: 1, height: "toggle" }, 400);
-                 $div2.animate({ opacity: 1, height: "toggle" }, 400);
-            }
 
-        }
+                     const typereserveid = $('#typereserveid').val();
 
+                     const token = $('input[name="__RequestVerificationToken"]').val();
 
-        function hidecalls()
-        {
+                     var lineid = $('#lineid').val();
 
-           const icono = document.getElementById("ocultarCalls");
+                     if (partnumber == '' || partnumber == null)
+                     {
+                          errorAction("Part Number is required");
+                          return;
+                     }
 
-           const $div1 = $('#divbody1');
-           const $div2 = $('#divbody2');
 
-            if (icono.classList.contains("fa-eye")) {
-                $('#ocultarCalls').removeClass("fa-eye");
-                $('#ocultarCalls').addClass("fa-eye-slash");
-                $div1.animate({ opacity: 0, height: "toggle" }, 400);
-                $div2.animate({ opacity: 0, height: "toggle" }, 400);
-            } else {
-                $('#ocultarCalls').addClass("fa-eye");
-                $('#ocultarCalls').removeClass("fa-eye-slash");
-                $div1.animate({ opacity: 1, height: "toggle" }, 400);
-                $div2.animate({ opacity: 1, height: "toggle" }, 400);
-            }
+                     if (binidin == 0 || binidin == null)
+                     {
+                          errorAction("Bin reserve is required");
+                          return;
+                     }
 
-        }
 
+                       if (typereserveid == 0 || typereserveid == null)
+                     {
+                          errorAction("Reserve type inventory  is required");
+                          return;
+                     }
 
-         function hidezebramov()
-        {
 
-           const icono = document.getElementById("ocultarZebraMov");
+                     const valsel = $('#companyclient').val();
 
-           const $div1 = $('#divzebramov1');
 
+                     if (valsel == 0 || valsel == null)
+                     {
+                          errorAction("Company client is required");
+                          return;
+                     }
 
-            if (icono.classList.contains("fa-eye")) {
-                $('#ocultarZebraMov').removeClass("fa-eye");
-                $('#ocultarZebraMov').addClass("fa-eye-slash");
-                $div1.animate({ opacity: 0, height: "toggle" }, 400);
 
-            } else {
-                $('#ocultarZebraMov').addClass("fa-eye");
-                $('#ocultarZebraMov').removeClass("fa-eye-slash");
-                $div1.animate({ opacity: 1, height: "toggle" }, 400);
+                     var companyclient = $('#companyclient option:selected').val();
 
-            }
 
-        }
+                       const table = $('#tableuserbinitems').DataTable();
 
+                       const res = [];
 
-        function hideservtrack()
-        {
+                       table.$('.qty-input', { page: 'all' }).each(function () {
+                       const binidout = Number($(this).data('binid'));
+                       const statusid = $(this).data('statusname');
+                       const inventorytypeid = $(this).data('invtype');
+                       const rackid = $(this).data('rackid');
+                       const qty   = Number($(this).val() || 0);
+
+                       if (qty > 0)
+                           {
+                           res.push({lineid, binidout, qty, typereserveid, binidin, statusid, inventorytypeid , rackid, partnumber});
+                           }
+                       });
+
+                       const payload = {
+                           companyclient: companyclient,
+                           lineid: lineid,
+                           itemslist: res
+                       };
+
+                       showSpinner();
+
+                       $.ajax({
+                             url: '@Url.Action("UpdateQuantityPickProcess", "PickProcess")',
+                             type: 'POST',
+                             contentType: 'application/json; charset=utf-8',
+                             data: JSON.stringify(payload),
+                             headers: { 'RequestVerificationToken': token } // Anti-forgery en header
+                           })
+                           .done(function (data)
+                           {
+
+
+                              if (data.status == "OK")
+                              {
+                                  loadDataDetail(data.lista);
+
+                              }
+                              else
+                              {
+                                   errorAction(data.status);
+                              }
+                           })
+                           .fail(function (xhr) {
+                               console.error('getClientBins FAIL:', xhr.status, xhr.responseText);
+                               alert('Could not load bins.');
+                           }).always(function(){
+
+                               hideSpinner();
+
+                                closemodal();
+                           });
+               }
+
+
+               function loadDataDetail(data)
+               {
+
+                    if (data != null) {
+
+                       var JsonArrayBines = [];
+
+                       for (var i = 0; i < data.length; i++) {
+
+                           var f = data[i];
+
+                           JsonArrayBines.push({
+                               action:'<a href="#" onclick="openmodal(' + f.lindId + ',\'' + f.itemNumber + '\',' + f.requestQuantity +',\'' + f.frm3plLocatorStatus + '\')"><i class="fa-solid fa-boxes-stacked"></i></a> | <a href="#" onclick="deleteAllBinsDistribution(' + f.lindId + ')"><i class="fa-solid fa-eraser"></i></a>',
+                               id:f.id,
+                               headid:f.idPickProcessHdr,
+                               lineid:f.lindId,
+                               partnubmer:f.itemNumber,
+                               requestquantity:f.requestQuantity,
+                               quantityprocess:f.quantityProcess,
+                               locator:f.frm3plLocatorStatus,
+                               picklpn:f.pickLPN,
+                               qtyonhand:f.qtyOnHand,
+                               partdesc:f.itemDescription,
+                               dateinserted:f.dateTimeInserted
+                           });
+                       }
+
+                       $('#tableuser').DataTable({
+                           data: JsonArrayBines,
+                           destroy: true,
+                           scrollX: true,
+                           processing: true,
+                           deferRender: true,
+                           stateSave: true,
+                           autoWidth: false,
+                           responsive: false,
+                           pageLength: 10,
+                           "bPaginate": false,
+                           "bLengthChange": false,
+                           "bFilter": true,
+                           "bInfo": false,
+                           "bAutoWidth": false,
+                           "searching": false,
+                           columns: [
+                                   { "data": "action" },
+                               { "data": "id" },
+                               { "data": "headid" },
+                               { "data": "lineid" },
+                               { "data": "partnubmer" },
+                               { "data": "requestquantity" },
+                               { "data": "quantityprocess" },
+                               { "data": "locator" },
+                               { "data": "picklpn" },
+                               { "data": "qtyonhand" },
+                               { "data": "partdesc" },
+                               { "data": "dateinserted" },
+                           ],
+                           createdRow: function (row, data, dataIndex) {
+                               // índices según tus columnas: requestquantity=4, quantityprocess=5
+                               const $qtyProcessCell = $('td', row).eq(6);
+
+                               // limpiar clases previas
+                               $qtyProcessCell.removeClass('text-success text-danger text-primary fw-bold');
+
+                               // tomar valores numéricos seguros
+                               const req  = Number(data.requestquantity ?? 0);
+                               const proc = Number(data.quantityprocess ?? 0);
+
+                               if (Number.isNaN(req) || Number.isNaN(proc)) return; // nada que pintar si vienen malos
+
+                               if (proc === 0) {
+                               // rojo
+                               $qtyProcessCell.addClass('text-danger fw-bold');
+                               } else if (proc === req) {
+                               // verde
+                               $qtyProcessCell.addClass('text-success fw-bold');
+                               } else if (proc > 0 && proc < req) {
+                               // azul
+                               $qtyProcessCell.addClass('text-primary fw-bold');
+                               }
+                           }
+
+                       });
+                   }
+
+
+
+               }
+
+               function hideheader()
+               {
+
+                  const icono = document.getElementById("ocultarHdr");
+                   const $div1 = $('#header1');
+                   const $div2 = $('#header2');
+                   const $div3 = $('#header3');
+
+                   if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarHdr').removeClass("fa-eye");
+                       $('#ocultarHdr').addClass("fa-eye-slash");
+                       $div1.animate({ opacity: 0, height: "toggle" }, 400);
+                       $div2.animate({ opacity: 0, height: "toggle" }, 400);
+                       $div3.animate({ opacity: 0, height: "toggle" }, 400);
+
+                   } else {
+                       $('#ocultarHdr').addClass("fa-eye");
+                       $('#ocultarHdr').removeClass("fa-eye-slash");
+                       $div1.animate({ opacity: 1, height: "toggle" }, 400);
+                       $div2.animate({ opacity: 1, height: "toggle" }, 400);
+                       $div3.animate({ opacity: 1, height: "toggle" }, 400);
+                   }
+
+               }
+
+
+               function hidedetail()
+               {
+
+                  const icono = document.getElementById("ocultarDetail");
+                  const $div1 = $('#detail1');
+                  const $div2 = $('#detail2');
+
+                  if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarDetail').removeClass("fa-eye");
+                       $('#ocultarDetail').addClass("fa-eye-slash");
+                        $div1.animate({ opacity: 0, height: "toggle" }, 400);
+                        $div2.animate({ opacity: 0, height: "toggle" }, 400);
+                   } else {
+                       $('#ocultarDetail').addClass("fa-eye");
+                       $('#ocultarDetail').removeClass("fa-eye-slash");
+                        $div1.animate({ opacity: 1, height: "toggle" }, 400);
+                        $div2.animate({ opacity: 1, height: "toggle" }, 400);
+                   }
+
+               }
+
+
+               function hidecalls()
+               {
+
+                  const icono = document.getElementById("ocultarCalls");
+
+                  const $div1 = $('#divbody1');
+                  const $div2 = $('#divbody2');
+
+                   if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarCalls').removeClass("fa-eye");
+                       $('#ocultarCalls').addClass("fa-eye-slash");
+                       $div1.animate({ opacity: 0, height: "toggle" }, 400);
+                       $div2.animate({ opacity: 0, height: "toggle" }, 400);
+                   } else {
+                       $('#ocultarCalls').addClass("fa-eye");
+                       $('#ocultarCalls').removeClass("fa-eye-slash");
+                       $div1.animate({ opacity: 1, height: "toggle" }, 400);
+                       $div2.animate({ opacity: 1, height: "toggle" }, 400);
+                   }
 
-           const icono = document.getElementById("ocultarServtrack");
-             const $div = $('#divservtrack1');
+               }
 
-            if (icono.classList.contains("fa-eye")) {
-                $('#ocultarServtrack').removeClass("fa-eye");
-                $('#ocultarServtrack').addClass("fa-eye-slash");
-               $div.animate({ opacity: 0, height: "toggle" }, 400);
 
-            } else {
-                $('#ocultarServtrack').addClass("fa-eye");
-                $('#ocultarServtrack').removeClass("fa-eye-slash");
+                function hidezebramov()
+               {
 
-                $div.animate({ opacity: 1, height: "toggle" }, 400);
-            }
+                  const icono = document.getElementById("ocultarZebraMov");
 
-        }
+                  const $div1 = $('#divzebramov1');
 
 
-          function hidewms()
-        {
+                   if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarZebraMov').removeClass("fa-eye");
+                       $('#ocultarZebraMov').addClass("fa-eye-slash");
+                       $div1.animate({ opacity: 0, height: "toggle" }, 400);
 
-           const icono = document.getElementById("ocultarWMS");
-             const $div = $('#divwms1');
+                   } else {
+                       $('#ocultarZebraMov').addClass("fa-eye");
+                       $('#ocultarZebraMov').removeClass("fa-eye-slash");
+                       $div1.animate({ opacity: 1, height: "toggle" }, 400);
 
-            if (icono.classList.contains("fa-eye")) {
-                $('#ocultarWMS').removeClass("fa-eye");
-                $('#ocultarWMS').addClass("fa-eye-slash");
-               $div.animate({ opacity: 0, height: "toggle" }, 400);
+                   }
 
-            } else {
-                $('#ocultarWMS').addClass("fa-eye");
-                $('#ocultarWMS').removeClass("fa-eye-slash");
+               }
 
-                $div.animate({ opacity: 1, height: "toggle" }, 400);
-            }
 
-        }
-        async function processPick()
-        {
+               function hideservtrack()
+               {
 
-             const ok = await confirmAction("¿Do you want to proccess this delivery ?");
+                  const icono = document.getElementById("ocultarServtrack");
+                    const $div = $('#divservtrack1');
 
-            if (!ok) return;
+                   if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarServtrack').removeClass("fa-eye");
+                       $('#ocultarServtrack').addClass("fa-eye-slash");
+                      $div.animate({ opacity: 0, height: "toggle" }, 400);
 
+                   } else {
+                       $('#ocultarServtrack').addClass("fa-eye");
+                       $('#ocultarServtrack').removeClass("fa-eye-slash");
 
-            var DeliveryId = $('#PickProcessHdr_DeliveryId').val();
+                       $div.animate({ opacity: 1, height: "toggle" }, 400);
+                   }
 
-            if (DeliveryId == null || DeliveryId == '')
-            {
-                 errorAction("Pick Process Number is required");
-                  return;
-            }
+               }
 
 
+                 function hidewms()
+               {
 
-            let table = $('#tableuser').DataTable();
+                  const icono = document.getElementById("ocultarWMS");
+                    const $div = $('#divwms1');
 
-            var continueP = true;
+                   if (icono.classList.contains("fa-eye")) {
+                       $('#ocultarWMS').removeClass("fa-eye");
+                       $('#ocultarWMS').addClass("fa-eye-slash");
+                      $div.animate({ opacity: 0, height: "toggle" }, 400);
 
-            table.rows({ search: 'applied' }).every(function () {
-                let data = this.data();  // obtienes el objeto por fila
+                   } else {
+                       $('#ocultarWMS').addClass("fa-eye");
+                       $('#ocultarWMS').removeClass("fa-eye-slash");
 
-                let val1 = Number(data.requestquantity);
-                let val2 = Number(data.quantityprocess);
+                       $div.animate({ opacity: 1, height: "toggle" }, 400);
+                   }
 
+               }
+               async function processPick()
+               {
 
-                if (val1 !== val2)
-                {
-                    continueP = false
-                }
-            });
+                    const ok = await confirmAction("¿Do you want to proccess this delivery ?");
 
-            if (!continueP)
-            {
-              errorAction("You must receive all items");
-                  return;
-            }
+                   if (!ok) return;
 
-              const locationid = document.getElementById("locationid").value;
 
-            if (locationid === "") {
-                errorAction("Location is required");
-                return;
-            }
+                   var DeliveryId = $('#PickProcessHdr_DeliveryId').val();
 
+                   if (DeliveryId == null || DeliveryId == '')
+                   {
+                        errorAction("Pick Process Number is required");
+                         return;
+                   }
 
-            const companyclient = document.getElementById("companyclient").value;
 
-            if (companyclient === "") {
-                errorAction("Company client is required");
-                return;
-            }
 
-            const conceptid = document.getElementById("conceptid").value;
+                   let table = $('#tableuser').DataTable();
 
-            if (conceptid === "") {
-                        errorAction("Concept ID client is required");
-                        return;
-            }
+                   var continueP = true;
 
-            const transactionid = document.getElementById("transactionid").value;
+                   table.rows({ search: 'applied' }).every(function () {
+                       let data = this.data();  // obtienes el objeto por fila
 
-            if (transactionid === "") {
-                        errorAction("Transaction ID client is required");
-                        return;
-            }
+                       let val1 = Number(data.requestquantity);
+                       let val2 = Number(data.quantityprocess);
 
-             const division = document.getElementById("divisionid").value;
 
-            if (division === "") {
-                        errorAction("Division ID is required");
-                        return;
-            }
-
-            var lpnid = $('#lpnid').val();pickprocessnumber
-             if (lpnid === "")
-             {
-                        errorAction("LPN is required");
-                        return;
-            }
-
-            var documentReference = DeliveryId;
-
-            var token = $('input[name="__RequestVerificationToken"]').val();
-
-            var observations = $('#observations').val();
-
-
-
-            showSpinner();
-
-            $.ajax({url:"@Url.Action("processPick", "PickProcess")",
-                data:{DeliveryId:DeliveryId,
-                    companyclient: companyclient,
-                    conceptid: conceptid,
-                    transactionid : transactionid,
-                    division : division,
-                    lpnid : lpnid,
-                    observations:observations,
-                    locationid:locationid
-                    }, type:"post", headers: { 'RequestVerificationToken': token }})
-            .done(function(data){
-
-                   if (data.status == "OK")
+                       if (val1 !== val2)
                        {
+                           continueP = false
+                       }
+                   });
 
-                           successAction("Process completed successfully")
+                   if (!continueP)
+                   {
+                     errorAction("You must receive all items");
+                         return;
+                   }
+
+                     const locationid = document.getElementById("locationid").value;
+
+                   if (locationid === "") {
+                       errorAction("Location is required");
+                       return;
+                   }
+
+
+                   const companyclient = document.getElementById("companyclient").value;
+
+                   if (companyclient === "") {
+                       errorAction("Company client is required");
+                       return;
+                   }
+
+                   const conceptid = document.getElementById("conceptid").value;
+
+                   if (conceptid === "") {
+                               errorAction("Concept ID client is required");
+                               return;
+                   }
+
+                   const transactionid = document.getElementById("transactionid").value;
+
+                   if (transactionid === "") {
+                               errorAction("Transaction ID client is required");
+                               return;
+                   }
+
+                    const division = document.getElementById("divisionid").value;
+
+                   if (division === "") {
+                               errorAction("Division ID is required");
+                               return;
+                   }
+
+                   var lpnid = $('#lpnid').val();pickprocessnumber
+                    if (lpnid === "")
+                    {
+                               errorAction("LPN is required");
+                               return;
+                   }
+
+                   var documentReference = DeliveryId;
+
+                   var token = $('input[name="__RequestVerificationToken"]').val();
+
+                   var observations = $('#observations').val();
+
+
+
+                   showSpinner();
+
+                   $.ajax({url:"@Url.Action("processPick", "PickProcess")",
+                       data:{DeliveryId:DeliveryId,
+                           companyclient: companyclient,
+                           conceptid: conceptid,
+                           transactionid : transactionid,
+                           division : division,
+                           lpnid : lpnid,
+                           observations:observations,
+                           locationid:locationid
+                           }, type:"post", headers: { 'RequestVerificationToken': token }})
+                   .done(function(data){
+
+                          if (data.status == "OK")
+                              {
+
+                                  successAction("Process completed successfully")
+
+                                  loadDataDetail(data.lista);
+
+                              }
+                              else
+                              {
+                                   errorAction(data.status);
+                              }
+
+                   })
+                   .fail(function(jqXHR, textStatus, errorThrown){
+
+                               if (jqXHR.status === 500) {
+                           errorAction('Error interno del servidor. Intenta más tarde.');
+                       } else {
+                           errorAction('Error inesperado: ' + jqXHR.status);
+                       }
+                   })
+                   .always(function()
+                   {
+                       hideSpinner();
+                   });
+               }
+
+
+               async function deleteAllBinsDistribution(lineid)
+               {
+
+                     const ok = await confirmAction("¿Do you want to delete all bins distribution for this line " + lineid + "?");
+
+                   if (!ok) return;
+
+                   showSpinner();
+
+                   var token = $('input[name="__RequestVerificationToken"]').val();
+
+                   showSpinner();
+
+
+                   $.ajax({url:"@Url.Action("deleteAllBinsDistribution", "PickProcess")", data:{__RequestVerificationToken: token,lineid:lineid}, type:"post"})
+                   .done(function(data)
+                   {
+                       if(data.status == "OK")
+                       {
+                           successAction("Distribution deleted");
 
                            loadDataDetail(data.lista);
-
                        }
                        else
                        {
                             errorAction(data.status);
                        }
+                   })
+                   .fail(function(){})
+                   .always(function()
+                   {
+                       hideSpinner();
+                   });
 
-            })
-            .fail(function(jqXHR, textStatus, errorThrown){
-
-                        if (jqXHR.status === 500) {
-                    errorAction('Error interno del servidor. Intenta más tarde.');
-                } else {
-                    errorAction('Error inesperado: ' + jqXHR.status);
-                }
-            })
-            .always(function()
-            {
-                hideSpinner();
-            });
-        }
+               }
 
 
-        async function deleteAllBinsDistribution(lineid)
+               function openpickprocessmodal(dateSearch)
+               {
+                    showSpinner();
+
+                   var token = $('input[name="__RequestVerificationToken"]').val();
+
+                   showSpinner();
+
+
+                   $.ajax({url:"@Url.Action("searchAllPickProcess", "PickProcess")", data:{__RequestVerificationToken: token,dateSearch:dateSearch}, type:"post"})
+                   .done(function(data)
+                   {
+                       if(data.status == "OK")
+                       {
+
+                           var JsonArrayBines = [];
+
+                           for (var i = 0; i < data.lista.length; i++) {
+                                                            
+                               var f = data.lista[i];
+                               
+                               JsonArrayBines.push({
+                                   action:'<a href="#" onclick="trasnferid(' + f.deliveryId + ')"><i class="fa-solid fa-arrow-left fa-lg"></i></a>',
+                                   deliveryid:f.deliveryId,
+                                   datecreated: f.creationDate,
+                                   shiptoaddress1 : f.shipToAddress1,
+                                   shiptoaddress2: f.shipToAddress2,
+                                   datetimeprocessed: f.dateTimeProcessed,
+                                   pickcall:f.outConsReqsId,
+                                   shipdate:f.shipDateTimeConfirmed,
+                                   shipcall: f.shipOutConsReqsId
+
+                                   });
+                           }
+
+                           $('#tablepickprocess').DataTable({
+                              data: JsonArrayBines,
+                               destroy: true,
+                               scrollX: true,
+
+                               columns: [
+                                   { "data": "action" },
+                                   { "data": "deliveryid" },
+                                   { "data": "datecreated" },
+                                   { "data": "shiptoaddress1" },
+                                   { "data": "shiptoaddress2" },
+                                   { "data": "datetimeprocessed" },
+                                   { "data": "pickcall" },
+                                   { "data": "shipdate" },
+                                   { "data": "shipcall" },
+                                ]
+                           })
+                         }
+
+                       else
+                       {
+                            errorAction(data.status);
+                       }
+                   })
+                   .fail(function(){})
+                   .always(function()
+                   {
+                       hideSpinner();
+                   });
+
+                   const modalpick = new bootstrap.Modal(document.getElementById('modalPickProcess'));
+                   modalpick.show();
+               }
+
+
+        function trasnferid(delivery)
         {
 
-              const ok = await confirmAction("¿Do you want to delete all bins distribution for this line " + lineid + "?");
+            clearform();
 
-            if (!ok) return;
+            $('#pickprocessnumber').val(delivery);
 
-            showSpinner();
+            const el = document.getElementById('modalPickProcess');
+            const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
+            inst.hide();
 
-            var token = $('input[name="__RequestVerificationToken"]').val();
+                
 
-            showSpinner();
-
-
-            $.ajax({url:"@Url.Action("deleteAllBinsDistribution", "PickProcess")", data:{__RequestVerificationToken: token,lineid:lineid}, type:"post"})
-            .done(function(data)
-            {
-                if(data.status == "OK")
-                {
-                    successAction("Distribution deleted");
-
-                    loadDataDetail(data.lista);
-                }
-                else
-                {
-                     errorAction(data.status);
-                }
-            })
-            .fail(function(){})
-            .always(function()
-            {
-                hideSpinner();
-            });
 
         }
     </script>

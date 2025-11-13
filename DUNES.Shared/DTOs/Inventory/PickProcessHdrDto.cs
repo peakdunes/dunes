@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.Inventory
 {
-    public class PickProcessHdr
+    public class PickProcessHdrDto
     {
         public int Id { get; set; }
 
@@ -34,8 +34,16 @@ namespace DUNES.Shared.DTOs.Inventory
 
         [MaxLength(240)]
         public string? Address4 { get; set; }
+        [MaxLength(240)]
+        public string ShipToAddress1 { get; set; } = null!;
+        [MaxLength(240)]
+        public string? ShipToAddress2 { get; set; }
+        [MaxLength(240)]
+        public string? ShipToAddress3 { get; set; }
+        [MaxLength(240)]
+        public string? ShipToAddress4 { get; set; }
 
-
+        public DateOnly CreationDate { get; set; }
 
         [MaxLength(100)]
         public string? Country { get; set; }

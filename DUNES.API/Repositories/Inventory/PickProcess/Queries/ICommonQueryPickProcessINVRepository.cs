@@ -1,5 +1,7 @@
-﻿using DUNES.API.ReadModels.B2B;
+﻿using DUNES.API.Models.Inventory.PickProcess;
+using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
@@ -19,7 +21,15 @@ namespace DUNES.API.Repositories.Inventory.PickProcess.Queries
         /// <returns></returns>
         Task<PickProcessRead?> GetPickProcessAllInfo(string DeliveryId, CancellationToken ct);
 
-        
+
+        /// <summary>
+        /// get all pick process from a start date
+        /// </summary>
+        /// <param name="dateSearch"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<List<TzebB2bPSoWoHdrTblItemInbConsReqsLog>> GetAllPickProcessByStartDate(DateTime dateSearch,  CancellationToken ct);
+
 
 
         /// <summary>
