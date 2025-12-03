@@ -1,6 +1,7 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
 using FluentValidation;
@@ -15,15 +16,17 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
 
 
         private readonly IClientCompaniesWMSAPIRepository _repository;
-        private readonly IValidator<WmsCompanyclientDto> _validator;
+        private readonly IValidator<WMSClientCompaniesDto> _validator;
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="repository"></param>
         /// <param name="validator"></param>
-        public ClientCompaniesWMSAPIService(IClientCompaniesWMSAPIRepository repository,
-            IValidator<WmsCompanyclientDto> validator)
+        public ClientCompaniesWMSAPIService(IClientCompaniesWMSAPIRepository repository
+            ,
+            IValidator<WMSClientCompaniesDto> validator
+            )
         {
             _repository = repository;
             _validator = validator;
@@ -39,20 +42,22 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         public async Task<ApiResponse<bool>> AddClientCompanyAsync(WmsCompanyclientDto dto, CancellationToken ct)
         {
 
-            var validation = await _validator.ValidateAsync(dto, opts =>
-            {
-                opts.IncludeRuleSets("Create");
-                
-            
-            }, ct);
-            
-            if (!validation.IsValid)
-            {
-                var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
+            //var validation = await _validator.ValidateAsync(dto, opts =>
+            //{
+            //    opts.IncludeRuleSets("Create");
 
-                return ApiResponseFactory.BadRequest<bool>(errors);
 
-            }
+            //}, ct);
+
+          
+
+            //if (!validation.IsValid)
+            //{
+            //    var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
+
+            //    return ApiResponseFactory.BadRequest<bool>(errors);
+
+            //}
 
             var exist = _repository.GetClientCompanyInformationByIdentificationAsync(dto.CompanyId!, ct);
             if (exist != null)

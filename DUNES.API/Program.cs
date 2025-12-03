@@ -201,6 +201,13 @@ builder.Services.AddSwaggerGen(c =>
             "CommonQueryWMSINV" => new[] { "WMS Inventory - Common queries" },
 
             //#########
+            //WMS MASTERS
+            //#########
+            "ClientCompaniesWMS" => new[] { "WMS - Client Companies" },
+            
+
+
+            //#########
             //MASTERS
             //#########
             "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
@@ -282,6 +289,12 @@ builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<
 //para usar en el CRUD de las tablas maestras
 builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 
+//VALIDATOR SERVICES
+
+builder.Services.AddScoped<IValidator<WMSClientCompaniesDto>, ClientCompaniesWMSAPIValidator>();
+
+
+
 //WMS MASTER SERVICES
 
 builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
@@ -312,10 +325,6 @@ builder.Services.AddScoped<ICommonQueryWMSINVService, CommonQueryWMSINVService>(
 builder.Services.AddScoped<ITransactionsWMSINVService, TransactionsWMSINVService>();
 builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepository>();
 
-
-//VALIDATOR SERVICES
-
-builder.Services.AddScoped<IValidator<WMSClientCompaniesDto>, ClientCompaniesWMSAPIValidator>();
 
 
 

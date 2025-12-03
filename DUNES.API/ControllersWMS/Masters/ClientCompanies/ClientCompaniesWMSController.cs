@@ -96,15 +96,15 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// <summary>
         /// Create a new Client Company
         /// </summary>
-        /// <param name="objcreate"></param>
+        /// <param name="companyinfo"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
-        [HttpPost("wms-create-client-company/{objcreate}")]
-        public async Task<IActionResult> CreateInventoryTransaction(WmsCompanyclientDto objcreate, CancellationToken ct)
+        [HttpPost("wms-create-client-company")]
+        public async Task<IActionResult> CreateClientCompany([FromBody] WmsCompanyclientDto companyinfo, CancellationToken ct)
         {
-            return await HandleApi(ct => _service.AddClientCompanyAsync(objcreate, ct), ct);
+            return await HandleApi(ct => _service.AddClientCompanyAsync(companyinfo, ct), ct);
         }
 
     }
