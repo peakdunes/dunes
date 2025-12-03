@@ -19,6 +19,7 @@ using DUNES.API.Repositories.WebService.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
+using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
@@ -288,8 +289,12 @@ builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterSer
 
 builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository>();
 
+builder.Services.AddScoped<IClientCompaniesWMSAPIRepository, ClientCompaniesWMSAPIRepository>();
 
-//WEB SERVCE SERVICES
+builder.Services.AddScoped<IClientCompaniesWMSAPIService, ClientCompaniesWMSAPIService>();
+
+
+//WEB SERVICE SERVICES
 
 builder.Services.AddScoped<ICommonQueryWebServiceRepository, CommonQueryWebServiceRepository>();
 builder.Services.AddScoped<ITransactionsWebServiceRepository, TransactionsWebServiceRepository>();

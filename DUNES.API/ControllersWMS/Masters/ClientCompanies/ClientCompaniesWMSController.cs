@@ -1,7 +1,10 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.Models;
+using DUNES.Shared.TemporalModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -87,6 +90,21 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
 
             return await HandleApi(ct => _service.GetClientCompanyInformationByIdAsync(id, ct), ct);
 
+        }
+
+
+        /// <summary>
+        /// Create a new Client Company
+        /// </summary>
+        /// <param name="objcreate"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [HttpPost("wms-create-client-company/{objcreate}")]
+        public async Task<IActionResult> CreateInventoryTransaction(WmsCompanyclientDto objcreate, CancellationToken ct)
+        {
+            return await HandleApi(ct => _service.AddClientCompanyAsync(objcreate, ct), ct);
         }
 
     }
