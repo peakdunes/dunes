@@ -1,5 +1,5 @@
 ﻿using DUNES.API.Data;
-using DUNES.API.Utils.Responses;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

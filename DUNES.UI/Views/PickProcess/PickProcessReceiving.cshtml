@@ -282,7 +282,7 @@
             <label asp-for="PickProcessHdr.ConsignRequestID" class="form-label"></label>
             <div class="input-group">
                 <input asp-for="PickProcessHdr.ConsignRequestID" readonly class="form-control" />
-                <button type="button" class="btn btn-outline-secondary" title="Print">
+                <button type="button" class="btn btn-outline-secondary" onclick="printPackingList()" title="Print">
                     <i class="bi bi-printer"></i>
                 </button>
             </div>
@@ -874,7 +874,12 @@
 
             <div class="col-12 col-md-2">
                 <label asp-for="OrderRepair.repairHdr.CustRef" class="form-label"></label>
-                <input asp-for="OrderRepair.repairHdr.CustRef" readonly class="form-control" />
+                <div class="input-group">
+                    <input asp-for="OrderRepair.repairHdr.CustRef" readonly class="form-control" />
+                    <button type="button" class="btn btn-outline-secondary" onclick="printPackingList()" title="Print">
+                        <i class="bi bi-printer"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="col-12 col-md-4">
@@ -2393,9 +2398,9 @@
                            var JsonArrayBines = [];
 
                            for (var i = 0; i < data.lista.length; i++) {
-                                                            
+
                                var f = data.lista[i];
-                               
+
                                JsonArrayBines.push({
                                    action:'<a href="#" onclick="trasnferid(' + f.deliveryId + ')"><i class="fa-solid fa-arrow-left fa-lg"></i></a>',
                                    deliveryid:f.deliveryId,
@@ -2456,9 +2461,95 @@
             const inst = bootstrap.Modal.getInstance(el) || bootstrap.Modal.getOrCreateInstance(el);
             inst.hide();
 
-                
 
 
+
+        }
+
+        function printPackingList()
+        {
+            var inforef = $('#OrderRepair_repairHdr_RefNo').val();
+
+            var infocustref = $('#OrderRepair_repairHdr_CustRef').val();
+
+            alert(inforef + '--' + infocustref);
+
+            if (inforef == null || inforef == '' || infocustref == '' || infocustref == null)
+            {
+
+            }
+             errorAction("Reference is required to print the Packing List");
+
+             /////////////
+
+               showSpinner();
+
+                   var token = $('input[name="__RequestVerificationToken"]').val();
+
+                   showSpinner();
+
+
+                   $.ajax({url:"@Url.Action("printPackingList", "PickProcess")", data:{__RequestVerificationToken: token,infocustref:infocustref}, type:"post"})
+                   .done(function(data)
+                   {
+                       if(data.status == "OK")
+                       {
+
+                           var JsonArrayBines = [];
+
+                           for (var i = 0; i < data.lista.length; i++) {
+
+                               var f = data.lista[i];
+
+                               JsonArrayBines.push({
+                                   action:'<a href="#" onclick="trasnferid(' + f.deliveryId + ')"><i class="fa-solid fa-arrow-left fa-lg"></i></a>',
+                                   deliveryid:f.deliveryId,
+                                   datecreated: f.creationDate,
+                                   shiptoaddress1 : f.shipToAddress1,
+                                   shiptoaddress2: f.shipToAddress2,
+                                   datetimeprocessed: f.dateTimeProcessed,
+                                   pickcall:f.outConsReqsId,
+                                   shipdate:f.shipDateTimeConfirmed,
+                                   shipcall: f.shipOutConsReqsId
+
+                                   });
+                           }
+
+                           $('#tablepickprocess').DataTable({
+                              data: JsonArrayBines,
+                               destroy: true,
+                               scrollX: true,
+
+                               columns: [
+                                   { "data": "action" },
+                                   { "data": "deliveryid" },
+                                   { "data": "datecreated" },
+                                   { "data": "shiptoaddress1" },
+                                   { "data": "shiptoaddress2" },
+                                   { "data": "datetimeprocessed" },
+                                   { "data": "pickcall" },
+                                   { "data": "shipdate" },
+                                   { "data": "shipcall" },
+                                ]
+                           })
+                         }
+
+                       else
+                       {
+                            errorAction(data.status);
+                       }
+                   })
+                   .fail(function(){})
+                   .always(function()
+                   {
+                       hideSpinner();
+                   });
+
+                   const modalpick = new bootstrap.Modal(document.getElementById('modalPickProcess'));
+                   modalpick.show();
+
+
+             //////////////
         }
     </script>
 }

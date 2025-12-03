@@ -1,7 +1,11 @@
 ﻿using DUNES.Shared.Models;
-using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace DUNES.API.Utils.Responses
+namespace DUNES.Shared.Utils.Reponse
 {
     /// <summary>
     /// Factory class for building standardized API responses.
@@ -113,7 +117,7 @@ namespace DUNES.API.Utils.Responses
         }
 
         // ----------------- SHORTHAND FAIL ALIASES -----------------
-        
+
         /// <summary>
         /// Returns a 400 Bad Request response.
         /// </summary>
@@ -180,6 +184,4 @@ namespace DUNES.API.Utils.Responses
         public static ApiResponse<T> Error<T>(string error) =>
             Fail<T>(error, "Internal Server Error", 500);
     }
-
-
 }

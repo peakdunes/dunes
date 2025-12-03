@@ -12,14 +12,14 @@ using System.Transactions;
 
 namespace DUNES.UI.Services.Inventory.PickProcess
 {
-    public class PickProcessService : IPickProcessService
+    public class PickProcessUIService : IPickProcessUIService
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private readonly IConfiguration _config;
 
 
-        public PickProcessService(IConfiguration config)
+        public PickProcessUIService(IConfiguration config)
         {
             _config = config;
             _baseUrl = _config["ApiSettings:BaseUrl"]!;

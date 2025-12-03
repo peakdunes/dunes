@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Utils.Logging;
-using DUNES.API.Utils.Responses;
+
+using DUNES.Shared.Utils.Reponse;
 using Serilog;
 using System.Net;
 using System.Text.Json;

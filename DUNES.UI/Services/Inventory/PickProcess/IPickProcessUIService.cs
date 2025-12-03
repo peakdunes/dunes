@@ -7,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace DUNES.UI.Services.Inventory.PickProcess
 {
-    public interface IPickProcessService
+    public interface IPickProcessUIService
     {
       
         Task<ApiResponse<PickProcessRequestDto>>  GetPickProcessAllInfo(string DeliveryId, string token, CancellationToken ct);

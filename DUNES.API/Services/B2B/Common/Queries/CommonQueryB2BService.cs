@@ -2,8 +2,9 @@
 using DUNES.API.Models.B2b;
 using DUNES.API.ReadModels.B2B;
 using DUNES.API.Repositories.B2B.Common.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Services.B2B.Common.Queries

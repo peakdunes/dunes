@@ -14,9 +14,9 @@ namespace DUNES.UI.Controllers.Admin
     {
         private readonly IHttpClientFactory _httpClientFactory;
         public readonly IConfiguration _config;
-        private readonly IMenuClientService _menuClientService;
+        private readonly IMenuClientUIService _menuClientService;
 
-        public MenuController(IHttpClientFactory httpClientFactory, IConfiguration config, IMenuClientService menuClientService)
+        public MenuController(IHttpClientFactory httpClientFactory, IConfiguration config, IMenuClientUIService menuClientService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

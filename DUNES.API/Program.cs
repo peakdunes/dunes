@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using DUNES.API.Data;
+using DUNES.API.Models.Configuration;
 using DUNES.API.Models.Masters;
 using DUNES.API.Profiles;
 using DUNES.API.Repositories.Auth;
@@ -18,6 +19,7 @@ using DUNES.API.Repositories.WebService.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
+using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
@@ -31,10 +33,14 @@ using DUNES.API.Services.WebService.Transactions;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
+using DUNES.API.ServicesWMS.Masters.ClientCompanies;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
+using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Interfaces.RequestInfo;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebSockets;
@@ -177,30 +183,40 @@ builder.Services.AddSwaggerGen(c =>
 
         return controllerName switch
         {
+
+            //#########
+            //INV
+            //#########
+
             "CommonQueryINV" => new[] { "Inventory - Common Queries" },
             "PickProcessINV" => new[] { "Inventory - Pick Process" },
             "CommonQueryASNINV" => new[] { "Inventory ASN - Common queries" },
+
+
+            //#########
+            //INV WMS
+            //#########
+            "TransactionWMSINV" => new[] { "WMS - Transactions" },
+            "CommonQueryWMSINV" => new[] { "WMS Inventory - Common queries" },
+
+            //#########
+            //MASTERS
+            //#########
             "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
             "ConsignmentCallType" => new[] { "Inventory Calls - CRUD" },
             "TzebB2bInventoryType" => new[] { "Inventory Types - CRUD" },
             "WmsCompanyclient" => new[] { "Company Clients - CRUD" },
+            "mvcGeneralParameters" => new[] { "General Parameters - CRUD" },
 
-            
 
+            //#########
+            //B2B
+            //#########
             "TzebFaultCodes" => new[] { "B2B - Fault Codes CRUD" },
             "TrepairActionsCodes" => new[] { "B2B - Action Codes CRUD" },
             "TzebWorkCodesTargets" => new[] { "B2B - Work Target Codes CRUD" },
-
-            "TransactionWMSINV" => new[] { "WMS - Transactions" },
-
-
             "CommonQueryB2B" => new[] { "B2B - Common queries" },
             "CommonQueryWMSMaster" => new[] { "WMS Master Tables - Common queries" },
-
-           
-
-
-            "CommonQueryWMSINV" => new[] { "WMS Inventory - Common queries" },
             
             _ => new[] { controllerName }
         };
@@ -270,6 +286,9 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
 builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterService>();
 
+builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository>();
+
+
 //WEB SERVCE SERVICES
 
 builder.Services.AddScoped<ICommonQueryWebServiceRepository, CommonQueryWebServiceRepository>();
@@ -287,6 +306,12 @@ builder.Services.AddScoped<ICommonQueryWMSINVRepository, CommonQueryWMSINVReposi
 builder.Services.AddScoped<ICommonQueryWMSINVService, CommonQueryWMSINVService>();
 builder.Services.AddScoped<ITransactionsWMSINVService, TransactionsWMSINVService>();
 builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepository>();
+
+
+//VALIDATOR SERVICES
+
+builder.Services.AddScoped<IValidator<WMSClientCompaniesDto>, ClientCompaniesWMSAPIValidator>();
+
 
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

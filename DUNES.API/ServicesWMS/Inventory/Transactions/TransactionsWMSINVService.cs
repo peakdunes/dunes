@@ -9,11 +9,12 @@ using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Masters;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 

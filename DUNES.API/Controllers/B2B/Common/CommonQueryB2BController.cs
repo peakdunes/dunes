@@ -1,6 +1,6 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Services.B2B.Common.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

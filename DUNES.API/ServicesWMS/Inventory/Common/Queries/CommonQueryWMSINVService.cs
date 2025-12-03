@@ -3,10 +3,11 @@ using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
 using DUNES.API.ReadModels.WMS;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using DUNES.Shared.Utils.Reponse;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 

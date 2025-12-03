@@ -145,12 +145,27 @@ body {
     font-weight: 600;
 }
 
+.btn-outline-primary {
+    border-color: var(--fig-primary) !important;
+    border-radius: var(--ctl-radius);
+    height: var(--btn-height);
+    color: var(--fig-primary) !important;
+    font-weight: 600;
+}
+
+
 
     .btn-primary:hover,
     .btn-primary:active {
         background-color: var(--fig-primary-600) !important;
         border-color: var(--fig-primary-600) !important;
     }
+.btn-outline-primary:hover,
+.btn-outline-primary:active {
+    background-color: var(--fig-primary-600) !important;
+    border-color: var(--fig-primary-600) !important;
+    color: white !important;
+}
 
 .subtitleDunes {
     color: var(--fig-primary) !important;

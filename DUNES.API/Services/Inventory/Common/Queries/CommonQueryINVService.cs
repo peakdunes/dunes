@@ -1,9 +1,10 @@
 ﻿using DUNES.API.Models.Inventory;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.Common.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 
 namespace DUNES.API.Services.Inventory.Common.Queries
 {

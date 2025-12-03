@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using DUNES.API.Repositories.Masters;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 
 namespace DUNES.API.Services.Masters
 {
@@ -136,7 +137,26 @@ namespace DUNES.API.Services.Masters
 
             return ApiResponseFactory.Ok(dtos, "Search completed successfully");
         }
+        /// <summary>
+        /// Get all table records for a int field
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="value"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<TDto>> SearchByIntFieldAsync(string fieldName, int value, CancellationToken ct)
+        {
+            var results = await _repository.SearchByIntFieldAsync(fieldName, value, ct);
 
-       
+            if (results == null)
+                return ApiResponseFactory.NotFound<TDto>(
+                    $"No records found for {fieldName} containing '{value}'"
+                );
+
+            var dtos = _mapper.Map<TDto>(results);
+
+            return ApiResponseFactory.Ok(dtos, "Search completed successfully");
+        }
     }
 }

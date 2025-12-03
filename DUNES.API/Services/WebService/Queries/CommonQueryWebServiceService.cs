@@ -1,8 +1,9 @@
 ﻿using DUNES.API.Repositories.WebService.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.WebService;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 
 namespace DUNES.API.Services.WebService.Queries
 {

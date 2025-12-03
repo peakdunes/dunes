@@ -27,15 +27,15 @@ namespace DUNES.UI.Controllers.Inventory.ASN
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IASNService _ASNService;
-        private readonly ICommonINVService _CommonINVService;
+        private readonly IASNUIService _ASNService;
+        private readonly ICommonINVUIService _CommonINVService;
         private readonly IConfiguration _config;
         private readonly int _companyDefault;
         private readonly string _typeDocument = "ASN";
 
 
-        public ASNController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNService ASNService,
-            ICommonINVService CommonINVService)
+        public ASNController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNUIService ASNService,
+            ICommonINVUIService CommonINVService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

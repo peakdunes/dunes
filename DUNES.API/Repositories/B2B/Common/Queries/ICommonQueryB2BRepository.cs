@@ -2,7 +2,7 @@
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
 using DUNES.API.ReadModels.B2B;
-using DUNES.API.Utils.Responses;
+
 
 namespace DUNES.API.Repositories.B2B.Common.Queries
 {

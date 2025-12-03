@@ -109,6 +109,11 @@ namespace DUNES.API.Data
         /// warehouse organization
         /// </summary>
         public virtual DbSet<Warehouseorganization> warehouseorganization { get; set; }
+
+        /// <summary>
+        /// Client companies master
+        /// </summary>
+        public virtual DbSet<CompanyClient> CompanyClient { get; set; }
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
@@ -116,6 +121,37 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<CompanyClient>(entity =>
+            {
+                entity.ToTable("companyClient");
+
+                entity.HasIndex(e => e.Idcity, "IX_companyClient_Idcity");
+
+                entity.HasIndex(e => e.Idcountry, "IX_companyClient_Idcountry");
+
+                entity.HasIndex(e => e.Idstate, "IX_companyClient_Idstate");
+
+                entity.Property(e => e.Active).HasColumnName("active");
+                entity.Property(e => e.Address)
+                    .HasMaxLength(200)
+                    .HasColumnName("address");
+                entity.Property(e => e.CompanyId)
+                    .HasMaxLength(100)
+                    .HasColumnName("companyId");
+                entity.Property(e => e.Name)
+                    .HasMaxLength(200)
+                    .HasColumnName("name");
+                entity.Property(e => e.Phone)
+                    .HasMaxLength(100)
+                    .HasColumnName("phone");
+                entity.Property(e => e.Website)
+                    .HasMaxLength(200)
+                    .HasColumnName("website");
+                entity.Property(e => e.Zipcode)
+                    .HasMaxLength(20)
+                    .HasColumnName("zipcode");
+            });
 
             modelBuilder.Entity<Warehouseorganization>(entity =>
             {

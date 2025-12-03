@@ -109,5 +109,28 @@ namespace DUNES.API.Repositories.Masters
             return await _context.Set<T>().FirstOrDefaultAsync(lambda,ct);
         }
 
+        /// <summary>
+        /// this utility searh in one table for a int field
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="value"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public async Task<T> SearchByIntFieldAsync(string fieldName, int value, CancellationToken ct)
+        {
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.PropertyOrField(parameter, fieldName);
+
+            if (property.Type != typeof(int))
+                throw new InvalidOperationException($"Property {fieldName} is not an int.");
+
+            var constant = Expression.Constant(value, typeof(int));
+            var equal = Expression.Equal(property, constant);
+
+            var lambda = Expression.Lambda<Func<T, bool>>(equal, parameter);
+
+            return await _context.Set<T>().FirstOrDefaultAsync(lambda, ct);
+        }
     }
 }

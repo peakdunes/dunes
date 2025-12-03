@@ -12,7 +12,7 @@ using System.Text.Json;
 
 namespace DUNES.UI.Services.Inventory.ASN
 {
-    public class ASNService : IASNService
+    public class ASNUIService : IASNUIService
     {
 
         private readonly HttpClient _httpClient;
@@ -20,7 +20,7 @@ namespace DUNES.UI.Services.Inventory.ASN
         private readonly IConfiguration _config;
 
 
-        public ASNService(IConfiguration config)
+        public ASNUIService(IConfiguration config)
         {
             _config = config;
             _baseUrl = _config["ApiSettings:BaseUrl"]!;

@@ -2,7 +2,7 @@
 
 namespace DUNES.UI.Services.Admin
 {
-    public interface IMenuClientService
+    public interface IMenuClientUIService
     {
 
         Task<List<MenuItemDto>> GetBreadcrumbAsync(string menuCode, string token);

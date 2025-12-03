@@ -1,8 +1,9 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.Auth;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

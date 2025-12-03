@@ -6,11 +6,12 @@ using DUNES.API.ReadModels.B2B;
 using DUNES.API.ReadModels.Inventory;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.B2B;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Services.Inventory.PickProcess.Queries

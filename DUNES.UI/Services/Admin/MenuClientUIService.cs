@@ -7,14 +7,14 @@ namespace DUNES.UI.Services.Admin
     /// <summary>
     /// Navegation menu
     /// </summary>
-    public class MenuClientService : IMenuClientService
+    public class MenuClientUIService : IMenuClientUIService
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl;
         private readonly IConfiguration _config;
       
 
-        public MenuClientService(IConfiguration config)
+        public MenuClientUIService(IConfiguration config)
         {
             _config = config;
             _baseUrl = _config["ApiSettings:BaseUrl"]!;

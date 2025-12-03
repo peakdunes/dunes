@@ -1,6 +1,6 @@
 ﻿using Azure;
 using DUNES.API.Services.Auth;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;

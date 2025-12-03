@@ -1,5 +1,6 @@
-﻿using DUNES.API.Utils.Responses;
+﻿using DUNES.Shared.Utils.Reponse;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 

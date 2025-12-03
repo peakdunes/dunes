@@ -42,12 +42,21 @@
         Task<bool> DeleteByIdAsync(int id, CancellationToken ct);
 
         /// <summary>
-        /// Get record list for a table by string
+        /// Get record list for a table by string field
         /// </summary>
         /// <param name="fieldName"></param>
         /// <param name="value"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<T> SearchByFieldAsync(string fieldName, string value,CancellationToken ct);
+
+        /// <summary>
+        /// Get record list for a table by int field
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="value"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<T> SearchByIntFieldAsync(string fieldName, int value, CancellationToken ct);
     }
 }

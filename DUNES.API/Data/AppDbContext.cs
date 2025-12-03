@@ -3,6 +3,7 @@ using DUNES.API.Models;
 using DUNES.API.Models.Auth;
 using DUNES.API.Models.B2b;
 using DUNES.API.Models.B2B;
+using DUNES.API.Models.Configuration;
 using DUNES.API.Models.Inventory.ASN;
 using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Inventory.PickProcess;
@@ -295,6 +296,7 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<MvcWebServiceHourlySummary> MvcWebServiceHourlySummary { get; set; }
 
+      
 
         /// <summary>
         /// Configures the database model and relationships using the Fluent API.
@@ -305,6 +307,8 @@ namespace DUNES.API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+          
 
             modelBuilder.Entity<MvcWebServiceDailySummary>(entity =>
             {

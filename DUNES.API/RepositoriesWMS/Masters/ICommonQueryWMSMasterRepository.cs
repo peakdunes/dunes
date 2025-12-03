@@ -10,6 +10,14 @@ namespace DUNES.API.RepositoriesWMS.Masters
     public interface ICommonQueryWMSMasterRepository
     {
 
+
+        /// <summary>
+        /// Get all company information
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<List<Company>> GetAllCompaniesInformation( CancellationToken ct);
+
         /// <summary>
         /// Get all information for a company by id
         /// </summary>

@@ -17,7 +17,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.UI.Services.Inventory.Common
 {
-    public class CommonINVService: ICommonINVService
+    public class CommonINVUIService: ICommonINVUIService
     {
 
         private readonly HttpClient _httpClient;
@@ -25,7 +25,7 @@ namespace DUNES.UI.Services.Inventory.Common
         private readonly IConfiguration _config;
 
 
-        public CommonINVService(IConfiguration config)
+        public CommonINVUIService(IConfiguration config)
         {
             _config = config;
             _baseUrl = _config["ApiSettings:BaseUrl"]!;
@@ -34,6 +34,9 @@ namespace DUNES.UI.Services.Inventory.Common
                 BaseAddress = new Uri(_baseUrl)
             };
         }
+
+
+
 
         public async Task<ApiResponse<List<WMSBinsDto>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct)
         {

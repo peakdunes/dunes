@@ -1,4 +1,4 @@
-﻿using DUNES.API.Utils.Responses;
+﻿
 using DUNES.Shared.Models;
 
 namespace DUNES.API.Services.Masters
@@ -56,5 +56,16 @@ namespace DUNES.API.Services.Masters
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<TDto>> SearchByFieldAsync(string fieldName, string value, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all table records for a int field
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="value"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<TDto>> SearchByIntFieldAsync(string fieldName, int value, CancellationToken ct);
+
     }
 }

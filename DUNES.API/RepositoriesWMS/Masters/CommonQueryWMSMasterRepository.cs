@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.Design;
 
 namespace DUNES.API.RepositoriesWMS.Masters
 {
@@ -23,6 +24,24 @@ namespace DUNES.API.RepositoriesWMS.Masters
             _wmscontext = wmscontext;
             
         }
+
+        /// <summary>
+        /// Get all companies information
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<List<Company>> GetAllCompaniesInformation(CancellationToken ct)
+        {
+            var infocompanylist = await _wmscontext.Company
+                .Include(x => x.IdcountryNavigation)
+                .Include(x => x.IdcityNavigation)
+                .Include(x => x.IdstateNavigation)
+                .ToListAsync(ct);
+
+            return infocompanylist;
+        }
+
+
         /// <summary>
         /// Get all information for a company by id
         /// </summary>
@@ -200,5 +219,6 @@ namespace DUNES.API.RepositoriesWMS.Masters
 
             return infoOrg;
         }
+      
     }
 }

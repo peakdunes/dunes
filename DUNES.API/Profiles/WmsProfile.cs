@@ -42,6 +42,8 @@ namespace DUNES.API.Profiles
             CreateMap<MvcWebServiceHourlySummary, MvcWebServiceHourlySummaryDto>().ReverseMap();
 
             CreateMap<TzebB2bPSoWoHdrTblItemInbConsReqsLog, PickProcessHdrDto>().ReverseMap();
+
+            CreateMap<MvcGeneralParameters, MvcGeneralParametersDto>().ReverseMap();
             
         }
 

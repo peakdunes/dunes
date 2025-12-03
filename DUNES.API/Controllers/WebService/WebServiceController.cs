@@ -41,6 +41,7 @@ namespace DUNES.API.Controllers.WebService
         /// <param name="dateRequest"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
         [HttpGet("calls-by-day-hour/{dateRequest:datetime}")]
         public async Task<IActionResult> GetCallsByDayHour([FromRoute] DateTime dateRequest, CancellationToken ct)
         {
@@ -54,6 +55,8 @@ namespace DUNES.API.Controllers.WebService
         /// <param name="inforecord"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
+        [AllowAnonymous]
         [HttpPost("hourly")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status400BadRequest)]

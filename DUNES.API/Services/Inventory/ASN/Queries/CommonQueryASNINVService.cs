@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using DUNES.API.DTOs.B2B;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using DUNES.Shared.WiewModels.Inventory;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;

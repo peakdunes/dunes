@@ -1,9 +1,10 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Repositories.Auth;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using System.Data;
 using System.Security.Claims;
 

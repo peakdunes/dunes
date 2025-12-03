@@ -1,9 +1,11 @@
 ﻿using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.RepositoriesWMS.Masters;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
+using System.ComponentModel.Design;
 
 namespace DUNES.API.ServicesWMS.Masters
 {
@@ -25,6 +27,41 @@ namespace DUNES.API.ServicesWMS.Masters
             _repository = repository;
         }
 
+
+        /// <summary>
+        /// Get all companies information
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<WMSCompaniesDTO>>> GetAllCompaniesInformation(CancellationToken ct)
+        {
+            var infocompanylist = await _repository.GetAllCompaniesInformation(ct);
+
+            if (infocompanylist.Count <= 0)
+                return ApiResponseFactory.BadRequest<List<WMSCompaniesDTO>>("Companies information not found");
+
+            var dtoList =   infocompanylist.Select(c => new WMSCompaniesDTO
+            {
+
+                 Id = c.Id,
+                CompanyId = c.CompanyId,
+                Name = c.Name,
+                Idcountry = c.Idcountry,
+                Idstate = c.Idstate,
+                Idcity = c.Idcity,
+                Zipcode = c.Zipcode,
+                Address = c.Address,
+                Phone = c.Phone,
+                Website = c.Website,
+                Active = c.Active,
+                CountryName = c.IdcountryNavigation.Name,
+                StateName = c.IdstateNavigation.Name,
+                CityName = c.IdcityNavigation.Name,
+
+            }).ToList();
+
+            return ApiResponseFactory.Ok(dtoList, "OK");
+        }
 
 
         /// <summary>
@@ -275,5 +312,7 @@ namespace DUNES.API.ServicesWMS.Masters
 
             return ApiResponseFactory.Ok(objlist, "OK");
         }
+
+      
     }
 }

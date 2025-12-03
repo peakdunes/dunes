@@ -8,6 +8,7 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
+using DUNES.UI.Services.Print;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Logging;
@@ -25,9 +26,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IPickProcessService _service;
-        private readonly ICommonINVService _CommonINVService;
-
+        private readonly IPickProcessUIService _service;
+        private readonly ICommonINVUIService _CommonINVService;
+        private readonly IPdfService _pdfService;
 
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
@@ -36,13 +37,17 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
 
         public PickProcessController(IHttpClientFactory httpClientFactory, IConfiguration config,
-            IPickProcessService service, ICommonINVService CommonINVService)
+            IPickProcessUIService service, ICommonINVUIService CommonINVService
+            ,
+            IPdfService pdfService
+            )
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
             _service = service;
             _companyDefault = _config.GetValue<int>("companyDefault", 1);
             _CommonINVService = CommonINVService;
+            //_pdfService = pdfService;
 
         }
 
@@ -874,7 +879,37 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             }, ct);
         }
 
-       
-        
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> printPackingList(string infocustref, CancellationToken ct)
+        //{
+
+        //    var token = GetToken();
+        //    if (token == null)
+        //        return RedirectToLogin();
+
+
+        //    return await HandleAsync(async ct =>
+        //    {
+        //        var info = await _service.GetAllTablesOrderRepairCreatedByPickProcessAsync(infocustref, token, ct);
+
+        //        if (info.Error != null)
+        //        {
+
+        //            return new ObjectResult(new { status = info.Error });
+        //        }
+
+        //        if (info.Data == null)
+        //        {
+        //            return new ObjectResult(new { status = "Information not found" });
+        //        }
+
+        //        var infoprint = await _pdfService.GeneratePackingList("hlopez", info.Data, ct);
+
+        //        return Ok(new { status = "OK" });
+        //    }, ct);
+        //}
+
     }
 }

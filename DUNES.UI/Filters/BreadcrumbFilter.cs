@@ -7,9 +7,9 @@ namespace DUNES.UI.Filters
     public class BreadcrumbFilter : IAsyncActionFilter
     {
         private const string SESSION_LEVEL_KEY = "LAST_LEVEL1";
-        private readonly IMenuClientService _menuService;
+        private readonly IMenuClientUIService _menuService;
 
-        public BreadcrumbFilter(IMenuClientService menuService)
+        public BreadcrumbFilter(IMenuClientUIService menuService)
         {
             _menuService = menuService;
         }

@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Services.Inventory.ASN
 {
-    public interface IASNService
+    public interface IASNUIService
     {
         /// <summary>
         /// Get all information (Header and Items Detail for an ASN)

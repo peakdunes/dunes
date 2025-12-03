@@ -5,10 +5,11 @@ using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
+using System.Runtime.CompilerServices;
 
 namespace DUNES.UI.Services.Inventory.Common
 {
-    public interface ICommonINVService
+    public interface ICommonINVUIService
     {
 
 
@@ -20,6 +21,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, string token, CancellationToken ct);
+
 
 
 

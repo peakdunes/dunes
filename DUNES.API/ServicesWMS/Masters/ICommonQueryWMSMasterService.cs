@@ -15,6 +15,15 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <summary>
         /// Get all information for a company by id
         /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<WMSCompaniesDTO>>> GetAllCompaniesInformation( CancellationToken ct);
+
+
+
+        /// <summary>
+        /// Get all information for a company by id
+        /// </summary>
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>

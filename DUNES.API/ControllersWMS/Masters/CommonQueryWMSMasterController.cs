@@ -1,7 +1,7 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ServicesWMS.Masters;
-using DUNES.API.Utils.Responses;
+
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Http;
@@ -29,6 +29,25 @@ namespace DUNES.API.ControllersWMS.Masters
         {
             _commonQueryWMSMasterService = commonQueryWMSMasterService;
         }
+
+        /// <summary>
+        /// get all companies information
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<Company>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("companynies-information")]
+        public async Task<IActionResult> GetAllCompaniesInformation(CancellationToken ct)
+        {
+            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllCompaniesInformation(ct), ct);
+
+
+        }
+
+
+
         /// <summary>
         /// Get all company information for id
         /// </summary>

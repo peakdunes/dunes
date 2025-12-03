@@ -1,10 +1,13 @@
 ﻿using DUNES.UI.Filters;
 using DUNES.UI.Infrastructure;
+using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
+using DUNES.UI.Services.Print;
+using DUNES.UI.Services.WMS.Common;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,11 +40,15 @@ builder.Services.AddControllersWithViews(options =>
 
 
 
-builder.Services.AddScoped<IMenuClientService, MenuClientService>();
-builder.Services.AddScoped<IASNService, ASNService>();
-builder.Services.AddScoped<IPickProcessService, PickProcessService>();
-builder.Services.AddScoped<ICommonINVService, CommonINVService>();
+builder.Services.AddScoped<IMenuClientUIService, MenuClientUIService>();
+builder.Services.AddScoped<IASNUIService, ASNUIService>();
+builder.Services.AddScoped<IPickProcessUIService, PickProcessUIService>();
+builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 
+builder.Services.AddScoped<ICommonWMSUIService, CommonWMSUIService>(); 
+
+builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
+builder.Services.AddScoped<IPdfService, PdfService>();
 
 // Necesario para el fallback de TempData si no hay Controller
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
