@@ -4,9 +4,11 @@ using DUNES.API.Models.Inventory.Common;
 using DUNES.API.Models.Inventory.PickProcess;
 using DUNES.API.Models.Masters;
 using DUNES.API.Models.WebService;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WebService;
+using DUNES.Shared.DTOs.WMS;
 
 namespace DUNES.API.Profiles
 {
@@ -44,7 +46,12 @@ namespace DUNES.API.Profiles
             CreateMap<TzebB2bPSoWoHdrTblItemInbConsReqsLog, PickProcessHdrDto>().ReverseMap();
 
             CreateMap<MvcGeneralParameters, MvcGeneralParametersDto>().ReverseMap();
-            
+
+            CreateMap<Countries , WMSCountriesDTO>().ReverseMap();
+
+            CreateMap<StatesCountries, WMSStatesCountriesDTO>().ReverseMap();
+
+            CreateMap<Cities, WMSCitiesDTO>().ReverseMap();
         }
 
     }

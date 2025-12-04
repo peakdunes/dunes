@@ -2,14 +2,16 @@
 using DUNES.UI.Services.Inventory.PickProcess;
 using DUNES.UI.Services.Print;
 using DUNES.UI.Services.WMS.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DUNES.UI.Controllers.WMS.Masters
+namespace DUNES.UI.Controllers.WMS.Masters.Companies
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class companiesController : BaseController
+   
+    public class companiesUIController : BaseController
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
@@ -20,13 +22,13 @@ namespace DUNES.UI.Controllers.WMS.Masters
               
 
 
-        public companiesController(IHttpClientFactory httpClientFactory, IConfiguration config,
+        public companiesUIController(IHttpClientFactory httpClientFactory, IConfiguration config,
             ICommonWMSUIService service)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
             _service = service;
-            _companyDefault = _config.GetValue<int>("companyDefault", 1);
+            _companyDefault = _config.GetValue("companyDefault", 1);
           
 
         }

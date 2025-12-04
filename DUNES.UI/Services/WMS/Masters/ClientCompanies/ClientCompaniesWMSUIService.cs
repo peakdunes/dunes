@@ -34,7 +34,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
             var json = JsonConvert.SerializeObject(entity);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var respapi = await _httpClient.PostAsync($"api/PickProcessINV/wms-create-client-company",content);
+            var respapi = await _httpClient.PostAsync($"api/ClientCompaniesWMS/wms-create-client-company",content);
 
             return await respapi.ReadAsApiResponseAsync<bool>(ct);
         }

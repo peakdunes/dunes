@@ -8,6 +8,7 @@ using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using DUNES.UI.Services.Print;
 using DUNES.UI.Services.WMS.Common;
+using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,10 @@ builder.Services.AddScoped<IMenuClientUIService, MenuClientUIService>();
 builder.Services.AddScoped<IASNUIService, ASNUIService>();
 builder.Services.AddScoped<IPickProcessUIService, PickProcessUIService>();
 builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
+
+
+builder.Services.AddScoped<IClientCompaniesWMSUIService, ClientCompaniesWMSUIService>();
+
 
 builder.Services.AddScoped<ICommonWMSUIService, CommonWMSUIService>(); 
 

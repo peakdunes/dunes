@@ -16,7 +16,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
 
 
         private readonly IClientCompaniesWMSAPIRepository _repository;
-        private readonly IValidator<WMSClientCompaniesDto> _validator;
+       // private readonly IValidator<WMSClientCompaniesDto> _validator;
 
         /// <summary>
         /// dependency injection
@@ -24,12 +24,12 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="repository"></param>
         /// <param name="validator"></param>
         public ClientCompaniesWMSAPIService(IClientCompaniesWMSAPIRepository repository
-            ,
-            IValidator<WMSClientCompaniesDto> validator
+            //,
+            //IValidator<WMSClientCompaniesDto> validator
             )
         {
             _repository = repository;
-            _validator = validator;
+            //_validator = validator;
         }
 
         /// <summary>
@@ -101,9 +101,11 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<ApiResponse<List<CompanyClient>>> GetAllClientCompaniesInformation(CancellationToken ct)
+        public async Task<ApiResponse<List<CompanyClient>>> GetAllClientCompaniesInformation(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var infocli = await _repository.GetAllClientCompaniesInformationAsync(ct);
+
+            return ApiResponseFactory.Ok(infocli, "");
         }
         /// <summary>
         /// get client company for id

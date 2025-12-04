@@ -30,7 +30,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// contructor dependency injection
         /// </summary>
         /// <param name="service"></param>
-        public ClientCompaniesWMSController(ClientCompaniesWMSAPIService service)
+        public ClientCompaniesWMSController(IClientCompaniesWMSAPIService service)
         {
             
             _service = service;
