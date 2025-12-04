@@ -6,7 +6,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
     /// <summary>
     /// cities repository
     /// </summary>
-    public class CitiesWMSAPIRepository
+    public class CitiesWMSAPIRepository: ICitiesWMSAPIRepository
     {
         private readonly appWmsDbContext _context;
 
@@ -65,7 +65,10 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <exception cref="NotImplementedException"></exception>
         public async Task<List<ModelsWMS.Masters.Cities>> GetActiveAsync(CancellationToken ct)
         {
-            var query = await _context.Cities.Where(x => x.Active == true).ToListAsync();
+            var query = await _context.Cities
+                .Include(x => x.IdcountryNavigation)
+                .Include(x => x.IdstateNavigation)
+                .Where(x => x.Active == true).ToListAsync();
 
             return query;
         }
@@ -78,7 +81,10 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <exception cref="NotImplementedException"></exception>
         public async Task<List<ModelsWMS.Masters.Cities>> GetAllAsync(CancellationToken ct)
         {
-            var query = await _context.Cities.ToListAsync();
+            var query = await _context.Cities
+                .Include(x => x.IdcountryNavigation)
+                .Include(x => x.IdstateNavigation)
+                .ToListAsync();
 
             return query;
         }
@@ -92,7 +98,10 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ModelsWMS.Masters.Cities?> GetByIdAsync(int id, CancellationToken ct)
         {
-            var info = await _context.Cities.FirstOrDefaultAsync(x => x.Id == id);
+            var info = await _context.Cities
+                .Include(x => x.IdcountryNavigation)
+                .Include(x => x.IdstateNavigation)
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             return info;
         }

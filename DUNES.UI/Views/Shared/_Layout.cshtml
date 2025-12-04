@@ -87,7 +87,13 @@
         <div class="container">
             <main role="main" class="pb-3">
                 @await Html.PartialAsync("_UIMsg")   <!-- UI Mensajes globales aquí -->
-                @await Html.PartialAsync("_BreadcrumbPartial", ViewData["Breadcrumb"])
+               @*  @await Html.PartialAsync("_BreadcrumbPartial", ViewData["Breadcrumb"]) *@
+
+                @{
+                    var breadcrumb = ViewData["Breadcrumb"] as List<DUNES.UI.Models.BreadcrumbItem>;
+                }
+
+                @await Html.PartialAsync("_Breadcrumb", breadcrumb)
                 @RenderBody()
             </main>
         </div>

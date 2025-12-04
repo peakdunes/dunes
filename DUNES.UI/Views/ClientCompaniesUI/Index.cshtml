@@ -8,7 +8,8 @@
 <p>
     <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
 </p>
-<table class="table">
+<table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
     <thead>
         <tr>
             <th>
@@ -92,3 +93,58 @@
 }
     </tbody>
 </table>
+@section Scripts {
+
+
+
+
+    <script>
+
+
+        $(document).ready(function(){
+
+            // $('#tablelist').DataTable({
+
+            //     "scrollX":true
+            //  });
+
+              $('#tablelist').DataTable
+                   ({
+                     processing: true,
+                     deferRender: true,
+                     stateSave: true,
+                     autoWidth: false,
+                     scrollX: true, // ✅ Habilita scroll horizontal
+                     responsive: false, // ✅ Evita que se escondan columnas
+                     pageLength: 10,
+
+                     order: [[9, 'desc']],
+
+                     columnDefs: [
+                       { targets: [6], className: 'text-end' },
+                       { targets: 0, orderable: false, searchable: false, className: 'text-center' }, // Desactiva ordenamiento en Actions
+                       { targets: '_all', className: 'align-middle' }
+                     ],
+
+                     dom:
+                       "<'row mb-2'<'col-md-6'l><'col-md-6 text-md-end'f>>" +
+                       "<'row'<'col-12'tr>>" +
+                       "<'row mt-2'<'col-md-5'i><'col-md-7'p>>",
+
+                     language: {
+                       search: "",
+                       searchPlaceholder: "Search...",
+                       lengthMenu: "_MENU_ entries per page",
+                       info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                       infoEmpty: "Showing 0 to 0 of 0 entries",
+                       infoFiltered: "(filtered from _MAX_ total entries)",
+                       zeroRecords: "No data available in table",
+                       paginate: { first: "«", previous: "‹", next: "›", last: "»" }
+                     }
+                   });
+
+        })
+
+
+    </script>
+}

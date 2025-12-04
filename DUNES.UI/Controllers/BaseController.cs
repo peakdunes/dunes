@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.Models;
 using DUNES.UI.Helpers; // Asegúrate de tener este using si usas MessageHelper
+using DUNES.UI.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -65,6 +66,11 @@ namespace DUNES.UI.Controllers
                
                 throw;
             }
+        }
+
+        protected void SetBreadcrumb(params BreadcrumbItem[] items)
+        {
+            ViewData["Breadcrumb"] = items.ToList();
         }
     }
 }

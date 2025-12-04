@@ -1,0 +1,63 @@
+﻿@model List<DUNES.UI.Models.BreadcrumbItem>
+
+@if (Model != null && Model.Any())
+{
+    <div class="dunes-breadcrumb mt-2 mb-3">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var item = Model[i];
+
+            if (item.IsCurrent)
+            {
+                <span class="crumb-current">@item.Text</span>
+            }
+            else
+            {
+                <a class="crumb-link" href="@item.Url">@item.Text</a>
+            }
+
+            @* separador "›" mientras no sea el último *@
+            if (i < Model.Count - 1)
+            {
+                <span class="crumb-separator">›</span>
+            }
+        }
+    </div>
+}
+
+<style>
+    .dunes-breadcrumb {
+        padding: 8px 20px;
+        border-radius: 999px;
+        background-color: #ffffff;
+        box-shadow: 0 0 6px rgba(0,0,0,0.05);
+        font-size: 1rem; /* ← AUMENTADO (antes .9rem) */
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .crumb-link {
+        color: #0056b3; /* azul retroceder */
+        text-decoration: none;
+        margin-right: 4px;
+        font-size: 1rem; /* ← AUMENTADO */
+    }
+
+        .crumb-link:hover {
+            text-decoration: underline;
+        }
+
+    .crumb-current {
+        color: #f6a300; /* amarillo página actual */
+        font-weight: 700;
+        margin-right: 4px;
+        font-size: 1.05rem; /* ← ligeramente más grande para destacar */
+    }
+
+    .crumb-separator {
+        color: #999;
+        margin: 0 6px;
+        font-size: 1rem; /* ← AUMENTADO */
+    }
+</style>
+

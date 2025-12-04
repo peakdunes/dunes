@@ -13,7 +13,7 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
     /// <summary>
     /// cities service
     /// </summary>
-    public class CitiesWMSAPIService
+    public class CitiesWMSAPIService : ICitiesWMSAPIService
     {
 
         private readonly ICitiesWMSAPIRepository _repository;

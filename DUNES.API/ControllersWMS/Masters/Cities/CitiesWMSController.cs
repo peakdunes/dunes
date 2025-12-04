@@ -18,19 +18,19 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
     public class CitiesWMSController : BaseController
     {
       
-        private readonly CitiesWMSAPIService _service;
+        private readonly ICitiesWMSAPIService _service;
 
         /// <summary>
         /// constructor dependency injection
         /// </summary>
         /// <param name="service"></param>
-        public CitiesWMSController(CitiesWMSAPIService service)
+        public CitiesWMSController(ICitiesWMSAPIService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Return all countries
+        /// Return all cities
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
@@ -38,7 +38,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetAllCountriesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetAllCitiesAsync(CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.GetAllAsync(ct),
@@ -46,7 +46,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         }
 
         /// <summary>
-        /// Return all active countries
+        /// Return all active cities
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
@@ -54,7 +54,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetActiveCountriesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetActiveCitiesAsync(CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.GetActiveAsync(ct),
@@ -62,7 +62,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         }
 
         /// <summary>
-        /// Return country information by id
+        /// Return city information by id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="ct"></param>
@@ -71,7 +71,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<WMSCitiesDTO?>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<WMSCitiesDTO?>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetCountryByIdAsync(int id, CancellationToken ct)
+        public async Task<IActionResult> GetCityByIdAsync(int id, CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.GetByIdAsync(id, ct),
@@ -79,7 +79,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         }
 
         /// <summary>
-        /// Create a new country
+        /// Create a new city
         /// </summary>
         /// <param name="model"></param>
         /// <param name="ct"></param>
@@ -88,7 +88,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateCountryAsync([FromBody] WMSCitiesDTO model, CancellationToken ct)
+        public async Task<IActionResult> CreateCityAsync([FromBody] WMSCitiesDTO model, CancellationToken ct)
         {
             // Si tienes [ApiController] y DataAnnotations en el modelo, aquí ya viene validado.
             return await HandleApi(
@@ -97,7 +97,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         }
 
         /// <summary>
-        /// Update country
+        /// Update city
         /// </summary>
         /// <param name="model"></param>
         /// <param name="ct"></param>
@@ -107,7 +107,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateCountryAsync([FromBody] WMSCitiesDTO model, CancellationToken ct)
+        public async Task<IActionResult> UpdateCityAsync([FromBody] WMSCitiesDTO model, CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.UpdateAsync(model, ct),
@@ -115,7 +115,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         }
 
         /// <summary>
-        /// Activate / Deactivate country
+        /// Activate / Deactivate city
         /// </summary>
         /// <param name="id"></param>
         /// <param name="isActive"></param>
@@ -125,7 +125,7 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SetActiveCountryAsync(int id, [FromQuery] bool isActive, CancellationToken ct)
+        public async Task<IActionResult> SetActiveCityAsync(int id, [FromQuery] bool isActive, CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.SetActiveAsync(id, isActive, ct),

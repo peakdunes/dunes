@@ -66,7 +66,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <exception cref="NotImplementedException"></exception>
         public async Task<List<ModelsWMS.Masters.StatesCountries>> GetActiveAsync(CancellationToken ct)
         {
-            var query = await _context.StatesCountries.Where(x => x.Active == true).ToListAsync();
+            var query = await _context.StatesCountries
+                .Include(x => x.IdcountryNavigation)
+                .Where(x => x.Active == true).ToListAsync();
 
             return query;
         }
@@ -79,7 +81,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <exception cref="NotImplementedException"></exception>
         public async Task<List<ModelsWMS.Masters.StatesCountries>> GetAllAsync(CancellationToken ct)
         {
-            var query = await _context.StatesCountries.ToListAsync();
+            var query = await _context.StatesCountries
+                 .Include(x => x.IdcountryNavigation)
+                .ToListAsync();
 
             return query;
         }
@@ -93,7 +97,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ModelsWMS.Masters.StatesCountries?> GetByIdAsync(int id, CancellationToken ct)
         {
-            var info = await _context.StatesCountries.FirstOrDefaultAsync(x => x.Id == id);
+            var info = await _context.StatesCountries.Include(x => x.IdcountryNavigation).FirstOrDefaultAsync(x => x.Id == id);
 
             return info;
         }

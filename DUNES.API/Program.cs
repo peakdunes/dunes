@@ -19,8 +19,11 @@ using DUNES.API.Repositories.WebService.Transactions;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
+using DUNES.API.RepositoriesWMS.Masters.Cities;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
+using DUNES.API.RepositoriesWMS.Masters.Countries;
+using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
@@ -34,7 +37,10 @@ using DUNES.API.Services.WebService.Transactions;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
+using DUNES.API.ServicesWMS.Masters.Cities;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.API.ServicesWMS.Masters.Countries;
+using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
@@ -204,7 +210,13 @@ builder.Services.AddSwaggerGen(c =>
             //WMS MASTERS
             //#########
             "ClientCompaniesWMS" => new[] { "WMS - Client Companies" },
-            
+
+            "StatesCountriesWMS" => new[] { "WMS - States (Countries)" },
+
+            "CitiesWMS" => new[] { "WMS - Cities" },
+
+            "CountriesWMS" => new[] { "WMS - Countries" },
+
 
 
             //#########
@@ -303,8 +315,18 @@ builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterSer
 builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository>();
 
 builder.Services.AddScoped<IClientCompaniesWMSAPIRepository, ClientCompaniesWMSAPIRepository>();
-
 builder.Services.AddScoped<IClientCompaniesWMSAPIService, ClientCompaniesWMSAPIService>();
+
+builder.Services.AddScoped<ICountriesWMSAPIRepository, CountriesWMSAPIRepository>();
+builder.Services.AddScoped<ICountriesWMSAPIService, CountriesWMSAPIService>();
+
+
+builder.Services.AddScoped<IStateCountriesWMSAPIRepository, StateCountriesWMSAPIRepository>();
+builder.Services.AddScoped<IStateCountriesWMSAPIService, StateCountriesWMSAPIService>();
+
+builder.Services.AddScoped<ICitiesWMSAPIRepository, CitiesWMSAPIRepository>();
+builder.Services.AddScoped<ICitiesWMSAPIService, CitiesWMSAPIService>();
+
 
 
 //WEB SERVICE SERVICES

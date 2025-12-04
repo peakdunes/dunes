@@ -9,6 +9,8 @@ using DUNES.UI.Services.Inventory.PickProcess;
 using DUNES.UI.Services.Print;
 using DUNES.UI.Services.WMS.Common;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
+using DUNES.UI.Services.WMS.Masters.Countries;
+using DUNES.UI.Services.WMS.Masters.StatesCountries;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,6 +51,9 @@ builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 
 builder.Services.AddScoped<IClientCompaniesWMSUIService, ClientCompaniesWMSUIService>();
 
+builder.Services.AddScoped<ICountriesWMSUIService, CountriesWMSUIService>();
+
+builder.Services.AddScoped<IStatesCountriesWMSUIService, StatesCountriesWMSUIService>();
 
 builder.Services.AddScoped<ICommonWMSUIService, CommonWMSUIService>(); 
 
