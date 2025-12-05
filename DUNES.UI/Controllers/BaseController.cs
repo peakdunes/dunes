@@ -1,6 +1,7 @@
 ﻿using DUNES.Shared.Models;
 using DUNES.UI.Helpers; // Asegúrate de tener este using si usas MessageHelper
 using DUNES.UI.Models;
+using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -18,6 +19,10 @@ namespace DUNES.UI.Controllers
     /// </summary>
     public class BaseController : Controller
     {
+
+
+
+
         /// <summary>
         /// Obtiene el token JWT almacenado en la sesión.
         /// </summary>
@@ -63,7 +68,7 @@ namespace DUNES.UI.Controllers
             }
             catch
             {
-               
+
                 throw;
             }
         }
@@ -72,5 +77,56 @@ namespace DUNES.UI.Controllers
         {
             ViewData["Breadcrumb"] = items.ToList();
         }
+
+        /// <summary>
+        /// Construye la miga de pan tomando como base un código de menú (01, 0101, etc.)
+        /// y permite agregar items extra al final (por ejemplo Countries, Create, Edit).
+        /// </summary>
+        protected async Task SetMenuBreadcrumbAsync(
+            string menuCode,
+            IMenuClientUIService menuClientService,
+            CancellationToken ct,
+             string token,
+            params BreadcrumbItem[] extraItems)
+        {
+
+            var isCrud = menuCode.Contains("ZZ");   // tu marca para Create/Edit/etc.
+            var newCode = menuCode.Trim();
+
+
+
+            if (isCrud)
+            {
+                // protección por si alguien pasa un código muy corto por error
+                if (menuCode.Length >= 4)
+                {
+                    newCode = menuCode.Substring(0, menuCode.Length - 2);
+                }
+            }
+
+            var breadcrumb = await menuClientService.GetBreadcrumbAsync(token, newCode, ct);
+
+            // Corregimos Home para que apunte bien
+            if (breadcrumb.Count > 0)
+                breadcrumb[0].Url = Url.Action("Index", "Home");
+
+
+
+            if (isCrud && breadcrumb.Count > 0)
+            {
+                // quitamos el último del menú (normalmente el listado)
+                breadcrumb.RemoveAt(breadcrumb.Count - 1);
+            }
+
+            if (extraItems != null && extraItems.Length > 0)
+            {
+                breadcrumb.AddRange(extraItems);
+            }
+
+            
+
+            SetBreadcrumb(breadcrumb.ToArray());
+        }
+
     }
 }

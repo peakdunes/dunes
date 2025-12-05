@@ -9,17 +9,22 @@ namespace DUNES.API.Repositories.Auth
     /// </summary>
     public interface IMenuRepository
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
 
         /// <summary>
-        /// 
+        /// get all menu options for create navegation scrum
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<List<MenuItemDto>> GetAllMenusAsync(CancellationToken ct);
+
+
+
+        /// <summary>
+        /// get all menu for rol
         /// </summary>
         /// <param name="userRoles"></param>
         /// <param name="ct"></param>
-        /// <returns>List of MenuItemDto with flat structure (not hierarchical yet).</returns>
+        /// <returns></returns>
         Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles, CancellationToken ct);
 
         /// <summary>

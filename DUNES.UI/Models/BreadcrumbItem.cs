@@ -4,10 +4,19 @@
     /// <summary>
     /// Navegation Menu
     /// </summary>
+    ///          
     public class BreadcrumbItem
     {
-        public string Text { get; set; } = null!;
-        public string? Url { get; set; }   // null = es la página actual (amarillo)
-        public bool IsCurrent => string.IsNullOrEmpty(Url);
+        public string Text { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Si Url es null, se considera el item actual (activo).
+        /// </summary>
+        public string? Url { get; set; }
+
+        /// <summary>
+        /// True cuando es la página actual (no tiene URL).
+        /// </summary>
+        public bool IsActive => string.IsNullOrWhiteSpace(Url);
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,10 +39,17 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// ISO Country Code is required
         /// </summary>
-        [Required(ErrorMessage = "ISO Country Code is required.")]
-        [MaxLength(5, ErrorMessage = "ISO Country Code cannot exceed 5 characters.")]
-        [Display(Name = "ISO Country Code")]
+        [Required(ErrorMessage = "ISO State Code is required.")]
+        [MaxLength(5, ErrorMessage = "ISO State Code cannot exceed 5 characters.")]
+        [Display(Name = "ISO State Code")]
         public string? Sigla { get; set; }
 
+
+
+        /// <summary>
+        /// Navigation property for the related City entity.
+        /// Allows access to full Bines details for this record.
+        /// </summary>
+        public virtual WMSCountriesDTO IdcountryNavigation { get; set; } = null!;
     }
 }

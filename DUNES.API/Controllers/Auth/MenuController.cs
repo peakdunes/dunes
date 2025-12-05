@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Security.Claims;
 
 namespace DUNES.API.Controllers.Auth
@@ -117,6 +118,16 @@ namespace DUNES.API.Controllers.Auth
             return await HandleApi(ct => _menuService.GetCodeByControllerAction(controller, action, ct), ct);
 
                        
+        }
+        /// <summary>
+        /// Get all active options menu
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            return await HandleApi(ct => _menuService.GetAllMenusAsync(ct), ct);
         }
     }
 }

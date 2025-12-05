@@ -20,7 +20,7 @@ namespace DUNES.UI.Services.WMS.Masters.Countries
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCountriesDTO>> GetCountryInformationByIdentificationAsync(string countryid, string token, CancellationToken ct);
+        Task<ApiResponse<bool>> GetCountryInformationByIdentificationAsync(string countryid, int? excludeId, string token, CancellationToken ct);
 
 
         /// <summary>

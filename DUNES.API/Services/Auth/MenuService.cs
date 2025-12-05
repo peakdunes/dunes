@@ -5,6 +5,8 @@ using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Data;
 using System.Security.Claims;
 
@@ -200,6 +202,29 @@ namespace DUNES.API.Services.Auth
             }
         
         }
-              
+        /// <summary>
+        /// get all active options menu
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<List<MenuItemDto>>> GetAllMenusAsync(CancellationToken ct)
+        {
+            var MenuInfo = await _repository.GetAllMenusAsync(ct);
+
+
+            if (MenuInfo == null)
+            {
+
+                return ApiResponseFactory.NotFound<List<MenuItemDto>>("Information Not found");
+
+
+            }
+            else
+            {
+
+                return ApiResponseFactory.Ok(MenuInfo, "OK");
+            }
+        }
     }
 }

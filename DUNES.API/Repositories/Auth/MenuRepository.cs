@@ -162,7 +162,37 @@ namespace DUNES.API.Repositories.Auth
                     previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code ?? string.Empty
                 };
         }
+        /// <summary>
+        /// return all active options menu
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<List<MenuItemDto>> GetAllMenusAsync(CancellationToken ct)
+        {
+            var menus = await _context.MvcPartRunnerMenu
+              .Where(m => m.Active == true)
+              .OrderBy(m => m.Order)
+              .ToListAsync(ct); // ejecuta la query en SQL
 
-      
+            var menu2 = menus
+                 .Select(m => new MenuItemDto
+                 {
+                     Code = m.Code ?? string.Empty,
+                     Title = m.Title ?? string.Empty,
+                     Utility = m.Utility ?? string.Empty,
+                     Controller = m.Controller ?? string.Empty,
+                     Action = m.Action ?? string.Empty,
+                     Roles = m.Roles ?? string.Empty,
+                     Active = m.Active,
+                     Order = m.Order,
+                     previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2
+                         ? m.Code.Substring(0, m.Code.Length - 2)
+                         : string.Empty  
+
+                 })
+                 .ToList();
+
+            return menu2;
+        }
     }
 }

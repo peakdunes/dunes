@@ -60,9 +60,17 @@ namespace DUNES.UI.Services.WMS.Masters.Countries
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<WMSCountriesDTO>> GetCountryInformationByIdentificationAsync(string countryid, string token, CancellationToken ct)
+        public async Task<ApiResponse<bool>> GetCountryInformationByIdentificationAsync(string countryid, int? excludeId, string token, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            var nameEncoded = Uri.EscapeDataString(countryid);
+
+            resp = await _httpClient.GetAsync($"/api/CountriesWMS/country-by-name?name={nameEncoded}&excludeId={excludeId}");
+
+            return await resp.ReadAsApiResponseAsync<bool>(ct);
         }
 
         public Task<ApiResponse<bool>> UpdateCountryAsync(WMSCountriesDTO entity, string token, CancellationToken ct)

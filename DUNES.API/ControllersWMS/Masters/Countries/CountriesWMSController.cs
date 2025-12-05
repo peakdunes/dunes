@@ -77,6 +77,25 @@ namespace DUNES.API.ControllersWMS.Masters.Countries
                 ct);
         }
 
+
+        /// <summary>
+        /// Return country information by id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="exluideId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("country-by-name")]
+        [ProducesResponseType(typeof(ApiResponse<WMSCountriesDTO?>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WMSCountriesDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetCountryByNameAsync([FromQuery] string name, [FromQuery] int? exluideId, CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.ExistsByNameAsync(name, exluideId, ct),
+                ct);
+        }
+
         /// <summary>
         /// Create a new country
         /// </summary>

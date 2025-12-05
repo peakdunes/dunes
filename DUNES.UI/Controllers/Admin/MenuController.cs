@@ -1,6 +1,7 @@
 ﻿using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
+using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.Eventing.Reader;
@@ -10,7 +11,7 @@ using System.Text.Json;
 
 namespace DUNES.UI.Controllers.Admin
 {
-    public class MenuController : Controller
+    public class MenuController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
         public readonly IConfiguration _config;
@@ -23,10 +24,10 @@ namespace DUNES.UI.Controllers.Admin
             _menuClientService = menuClientService;
         }
 
-       
+
 
         [HttpGet("Menu/Level/{level1}")]
-        public async Task<IActionResult> Level(string level1)
+        public async Task<IActionResult> Level(string level1, CancellationToken ct)
         {
             string menuCode = level1;
 
@@ -41,14 +42,17 @@ namespace DUNES.UI.Controllers.Admin
             }
 
             var token = HttpContext.Session.GetString("JWToken");
-            
+
             if (token == null)
             {
 
                 MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
 
-                return RedirectToAction("Index","Home"); // regresar a la misma vista
+                return RedirectToAction("Index", "Home"); // regresar a la misma vista
             }
+
+
+
 
             var baseUrl = _config["ApiSettings:BaseUrl"];
 
@@ -57,13 +61,22 @@ namespace DUNES.UI.Controllers.Admin
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
-            //se busca la opcion de menu para la barra de navegacion
+            //navegation menu
 
-            var breadcrumb = await _menuClientService.GetBreadcrumbAsync(menuCode, token);
+            var breadcrumb = await _menuClientService.GetBreadcrumbAsync(token, level1, ct);
+            breadcrumb[0].Url = Url.Action("Index", "Home"); // corrige Home
+            SetBreadcrumb(breadcrumb.ToArray());
 
-            ViewData["Breadcrumb"] = breadcrumb;
 
-            //fin  la barra de navegacion
+            //end navegation menu
+
+            ////se busca la opcion de menu para la barra de navegacion
+
+            //var breadcrumb = await _menuClientService.GetBreadcrumbAsync(menuCode, token);
+
+            //ViewData["Breadcrumb"] = breadcrumb;
+
+            ////fin  la barra de navegacion
 
 
             // Ahora usamos el parámetro level1, no "01" fijo

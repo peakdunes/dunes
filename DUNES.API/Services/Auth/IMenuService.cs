@@ -45,5 +45,16 @@ namespace DUNES.API.Services.Auth
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<ApiResponse<MenuItemDto>> GetCodeByControllerAction(string controller, string action, CancellationToken ct);
+
+
+        /// <summary>
+        /// get all active menu option
+        /// </summary>
+      
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<MenuItemDto>>> GetAllMenusAsync(CancellationToken ct);
+
+        
     }
 }

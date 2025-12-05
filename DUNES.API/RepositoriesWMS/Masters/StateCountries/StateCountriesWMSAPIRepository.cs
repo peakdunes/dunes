@@ -82,6 +82,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         public async Task<List<ModelsWMS.Masters.StatesCountries>> GetAllAsync(CancellationToken ct)
         {
             var query = await _context.StatesCountries
+                .Include(x => x.IdcountryNavigation)
                  .Include(x => x.IdcountryNavigation)
                 .ToListAsync();
 

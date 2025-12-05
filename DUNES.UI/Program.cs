@@ -1,4 +1,4 @@
-﻿using DUNES.UI.Filters;
+﻿
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
@@ -24,14 +24,12 @@ var builder = WebApplication.CreateBuilder(args);
 //Filtro para mostrar los avisos informations
 //builder.Services.AddScoped<TransferMiddlewareMessagesFilter>();
 
-//filtro para cargar el menu de navegacion
-builder.Services.AddScoped<BreadcrumbFilter>();
+
 
 // MVC con filtros globales
 builder.Services.AddControllersWithViews(options =>
 {
-   // options.Filters.Add<TransferMiddlewareMessagesFilter>();
-    options.Filters.AddService<BreadcrumbFilter>();
+
 
     options.Filters.Add<UiExceptionFilter>(); // ← registro global de exepciones
 });
