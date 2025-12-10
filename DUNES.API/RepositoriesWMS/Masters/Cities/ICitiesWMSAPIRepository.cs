@@ -12,15 +12,17 @@
         /// get all cities
         /// </summary>
         /// <param name="ct"></param>
+        /// <param name="countryid"></param>
         /// <returns></returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Cities>> GetAllAsync(CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Cities>> GetAllAsync(int countryid, CancellationToken ct);
 
         /// <summary>
         /// get all active cities
         /// </summary>
         /// <param name="ct"></param>
+        /// <param name="countryid"></param>
         /// <returns></returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Cities>> GetActiveAsync(CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Cities>> GetActiveAsync(int countryid, CancellationToken ct);
 
         /// <summary>
         /// get city by id
@@ -33,11 +35,12 @@
         /// <summary>
         /// exist city by id
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="name"></param>
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct);
+        Task<bool> ExistsByNameAsync(int countryid, string name, int? excludeId, CancellationToken ct);
 
         /// <summary>
         /// add new city

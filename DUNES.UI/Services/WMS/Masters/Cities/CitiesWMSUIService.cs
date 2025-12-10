@@ -41,23 +41,23 @@ namespace DUNES.UI.Services.WMS.Masters.Cities
             throw new NotImplementedException();
         }
 
-        public async Task<ApiResponse<List<WMSCitiesDTO>>> GetAllCitiesInformation(string token, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSCitiesReadDTO>>> GetAllCitiesInformation(int countryid,string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             HttpResponseMessage resp;
 
-            resp = await _httpClient.GetAsync($"/api/CitiesWMS/all-countries");
+            resp = await _httpClient.GetAsync($"/api/CitiesWMS/all-cities/{countryid}");
 
-            return await resp.ReadAsApiResponseAsync<List<WMSCitiesDTO>>(ct);
+            return await resp.ReadAsApiResponseAsync<List<WMSCitiesReadDTO>>(ct);
         }
 
-        public Task<ApiResponse<WMSCitiesDTO>> GetCityInformationByIdAsync(int Id, string token, CancellationToken ct)
+        public Task<ApiResponse<WMSCitiesReadDTO>> GetCityInformationByIdAsync(int Id, string token, CancellationToken ct)
         {
             throw new NotImplementedException();
         }
 
-        public Task<ApiResponse<WMSCitiesDTO>> GetCityInformationByIdentificationAsync(string countryid, string token, CancellationToken ct)
+        public Task<ApiResponse<WMSCitiesReadDTO>> GetCityInformationByIdentificationAsync(string countryid, string token, CancellationToken ct)
         {
             throw new NotImplementedException();
         }

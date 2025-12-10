@@ -1,4 +1,6 @@
 ﻿using DUNES.API.Data;
+using DUNES.Shared.DTOs.WMS;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
@@ -24,49 +26,80 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <summary>
         /// add new state
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="dto"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public async Task<ModelsWMS.Masters.StatesCountries> CreateAsync(ModelsWMS.Masters.StatesCountries entity, CancellationToken ct)
+        public async Task<WMSStatesCountriesDTO> CreateAsync(WMSStatesCountriesDTO dto, CancellationToken ct)
         {
+
+            var entity = new DUNES.API.ModelsWMS.Masters.StatesCountries
+            {
+                Idcountry = dto.Idcountry,
+                Name = dto.Name!.Trim(),
+                Active = dto.Active,
+                Sigla = dto.Sigla
+
+            };
+
             _context.StatesCountries.Add(entity);
             await _context.SaveChangesAsync();
-            return entity;
+            return dto;
         }
-
         /// <summary>
-        /// exist state name
+        /// exist by ISO Code
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="countryid"></param>
+        /// <param name="isocode"></param>
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct)
+        public async Task<ModelsWMS.Masters.StatesCountries?> ExistsByISOCodeAsync(int countryid, string isocode, int? excludeId, CancellationToken ct)
         {
-            var query = _context.StatesCountries.AsNoTracking().Where(x => x.Name == name);
+            var query = _context.StatesCountries.AsNoTracking().Where(x => x.Idcountry == countryid && x.Sigla == isocode);
 
             if (excludeId.HasValue)
             {
                 query = query.Where(x => x.Id != excludeId.Value);
             }
 
-            return await query.AnyAsync(ct);
+            return await query.FirstOrDefaultAsync(ct);
+        }
 
+        /// <summary>
+        /// exist state name
+        /// </summary>
+        /// <param name="countryid"></param>
+        /// <param name="name"></param>
+        /// <param name="excludeId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ModelsWMS.Masters.StatesCountries?> ExistsByNameAsync(int countryid, string name, int? excludeId, CancellationToken ct)
+        {
+            var query = _context.StatesCountries.AsNoTracking().Where(x => x.Idcountry == countryid && x.Name == name);
 
+            if (excludeId.HasValue)
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
+
+           
+
+            return await query.FirstOrDefaultAsync(ct);
         }
 
         /// <summary>
         /// get all active states
         /// </summary>
         /// <param name="ct"></param>
+        /// <param name="countryid"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.StatesCountries>> GetActiveAsync(CancellationToken ct)
+        public async Task<List<ModelsWMS.Masters.StatesCountries>> GetActiveAsync(int countryid, CancellationToken ct)
         {
-            var query = await _context.StatesCountries
+            var query = await _context.StatesCountries.Where(x => x.Idcountry == countryid)
                 .Include(x => x.IdcountryNavigation)
                 .Where(x => x.Active == true).ToListAsync();
 
@@ -76,12 +109,13 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <summary>
         /// get all states
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.StatesCountries>> GetAllAsync(CancellationToken ct)
+        public async Task<List<ModelsWMS.Masters.StatesCountries>> GetAllAsync(int countryid, CancellationToken ct)
         {
-            var query = await _context.StatesCountries
+            var query = await _context.StatesCountries.Where(x => x.Idcountry == countryid)
                 .Include(x => x.IdcountryNavigation)
                  .Include(x => x.IdcountryNavigation)
                 .ToListAsync();
@@ -96,7 +130,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.StateCountries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ModelsWMS.Masters.StatesCountries?> GetByIdAsync(int id, CancellationToken ct)
+        public async Task<ModelsWMS.Masters.StatesCountries?> GetByIdAsync( int id, CancellationToken ct)
         {
             var info = await _context.StatesCountries.Include(x => x.IdcountryNavigation).FirstOrDefaultAsync(x => x.Id == id);
 

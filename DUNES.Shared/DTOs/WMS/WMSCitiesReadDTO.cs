@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.WMS
 {
-    public class WMSStatesCountriesDTO
+    public class WMSCitiesReadDTO
     {
         /// <summary>
         /// internal id
@@ -22,15 +19,22 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         /// 
         [Required(ErrorMessage = "Country is required.")]
-        [Display(Name = "Country ID")]
+        [Display(Name = "Country Id")]
         public int Idcountry { get; set; }
 
         /// <summary>
-        /// state name
+        /// state id
+        /// </summary>
+        [Required(ErrorMessage = "State is required.")]
+        [Display(Name = "State Id")]
+        public int Idstate { get; set; }
+
+        /// <summary>
+        /// city name
         /// </summary>
         [Required(ErrorMessage = "Name is required.")]
         [MaxLength(200, ErrorMessage = "Name cannot exceed 200 characters.")]
-        [Display(Name = "State Name")]
+        [Display(Name = "City Name")]
         public string? Name { get; set; }
 
         /// <summary>
@@ -38,16 +42,20 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         public bool Active { get; set; }
 
+
         /// <summary>
-        /// ISO Country Code is required
+        /// Navigation property for the related City entity.
+        /// Allows access to full Bines details for this record.
         /// </summary>
-        [Required(ErrorMessage = "ISO State Code is required.")]
-        [MaxLength(5, ErrorMessage = "ISO State Code cannot exceed 5 characters.")]
-        [Display(Name = "ISO State Code")]
-        public string? Sigla { get; set; }
+
+        public virtual WMSCountriesDTO IdcountryNavigation { get; set; } = null!;
 
 
+        /// <summary>
+        /// Navigation property for the related City entity.
+        /// Allows access to full Bines details for this record.
+        /// </summary>
 
-      
+        public virtual WMSStatesCountriesDTO IdstateNavigation { get; set; } = null!;
     }
 }

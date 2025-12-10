@@ -4,77 +4,223 @@
     ViewData["Title"] = "Create";
 }
 
+<form asp-action="Create">
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
+    <div class="row">
+
+        <div class="col-md-2">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Id" class="control-label"></label>
-                <input asp-for="Id" class="form-control" />
-                <span asp-validation-for="Id" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="CompanyId" class="control-label"></label>
                 <input asp-for="CompanyId" class="form-control" />
                 <span asp-validation-for="CompanyId" class="text-danger"></span>
             </div>
+        </div>
+
+        <div class="col-md-4">
+
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Idcountry" class="control-label"></label>
-                <input asp-for="Idcountry" class="form-control" />
-                <span asp-validation-for="Idcountry" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Idstate" class="control-label"></label>
-                <input asp-for="Idstate" class="form-control" />
-                <span asp-validation-for="Idstate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Idcity" class="control-label"></label>
-                <input asp-for="Idcity" class="form-control" />
-                <span asp-validation-for="Idcity" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Zipcode" class="control-label"></label>
-                <input asp-for="Zipcode" class="form-control" />
-                <span asp-validation-for="Zipcode" class="text-danger"></span>
-            </div>
+        </div>
+        <div class="col-md-6">
             <div class="form-group">
                 <label asp-for="Address" class="control-label"></label>
                 <input asp-for="Address" class="form-control" />
                 <span asp-validation-for="Address" class="text-danger"></span>
             </div>
+        </div>
+    
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idcountry" class="control-label"></label>
+                <select asp-for="Idcountry" class="form-control" asp-items="@ViewBag.listcountries">
+                    <option value="0" selected disabled>Select Country</option>
+                </select>
+                <span asp-validation-for="Idcountry" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idstate" class="control-label"></label>
+                <select asp-for="Idstate" class="form-control" id="Idstate" disabled>
+                    <option value="0">Select State</option>
+                </select>
+                <span asp-validation-for="Idstate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idcity" class="control-label"></label>
+                <select asp-for="Idcity" class="form-control" id="Idcity" disabled>
+                    <option value="0">Select City</option>
+                </select>
+                <span asp-validation-for="Idcity" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Zipcode" class="control-label"></label>
+                <input asp-for="Zipcode" class="form-control" />
+                <span asp-validation-for="Zipcode" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
             <div class="form-group">
                 <label asp-for="Phone" class="control-label"></label>
                 <input asp-for="Phone" class="form-control" />
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
+        </div>
+
+        <div class="col-md-4">
             <div class="form-group">
                 <label asp-for="Website" class="control-label"></label>
                 <input asp-for="Website" class="form-control" />
                 <span asp-validation-for="Website" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+        </div>
+
+     @*    <div class="form-group form-check col-md-2">
+            <label class="form-check-label mt-4">
+                <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+            </label>
+        </div> *@
+
+        <div class="form-group col-md-1">
+            <div class="form-check mt-4">
+                <input class="form-check-input" checked="checked" asp-for="Active" />
+                <label class="form-check-label" asp-for="Active">
+                    @Html.DisplayNameFor(model => model.Active)
                 </label>
             </div>
+        </div>
+
+
+
+
+
+
+
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-4">
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<div>
+</form>
+<div class="mt-2">
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const countrySelect = document.getElementById('Idcountry');
+            const stateSelect = document.getElementById('Idstate');
+            const citySelect = document.getElementById('Idcity');
+
+            function clearSelect(select, placeholder) {
+                select.innerHTML = '';
+                const opt = document.createElement('option');
+                opt.value = '';
+                opt.textContent = placeholder;
+                select.appendChild(opt);
+            }
+
+            // When country changes → load states
+            countrySelect.addEventListener('change', function () {
+                const countryId = this.value;
+
+                // Reset state & city
+                clearSelect(stateSelect, 'Select State');
+                clearSelect(citySelect, 'Select City');
+                stateSelect.disabled = true;
+                citySelect.disabled = true;
+
+                if (!countryId) {
+                    return;
+                }
+
+                fetch(`@Url.Action("GetStatesByCountry", "ClientCompaniesUI")?countryId=${countryId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error loading states');
+                        }
+                        return response.json();
+                    })
+                    .then(states => {
+                        if (states.length === 0) {
+                            return;
+                        }
+
+                        states.forEach(s => {
+                            const opt = document.createElement('option');
+                            opt.value = s.id;
+                            opt.textContent = s.name;
+                            stateSelect.appendChild(opt);
+                        });
+
+                        stateSelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+
+            // When state changes → load cities
+            stateSelect.addEventListener('change', function () {
+                const stateId = this.value;
+
+                const countryId = $('#Idcountry').val();
+                clearSelect(citySelect, 'Select City');
+                citySelect.disabled = true;
+
+                if (!stateId) {
+                    return;
+                }
+
+                fetch(`@Url.Action("GetCitiesByState", "ClientCompaniesUI")?stateId=${stateId}&countryId=${countryId}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error loading cities');
+                        }
+                        return response.json();
+                    })
+                    .then(cities => {
+                        if (cities.length === 0) {
+                            return;
+                        }
+
+                        cities.forEach(c => {
+                            const opt = document.createElement('option');
+                            opt.value = c.id;
+                            opt.textContent = c.name;
+                            citySelect.appendChild(opt);
+                        });
+
+                        citySelect.disabled = false;
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            });
+        });
+    </script>
+
+
 }

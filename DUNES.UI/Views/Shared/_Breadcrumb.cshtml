@@ -14,12 +14,14 @@
             else
             {
                 <a class="crumb-link" href="@item.Url">@item.Text</a>
+    
+                <span class="crumb-separator">></span>
             }
 
             @* separador "›" mientras no sea el último *@
             if (i < Model.Count - 1)
             {
-                <span class="crumb-separator">›</span>
+                <span class="crumb-separator"></span>
             }
         }
     </div>
@@ -56,7 +58,8 @@
 
     .crumb-separator {
         color: #999;
-        margin: 0 6px;
+        /*margin: 0 6px;*/
+        margin: 2px;
         font-size: 1rem; /* ← AUMENTADO */
     }
 </style>

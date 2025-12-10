@@ -8,9 +8,10 @@ namespace DUNES.UI.Services.WMS.Masters.Cities
         /// <summary>
         /// Get all cities  information
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCitiesDTO>>> GetAllCitiesInformation(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSCitiesReadDTO>>> GetAllCitiesInformation(int countryid, string token, CancellationToken ct);
 
         /// <summary>
         /// Get city by country name
@@ -18,7 +19,7 @@ namespace DUNES.UI.Services.WMS.Masters.Cities
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCitiesDTO>> GetCityInformationByIdentificationAsync(string entityid, string token, CancellationToken ct);
+        Task<ApiResponse<WMSCitiesReadDTO>> GetCityInformationByIdentificationAsync(string entityid, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -27,7 +28,7 @@ namespace DUNES.UI.Services.WMS.Masters.Cities
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCitiesDTO>> GetCityInformationByIdAsync(int Id, string token, CancellationToken ct);
+        Task<ApiResponse<WMSCitiesReadDTO>> GetCityInformationByIdAsync(int Id, string token, CancellationToken ct);
 
 
         /// <summary>

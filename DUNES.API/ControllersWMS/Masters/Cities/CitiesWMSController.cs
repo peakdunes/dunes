@@ -32,32 +32,35 @@ namespace DUNES.API.ControllersWMS.Masters.Cities
         /// <summary>
         /// Return all cities
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
+        /// 
         /// <returns></returns>
-        [HttpGet("all-cities")]
+        [HttpGet("all-cities/{countryid}")]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetAllCitiesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetAllCitiesAsync(int countryid, CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetAllAsync(ct),
+                ct => _service.GetAllAsync(countryid, ct),
                 ct);
         }
 
         /// <summary>
         /// Return all active cities
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [HttpGet("active-cities")]
+        [HttpGet("active-cities/{countryid}")]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSCitiesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetActiveCitiesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetActiveCitiesAsync(int countryid, CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetActiveAsync(ct),
+                ct => _service.GetActiveAsync(countryid, ct),
                 ct);
         }
 

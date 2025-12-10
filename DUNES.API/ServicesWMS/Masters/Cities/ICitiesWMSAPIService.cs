@@ -12,15 +12,17 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// get all cities
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCitiesDTO>>> GetAllAsync(CancellationToken ct);
+        Task<ApiResponse<List<WMSCitiesReadDTO>>> GetAllAsync(int countryid, CancellationToken ct);
         /// <summary>
         /// get all active cities
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCitiesDTO>>> GetActiveAsync(CancellationToken ct);
+        Task<ApiResponse<List<WMSCitiesReadDTO>>> GetActiveAsync(int countryid, CancellationToken ct);
 
         /// <summary>
         /// get city by id
@@ -28,7 +30,7 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCitiesDTO?>> GetByIdAsync(int id, CancellationToken ct);
+        Task<ApiResponse<WMSCitiesReadDTO?>> GetByIdAsync(int id, CancellationToken ct);
 
         /// <summary>
         /// add new city
@@ -52,7 +54,7 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// validate if exists a city with the same name
         /// </summary>
-        Task<ApiResponse<bool>> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct);
+        Task<ApiResponse<bool>> ExistsByNameAsync(int countryid, string name, int? excludeId, CancellationToken ct);
 
     }
 }

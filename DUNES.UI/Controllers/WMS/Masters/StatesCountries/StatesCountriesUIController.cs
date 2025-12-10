@@ -1,4 +1,5 @@
-﻿using DUNES.Shared.Models;
+﻿using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
@@ -8,6 +9,9 @@ using Humanizer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
+using NuGet.Common;
+using System.Xml;
 
 namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
 {
@@ -38,7 +42,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
         }
 
         // GET: StatesCountriesUIController
-        public async Task<IActionResult> Index(CancellationToken ct)
+        public async Task<IActionResult> Index(int? countryId, CancellationToken ct)
         {
             var token = GetToken();
 
@@ -55,11 +59,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
                Url = null
            });
 
+            if (countryId == null)
+            {
+                countryId = 0;
+            }
+
             return await HandleAsync(async ct =>
             {
-                var listcountries = await _service.GetAllStatesCountryInformation(token, ct);
+                await LoadInfoAsync(token, ct, 0);
 
-                return View(listcountries.Data);
+                var liststates = await _service.GetAllStatesCountryInformation(Convert.ToInt32(countryId), token, ct);
+
+                return View(liststates.Data ?? new List<WMSStatesCountriesReadDTO>());
 
             }, ct);
         }
@@ -70,6 +81,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
             return View();
         }
 
+       
         // GET: StatesCountriesUIController/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
@@ -85,34 +97,77 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
                     Url = null
                 });
 
-           var listcountries = await  _countryService.GetAllCountriesInformation(token, ct);
-
-            if (listcountries.Data == null || listcountries.Data.Count <= 0)
-            {
-                MessageHelper.SetMessage(this, "danger", "Country Name already exist", MessageDisplay.Inline);
-                return View();
-            }
-
-            var listactives = listcountries.Data.Where(x => x.Active == true).ToList();
-
-            ViewBag.listcountries = new SelectList(listactives,"Id","Name");
-
+            await LoadInfoAsync(token, ct, 0);
+            
             return View();
         }
 
         // POST: StatesCountriesUIController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+
+        public async Task<IActionResult> Create(WMSStatesCountriesDTO dto, CancellationToken ct)
         {
-            try
+
+
+            var token = GetToken();
+
+            if (token == null)
+                return RedirectToLogin();
+
+
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, token,
+            new BreadcrumbItem
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                Text = "New State",
+                Url = null
+            });
+
+            return await HandleAsync(async ct =>
+                {
+                    var infostate = await _service.GetStateCountryInformationByIdentificationAsync(dto.Idcountry, dto.Name!.Trim(), token, ct);
+
+                    if (infostate.Data != null)
+                    {
+                        MessageHelper.SetMessage(this, "danger", infostate.Message.Trim(), MessageDisplay.Inline);
+
+                        await LoadInfoAsync(token, ct, dto.Idcountry);
+                        
+                        return View(dto);
+                    }
+
+                    var infostateiso = await _service.GetStateCountryInformationByISOCodeAsync(dto.Idcountry, dto.Sigla!.Trim(), token, ct);
+
+                    if (infostateiso.Data != null)
+                    {
+                        MessageHelper.SetMessage(this, "danger", infostateiso.Message.Trim(), MessageDisplay.Inline);
+
+                        await LoadInfoAsync(token, ct, dto.Idcountry);
+
+                        return View(dto);
+                    }
+
+                    var createrecord = await _service.AddStateCountryAsync(dto, token, ct);
+
+                    if (!createrecord.Data)
+                    {
+                        MessageHelper.SetMessage(this, "danger", $"Error creating this country Error:{createrecord.Message}", MessageDisplay.Inline);
+
+                        await LoadInfoAsync(token, ct, dto.Idcountry);
+
+                        return View(dto);
+                    }
+
+                    MessageHelper.SetMessage(this, "success", $"Country created", MessageDisplay.Inline);
+
+
+                    return RedirectToAction(nameof(Index));
+                }, ct);
+
+
+
+
+
         }
 
         // GET: StatesCountriesUIController/Edit/5
@@ -155,6 +210,27 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
             {
                 return View();
             }
+        }
+
+
+        private async Task LoadInfoAsync(string token, CancellationToken ct, int idselected)
+        {
+
+            var listcountries = await _countryService.GetAllCountriesInformation(token, ct);
+
+            var data = listcountries.Data ?? new List<WMSCountriesDTO>();
+
+            var listactives = data.Where(x => x.Active == true).ToList();
+
+            if (idselected == 0)
+            {
+                ViewBag.listcountries = new SelectList(listactives, "Id", "Name");
+            }
+            else
+            {
+                ViewBag.listcountries = new SelectList(listactives, "Id", "Name", idselected);
+            }
+
         }
     }
 }

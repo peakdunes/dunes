@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSStatesCountriesDTO>
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSStatesCountriesReadDTO>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,64 +7,94 @@
 <p>
     <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
 </p>
-<table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
 
-    <thead>
-        <tr>
-            <th>Actions</th>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sigla)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-              <th>
-                @Html.DisplayNameFor(model => model.Idcountry)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdcountryNavigation.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Active)
-            </th>
+<div class="row">
+    @using (Html.BeginForm("Index", "StatesCountriesUI", FormMethod.Get))
+    {
 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Country </label>
+
+                @Html.DropDownList(
+                "countryId",
+                (SelectList)ViewBag.ListCountries,
+                "-- Select Country --",
+                new {
+                    @class = "form-control",
+                    onchange = "this.form.submit();"
+            })
+
+            </div>
+        </div>
+    }
+</div>
+<div class="row">
+    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+        <thead>
             <tr>
-                <td>
-                    <a href="#" onclick="openmodal(@item.Id)"><i class="fas fa-pencil-alt"></i></a> |
-                    <a href="#" onclick="editcompany(@item.Id)"><i class="fas fa-trash-alt"></i></a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Id)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Sigla)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Idcountry)
-                </td>
-
-                <td>
-                    @Html.DisplayFor(modelItem => item.IdcountryNavigation.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Active)
-                </td>
+                <th>Actions</th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Sigla)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Idcountry)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.IdcountryNavigation.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Active)
+                </th>
 
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <a href="#" onclick="openmodal(@item.Id)"><i class="fas fa-pencil-alt"></i></a> |
+                            <a href="#" onclick="editcompany(@item.Id)"><i class="fas fa-trash-alt"></i></a>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Sigla)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Idcountry)
+                        </td>
+
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IdcountryNavigation.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Active)
+                        </td>
+
+                    </tr>
+                }
+
+            }
+        </tbody>
+    </table>
+</div>
+
 @section Scripts {
 
 
@@ -75,15 +105,10 @@
 
         $(document).ready(function(){
 
-            // $('#tablelist').DataTable({
-
-            //     "scrollX":true
-            //  });
-
-              $('#tablelist').DataTable
+                     $('#tablelist').DataTable
                    ({
 
-                     scrollX: true, // ✅ Habilita scroll horizontal
+                     scrollX: true,
 
                    });
 

@@ -32,14 +32,14 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// get all states
         /// </summary>
-        public async Task<ApiResponse<List<WMSCitiesDTO>>> GetAllAsync(CancellationToken ct)
+        public async Task<ApiResponse<List<WMSCitiesReadDTO>>> GetAllAsync(int countryid, CancellationToken ct)
         {
-            var data = await _repository.GetAllAsync(ct);
+            var data = await _repository.GetAllAsync(countryid,ct);
 
             if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSCitiesDTO>>("No cities found.");
+                return ApiResponseFactory.NotFound<List<WMSCitiesReadDTO>>("No cities found.");
 
-            var objlist = _mapper.Map<List<WMSCitiesDTO>>(data);
+            var objlist = _mapper.Map<List<WMSCitiesReadDTO>>(data);
 
             return ApiResponseFactory.Ok(objlist);
         }
@@ -47,14 +47,14 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// get all active states
         /// </summary>
-        public async Task<ApiResponse<List<WMSCitiesDTO>>> GetActiveAsync(CancellationToken ct)
+        public async Task<ApiResponse<List<WMSCitiesReadDTO>>> GetActiveAsync(int countryid, CancellationToken ct)
         {
-            var data = await _repository.GetActiveAsync(ct);
+            var data = await _repository.GetActiveAsync(countryid,ct);
 
             if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSCitiesDTO>>("No active cities found.");
+                return ApiResponseFactory.NotFound<List<WMSCitiesReadDTO>>("No active cities found.");
 
-            var objlist = _mapper.Map<List<WMSCitiesDTO>>(data);
+            var objlist = _mapper.Map<List<WMSCitiesReadDTO>>(data);
 
             return ApiResponseFactory.Ok(objlist);
         }
@@ -62,14 +62,14 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// get state by id
         /// </summary>
-        public async Task<ApiResponse<WMSCitiesDTO?>> GetByIdAsync(int id, CancellationToken ct)
+        public async Task<ApiResponse<WMSCitiesReadDTO?>> GetByIdAsync(int id, CancellationToken ct)
         {
             var entity = await _repository.GetByIdAsync(id, ct);
 
             if (entity is null)
-                return ApiResponseFactory.NotFound<WMSCitiesDTO?>($"city with Id {id} was not found.");
+                return ApiResponseFactory.NotFound<WMSCitiesReadDTO?>($"city with Id {id} was not found.");
 
-            var objmap = _mapper.Map<WMSCitiesDTO>(entity);
+            var objmap = _mapper.Map<WMSCitiesReadDTO>(entity);
 
             return ApiResponseFactory.Ok(objmap);
         }
@@ -80,7 +80,7 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         public async Task<ApiResponse<bool>> CreateAsync(WMSCitiesDTO entity, CancellationToken ct)
         {
             // validar nombre duplicado
-            var exists = await _repository.ExistsByNameAsync(entity.Name!, null, ct);
+            var exists = await _repository.ExistsByNameAsync(entity.Idcountry, entity.Name!, null, ct);
             if (exists)
             {
                 return ApiResponseFactory.Fail<bool>(
@@ -101,7 +101,7 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         public async Task<ApiResponse<bool>> UpdateAsync(WMSCitiesDTO entity, CancellationToken ct)
         {
             // validar nombre duplicado excluyendo el propio Id
-            var exists = await _repository.ExistsByNameAsync(entity.Name!, entity.Id, ct);
+            var exists = await _repository.ExistsByNameAsync(entity.Idcountry,entity.Name!, entity.Id, ct);
             if (exists)
             {
                 return ApiResponseFactory.Fail<bool>(
@@ -145,13 +145,14 @@ namespace DUNES.API.ServicesWMS.Masters.Cities
         /// <summary>
         /// exist state name
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="name"></param>
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<bool>> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct)
+        public async Task<ApiResponse<bool>> ExistsByNameAsync(int countryid,string name, int? excludeId, CancellationToken ct)
         {
-            var exists = await _repository.ExistsByNameAsync(name, excludeId, ct);
+            var exists = await _repository.ExistsByNameAsync(countryid, name, excludeId, ct);
 
             // aquí tienes dos enfoques posibles:
 

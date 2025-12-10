@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+
+
 
 namespace DUNES.Shared.DTOs.WMS
 {
-    public class WMSStatesCountriesDTO
+    /// <summary>
+    /// Used to show all information included Country Information
+    /// </summary>
+    public class WMSStatesCountriesReadDTO
     {
         /// <summary>
         /// internal id
@@ -48,6 +50,11 @@ namespace DUNES.Shared.DTOs.WMS
 
 
 
-      
+        /// <summary>
+        /// Navigation property for the related City entity.
+        /// Allows access to full Bines details for this record.
+        /// </summary>
+
+        public virtual WMSCountriesDTO IdcountryNavigation { get; set; } = null!;
     }
 }

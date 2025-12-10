@@ -33,15 +33,16 @@ namespace DUNES.API.ControllersWMS.Masters.StatesCountries
         /// Return all countries
         /// </summary>
         /// <param name="ct"></param>
+        /// <param name="countryId"></param>
         /// <returns></returns>
-        [HttpGet("all-states-by-countries")]
+        [HttpGet("all-states-by-countries/{countryId}")]
         [ProducesResponseType(typeof(ApiResponse<List<WMSStatesCountriesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSStatesCountriesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetAllStatesCountriesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetAllStatesCountriesAsync(int countryId, CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetAllAsync(ct),
+                ct => _service.GetAllAsync(countryId, ct),
                 ct);
         }
 
@@ -49,21 +50,23 @@ namespace DUNES.API.ControllersWMS.Masters.StatesCountries
         /// Return all active countries
         /// </summary>
         /// <param name="ct"></param>
+        ///  <param name="countryId"></param>
         /// <returns></returns>
-        [HttpGet("active-states-countries")]
+        [HttpGet("active-states-countries/{countryId}")]
         [ProducesResponseType(typeof(ApiResponse<List<WMSStatesCountriesDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<List<WMSStatesCountriesDTO>>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetActiveStatesCountriesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetActiveStatesCountriesAsync(int countryId, CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetActiveAsync(ct),
+                ct => _service.GetActiveAsync(countryId, ct),
                 ct);
         }
 
         /// <summary>
         /// Return country information by id
         /// </summary>
+        ///
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
@@ -78,16 +81,57 @@ namespace DUNES.API.ControllersWMS.Masters.StatesCountries
                 ct);
         }
 
+
+
         /// <summary>
-        /// Create a new country
+        /// Return country information by id
+        /// </summary>
+        /// <param name="countryid"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        [HttpGet("state-country-by-name/{countryid:int}/{name}")]
+        [ProducesResponseType(typeof(ApiResponse<WMSStatesCountriesDTO?>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WMSStatesCountriesDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetStateCountryByNameAsync(int countryid, string name, CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.GetByNameAsync(countryid, name , ct),
+                ct);
+        }
+
+        /// <summary>
+        /// get state by iso code country
+        /// </summary>
+        /// <param name="countryid"></param>
+        /// <param name="code"></param>
+        /// <param name="excludelid"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("state-country-by-isocode/{countryid:int}/{code}")]
+        [ProducesResponseType(typeof(ApiResponse<WMSStatesCountriesDTO?>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<WMSStatesCountriesDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetStateCountryByISOCodeAsync(int countryid, string code,int? excludelid, CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.GetByISOCodeAsync(countryid, code, excludelid, ct),
+                ct);
+        }
+
+
+        /// <summary>
+        /// Create a new State 
         /// </summary>
         /// <param name="model"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
         [HttpPost("create-state-country")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        
         public async Task<IActionResult> CreateStateCountryAsync([FromBody] WMSStatesCountriesDTO model, CancellationToken ct)
         {
             // Si tienes [ApiController] y DataAnnotations en el modelo, aquí ya viene validado.

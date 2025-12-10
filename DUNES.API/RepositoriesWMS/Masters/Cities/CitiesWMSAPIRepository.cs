@@ -38,14 +38,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <summary>
         /// exist city name
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="name"></param>
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct)
+        public async Task<bool> ExistsByNameAsync(int countryid, string name, int? excludeId, CancellationToken ct)
         {
-            var query = _context.Cities.AsNoTracking().Where(x => x.Name == name);
+            var query = _context.Cities.AsNoTracking().Where(x => x.Idcountry == countryid && x.Name == name);
 
             if (excludeId.HasValue)
             {
@@ -60,15 +61,16 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <summary>
         /// get all active cities
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.Cities>> GetActiveAsync(CancellationToken ct)
+        public async Task<List<ModelsWMS.Masters.Cities>> GetActiveAsync(int countryid, CancellationToken ct)
         {
             var query = await _context.Cities
                 .Include(x => x.IdcountryNavigation)
                 .Include(x => x.IdstateNavigation)
-                .Where(x => x.Active == true).ToListAsync();
+                .Where(x => x.Idcountry == countryid && x.Active == true).ToListAsync();
 
             return query;
         }
@@ -76,14 +78,16 @@ namespace DUNES.API.RepositoriesWMS.Masters.Cities
         /// <summary>
         /// get all countries
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.Cities>> GetAllAsync(CancellationToken ct)
+        public async Task<List<ModelsWMS.Masters.Cities>> GetAllAsync(int countryid, CancellationToken ct)
         {
             var query = await _context.Cities
                 .Include(x => x.IdcountryNavigation)
                 .Include(x => x.IdstateNavigation)
+                .Where(x => x.Idcountry == countryid)
                 .ToListAsync();
 
             return query;

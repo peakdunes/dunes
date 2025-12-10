@@ -51,7 +51,11 @@ namespace DUNES.API.Profiles
 
             CreateMap<StatesCountries, WMSStatesCountriesDTO>().ReverseMap();
 
+            CreateMap<StatesCountries, WMSStatesCountriesReadDTO>().ReverseMap();
+
             CreateMap<Cities, WMSCitiesDTO>().ReverseMap();
+
+            CreateMap<Cities, WMSCitiesReadDTO>().ReverseMap();
         }
 
     }

@@ -1,6 +1,12 @@
 ﻿using DUNES.Shared.DTOs.WMS;
+using DUNES.UI.Models;
+using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Common;
+using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
+using DUNES.UI.Services.WMS.Masters.Companies;
+using DUNES.UI.Services.WMS.Masters.Countries;
+using DUNES.UI.Services.WMS.Masters.StatesCountries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,22 +21,37 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
     public class ClientCompaniesUIController : BaseController
     {
 
-        private readonly ICommonWMSUIService _companyservice;
+        private readonly ICompaniesWMSUIService _companyservice;
         private readonly IClientCompaniesWMSUIService _service;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly ICountriesWMSUIService _countryService;
+        private readonly ICitiesWMSUIService _cityService;
+
+        private readonly IStatesCountriesWMSUIService _statesservice;
+
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
+        private readonly IMenuClientUIService _menuClientService;
+      
 
+        private const string MENU_CODE_INDEX = "01020301";
+        private const string MENU_CODE_CRUD = "01020301ZZ";
 
 
         public ClientCompaniesUIController(IHttpClientFactory httpClientFactory, IConfiguration config,
-            IClientCompaniesWMSUIService service, ICommonWMSUIService companyservice)
+            IClientCompaniesWMSUIService service, ICompaniesWMSUIService companyservice,
+            IMenuClientUIService menuClientService, ICountriesWMSUIService countryService,
+            IStatesCountriesWMSUIService statesservice, ICitiesWMSUIService cityService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;
             _service = service;
             _companyDefault = _config.GetValue("companyDefault", 1);
             _companyservice = companyservice;
+            _menuClientService = menuClientService;
+            _countryService = countryService;
+            _statesservice = statesservice;
+            _cityService = cityService;
 
 
         }
@@ -42,6 +63,16 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             if (token == null)
                 return RedirectToLogin();
+
+               await SetMenuBreadcrumbAsync(
+                   MENU_CODE_INDEX,
+                  _menuClientService, ct, token,
+                  new BreadcrumbItem
+                  {
+                      Text = "",   // actual
+                      Url = null
+                  });
+
 
             return await HandleAsync(async ct =>
             {
@@ -62,6 +93,16 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             if (token == null)
                 return RedirectToLogin();
+
+            await LoadInfoAsync(token, ct, 0);
+
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, token,
+                new BreadcrumbItem
+                {
+                    Text = "New Company Client",
+                    Url = null
+                });
+
             var listcompanies = await _companyservice.GetAllCompaniesInformation(token, ct);
 
             if(listcompanies.Data == null || listcompanies.Data.Count == 0)
@@ -75,6 +116,84 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> GetStatesByCountry(int countryId, CancellationToken ct)
+        {
+            var token = GetToken();
+            if (token == null)
+                return Unauthorized();
 
+            var response = await _statesservice.GetAllStatesCountryInformation(countryId, token, ct);
+
+            var list = response.Data ?? new List<WMSStatesCountriesReadDTO>();
+
+            var data = list.Where(x => x.Active == true)
+               .Select(x => new
+               {
+                   id = x.Id,
+                   name = x.Name
+               })
+               .ToList();   
+
+            return Json(data);
+
+         
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCitiesByState(int stateId, int countryId, CancellationToken ct)
+        {
+            var token = GetToken();
+            if (token == null)
+                return Unauthorized();
+
+            var response = await _cityService.GetAllCitiesInformation(countryId, token, ct);
+            // Ajusta el nombre del método según lo tengas
+
+            var list = response.Data ?? new List<WMSCitiesReadDTO>();
+
+            var data = list.Where(x => x.Active == true && x.Idstate == stateId)
+               .Select(x => new
+               {
+                   id = x.Id,
+                   name = x.Name
+               })
+               .ToList();
+
+            return Json(data);
+
+            return Json(data);
+        }
+
+
+
+        private async Task LoadInfoAsync(string token, CancellationToken ct, int idselected)
+        {
+
+            var listcountries = await _countryService.GetAllCountriesInformation(token, ct);
+
+            var data = listcountries.Data ?? new List<WMSCountriesDTO>();
+
+            var listactives = data.Where(x => x.Active == true).ToList();
+
+            if (idselected == 0)
+            {
+                ViewBag.listcountries = new SelectList(listactives, "Id", "Name");
+            }
+            else
+            {
+                ViewBag.listcountries = new SelectList(listactives, "Id", "Name", idselected);
+            }
+
+
+            var listcompanies = await _companyservice.GetAllCompaniesInformation(token, ct);
+
+            var datacompanies = listcompanies.Data ?? new List<WMSCompaniesDTO>();
+
+            var listCompaniesActives = datacompanies.Where(x => x.Active == true).ToList();
+
+
+            ViewBag.listcompanies = new SelectList(listCompaniesActives, "Id", "Name");
+        }
     }
 }

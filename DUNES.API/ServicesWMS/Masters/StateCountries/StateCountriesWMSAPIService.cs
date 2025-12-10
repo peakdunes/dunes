@@ -4,7 +4,9 @@ using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Net;
+using System.Reflection.Metadata;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.API.ServicesWMS.Masters.StateCountries
@@ -15,7 +17,7 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
     /// </summary>
     public class StateCountriesWMSAPIService : IStateCountriesWMSAPIService
     {
-        private readonly  IStateCountriesWMSAPIRepository _repository;
+        private readonly IStateCountriesWMSAPIRepository _repository;
         private readonly IMapper _mapper;
 
         /// <summary>
@@ -32,14 +34,14 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         /// <summary>
         /// get all states
         /// </summary>
-        public async Task<ApiResponse<List<WMSStatesCountriesDTO>>> GetAllAsync(CancellationToken ct)
+        public async Task<ApiResponse<List<WMSStatesCountriesReadDTO>>> GetAllAsync(int countryId, CancellationToken ct)
         {
-            var data = await _repository.GetAllAsync(ct);
+            var data = await _repository.GetAllAsync(countryId, ct);
 
             if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSStatesCountriesDTO>>("No states found.");
+                return ApiResponseFactory.NotFound<List<WMSStatesCountriesReadDTO>>("No states found.");
 
-            var objlist = _mapper.Map<List<WMSStatesCountriesDTO>>(data);
+            var objlist = _mapper.Map<List<WMSStatesCountriesReadDTO>>(data);
 
             return ApiResponseFactory.Ok(objlist);
         }
@@ -47,14 +49,11 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         /// <summary>
         /// get all active states
         /// </summary>
-        public async Task<ApiResponse<List<WMSStatesCountriesDTO>>> GetActiveAsync(CancellationToken ct)
+        public async Task<ApiResponse<List<WMSStatesCountriesReadDTO>>> GetActiveAsync(int countryId, CancellationToken ct)
         {
-            var data = await _repository.GetActiveAsync(ct);
+            var data = await _repository.GetActiveAsync(countryId, ct);
 
-            if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSStatesCountriesDTO>>("No active states found.");
-
-            var objlist = _mapper.Map<List<WMSStatesCountriesDTO>>(data);
+            var objlist = _mapper.Map<List<WMSStatesCountriesReadDTO>>(data);
 
             return ApiResponseFactory.Ok(objlist);
         }
@@ -62,14 +61,14 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         /// <summary>
         /// get state by id
         /// </summary>
-        public async Task<ApiResponse<WMSStatesCountriesDTO?>> GetByIdAsync(int id, CancellationToken ct)
+        public async Task<ApiResponse<WMSStatesCountriesReadDTO?>> GetByIdAsync(int id, CancellationToken ct)
         {
             var entity = await _repository.GetByIdAsync(id, ct);
 
             if (entity is null)
-                return ApiResponseFactory.NotFound<WMSStatesCountriesDTO?>($"state with Id {id} was not found.");
+                return ApiResponseFactory.NotFound<WMSStatesCountriesReadDTO?>($"state with Id {id} was not found.");
 
-            var objmap = _mapper.Map<WMSStatesCountriesDTO>(entity);
+            var objmap = _mapper.Map<WMSStatesCountriesReadDTO>(entity);
 
             return ApiResponseFactory.Ok(objmap);
         }
@@ -80,8 +79,8 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         public async Task<ApiResponse<bool>> CreateAsync(WMSStatesCountriesDTO entity, CancellationToken ct)
         {
             // validar nombre duplicado
-            var exists = await _repository.ExistsByNameAsync(entity.Name!, null, ct);
-            if (exists)
+            var infocountry = await _repository.ExistsByNameAsync(entity.Idcountry, entity.Name!, null, ct);
+            if (infocountry != null)
             {
                 return ApiResponseFactory.Fail<bool>(
                          error: "DUPLICATE_STATE_NAME",
@@ -89,9 +88,9 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
                          statusCode: (int)HttpStatusCode.Conflict);
             }
 
-            var objmap = _mapper.Map<DUNES.API.ModelsWMS.Masters.StatesCountries>(entity);
-            
-            await _repository.CreateAsync(objmap, ct);
+            //var objmap = _mapper.Map<DUNES.API.ModelsWMS.Masters.StatesCountries>(entity);
+
+            await _repository.CreateAsync(entity, ct);
             return ApiResponseFactory.Ok(true, "State created successfully.");
         }
 
@@ -101,8 +100,8 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         public async Task<ApiResponse<bool>> UpdateAsync(WMSStatesCountriesDTO entity, CancellationToken ct)
         {
             // validar nombre duplicado excluyendo el propio Id
-            var exists = await _repository.ExistsByNameAsync(entity.Name!, entity.Id, ct);
-            if (exists)
+            var infostate = await _repository.ExistsByNameAsync(entity.Idcountry,entity.Name!, entity.Id, ct);
+            if (infostate != null)
             {
                 return ApiResponseFactory.Fail<bool>(
                          error: "DUPLICATE_STATE_NAME",
@@ -145,21 +144,108 @@ namespace DUNES.API.ServicesWMS.Masters.StateCountries
         /// <summary>
         /// exist state name
         /// </summary>
+        /// <param name="countryid"></param>
         /// <param name="name"></param>
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<bool>> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct)
+        public async Task<ApiResponse<WMSStatesCountriesReadDTO?>> ExistsByNameAsync(int countryid, string name, int? excludeId, CancellationToken ct)
         {
-            var exists = await _repository.ExistsByNameAsync(name, excludeId, ct);
+            var infostate = await _repository.ExistsByNameAsync(countryid, name, excludeId, ct);
 
-            // aquí tienes dos enfoques posibles:
+            if (infostate != null)
+            {
+                var dto = _mapper.Map<WMSStatesCountriesReadDTO>(infostate);
 
-            // 1) Regresar "exists" tal cual (true = ya existe, false = no existe):
-            return ApiResponseFactory.Ok(exists);
+                var response = ApiResponseFactory.Fail<WMSStatesCountriesReadDTO?>(
+                        error: "DUPLICATE_ISO_CODE",
+                        message: $"There is already a state with ISO Code '{name}'.",
+                        statusCode: (int)HttpStatusCode.Conflict
+                    );
 
-            // 2) O si lo quieres como "isAvailable" (true = nombre disponible):
-            // return ApiResponseFactory.Ok(!exists);
+                response.Data = dto;
+
+                return response;
+            }
+
+            return ApiResponseFactory.Ok<WMSStatesCountriesReadDTO?>(
+                  data: null,
+                  message: "ISO Code not found"
+              );
         }
+
+        /// <summary>
+        /// check if a ISO Code exist in our system
+        /// </summary>
+        /// <param name="countryid"></param>
+        /// <param name="isocode"></param>
+        /// <param name="excludeId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        ///       
+     
+        public async Task<ApiResponse<WMSStatesCountriesReadDTO?>> GetByISOCodeAsync(int countryid, string isocode, int? excludeId, CancellationToken ct)
+        {
+            // validar nombre duplicado
+            var infocountry = await _repository.ExistsByISOCodeAsync(countryid, isocode!, null, ct);
+            if (infocountry != null)
+            {
+                var dto = _mapper.Map<WMSStatesCountriesReadDTO>(infocountry);
+
+                var response = ApiResponseFactory.Fail<WMSStatesCountriesReadDTO?>(
+                        error: "DUPLICATE_ISO_CODE",
+                        message: $"There is already a state with ISO Code '{isocode}'.",
+                        statusCode: (int)HttpStatusCode.Conflict
+                    );
+
+                response.Data = dto;
+
+                return response;
+            }
+
+            return ApiResponseFactory.Ok<WMSStatesCountriesReadDTO?>(
+                  data: null,
+                  message: "ISO Code not found"
+              );
+        }
+
+
+
+        /// <summary>
+        /// get state info by name
+        /// </summary>
+        /// <param name="countryid"></param>
+        /// <param name="name"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<WMSStatesCountriesReadDTO?>> GetByNameAsync(int countryid, string name, CancellationToken ct)
+        {
+            // validar nombre duplicado
+            var infocountry = await _repository.ExistsByNameAsync(countryid, name!, null, ct);
+            if (infocountry != null)
+            {
+                var dto = _mapper.Map<WMSStatesCountriesReadDTO>(infocountry);
+
+                var response = ApiResponseFactory.Fail<WMSStatesCountriesReadDTO?>(
+                        error: "DUPLICATE_ISO_CODE",
+                        message: $"There is already a state with Name '{name}'.",
+                        statusCode: (int)HttpStatusCode.Conflict
+                    );
+
+                response.Data = dto;
+
+                return response;
+            }
+
+            return ApiResponseFactory.Ok<WMSStatesCountriesReadDTO?>(
+                  data: null,
+                  message: "ISO Code not found"
+              );
+
+
+        }
+
+      
     }
 }

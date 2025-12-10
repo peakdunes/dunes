@@ -11,7 +11,7 @@ namespace DUNES.UI.Services.WMS.Masters.StatesCountries
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSStatesCountriesDTO>>> GetAllStatesCountryInformation(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSStatesCountriesReadDTO>>> GetAllStatesCountryInformation(int countryId, string token, CancellationToken ct);
 
         /// <summary>
         /// Get State by country name
@@ -19,7 +19,17 @@ namespace DUNES.UI.Services.WMS.Masters.StatesCountries
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSStatesCountriesDTO>> GetStateCountryInformationByIdentificationAsync(string entityid, string token, CancellationToken ct);
+        Task<ApiResponse<WMSStatesCountriesReadDTO>> GetStateCountryInformationByIdentificationAsync(int countryId, string statename, string token, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get State by country name
+        /// </summary>
+        /// <param name="companyid"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WMSStatesCountriesReadDTO>> GetStateCountryInformationByISOCodeAsync(int countryId, string isocode, string token, CancellationToken ct);
+
 
 
         /// <summary>
@@ -28,7 +38,7 @@ namespace DUNES.UI.Services.WMS.Masters.StatesCountries
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSStatesCountriesDTO>> GetStateCountryInformationByIdAsync(int Id, string token, CancellationToken ct);
+        Task<ApiResponse<WMSStatesCountriesReadDTO>> GetStateCountryInformationByIdAsync(int countryId, int Id, string token, CancellationToken ct);
 
 
         /// <summary>

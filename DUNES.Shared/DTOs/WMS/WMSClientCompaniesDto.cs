@@ -9,25 +9,44 @@ namespace DUNES.Shared.DTOs.WMS
 {
     public class WMSClientCompaniesDto
     {
+
+      
         public int Id { get; set; }
 
+        [Required(ErrorMessage = "Company Legal Identification")]
+        [Display(Name ="Identification ID")]
         public string? CompanyId { get; set; }
 
+        [Required(ErrorMessage = "Company Name is required")]
+        [Display(Name = "Company Name")]
         public string? Name { get; set; }
 
+        [Required(ErrorMessage = "Country company is required")]
+        [Display(Name = "Country")]
         public int Idcountry { get; set; }
 
+        [Required(ErrorMessage = "State company is required")]
+        [Display(Name = "State")]
         public int Idstate { get; set; }
 
+        [Required(ErrorMessage = "City company is required")]
+        [Display(Name = "City")]
         public int Idcity { get; set; }
 
+        [Required(ErrorMessage = "Zipcode company is required")]
+        [Display(Name = "Zip Code")]
         public string? Zipcode { get; set; }
 
+        [Required(ErrorMessage ="Address company is required")]
+        [Display(Name = "Address")]
         public string? Address { get; set; }
 
+        [Required(ErrorMessage = "Phone company is required")]
+        [Display(Name = "Phone")]
         public string? Phone { get; set; }
 
         public string? Website { get; set; }
+
 
         public bool Active { get; set; }
 
