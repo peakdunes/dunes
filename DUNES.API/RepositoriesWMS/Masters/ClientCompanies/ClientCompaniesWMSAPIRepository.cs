@@ -131,7 +131,17 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
 
             return true;
         }
+        /// <summary>
+        /// get company information by name
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<CompanyClient> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct)
+        {
+            var infoclient = await _context.CompanyClient.FirstOrDefaultAsync(x => x.Name.ToUpper() == companyname.ToUpper());
 
-       
+            return infoclient;
+        }
     }
 }

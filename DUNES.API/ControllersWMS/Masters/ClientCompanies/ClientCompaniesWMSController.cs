@@ -75,6 +75,24 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
 
 
         /// <summary>
+        /// get company client information by name
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [ProducesResponseType(typeof(List<WmsCompanyclientDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [HttpGet("wms-client-company-by-name/{companyname}")]
+
+        public async Task<IActionResult> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct)
+        {
+
+            return await HandleApi(ct => _service.GetClientCompanyInformationByNameAsync(companyname, ct), ct);
+
+        }
+
+        /// <summary>
         /// Return client company by identification  bins for a id
         /// </summary>
         /// <param name="id"></param>

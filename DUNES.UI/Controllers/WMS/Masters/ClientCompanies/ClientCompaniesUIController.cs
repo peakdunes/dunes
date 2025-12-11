@@ -1,7 +1,9 @@
-﻿using DUNES.Shared.DTOs.WMS;
+﻿using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Models;
+using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
-using DUNES.UI.Services.WMS.Common;
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
@@ -116,6 +118,92 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             return View();
         }
+
+        
+
+        // POST: StatesCountriesUIController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+
+        public async Task<IActionResult> Create(WmsCompanyclientDto dto, CancellationToken ct)
+        {
+
+
+            var token = GetToken();
+
+            if (token == null)
+                return RedirectToLogin();
+
+
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, token,
+            new BreadcrumbItem
+            {
+                Text = "New Company Client",
+                Url = null
+            });
+
+            return await HandleAsync(async ct =>
+            {
+                var infocompany = await _service.GetClientCompanyInformationByIdentificationAsync(dto.CompanyId!, token, ct);
+
+                if (infocompany.Data != null)
+                {
+                    MessageHelper.SetMessage(this, "danger", infocompany.Message.Trim(), MessageDisplay.Inline);
+
+                    await LoadInfoAsync(token, ct, dto.Idcountry);
+
+                    return View(dto);
+                }
+
+                var infocompanyname = await _service.GetClientCompanyInformationByNameAsync(dto.Name!, token, ct);
+
+                if (infocompanyname.Data != null)
+                {
+                    MessageHelper.SetMessage(this, "danger", infocompany.Message.Trim(), MessageDisplay.Inline);
+
+                    await LoadInfoAsync(token, ct, dto.Idcountry);
+
+                    return View(dto);
+                }
+
+                var createrecord = await _service.AddClientCompanyAsync(dto, token, ct);
+
+                if (!createrecord.Data)
+                {
+                    MessageHelper.SetMessage(this, "danger", $"Error creating this Company Client Error:{createrecord.Message}", MessageDisplay.Inline);
+
+                    await LoadInfoAsync(token, ct, dto.Idcountry);
+
+                    return View(dto);
+                }
+
+                MessageHelper.SetMessage(this, "success", $"Company Client created", MessageDisplay.Inline);
+
+
+                return RedirectToAction(nameof(Index));
+            }, ct);
+
+
+
+
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> GetStatesByCountry(int countryId, CancellationToken ct)
         {
@@ -162,7 +250,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             return Json(data);
 
-            return Json(data);
+            
         }
 
 

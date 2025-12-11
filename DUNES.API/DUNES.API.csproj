@@ -30,6 +30,9 @@
    
   
     <Folder Include="Logs\" />
+   
+  
+    <Folder Include="Migrations\" />
     <Folder Include="Models\B2B\" />
     <Folder Include="Models\Configuration\" />
     <Folder Include="Models\WebService\" />

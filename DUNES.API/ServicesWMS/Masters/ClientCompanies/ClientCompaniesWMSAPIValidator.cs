@@ -7,7 +7,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
     /// <summary>
     /// Company client validator
     /// </summary>
-    public class ClientCompaniesWMSAPIValidator : AbstractValidator<WMSClientCompaniesDto>
+    public class ClientCompaniesWMSAPIValidator : AbstractValidator<WMSClientCompaniesDTO>
     {
         /// <summary>
         /// constructor

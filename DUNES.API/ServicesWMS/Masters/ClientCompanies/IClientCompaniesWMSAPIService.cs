@@ -16,7 +16,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<CompanyClient>>> GetAllClientCompaniesInformation(CancellationToken ct);
+        Task<ApiResponse<List<WmsCompanyclientDto>>> GetAllClientCompaniesInformation(CancellationToken ct);
 
         /// <summary>
         /// Get client company information by company identification
@@ -24,7 +24,19 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<CompanyClient>> GetClientCompanyInformationByIdentificationAsync(string companyid, CancellationToken ct);
+        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, CancellationToken ct);
+
+
+
+
+        /// <summary>
+        /// get company client by name
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct);
+
 
 
         /// <summary>
@@ -33,7 +45,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<CompanyClient>> GetClientCompanyInformationByIdAsync(int Id, CancellationToken ct);
+        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, CancellationToken ct);
 
 
         /// <summary>

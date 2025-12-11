@@ -26,6 +26,16 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
         Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct);
 
 
+
+        /// <summary>
+        /// Get client company information by company identification
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct);
+
+
         /// <summary>
         /// Get all client information for a company by company Id
         /// </summary>

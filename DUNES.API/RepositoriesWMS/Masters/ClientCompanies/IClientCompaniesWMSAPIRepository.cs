@@ -26,6 +26,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
 
 
         /// <summary>
+        /// Get all client information for a company by company identification
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<CompanyClient> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct);
+
+
+        /// <summary>
         /// Get all client information for a company by company Id
         /// </summary>
         /// <param name="Id"></param>

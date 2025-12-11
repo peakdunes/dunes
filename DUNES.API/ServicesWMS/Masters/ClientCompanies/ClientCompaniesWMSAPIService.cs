@@ -1,4 +1,5 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using AutoMapper;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
@@ -16,20 +17,23 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
 
 
         private readonly IClientCompaniesWMSAPIRepository _repository;
-       // private readonly IValidator<WMSClientCompaniesDto> _validator;
+        private readonly IMapper _mapper;
+        // private readonly IValidator<WMSClientCompaniesDto> _validator;
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="repository"></param>
-        /// <param name="validator"></param>
+        /// <param name="mapper"></param>
         public ClientCompaniesWMSAPIService(IClientCompaniesWMSAPIRepository repository
             //,
             //IValidator<WMSClientCompaniesDto> validator
+            , IMapper mapper
             )
         {
             _repository = repository;
             //_validator = validator;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -59,7 +63,8 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
 
             //}
 
-            var exist = _repository.GetClientCompanyInformationByIdentificationAsync(dto.CompanyId!, ct);
+            var exist = await _repository.GetClientCompanyInformationByIdentificationAsync(dto.CompanyId!, ct);
+            
             if (exist != null)
             {
                 return ApiResponseFactory.BadRequest<bool>($"A client with this CompanyId {dto.CompanyId} already exists.");
@@ -101,11 +106,13 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<CompanyClient>>> GetAllClientCompaniesInformation(CancellationToken ct)
+        public async Task<ApiResponse<List<WmsCompanyclientDto>>> GetAllClientCompaniesInformation(CancellationToken ct)
         {
             var infocli = await _repository.GetAllClientCompaniesInformationAsync(ct);
 
-            return ApiResponseFactory.Ok(infocli, "");
+            var infoclimap = _mapper.Map<List<WmsCompanyclientDto>>(infocli);
+
+            return ApiResponseFactory.Ok(infoclimap, "");
         }
         /// <summary>
         /// get client company for id
@@ -115,9 +122,30 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public Task<ApiResponse<CompanyClient>> GetClientCompanyInformationByIdAsync(int Id, CancellationToken ct)
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var infocli = await _repository.GetClientCompanyInformationByIdAsync(Id, ct);
+
+            var infoclimap = _mapper.Map<WmsCompanyclientDto>(infocli);
+
+            return ApiResponseFactory.Ok(infoclimap, "");
+        }
+
+
+        /// <summary>
+        /// Get company information by name
+        /// </summary>
+        /// <param name="companyname"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct)
+        {
+            var infocli = await _repository.GetClientCompanyInformationByNameAsync(companyname, ct);
+
+            var infoclimap = _mapper.Map<WmsCompanyclientDto>(infocli);
+
+            return ApiResponseFactory.Ok(infoclimap, "");
         }
         /// <summary>
         /// get client company information by company identification
@@ -127,9 +155,13 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
 
-        public Task<ApiResponse<CompanyClient>> GetClientCompanyInformationByIdentificationAsync(string companyid, CancellationToken ct)
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var infocli = await _repository.GetClientCompanyInformationByIdentificationAsync(companyid, ct);
+
+            var infoclimap = _mapper.Map<WmsCompanyclientDto>(infocli);
+
+            return ApiResponseFactory.Ok(infoclimap, "");
         }
 
         /// <summary>
@@ -143,5 +175,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         {
             throw new NotImplementedException();
         }
+
+      
     }
 }

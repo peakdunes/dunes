@@ -69,7 +69,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 AsnCompanyClientsWm objresult = new AsnCompanyClientsWm
                 {
                     asdDto = objdto,
-                    listcompanyclients = new List<WMSClientCompaniesDto>()
+                    listcompanyclients = new List<WMSClientCompaniesDTO>()
                 };
 
                 if (string.IsNullOrWhiteSpace(asnnumber))

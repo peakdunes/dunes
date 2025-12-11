@@ -303,7 +303,7 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 
 //VALIDATOR SERVICES
 
-builder.Services.AddScoped<IValidator<WMSClientCompaniesDto>, ClientCompaniesWMSAPIValidator>();
+builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 
 
 

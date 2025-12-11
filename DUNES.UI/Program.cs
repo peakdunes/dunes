@@ -7,7 +7,7 @@ using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using DUNES.UI.Services.Print;
-using DUNES.UI.Services.WMS.Common;
+
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
@@ -59,8 +59,6 @@ builder.Services.AddScoped<IStatesCountriesWMSUIService, StatesCountriesWMSUISer
 
 builder.Services.AddScoped<ICitiesWMSUIService, CitiesWMSUIService>();
 
-
-builder.Services.AddScoped<ICommonWMSUIService, CommonWMSUIService>(); 
 
 builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
 builder.Services.AddScoped<IPdfService, PdfService>();

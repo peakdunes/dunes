@@ -34,7 +34,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
             var json = JsonConvert.SerializeObject(entity);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var respapi = await _httpClient.PostAsync($"api/ClientCompaniesWMS/wms-create-client-company",content);
+            var respapi = await _httpClient.PostAsync($"/api/ClientCompaniesWMS/wms-create-client-company",content);
 
             return await respapi.ReadAsApiResponseAsync<bool>(ct);
         }
@@ -55,15 +55,40 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
             return await resp.ReadAsApiResponseAsync<List<WmsCompanyclientDto>>(ct);
         }
 
-        public Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct)
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-id/{Id}");
+
+            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
         }
 
-        public Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct)
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct)
         {
-            throw new NotImplementedException();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-identification/{companyid}");
+
+            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
         }
+
+
+        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            HttpResponseMessage resp;
+
+            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-name/{companyname}");
+
+            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
+        }
+
 
         public Task<ApiResponse<bool>> UpdateClientCompanyAsync(WmsCompanyclientDto entity, string token, CancellationToken ct)
         {

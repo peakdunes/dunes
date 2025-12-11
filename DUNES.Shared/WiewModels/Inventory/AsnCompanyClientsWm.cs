@@ -15,7 +15,7 @@ namespace DUNES.UI.WiewModels
 
         public ASNWm asdDto { get; set; } = new();
 
-        public List<WMSClientCompaniesDto> listcompanyclients { get; set; } = new();
+        public List<WMSClientCompaniesDTO> listcompanyclients { get; set; } = new();
 
         public PickProcessCallsReadDto? CallsRead { get; set; }
 

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DUNES.API.ModelsWMS.Masters;
 
@@ -34,7 +36,10 @@ public partial class CompanyClient
     /// country
     /// </summary>
      [Display(Name ="Country")]
+  
     public int Idcountry { get; set; }
+
+   
 
     /// <summary>
     /// state
@@ -83,4 +88,25 @@ public partial class CompanyClient
     /// 
     [Display(Name = "Is Active")]
     public bool Active { get; set; }
+
+
+    // 🔹 NAVIGATIONS con [ForeignKey]
+
+    /// <summary>
+    /// country navigation
+    /// </summary>
+    [ForeignKey(nameof(Idcountry))]
+    public virtual Countries Country { get; set; } = null!;
+
+    /// <summary>
+    /// state navigation
+    /// </summary>
+    [ForeignKey(nameof(Idstate))]
+    public virtual StatesCountries State { get; set; } = null!;
+
+    /// <summary>
+    /// city navigation
+    /// </summary>
+    [ForeignKey(nameof(Idcity))]
+    public virtual Cities City { get; set; } = null!;
 }
