@@ -1,4 +1,5 @@
 ﻿using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
@@ -15,7 +16,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WmsCompanyclientDto>>> GetAllClientCompaniesInformation(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSClientCompaniesReadDTO>>> GetAllClientCompaniesInformation(string token, CancellationToken ct);
 
         /// <summary>
         /// Get client company information by company identification
@@ -23,7 +24,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct);
+        Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct);
 
 
 
@@ -33,7 +34,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
         /// <param name="companyname"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct);
+        Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -42,7 +43,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct);
+        Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct);
 
 
         /// <summary>

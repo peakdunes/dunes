@@ -1,4 +1,4 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.Masters.WmsCompanyclientDto>
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSClientCompaniesReadDTO>
 
 @{
     ViewData["Title"] = "Index";
@@ -12,6 +12,7 @@
 
     <thead>
         <tr>
+            <th>Actions</th>
             <th>
                 @Html.DisplayNameFor(model => model.Id)
             </th>
@@ -25,10 +26,19 @@
                 @Html.DisplayNameFor(model => model.Idcountry)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.CountryNavegation.Name)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Idstate)
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.StateNavegation.Name)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Idcity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CityNavegation.Name)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Zipcode)
@@ -45,7 +55,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.Active)
             </th>
-            <th></th>
+          
         </tr>
     </thead>
     <tbody>
@@ -55,6 +65,10 @@
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>
+                        <a href="#" onclick="openmodal(@item.Id)"><i class="fas fa-pencil-alt"></i></a> |
+                        <a href="#" onclick="editcompany(@item.Id)"><i class="fas fa-trash-alt"></i></a>
+                    </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Id)
                     </td>
@@ -68,10 +82,19 @@
                         @Html.DisplayFor(modelItem => item.Idcountry)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.CountryNavegation.Name)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Idstate)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.StateNavegation.Name)
+                    </td>
+                    <td>
                         @Html.DisplayFor(modelItem => item.Idcity)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CityNavegation.Name)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Zipcode)
@@ -88,11 +111,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Active)
                     </td>
-                    <td>
-                        @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                        @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-                    </td>
+                   
                 </tr>
             }
         }

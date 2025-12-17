@@ -74,7 +74,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
         /// <returns></returns>
         public async Task<List<CompanyClient>> GetAllClientCompaniesInformationAsync(CancellationToken ct)
         {
-            var companyclientlist = await _context.CompanyClient.ToListAsync();
+            var companyclientlist = await _context.CompanyClient
+               .Include(x => x.CountryNavegation)
+               .Include(x => x.StateNavegation)
+               .Include(x => x.CityNavegation)
+                .ToListAsync();
 
             return companyclientlist;
 
@@ -88,7 +92,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
         /// <returns></returns>
         public async Task<CompanyClient> GetClientCompanyInformationByIdentificationAsync(string companyid, CancellationToken ct)
         {
-            var infoclient = await _context.CompanyClient.FirstOrDefaultAsync(x => x.CompanyId == companyid);
+            var infoclient = await _context.CompanyClient
+               .Include(x => x.CountryNavegation)
+               .Include(x => x.StateNavegation)
+               .Include(x => x.CityNavegation)
+                .FirstOrDefaultAsync(x => x.CompanyId == companyid);
 
             return infoclient;
         }
@@ -103,7 +111,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
         ///                            
         public async Task<CompanyClient> GetClientCompanyInformationByIdAsync(int Id, CancellationToken ct)
         {
-            var infoclient = await _context.CompanyClient.FirstOrDefaultAsync(x => x.Id == Id);
+            var infoclient = await _context.CompanyClient
+              .Include(x => x.CountryNavegation)
+               .Include(x => x.StateNavegation)
+               .Include(x => x.CityNavegation)
+                .FirstOrDefaultAsync(x => x.Id == Id);
 
             return infoclient;
         }
@@ -139,7 +151,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.ClientCompanies
         /// <returns></returns>
         public async Task<CompanyClient> GetClientCompanyInformationByNameAsync(string companyname, CancellationToken ct)
         {
-            var infoclient = await _context.CompanyClient.FirstOrDefaultAsync(x => x.Name.ToUpper() == companyname.ToUpper());
+            var infoclient = await _context.CompanyClient
+            .Include(x => x.CountryNavegation)
+               .Include(x => x.StateNavegation)
+               .Include(x => x.CityNavegation)
+                .FirstOrDefaultAsync(x => x.Name!.ToUpper() == companyname.ToUpper());
 
             return infoclient;
         }

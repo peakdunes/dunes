@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.UI.Infrastructure;
 using Newtonsoft.Json;
@@ -44,7 +45,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
             throw new NotImplementedException();
         }
 
-        public async Task<ApiResponse<List<WmsCompanyclientDto>>> GetAllClientCompaniesInformation(string token ,CancellationToken ct)
+        public async Task<ApiResponse<List<WMSClientCompaniesReadDTO>>> GetAllClientCompaniesInformation(string token ,CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -52,10 +53,10 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
 
             resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/all-client-companies");
 
-            return await resp.ReadAsApiResponseAsync<List<WmsCompanyclientDto>>(ct);
+            return await resp.ReadAsApiResponseAsync<List<WMSClientCompaniesReadDTO>>(ct);
         }
 
-        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct)
+        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -63,10 +64,10 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
 
             resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-id/{Id}");
 
-            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
+            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
         }
 
-        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct)
+        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -74,11 +75,11 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
 
             resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-identification/{companyid}");
 
-            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
+            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
         }
 
 
-        public async Task<ApiResponse<WmsCompanyclientDto>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct)
+        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct)
         {
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -86,7 +87,7 @@ namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
 
             resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-name/{companyname}");
 
-            return await resp.ReadAsApiResponseAsync<WmsCompanyclientDto>(ct);
+            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
         }
 
 

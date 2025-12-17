@@ -58,6 +58,8 @@ namespace DUNES.API.Profiles
             CreateMap<Cities, WMSCitiesReadDTO>().ReverseMap();
 
             CreateMap<CompanyClient, WmsCompanyclientDto>().ReverseMap();
+
+            CreateMap < CompanyClient, WMSClientCompaniesReadDTO>().ReverseMap();
         }
 
     }

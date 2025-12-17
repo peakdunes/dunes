@@ -1,4 +1,4 @@
-﻿
+﻿//funcionando
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
@@ -49,7 +49,7 @@ builder.Services.AddScoped<IPickProcessUIService, PickProcessUIService>();
 builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 
 
-builder.Services.AddScoped <ICompaniesWMSUIService, CompaniesWMSUIService> ();
+builder.Services.AddScoped<ICompaniesWMSUIService, CompaniesWMSUIService>();
 
 builder.Services.AddScoped<IClientCompaniesWMSUIService, ClientCompaniesWMSUIService>();
 

@@ -60,7 +60,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// Allows access to full Bines details for this record.
         /// </summary>
 
-        public virtual WMSCountriesDTO IdcountryNavigation { get; set; } = null!;
+        public virtual WMSCountriesDTO CountryNavegation { get; set; } = null!;
 
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// Allows access to full Bines details for this record.
         /// </summary>
 
-        public virtual WMSStatesCountriesDTO IdstateNavigation { get; set; } = null!;
+        public virtual WMSStatesCountriesDTO StateNavegation { get; set; } = null!;
 
 
         /// <summary>
@@ -76,6 +76,6 @@ namespace DUNES.Shared.DTOs.WMS
         /// Allows access to full Bines details for this record.
         /// </summary>
 
-        public virtual WMSCitiesDTO IdcityNavigation { get; set; } = null!;
+        public virtual WMSCitiesDTO CityNavegation { get; set; } = null!;
     }
 }

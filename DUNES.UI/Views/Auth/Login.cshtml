@@ -16,7 +16,9 @@
                         <div class="alert alert-danger" role="alert">@ViewBag.Error</div>
                     }
 
-                    <form asp-action="Login" method="post" onsubmit="return handleLoginSubmit(this)">
+                    <form action="/Auth/Login" method="post" onsubmit="return handleLoginSubmit(this)">
+
+
                         @Html.AntiForgeryToken()
 
                         <div class="mb-3">

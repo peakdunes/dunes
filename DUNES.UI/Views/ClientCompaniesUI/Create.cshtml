@@ -4,7 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<form asp-action="Create">
+<form asp-action="Create" method="post" id="createForm">
 
     <div class="row">
 
@@ -112,7 +112,7 @@
     <div class="row mt-2">
         <div class="col-md-4">
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" id="submitBtn" class="btn btn-primary" />
             </div>
         </div>
     </div>
@@ -219,6 +219,18 @@
                         console.error(error);
                     });
             });
+        });
+
+           const btn = document.getElementById("submitBtn");
+
+             document.getElementById("createForm").addEventListener("submit", async function (e) {
+                      e.preventDefault();
+
+                      const ok = await confirmAction("Do you want to add this company client?");
+                      if (!ok) return;
+
+                      btn.disabled = true;
+                      this.submit(); // continue to controller
         });
     </script>
 

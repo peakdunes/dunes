@@ -31,46 +31,86 @@ namespace DUNES.UI.Middleware
         /// </summary>
         /// <param name="context"></param>
         /// <returns></returns>
+        //public async Task Invoke(HttpContext context)
+        //{
+
+
+        //    var path = context.Request.Path;
+
+
+        //    // Rutas excluidas: no validan token porque en el caso de Auth no se
+        //    //debe validar el token porque lo va ha solicitar, 
+        //    var excludedPaths = new[]
+        //    {
+        //    "/Auth", "/Home", "/Password", "/css", "/js", "/images", "/lib", "/favicon.ico"
+        //    };
+
+        //    bool isExcluded = excludedPaths.Any(p => path.StartsWithSegments(p));
+        //    if (isExcluded)
+        //    {
+        //        await _next(context); // Pasa al siguiente middleware sin  validar token
+        //        return;
+        //    }
+
+        //    // Aquí validamos el token de sesión
+        //    var token = context.Session.GetString("JWToken");
+
+
+
+        //    if (!IsValidToken(token))
+        //    {
+        //        context.Session.Remove("JWToken");
+
+        //        context.Items["ApiMessage"] = "Your token has expired.";
+        //        context.Items["ApiType"] = "danger";
+
+        //        // Redirigir a login o mostrar error
+        //        context.Response.Redirect("/Auth/Login");
+        //        return;
+        //    }
+
+        //    await _next(context); // Continuar si todo está bien
+        //}
+
         public async Task Invoke(HttpContext context)
         {
+            var path = context.Request.Path.Value?.ToLowerInvariant() ?? "";
 
-
-            var path = context.Request.Path;
-
-
-            // Rutas excluidas: no validan token porque en el caso de Auth no se
-            //debe validar el token porque lo va ha solicitar, 
-            var excludedPaths = new[]
+            // ✅ Solo rutas públicas (login + estáticos + error)
+            var excluded = new[]
             {
-            "/Auth", "/Home", "/Password", "/css", "/js", "/images", "/lib", "/favicon.ico"
-            };
+        "/auth/login",
+        "/password",
+        "/css",
+        "/js",
+        "/images",
+        "/lib",
+        "/favicon.ico",
+        "/error"
+    };
 
-            bool isExcluded = excludedPaths.Any(p => path.StartsWithSegments(p));
-            if (isExcluded)
+            if (excluded.Any(p => path.StartsWith(p)))
             {
-                await _next(context); // Pasa al siguiente middleware sin  validar token
+                await _next(context);
                 return;
             }
 
-            // Aquí validamos el token de sesión
             var token = context.Session.GetString("JWToken");
-
-
 
             if (!IsValidToken(token))
             {
                 context.Session.Remove("JWToken");
-
                 context.Items["ApiMessage"] = "Your token has expired.";
                 context.Items["ApiType"] = "danger";
 
-                // Redirigir a login o mostrar error
                 context.Response.Redirect("/Auth/Login");
                 return;
             }
 
-            await _next(context); // Continuar si todo está bien
+            await _next(context);
         }
+
+
 
 
         private bool IsValidToken(string token)

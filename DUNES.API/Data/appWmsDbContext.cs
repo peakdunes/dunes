@@ -110,10 +110,22 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<Warehouseorganization> warehouseorganization { get; set; }
 
+
+        /// <summary>
+        /// multilanguage 
+        /// </summary>
+        public virtual DbSet<ui_translation> Ui_translation { get; set; }
+        
+
         /// <summary>
         /// Client companies master
         /// </summary>
         public virtual DbSet<CompanyClient> CompanyClient { get; set; }
+
+        /// <summary>
+        /// companies client contract
+        /// </summary>
+        public virtual DbSet<CompaniesContract> CompaniesContract { get; set; }
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.

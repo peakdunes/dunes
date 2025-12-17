@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251216151248_mig20251220")]
+    partial class mig20251220
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,61 +94,6 @@ namespace DUNES.API.Migrations
                     b.HasIndex(new[] { "Idstate" }, "IX_cities_Idstate");
 
                     b.ToTable("cities", (string)null);
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompaniesContract", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompanyClientId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContactEmail")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("ContactName")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("ContactPhone")
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("ContractCode")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ItemCatalogMode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompanyClientId");
-
-                    b.HasIndex("CompanyId");
-
-                    b.ToTable("CompaniesContract");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Company", b =>
@@ -1059,34 +1007,6 @@ namespace DUNES.API.Migrations
                     b.ToTable("warehouseorganization", (string)null);
                 });
 
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.ui_translation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Lang")
-                        .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("nvarchar(5)");
-
-                    b.Property<string>("TKey")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TValue")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ui_translation");
-                });
-
             modelBuilder.Entity("DUNES.API.ModelsWMS.Transactions.Itemsbybin", b =>
                 {
                     b.Property<int>("Id")
@@ -1132,6 +1052,34 @@ namespace DUNES.API.Migrations
                     b.ToTable("itemsbybin", (string)null);
                 });
 
+            modelBuilder.Entity("DUNES.API.ModelsWMS.ui_translation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Lang")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)");
+
+                    b.Property<string>("TKey")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("TValue")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Ui_translation");
+                });
+
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Bines", b =>
                 {
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
@@ -1160,25 +1108,6 @@ namespace DUNES.API.Migrations
                     b.Navigation("IdcountryNavigation");
 
                     b.Navigation("IdstateNavigation");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompaniesContract", b =>
-                {
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.CompanyClient", "CompanyClientNavegation")
-                        .WithMany()
-                        .HasForeignKey("CompanyClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "CompanyNavegation")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CompanyClientNavegation");
-
-                    b.Navigation("CompanyNavegation");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Company", b =>

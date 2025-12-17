@@ -96,17 +96,17 @@ public partial class CompanyClient
     /// country navigation
     /// </summary>
     [ForeignKey(nameof(Idcountry))]
-    public virtual Countries Country { get; set; } = null!;
+    public virtual Countries CountryNavegation { get; set; } = null!;
 
     /// <summary>
     /// state navigation
     /// </summary>
     [ForeignKey(nameof(Idstate))]
-    public virtual StatesCountries State { get; set; } = null!;
+    public virtual StatesCountries StateNavegation { get; set; } = null!;
 
     /// <summary>
     /// city navigation
     /// </summary>
     [ForeignKey(nameof(Idcity))]
-    public virtual Cities City { get; set; } = null!;
+    public virtual Cities CityNavegation { get; set; } = null!;
 }
