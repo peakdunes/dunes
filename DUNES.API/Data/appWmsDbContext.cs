@@ -1,4 +1,5 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.API.ModelsWMS.Admin;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
 using Microsoft.EntityFrameworkCore;
 
@@ -126,6 +127,17 @@ namespace DUNES.API.Data
         /// companies client contract
         /// </summary>
         public virtual DbSet<CompaniesContract> CompaniesContract { get; set; }
+
+        /// <summary>
+        /// auditory transactions
+        /// </summary>
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
+        /// <summary>
+        /// Company Client Division
+        /// </summary>
+        public virtual DbSet<CompanyClientDivision> CompanyClientDivision { get; set; }
+
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
@@ -133,6 +145,70 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+            modelBuilder.Entity<CompanyClientDivision>(entity =>
+            {
+                entity.ToTable("companyClientDivision");
+
+                entity.HasIndex(e => e.Idcompanyclient, "IX_companyClientDivision_Idcompanyclient");
+
+                entity.Property(e => e.DivisionName).HasMaxLength(200);
+            });
+
+
+            modelBuilder.Entity<AuditLog>(b =>
+            {
+                b.ToTable("AuditLog", "dbo");
+                b.HasKey(x => x.Id);
+
+                b.Property(x => x.EventDateUtc)
+                    .HasColumnType("datetime2(3)")
+                    .HasDefaultValueSql("SYSUTCDATETIME()")
+                    .IsRequired();
+
+                b.Property(x => x.EventType)
+                    .HasColumnType("char(6)")
+                    .IsRequired();
+
+                b.Property(x => x.SchemaName).HasMaxLength(128).HasDefaultValue("dbo").IsRequired();
+                b.Property(x => x.TableName).HasMaxLength(128).IsRequired();
+                b.Property(x => x.PrimaryKey).HasMaxLength(300);
+
+                b.Property(x => x.UserName).HasMaxLength(200);
+                b.Property(x => x.TraceId).HasMaxLength(100);
+                b.Property(x => x.IpAddress).HasMaxLength(50);
+                b.Property(x => x.AppName).HasMaxLength(80);
+
+                b.Property(x => x.Module).HasMaxLength(80);
+                b.Property(x => x.BusinessKey).HasMaxLength(250);
+                b.Property(x => x.ChangedColumns).HasMaxLength(1000);
+
+                b.Property(x => x.JsonOld).HasColumnType("nvarchar(max)");
+                b.Property(x => x.JsonNew).HasColumnType("nvarchar(max)");
+
+                b.ToTable(t => t.HasCheckConstraint(
+                    "CK_AuditLog_EventType",
+                    "EventType IN ('INSERT','UPDATE','DELETE')"
+                ));
+
+                b.HasIndex(x => new { x.SchemaName, x.TableName, x.PrimaryKey, x.EventDateUtc })
+                    .HasDatabaseName("IX_AuditLog_Table_PK_Date");
+
+                b.HasIndex(x => new { x.UserName, x.EventDateUtc })
+                    .HasDatabaseName("IX_AuditLog_User_Date");
+
+                b.HasIndex(x => x.TraceId)
+                    .HasDatabaseName("IX_AuditLog_TraceId");
+
+                b.HasIndex(x => new { x.SchemaName, x.TableName, x.EventType, x.EventDateUtc })
+                    .HasDatabaseName("IX_AuditLog_Table_Type_Date");
+
+                b.HasIndex(x => new { x.Module, x.EventDateUtc })
+                    .HasDatabaseName("IX_AuditLog_Module_Date");
+
+                b.HasIndex(x => new { x.BusinessKey, x.EventDateUtc })
+                    .HasDatabaseName("IX_AuditLog_BusinessKey_Date");
+            });
 
             modelBuilder.Entity<CompanyClient>(entity =>
             {

@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using DUNES.API.Data;
+using DUNES.API.Data.Interceptors;
 using DUNES.API.Models.Configuration;
 using DUNES.API.Models.Masters;
 using DUNES.API.Profiles;
@@ -46,6 +47,7 @@ using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Interfaces.AuditContext;
 using DUNES.Shared.Interfaces.RequestInfo;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -73,14 +75,28 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Host.UseSerilog();
 
+//GET HTTP Information SERVICE (Auditory)
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IRequestInfo, RequestInfo>();
+builder.Services.AddScoped<IAuditContext, AuditContext>();
+builder.Services.AddScoped<AuditSaveChangesInterceptor>();
+
+
+
 
 //DBK database conection
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //DBKWMS database conecton
-builder.Services.AddDbContext<appWmsDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
+builder.Services.AddDbContext<appWmsDbContext>((sp, options) =>
+{
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection"));
+    //interceptor do auditory insert record for Insert, Update and Delete transactions
+    options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+});
 
 //User administration with Identity
 builder.Services.AddDbContext<IdentityDbContext>(options =>
@@ -246,9 +262,6 @@ builder.Services.AddSwaggerGen(c =>
 
 //SERVICES
 
-//GET HTTP Information SERVICE
-
-builder.Services.AddScoped<IRequestInfo, RequestInfo>();
 
 
 //AUTHENTICATION SERVICES

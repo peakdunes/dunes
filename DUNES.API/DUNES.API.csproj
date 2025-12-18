@@ -35,7 +35,6 @@
     <Folder Include="Migrations\" />
     <Folder Include="Models\B2B\" />
     <Folder Include="Models\Configuration\" />
-    <Folder Include="Models\Admin\" />
     <Folder Include="Models\WebService\" />
     <Folder Include="ReadModels\WMS\" />
     <Folder Include="Utils\Responses\" />
