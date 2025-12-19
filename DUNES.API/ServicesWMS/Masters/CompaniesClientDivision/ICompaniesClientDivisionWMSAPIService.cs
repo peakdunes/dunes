@@ -18,7 +18,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompanyClientDivisionDTO>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct);
+        Task<ApiResponse<bool>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct);
 
         /// <summary>
         /// update client company division
@@ -60,9 +60,10 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// Get all division client information for a company by company identification
         /// </summary>
         /// <param name="divisionname"></param>
+        /// <param name="companyClientId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(string divisionname, CancellationToken ct);
+        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, CancellationToken ct);
 
 
     }

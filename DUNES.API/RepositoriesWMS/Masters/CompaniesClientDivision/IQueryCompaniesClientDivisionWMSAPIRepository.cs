@@ -31,9 +31,10 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision
         /// Get all division client information for a company by company identification
         /// </summary>
         /// <param name="divisionname"></param>
+        /// <param name="companyClientId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WMSCompanyClientDivisionReadDTO?> GetCompanyClientDivisionByNameAsync(string divisionname, CancellationToken ct);
+        Task<WMSCompanyClientDivisionReadDTO?> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, CancellationToken ct);
 
 
        

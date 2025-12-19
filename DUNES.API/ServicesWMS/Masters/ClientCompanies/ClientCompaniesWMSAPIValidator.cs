@@ -39,7 +39,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
 
                 
             });
-
+              
             // 🔹 Reglas específicas para UPDATE
             RuleSet("Update", () =>
             {

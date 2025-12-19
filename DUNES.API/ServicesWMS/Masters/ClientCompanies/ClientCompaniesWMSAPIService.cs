@@ -15,24 +15,25 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
     public class ClientCompaniesWMSAPIService : IClientCompaniesWMSAPIService
     {
 
-
+        private readonly IValidator<WMSClientCompaniesDTO> _validator;
         private readonly IClientCompaniesWMSAPIRepository _repository;
         private readonly IMapper _mapper;
-        // private readonly IValidator<WMSClientCompaniesDto> _validator;
+       
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="repository"></param>
         /// <param name="mapper"></param>
+        /// <param name="validator"></param>
         public ClientCompaniesWMSAPIService(IClientCompaniesWMSAPIRepository repository
-            //,
-            //IValidator<WMSClientCompaniesDto> validator
+            ,
+            IValidator<WMSClientCompaniesDTO> validator
             , IMapper mapper
             )
         {
             _repository = repository;
-            //_validator = validator;
+            _validator = validator;
             _mapper = mapper;
         }
 
@@ -43,25 +44,17 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<bool>> AddClientCompanyAsync(WmsCompanyclientDto dto, CancellationToken ct)
+        public async Task<ApiResponse<bool>> AddClientCompanyAsync(WMSClientCompaniesDTO dto, CancellationToken ct)
         {
+            var validation = await _validator.ValidateAsync(dto, o => o.IncludeRuleSets("Create"));
 
-            //var validation = await _validator.ValidateAsync(dto, opts =>
-            //{
-            //    opts.IncludeRuleSets("Create");
+            if (!validation.IsValid)
+            {
+                var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
 
+                return ApiResponseFactory.BadRequest<bool>(errors);
 
-            //}, ct);
-
-          
-
-            //if (!validation.IsValid)
-            //{
-            //    var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
-
-            //    return ApiResponseFactory.BadRequest<bool>(errors);
-
-            //}
+            }
 
             var exist = await _repository.GetClientCompanyInformationByIdentificationAsync(dto.CompanyId!, ct);
             

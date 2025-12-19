@@ -1,8 +1,15 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using AutoMapper;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
+using DUNES.API.ServicesWMS.Masters.Cities;
+using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.API.ServicesWMS.Masters.Countries;
+using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using FluentValidation;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
 {
@@ -14,36 +21,76 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
     {
 
 
-
+        private readonly IValidator<WMSCompanyClientDivisionDTO> _validator;
         private readonly ICommandCompaniesClientDivisionWMSAPIRepository _commandrepository;
-
         private readonly IQueryCompaniesClientDivisionWMSAPIRepository _queryrepository;
+        private readonly IClientCompaniesWMSAPIService _companyService;
+        private readonly IMapper _mapper;
 
         /// <summary>
         /// constructor and dependency injection
         /// </summary>
         /// <param name="commandrepository"></param>
         /// <param name="queryrepository"></param>
+        /// <param name="validator"></param>
+        /// <param name="companyService"></param>
+        /// <param name="mapper"></param>
+
         public CompaniesClientDivisionWMSAPIService(ICommandCompaniesClientDivisionWMSAPIRepository commandrepository,
-            IQueryCompaniesClientDivisionWMSAPIRepository queryrepository )
+            IQueryCompaniesClientDivisionWMSAPIRepository queryrepository,
+            IValidator<WMSCompanyClientDivisionDTO> validator, IClientCompaniesWMSAPIService companyService,
+            IMapper mapper)
         {
             _commandrepository = commandrepository;
             _queryrepository = queryrepository;
+            _validator = validator;
+            _companyService = companyService;
+            _mapper = mapper;
             
         }
 
         /// <summary>
         /// add mew company client division
         /// </summary>
-        /// <param name="entity"></param>
+        /// <param name="dto"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<ApiResponse<WMSCompanyClientDivisionDTO>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct)
+        public async Task<ApiResponse<bool>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO dto, CancellationToken ct)
         {
+            var validation = await _validator.ValidateAsync(dto, o => o.IncludeRuleSets("Create"));
+
+            if (!validation.IsValid)
+            {
+                var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
+
+                return ApiResponseFactory.BadRequest<bool>(errors);
+
+            }
+
+            var existCompany = await _companyService.GetClientCompanyInformationByIdAsync(dto.Idcompanyclient, ct);
+
+            if (existCompany == null || existCompany.Data == null)
+            {
+
+                return ApiResponseFactory.BadRequest<bool>("Company Client do not exist");
+            }
+
+            var existDivision = await _queryrepository.GetCompanyClientDivisionByNameAsync(dto.Idcompanyclient, dto.DivisionName!, ct);
+
+            if(existDivision != null)
+            {
 
 
-            throw new NotImplementedException();
+                return ApiResponseFactory.BadRequest<bool>("Division already exist");
+            }
+
+           var comCliDiv =  _mapper.Map<CompanyClientDivision>(dto);
+
+            var infoinsert = _commandrepository.AddClientCompanyDivisionAsync(comCliDiv, ct);
+
+            return ApiResponseFactory.Ok(true, "Client company created successfully.");
+            //throw new NotImplementedException();
         }
         /// <summary>
         /// delete company client division
@@ -93,10 +140,11 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// get a client division by name
         /// </summary>
         /// <param name="divisionname"></param>
+        /// <param name="companyClientId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(string divisionname, CancellationToken ct)
+        public async Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, CancellationToken ct)
         {
 
             if (string.IsNullOrEmpty(divisionname))
@@ -104,7 +152,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
                 return ApiResponseFactory.Error<WMSCompanyClientDivisionReadDTO?>("Division name can not null or blank");
             }
 
-            var infodivision = await _queryrepository.GetCompanyClientDivisionByNameAsync(divisionname, ct);
+            var infodivision = await _queryrepository.GetCompanyClientDivisionByNameAsync(companyClientId, divisionname, ct);
 
 
             return ApiResponseFactory.Ok(infodivision, "");

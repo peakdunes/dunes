@@ -50,6 +50,7 @@ using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Interfaces.AuditContext;
 using DUNES.Shared.Interfaces.RequestInfo;
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebSockets;
@@ -63,6 +64,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -315,7 +318,7 @@ builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<
 builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 
 //VALIDATOR SERVICES
-
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 
 

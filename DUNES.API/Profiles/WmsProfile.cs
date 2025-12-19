@@ -60,7 +60,10 @@ namespace DUNES.API.Profiles
             CreateMap<CompanyClient, WmsCompanyclientDto>().ReverseMap();
 
             CreateMap < CompanyClient, WMSClientCompaniesReadDTO>().ReverseMap();
+
+            CreateMap<CompanyClientDivision, WMSCompanyClientDivisionDTO>().ReverseMap();
         }
+
 
     }
 }

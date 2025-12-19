@@ -85,14 +85,16 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision
         /// </summary>
         /// <param name="divisionname"></param>
         /// <param name="ct"></param>
+        /// <param name="companyClientId"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<WMSCompanyClientDivisionReadDTO?> GetCompanyClientDivisionByNameAsync(string divisionname, CancellationToken ct)
+        public async Task<WMSCompanyClientDivisionReadDTO?> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, CancellationToken ct)
         {
             var infodivision = await(from enc in _context.CompanyClientDivision
                                      join det in _context.CompanyClient on
                                      enc.Idcompanyclient equals det.Id
                                      where enc.DivisionName!.ToUpper() == divisionname.ToUpper()
+                                     && enc.Idcompanyclient == companyClientId
                                      select new WMSCompanyClientDivisionReadDTO
                                      {
                                          Id = enc.Id,

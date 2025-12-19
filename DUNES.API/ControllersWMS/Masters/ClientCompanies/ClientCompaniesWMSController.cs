@@ -3,6 +3,7 @@ using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.DTOs.Masters;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using Microsoft.AspNetCore.Authorization;
@@ -80,7 +81,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// <param name="companyname"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WmsCompanyclientDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-client-company-by-name/{companyname}")]
@@ -98,7 +99,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WmsCompanyclientDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-client-company-by-id/{id}")]
@@ -120,7 +121,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [HttpPost("wms-create-client-company")]
-        public async Task<IActionResult> CreateClientCompany([FromBody] WmsCompanyclientDto companyinfo, CancellationToken ct)
+        public async Task<IActionResult> CreateClientCompany([FromBody] WMSClientCompaniesDTO companyinfo, CancellationToken ct)
         {
             return await HandleApi(ct => _service.AddClientCompanyAsync(companyinfo, ct), ct);
         }

@@ -52,7 +52,7 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> AddClientCompanyAsync(WmsCompanyclientDto entity, CancellationToken ct);
+        Task<ApiResponse<bool>> AddClientCompanyAsync(WMSClientCompaniesDTO entity, CancellationToken ct);
 
         /// <summary>
         /// update client company
