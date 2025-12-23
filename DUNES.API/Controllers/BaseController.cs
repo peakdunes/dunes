@@ -76,8 +76,7 @@ namespace DUNES.API.Controllers
         /// <summary>
         /// Llama a tu servicio que ya devuelve ApiResponse y se limita a pasar el resultado; 
         /// si hay error/cancelación, construye la respuesta estándar.
-     
-        /// </summary>
+       /// </summary>
         protected async Task<IActionResult> HandleApi<T>(
             Func<CancellationToken, Task<ApiResponse<T>>> action,
             CancellationToken ct)

@@ -23,6 +23,7 @@ namespace DUNES.API.Controllers.Auth
         /// dependency injection
         /// </summary>
         /// <param name="authService"></param>
+        /// <param name="userManager"></param>
         public AuthController(IAuthService authService, UserManager<IdentityUser> userManager)
         {
             _authService = authService;
@@ -63,6 +64,7 @@ namespace DUNES.API.Controllers.Auth
         /// ```
         /// </remarks>
         /// <param name="model">The login credentials (email and password).</param>
+        /// <param name="ct">The login credentials (email and password).</param>
         /// <response code="200">Login successful, returns a JWT token.</response>
         /// <response code="400">Bad request if required fields are missing.</response>
         /// <response code="401">Unauthorized if the credentials are invalid.</response>

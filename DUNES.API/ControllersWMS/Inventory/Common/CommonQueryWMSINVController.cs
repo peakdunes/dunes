@@ -64,6 +64,7 @@ namespace DUNES.API.ControllersWMS.Inventory.Common
         /// </summary>
         /// <param name="companyid"></param>
         /// <param name="companyClient"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(List<Bines>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

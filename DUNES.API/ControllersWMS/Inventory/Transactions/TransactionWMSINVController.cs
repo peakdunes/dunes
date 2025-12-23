@@ -31,11 +31,12 @@ namespace DUNES.API.ControllersWMS.Inventory.Transactions
             
         }
 
-       
+
         /// <summary>
         /// Create a new WMS Inventory transaction
         /// </summary>
         /// <param name="objcreate"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<PickProcessRequestDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]

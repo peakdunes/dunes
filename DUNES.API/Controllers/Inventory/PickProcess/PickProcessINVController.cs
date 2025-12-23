@@ -27,6 +27,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         /// dependency injection
         /// </summary>
         /// <param name="service"></param>
+        /// <param name="transactionservice"></param>
         public PickProcessINVController(ICommonQueryPickProcessINVService service, ITransactionsPickProcessINVService transactionservice)
         {
             _service = service;
@@ -119,6 +120,7 @@ namespace DUNES.API.Controllers.Inventory.PickProcess
         /// <param name="DeliveryId"></param>
         /// <param name="objInvTransaction"></param>
         /// <param name="lpnid"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [ProducesResponseType(typeof(ApiResponse<PickProcessResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]

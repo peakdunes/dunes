@@ -1,15 +1,9 @@
-﻿using DUNES.API.ModelsWMS.Masters;
-using DUNES.Shared.DTOs.WMS;
+﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
-namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
+namespace DUNES.UI.Services.WMS.Masters.CompaniesContract
 {
-
-
-    /// <summary>
-    /// companies client contracts
-    /// </summary>
-    public interface ICompaniesContractWMSAPIService
+    public interface ICompaniesClientContractWMSUIService
     {
 
 
@@ -18,7 +12,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(CancellationToken ct);
+        Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(string token, CancellationToken ct);
 
         /// <summary>
         /// Get all client information for a contract by number
@@ -26,7 +20,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="contractcode"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberAsync(string contractcode, CancellationToken ct);
+        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberAsync(string contractcode, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -36,7 +30,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="contractcode"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberCompanyIdAsync(int companyclientid, string contractcode, CancellationToken ct);
+        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberCompanyIdAsync(int companyclientid, string contractcode, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -45,7 +39,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="companyclientid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetClientCompanyInformationContractByCompanyIdAsync(int companyclientid, CancellationToken ct);
+        Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetClientCompanyInformationContractByCompanyIdAsync(int companyclientid, string token, CancellationToken ct);
 
 
 
@@ -55,7 +49,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyContractInformationByIdAsync(int Id, CancellationToken ct);
+        Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyContractInformationByIdAsync(int Id, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -64,7 +58,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompaniesContractDTO>> AddClientCompanyContractAsync(WMSCompaniesContractDTO entity, CancellationToken ct);
+        Task<ApiResponse<WMSCompaniesContractDTO>> AddClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct);
 
         /// <summary>
         /// update client company
@@ -72,7 +66,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> UpdateClientCompanyContractAsync(WMSCompaniesContractDTO entity, CancellationToken ct);
+        Task<ApiResponse<bool>> UpdateClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct);
 
         /// <summary>
         /// delete client company
@@ -80,6 +74,6 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> DeleteClientCompanyContractAsync(int id, CancellationToken ct);
+        Task<ApiResponse<bool>> DeleteClientCompanyContractAsync(int id, string token, CancellationToken ct);
     }
 }

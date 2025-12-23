@@ -88,6 +88,7 @@ namespace DUNES.API.ControllersWMS.Masters.StatesCountries
         /// </summary>
         /// <param name="countryid"></param>
         /// <param name="name"></param>
+        /// <param name="ct"></param>
         /// <returns></returns>
         [HttpGet("state-country-by-name/{countryid:int}/{name}")]
         [ProducesResponseType(typeof(ApiResponse<WMSStatesCountriesDTO?>), StatusCodes.Status200OK)]

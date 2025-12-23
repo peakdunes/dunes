@@ -52,7 +52,9 @@ namespace DUNES.API.DTOs.B2B
         [MaxLength(50)]
         public string SerialRECEIVED { get; set; } = string.Empty;
 
-
+        /// <summary>
+        /// Unid ID
+        /// </summary>
         [MaxLength(50)]
         public string UnitID { get; set; } = string.Empty;
 
