@@ -11,6 +11,7 @@ using DUNES.UI.Services.Print;
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
+using DUNES.UI.Services.WMS.Masters.CompaniesClientDivision;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -52,6 +53,8 @@ builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 builder.Services.AddScoped<ICompaniesWMSUIService, CompaniesWMSUIService>();
 
 builder.Services.AddScoped<IClientCompaniesWMSUIService, ClientCompaniesWMSUIService>();
+
+builder.Services.AddScoped<ICompaniesClientDivisionWMSUIService, CompaniesClientDivisionWMSUIService>();
 
 builder.Services.AddScoped<ICountriesWMSUIService, CountriesWMSUIService>();
 

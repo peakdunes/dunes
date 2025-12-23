@@ -17,23 +17,34 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// Division Name
         /// </summary>
+        /// 
+
+       
+        [Display(Name = "Division Name")]
         public string? DivisionName { get; set; }
 
         /// <summary>
         /// Company client Id
         /// </summary>
+        /// 
+        
+        [Display(Name = "Company Client Id")]
         public int Idcompanyclient { get; set; }
 
 
         /// <summary>
         /// Active
         /// </summary>
+        /// 
+        [Display(Name = "Active")]
         public bool IsActive { get; set; }
 
 
         /// <summary>
         /// Company client name (from CompanyClient table)
         /// </summary>
+        /// 
+        [Display(Name = "Company Client Name")]
         public string? CompanyClientName { get; set; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿
 
 using AutoMapper;
+using DUNES.API.ControllersWMS.Masters.CompanyClientDivision;
 using DUNES.API.Data;
 using DUNES.API.Data.Interceptors;
 using DUNES.API.Models.Configuration;
@@ -23,6 +24,7 @@ using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.Cities;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
+using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.API.Services.Auth;
@@ -40,6 +42,7 @@ using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.ServicesWMS.Masters.Cities;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.API.Utils.Logging;
@@ -64,6 +67,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
+
 
 
 
@@ -246,6 +250,9 @@ builder.Services.AddSwaggerGen(c =>
             "TzebB2bInventoryType" => new[] { "Inventory Types - CRUD" },
             "WmsCompanyclient" => new[] { "Company Clients - CRUD" },
             "mvcGeneralParameters" => new[] { "General Parameters - CRUD" },
+            "CompanyClientDivisionWMS" => new[] { "Company Clients Division - CRUD" },
+
+            
 
 
             //#########
@@ -320,6 +327,7 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 //VALIDATOR SERVICES
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
+builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
 
 
 
@@ -332,6 +340,14 @@ builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository
 
 builder.Services.AddScoped<IClientCompaniesWMSAPIRepository, ClientCompaniesWMSAPIRepository>();
 builder.Services.AddScoped<IClientCompaniesWMSAPIService, ClientCompaniesWMSAPIService>();
+
+
+builder.Services.AddScoped<ICommandCompaniesClientDivisionWMSAPIRepository, CommandCompaniesClientDivisionWMSAPIRepository>();
+builder.Services.AddScoped<IQueryCompaniesClientDivisionWMSAPIRepository, QueryCompaniesClientDivisionWMSAPIRepository>();
+builder.Services.AddScoped<ICompaniesClientDivisionWMSAPIService, CompaniesClientDivisionWMSAPIService>();
+
+
+
 
 builder.Services.AddScoped<ICountriesWMSAPIRepository, CountriesWMSAPIRepository>();
 builder.Services.AddScoped<ICountriesWMSAPIService, CountriesWMSAPIService>();
@@ -453,4 +469,6 @@ app.UseAuthentication();
 
 app.UseAuthorization();
 app.MapControllers();
+
+
 app.Run();

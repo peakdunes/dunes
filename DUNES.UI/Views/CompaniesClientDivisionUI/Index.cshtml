@@ -1,0 +1,117 @@
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSCompanyClientDivisionReadDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+
+<p>
+    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+</p>
+<div class="row">
+    @using (Html.BeginForm("Index", "CompaniesClientDivisionUI", FormMethod.Get))
+    {
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Client Companies</label>
+
+                @Html.DropDownList(
+                "companyclientid",
+                (SelectList)ViewBag.companiesclient,
+                "Select Company Client",
+                new {
+                    @class = "form-control",
+                    onchange = "this.form.submit();"
+            })
+
+            </div>
+        </div>
+    }
+</div>
+
+<div class="row">
+ <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+    <thead>
+        <tr>
+            <th>Actions</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+              <th>
+                @Html.DisplayNameFor(model => model.Idcompanyclient)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.CompanyClientName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DivisionName)
+            </th>
+          
+             <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @if(Model != null)
+        {
+        @foreach (var item in Model) 
+        {
+
+    
+            <tr>
+               <td>
+                <a href="#" onclick="openmodal(@item.Id)"><i class="fas fa-pencil-alt"></i></a> |
+                <a href="#" onclick="editcompany(@item.Id)"><i class="fas fa-trash-alt"></i></a>
+                       
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Idcompanyclient)
+            </td>
+              <td>
+                @Html.DisplayFor(modelItem => item.CompanyClientName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DivisionName)
+            </td>
+           
+            <td>
+                @Html.DisplayFor(modelItem => item.IsActive)
+            </td>
+          
+      
+        </tr>
+}
+}
+    </tbody>
+</table>
+</div>
+@section Scripts {
+
+
+
+
+    <script>
+
+
+        $(document).ready(function(){
+
+                     $('#tablelist').DataTable
+                   ({
+
+                     scrollX: true,
+
+                   });
+
+        })
+
+
+    </script>
+}

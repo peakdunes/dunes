@@ -11,11 +11,21 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision
     {
 
         /// <summary>
-        /// Get all company information
+        /// Get all company division information
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<List<WMSCompanyClientDivisionReadDTO>> GetAllCompaniesClientDivisionInformation(CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all company division information by company
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="companyclientid"></param>
+        /// <returns></returns>
+        Task<List<WMSCompanyClientDivisionReadDTO>> GetAllCompaniesClientDivisionInformationByCompanyClient(int companyclientid, CancellationToken ct);
+
 
         /// <summary>
         /// Get all division information for a company by id

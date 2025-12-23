@@ -1,24 +1,17 @@
-﻿using DUNES.API.ModelsWMS.Masters;
-using DUNES.Shared.DTOs.WMS;
+﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
-namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
+namespace DUNES.UI.Services.WMS.Masters.CompaniesClientDivision
 {
-
-    /// <summary>
-    /// company client division service
-    /// </summary>
-    public interface ICompaniesClientDivisionWMSAPIService
+    public interface ICompaniesClientDivisionWMSUIService
     {
-
-
         /// <summary>
         /// add new client company division
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct);
+        Task<ApiResponse<bool>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, string token, CancellationToken ct);
 
         /// <summary>
         /// update client company division
@@ -26,7 +19,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> UpdateClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct);
+        Task<ApiResponse<bool>> UpdateClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, string token, CancellationToken ct);
 
         /// <summary>
         /// delete client company division
@@ -34,7 +27,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> DeleteClientCompanyDivisionAsync(int id, CancellationToken ct);
+        Task<ApiResponse<bool>> DeleteClientCompanyDivisionAsync(int id, string token, CancellationToken ct);
 
 
 
@@ -44,7 +37,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformation(CancellationToken ct);
+        Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformation(string token, CancellationToken ct);
 
 
         /// <summary>
@@ -53,7 +46,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="ct"></param>
         /// <param name="companyclientid"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformationByCompanyClient(int companyclientid,CancellationToken ct);
+        Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformationByCompanyClient(int companyclientid, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -62,7 +55,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="divisionId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionById(int divisionId, CancellationToken ct);
+        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionById(int divisionId, string token, CancellationToken ct);
 
 
 
@@ -73,7 +66,8 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="companyClientId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, CancellationToken ct);
+        Task<ApiResponse<WMSCompanyClientDivisionReadDTO?>> GetCompanyClientDivisionByNameAsync(int companyClientId, string divisionname, string token, CancellationToken ct);
+
 
 
     }

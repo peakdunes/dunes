@@ -19,8 +19,6 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
 
     public class CompaniesClientDivisionWMSAPIService : ICompaniesClientDivisionWMSAPIService
     {
-
-
         private readonly IValidator<WMSCompanyClientDivisionDTO> _validator;
         private readonly ICommandCompaniesClientDivisionWMSAPIRepository _commandrepository;
         private readonly IQueryCompaniesClientDivisionWMSAPIRepository _queryrepository;
@@ -72,7 +70,6 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
 
             if (existCompany == null || existCompany.Data == null)
             {
-
                 return ApiResponseFactory.BadRequest<bool>("Company Client do not exist");
             }
 
@@ -80,8 +77,6 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
 
             if(existDivision != null)
             {
-
-
                 return ApiResponseFactory.BadRequest<bool>("Division already exist");
             }
 
@@ -112,10 +107,25 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         public async Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformation(CancellationToken ct)
         {
             var infodivisionlist = await _queryrepository.GetAllCompaniesClientDivisionInformation(ct);
-                     
+ 
+            return ApiResponseFactory.Ok(infodivisionlist, "");
+        }
+
+
+        /// <summary>
+        /// get all company client division
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="companyclientid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<List<WMSCompanyClientDivisionReadDTO>>> GetAllCompaniesClientDivisionInformationByCompanyClient(int companyclientid,CancellationToken ct)
+        {
+            var infodivisionlist = await _queryrepository.GetAllCompaniesClientDivisionInformationByCompanyClient(companyclientid,ct);
 
             return ApiResponseFactory.Ok(infodivisionlist, "");
         }
+
         /// <summary>
         /// get a division by id
         /// </summary>
@@ -165,7 +175,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesClientDivision
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<ApiResponse<bool>> UpdateClientCompanyDivisionAsync(CompanyClientDivision entity, CancellationToken ct)
+        public Task<ApiResponse<bool>> UpdateClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, CancellationToken ct)
         {
             throw new NotImplementedException();
         }

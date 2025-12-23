@@ -38,12 +38,12 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         }
 
         /// <summary>
-        /// Return all active bins for a company client
+        /// Return all company clients
         /// </summary>
         /// <param name="ct"></param>
        
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<Bines>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("all-client-companies")]
@@ -57,12 +57,12 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         }
 
         /// <summary>
-        /// Return client company by identification  bins for a company client
+        /// Return client company by identification 
         /// </summary>
         /// <param name="companyid"></param>
         ///  <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WmsCompanyclientDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-client-company-by-identification/{companyid}")]
@@ -81,7 +81,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// <param name="companyname"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WMSClientCompaniesDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-client-company-by-name/{companyname}")]
@@ -99,7 +99,7 @@ namespace DUNES.API.ControllersWMS.Masters.ClientCompanies
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WMSClientCompaniesDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSClientCompaniesReadDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("wms-client-company-by-id/{id}")]

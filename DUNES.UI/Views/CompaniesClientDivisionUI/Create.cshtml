@@ -1,0 +1,74 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSCompanyClientDivisionDTO
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<form asp-action="Create" id="createform" method="post">
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="Idcompanyclient" class="control-label"></label>
+                <select asp-for="Idcompanyclient" asp-items=@ViewBag.companiesclient class="form-control">
+                    <option disabled value="0" selected>Select Company Client</option>
+                </select>
+                <span asp-validation-for="Idcompanyclient" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div> *@
+            <div class="form-group">
+                <label asp-for="DivisionName" class="control-label"></label>
+                <input asp-for="DivisionName" class="form-control" />
+                <span asp-validation-for="DivisionName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-1 mt-4">
+            <div class="form-group form-check mt-1">
+                <label class="form-check-label">
+                    <input class="form-check-input" checked="checked" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+        </div>
+        <div class="col-md-1 mt-4">
+            <div class="form-group">
+                <input type="submit" id="btnsubmit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+    
+</form>
+<div class="mt-2">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+
+        const btn = document.getElementById("btnsubmit");
+
+        document.getElementById("createform").addEventListener("submit", async function(e){
+            e.preventDefault();
+
+             const ok = await confirmAction("Do you want to add this company client division?");
+                      if (!ok) return;
+
+                      btn.disabled = true;
+                      this.submit(); // continue to controller
+        
+        
+        });
+
+    </script>
+
+}

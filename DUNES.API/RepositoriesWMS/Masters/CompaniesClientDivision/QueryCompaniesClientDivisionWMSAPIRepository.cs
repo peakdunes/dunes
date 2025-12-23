@@ -53,6 +53,34 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision
             return infodivisionlist;
 
         }
+
+        /// <summary>
+        /// get all company client division by company client
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="companyclientid"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<List<WMSCompanyClientDivisionReadDTO>> GetAllCompaniesClientDivisionInformationByCompanyClient(int companyclientid, CancellationToken ct)
+        {
+            var infodivisionlist = await (from enc in _context.CompanyClientDivision
+                                          join det in _context.CompanyClient on
+                                          enc.Idcompanyclient equals det.Id
+                                          where enc.Idcompanyclient == companyclientid
+                                          select new WMSCompanyClientDivisionReadDTO
+                                          {
+                                              Id = enc.Id,
+                                              DivisionName = enc.DivisionName,
+                                              Idcompanyclient = enc.Idcompanyclient,
+                                              IsActive = enc.IsActive,
+                                              CompanyClientName = det.Name
+
+                                          }).AsNoTracking().ToListAsync(ct);
+
+            return infodivisionlist;
+
+        }
+
         /// <summary>
         /// get division by id
         /// </summary>
