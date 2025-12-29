@@ -13,31 +13,43 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// identity
         /// </summary>
+        /// 
+        [Display(Name = "ID")]
         public int Id { get; set; }
 
         /// <summary>
         /// company id
         /// </summary>
+        /// 
+        [Display(Name = "Company")]
         public int CompanyId { get; set; }
 
         /// <summary>
         /// company client Id
         /// </summary>
+        /// 
+        [Display(Name = "Company Client")]
         public int CompanyClientId { get; set; }
 
         /// <summary>
         /// contract start date
         /// </summary>
+        /// 
+        [Display(Name = "Start Date")]
         public DateTime StartDate { get; set; }
 
         /// <summary>
         /// contract end date
         /// </summary>
+        /// 
+        [Display(Name = "End Date")]
         public DateTime EndDate { get; set; }
 
         /// <summary>
         /// contract is active
         /// </summary>
+        /// 
+        [Display(Name = "Is Active")]
         public bool IsActive { get; set; }
 
 
@@ -45,12 +57,16 @@ namespace DUNES.Shared.DTOs.WMS
         /// contract code
         /// </summary>
         [MaxLength(50)]
+
+        [Display(Name = "Contract Number")]
         public string? ContractCode { get; set; }
 
         /// <summary>
         /// User contract 
         /// </summary>
         [MaxLength(150)]
+
+        [Display(Name = "Contact Name")]
         public string? ContactName { get; set; }
 
 
@@ -58,18 +74,24 @@ namespace DUNES.Shared.DTOs.WMS
         /// contract mail
         /// </summary>
         [MaxLength(150)]
+
+        [Display(Name = "Contect Email")]
         public string? ContactEmail { get; set; }
 
         /// <summary>
         /// Contract phone
         /// </summary>
         [MaxLength(150)]
+
+        [Display(Name = "Contact Phone")]
         public string? ContactPhone { get; set; }
 
         /// <summary>
         /// Notes
         /// </summary>
         [MaxLength(50)]
+
+        [Display(Name = "Notes")]
         public string? Notes { get; set; }
 
         /// <summary>
@@ -77,6 +99,8 @@ namespace DUNES.Shared.DTOs.WMS
         /// 1 = ClientOnly (items del client)
         /// 2 = GenericPlusClient (items propios y del client)
         /// </summary>
+        /// 
+        [Display(Name = "Item Catalog Mode")]
         public int ItemCatalogMode { get; set; }
 
 
