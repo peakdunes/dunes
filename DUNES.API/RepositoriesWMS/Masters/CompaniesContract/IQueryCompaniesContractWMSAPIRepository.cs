@@ -20,24 +20,36 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesContract
         Task<List<WMSCompaniesContractReadDTO>> GetAllClientCompaniesContractInformationAsync(CancellationToken ct);
 
 
+
+        /// <summary>
+        /// Get all company contract  information
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <param name="companyid"></param>
+        /// <returns></returns>
+        Task<List<WMSCompaniesContractReadDTO>> GetAllClientCompaniesContractInformationByCompanyIdAsync(int companyid, CancellationToken ct);
+
+
+
+
         /// <summary>
         /// Get all client company contract  information
         /// </summary>
         /// <param name="ct"></param>
         /// <param name="companyclientid"></param>
         /// <returns></returns>
-        Task<List<WMSCompaniesContractReadDTO>> GetAllClientCompaniesContractInformationByCompanyAsync(int companyclientid, CancellationToken ct);
+        Task<List<WMSCompaniesContractReadDTO>> GetAllClientCompaniesContractInformationByCompanyClientIdAsync(int companyclientid, CancellationToken ct);
 
 
 
         /// <summary>
-        /// Get all client contract information for a company by company identification
+        /// Get all client contract information for a company by company identification and contract number 
         /// </summary>
         /// <param name="companyclientid"></param>
         /// <param name="contractcode"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WMSCompaniesContractReadDTO> GetClientCompanyInformationContractByNumberAsync(int companyclientid, string contractcode, CancellationToken ct);
+        Task<WMSCompaniesContractReadDTO?> GetClientCompanyInformationContractByNumberAndCompanyIdAsync(int companyclientid, string contractcode, CancellationToken ct);
 
 
        
@@ -48,7 +60,16 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesContract
         /// <param name="Id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<WMSCompaniesContractReadDTO> GetClientCompanyContractInformationByIdAsync(int Id, CancellationToken ct);
+        Task<WMSCompaniesContractReadDTO?> GetClientCompanyContractInformationByContractIdAsync(int Id, CancellationToken ct);
+
+
+        /// <summary>
+        /// Get all client contract information for a company by company identification and contract number 
+        /// </summary>
+        /// <param name="contractcode"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<WMSCompaniesContractReadDTO?> GetClientCompanyInformationContractByNumberAsync(string contractcode, CancellationToken ct);
 
 
     }

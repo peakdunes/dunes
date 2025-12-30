@@ -46,7 +46,13 @@ namespace DUNES.API.ServicesWMS.Masters.ClientCompanies
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ApiResponse<bool>> AddClientCompanyAsync(WMSClientCompaniesDTO dto, CancellationToken ct)
         {
-            var validation = await _validator.ValidateAsync(dto, o => o.IncludeRuleSets("Create"));
+           
+            var validation = await _validator.ValidateAsync(dto, o =>
+                     o.IncludeRuleSets("Create")
+                      .IncludeRulesNotInRuleSet()
+                 );
+
+
 
             if (!validation.IsValid)
             {

@@ -1,4 +1,5 @@
-﻿using DUNES.API.Controllers;
+﻿using AutoMapper;
+using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
@@ -18,6 +19,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
     {
 
         private readonly ICompaniesContractWMSAPIService _service;
+        
 
         /// <summary>
         /// DI
@@ -26,6 +28,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         public CompaniesContractWMSController(ICompaniesContractWMSAPIService service)
         {
             _service = service;
+           
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         public async Task<IActionResult> GetAllCompaniesClientContractInformationByCompanyClient(int companyclientid, CancellationToken ct)
         {
 
-            return await HandleApi(ct => _service.GetClientCompanyInformationContractByCompanyIdAsync(companyclientid, ct), ct);
+            return await HandleApi(ct => _service.GetAllClientCompaniesContractInformationByCompanyClientIdAsync(companyclientid, ct), ct);
 
 
         }
@@ -84,7 +87,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         public async Task<IActionResult> GetCompanyClientDivisionByIdAsync(int contractid, CancellationToken ct)
         {
 
-            return await HandleApi(ct => _service.GetClientCompanyContractInformationByIdAsync(contractid, ct), ct);
+            return await HandleApi(ct => _service.GetClientCompanyContractInformationByContractIdAsync(contractid, ct), ct);
 
         }
 
@@ -104,7 +107,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         public async Task<IActionResult> GetCompanyClientContractByNumberCompanyIdAsync(int companyClientId, string contractnumber, CancellationToken ct)
         {
 
-            return await HandleApi(ct => _service.GetClientCompanyInformationContractByNumberCompanyIdAsync(companyClientId, contractnumber, ct), ct);
+            return await HandleApi(ct => _service.GetClientCompanyInformationContractByCompanyIdAndNumberAsync(companyClientId, contractnumber, ct), ct);
 
         }
 
@@ -138,8 +141,6 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         [HttpPost("wms-create-client-company-contract")]
         public async Task<IActionResult> AddClientCompanyContractAsync([FromBody] WMSCompaniesContractDTO companyinfo, CancellationToken ct)
         {
-
-
             return await HandleApi(ct => _service.AddClientCompanyContractAsync(companyinfo, ct), ct);
         }
 
@@ -157,7 +158,6 @@ namespace DUNES.API.ControllersWMS.Masters.CompaniesContract
         {
             return await HandleApi(ct => _service.UpdateClientCompanyContractAsync(companyinfo, ct), ct);
         }
-
 
     }
 }

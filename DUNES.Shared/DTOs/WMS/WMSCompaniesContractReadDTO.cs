@@ -104,16 +104,25 @@ namespace DUNES.Shared.DTOs.WMS
         public int ItemCatalogMode { get; set; }
 
 
-        /// <summary>
-        /// Company Navegation
-        /// </summary>
-        [ForeignKey(nameof(CompanyId))]
-        public virtual WMSCompaniesDTO CompanyNavegation { get; set; } = null!;
+        [Display(Name = "Company Name")]
+        [MaxLength(200)]
+        public string? companyname { get; set; }
 
-        /// <summary>
-        /// state navigation
-        /// </summary>
-        [ForeignKey(nameof(CompanyClientId))]
-        public virtual WMSClientCompaniesDTO CompanyClientNavegation { get; set; } = null!;
+
+        [Display(Name = "Company Client Name")]
+        [MaxLength(200)]
+        public string? companyclientname { get; set; }
+
+        //// <summary>
+        //// Company Navegation
+        //// </summary>
+        //[ForeignKey(nameof(CompanyId))]
+        //public virtual WMSCompaniesDTO CompanyNavegation { get; set; } = null!;
+
+        //// <summary>
+        //// state navigation
+        //// </summary>
+        //[ForeignKey(nameof(CompanyClientId))]
+        //public virtual WMSClientCompaniesDTO CompanyClientNavegation { get; set; } = null!;
     }
 }

@@ -24,7 +24,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesContract
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<bool> UpdateClientCompanyContractAsync(CompanyClient entity, CancellationToken ct);
+        Task<bool> UpdateClientCompanyContractAsync(ModelsWMS.Masters.CompaniesContract entity, CancellationToken ct);
 
         /// <summary>
         /// delete client company contract

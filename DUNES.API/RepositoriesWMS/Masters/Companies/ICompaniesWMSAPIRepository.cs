@@ -16,13 +16,51 @@ namespace DUNES.API.RepositoriesWMS.Masters.Companies
         /// <returns></returns>
         Task<List<Company>> GetAllCompaniesInformation(CancellationToken ct);
 
+    
         /// <summary>
-        /// Get all information for a company by id
+        /// get all active companies
         /// </summary>
-        /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<Company> GetCompanyInformation(int companyid, CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Company>> GetActiveAsync(CancellationToken ct);
+
+        /// <summary>
+        /// get country by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<DUNES.API.ModelsWMS.Masters.Company?> GetByIdAsync(int id, CancellationToken ct);
+
+        /// <summary>
+        /// exist country by id
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="excludeId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct);
+
+        /// <summary>
+        /// add new country
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<DUNES.API.ModelsWMS.Masters.Company> CreateAsync(DUNES.API.ModelsWMS.Masters.Company entity, CancellationToken ct);
+
+        /// <summary>
+        /// update country
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<DUNES.API.ModelsWMS.Masters.Company> UpdateAsync(DUNES.API.ModelsWMS.Masters.Company entity, CancellationToken ct);
+
+        /// <summary>
+        /// Active / No active.
+        /// </summary>
+        Task<bool> SetActiveAsync(int id, bool isActive, CancellationToken ct);
 
     }
 }
