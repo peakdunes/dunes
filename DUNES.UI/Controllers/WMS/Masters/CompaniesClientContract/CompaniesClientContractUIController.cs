@@ -1,4 +1,6 @@
 ﻿using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Models;
+using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
@@ -54,7 +56,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
               Text = "",   // actual
               Url = null
           });
-            return View();
+
+
+            var contractList = await _service.GetAllClientCompaniesContractInformationAsync(token, ct);
+
+
+            return View(contractList.Data);
         }
 
 
@@ -77,9 +84,47 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> create(WMSCompaniesContractDTO dto, CancellationToken ct)
+        {
+            var token = GetToken();
+
+            if (token == null)
+                return RedirectToLogin();
+
+
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, token,
+            new BreadcrumbItem
+            {
+                Text = "New Contract",
+                Url = null
+            });
+
+            return await HandleAsync(async ct =>
+            {
+
+                var createrecord = await _service.AddClientCompanyContractAsync(dto, token, ct);
+
+                if (createrecord == null || createrecord.Data == false)
+                {
+                    MessageHelper.SetMessage(this, "danger", $"Error creating this Company Client Contract Error:{createrecord.Message}", MessageDisplay.Inline);
+
+                    return View(dto);
+                }
+
+                MessageHelper.SetMessage(this, "success", createrecord.Message, MessageDisplay.Inline);
+
+                await LoadInfoAsync(token, ct, 0);
+
+                return RedirectToAction(nameof(Index));
+
+            }, ct);
+
+        }
+
         private async Task LoadInfoAsync(string token, CancellationToken ct, int idselected)
         {
-
 
             List<WMSClientCompaniesReadDTO> listclientcompaniesactives = new List<WMSClientCompaniesReadDTO>();
 

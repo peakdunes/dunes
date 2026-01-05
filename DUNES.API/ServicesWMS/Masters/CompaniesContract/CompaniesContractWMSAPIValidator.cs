@@ -37,7 +37,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
                 RuleFor(x => x.Id)
                     .Equal(0).WithMessage("Id must be 0 when creating.");
 
-
+                RuleFor(x => x.EndDate).Empty().WithMessage("End Date is not required");
             });
 
             // Reglas específicas para UPDATE

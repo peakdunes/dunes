@@ -43,7 +43,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         /// 
         [Display(Name = "End Date")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// contract is active

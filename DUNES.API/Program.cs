@@ -25,6 +25,7 @@ using DUNES.API.RepositoriesWMS.Masters.Cities;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
+using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.API.Services.Auth;
@@ -42,7 +43,9 @@ using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.ServicesWMS.Masters.Cities;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.API.ServicesWMS.Masters.Companies;
 using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
+using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.API.Utils.Logging;
@@ -328,6 +331,7 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
+builder.Services.AddScoped<IValidator<WMSCompaniesContractDTO>, CompaniesContractWMSAPIValidator>();
 
 
 
@@ -340,12 +344,15 @@ builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository
 
 builder.Services.AddScoped<IClientCompaniesWMSAPIRepository, ClientCompaniesWMSAPIRepository>();
 builder.Services.AddScoped<IClientCompaniesWMSAPIService, ClientCompaniesWMSAPIService>();
-
+builder.Services.AddScoped<ICompaniesWMSAPIService, CompaniesWMSAPIService>();
 
 builder.Services.AddScoped<ICommandCompaniesClientDivisionWMSAPIRepository, CommandCompaniesClientDivisionWMSAPIRepository>();
 builder.Services.AddScoped<IQueryCompaniesClientDivisionWMSAPIRepository, QueryCompaniesClientDivisionWMSAPIRepository>();
 builder.Services.AddScoped<ICompaniesClientDivisionWMSAPIService, CompaniesClientDivisionWMSAPIService>();
 
+builder.Services.AddScoped<ICommandCompaniesContractWMSAPIRepository, CommandCompaniesContractWMSAPIRepository>();
+builder.Services.AddScoped<IQueryCompaniesContractWMSAPIRepository, QueryCompaniesContractWMSAPIRepository>();
+builder.Services.AddScoped<ICompaniesContractWMSAPIService, CompaniesContractWMSAPIService>();
 
 
 

@@ -32,7 +32,7 @@ namespace DUNES.API.ModelsWMS.Masters
         /// <summary>
         /// contract end date
         /// </summary>
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 	
         /// <summary>
         /// contract is active

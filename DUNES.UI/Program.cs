@@ -73,7 +73,11 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
 // Cliente HTTP
-builder.Services.AddHttpClient();
+builder.Services.AddHttpClient("DUNES_API", (sp, client) =>
+{
+    var config = sp.GetRequiredService<IConfiguration>();
+    client.BaseAddress = new Uri(config["ApiSettings:BaseUrl"]!);
+});
 
 // Sesión
 builder.Services.AddSession(options =>

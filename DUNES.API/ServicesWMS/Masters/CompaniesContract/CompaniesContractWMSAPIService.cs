@@ -59,9 +59,11 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(CancellationToken ct)
+        public async Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(CancellationToken ct)
         {
-            throw new NotImplementedException();
+            var listcontract = await _queryrepository.GetAllClientCompaniesContractInformationAsync(ct);
+
+            return ApiResponseFactory.Ok(listcontract, "Contract(s) registered in our system.");
         }
 
         /// <summary>
@@ -214,7 +216,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
                 return ApiResponseFactory.BadRequest<bool>("Company Client do not exist");
             }
 
-            var existCompany = await _companyService.GetByIdAsync(entity.CompanyClientId, ct);
+            var existCompany = await _companyService.GetByIdAsync(entity.CompanyId, ct);
 
             if (existCompany == null || existCompany.Data == null)
             {
@@ -223,7 +225,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompaniesContract
      
             var contractinfo = _mapper.Map<DUNES.API.ModelsWMS.Masters.CompaniesContract>(entity);
          
-            var infoinsert = _commandrepository.AddClientCompanyContractAsync(contractinfo, ct);
+            var infoinsert = await _commandrepository.AddClientCompanyContractAsync(contractinfo, ct);
 
             return ApiResponseFactory.Ok(true, "Contract created successfully.");
         }

@@ -13,22 +13,16 @@ namespace DUNES.UI.Services.WMS.Masters.CompaniesClientDivision
     {
 
         private readonly HttpClient _httpClient;
-        private readonly IConfiguration _config;
-        private readonly string _baseUrl;
+      
 
 
         /// <summary>
         /// contructor (DI)
         /// </summary>
         /// <param name="_config"></param>
-        public CompaniesClientDivisionWMSUIService(IConfiguration config)
+        public CompaniesClientDivisionWMSUIService(IHttpClientFactory factory)
         {
-            _config = config;
-            _baseUrl = _config["ApiSettings:BaseUrl"]!;
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(_baseUrl)
-            };
+            _httpClient = factory.CreateClient("DUNES_API");
         }
 
         public async Task<ApiResponse<bool>> AddClientCompanyDivisionAsync(WMSCompanyClientDivisionDTO entity, string token, CancellationToken ct)
@@ -38,7 +32,7 @@ namespace DUNES.UI.Services.WMS.Masters.CompaniesClientDivision
             var json = JsonConvert.SerializeObject(entity);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var respapi = await _httpClient.PostAsync($"/api/CompanyClientDivisionWMS/wms-create-client-company-division", content);
+            var respapi = await _httpClient.PostAsync($"/api/wms-create-client-company-division", content);
 
             return await respapi.ReadAsApiResponseAsync<bool>(ct);
         }

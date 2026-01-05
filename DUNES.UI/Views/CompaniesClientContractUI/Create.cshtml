@@ -5,6 +5,7 @@
 }
 
 <form asp-action="Create">
+    @Html.AntiForgeryToken()
     <div class="row" style="display:none">
         <div class="col-md-4">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -100,7 +101,7 @@
                 <span asp-validation-for="StartDate" class="text-danger"></span>
             </div>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-3" style="display:none">
             <div class="form-group">
                 <label asp-for="EndDate" class="control-label"></label>
                 <input asp-for="EndDate" class="form-control" />

@@ -34,13 +34,33 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesContract
         /// <exception cref="NotImplementedException"></exception>
         public async Task<ModelsWMS.Masters.CompaniesContract> AddClientCompanyContractAsync(ModelsWMS.Masters.CompaniesContract entity, CancellationToken ct)
         {
-           _context.CompaniesContract.Add(entity);
 
-            await _context.SaveChangesAsync();
+            var now = DateTime.UtcNow;
+
+            await using var tx = await _context.Database.BeginTransactionAsync(ct);
+
+            var listcontract = await _context.CompaniesContract
+                .Where(x => x.CompanyClientId == entity.CompanyClientId && x.IsActive)
+                .ToListAsync(ct);
+
+            foreach (var c in listcontract)
+            {
+                c.IsActive = false;
+                if (c.EndDate == null)
+                    c.EndDate = now;
+            }
+
+            // Insert del nuevo
+            _context.CompaniesContract.Add(entity);
+
+            // Un solo SaveChanges => interceptor audita todo en conjunto
+            await _context.SaveChangesAsync(ct);
+
+            await tx.CommitAsync(ct);
 
             return entity;
-            
-            
+
+
         }
         /// <summary>
         /// delete contract
@@ -65,7 +85,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompaniesContract
                 return false;
             }
 
-               
+
         }
         /// <summary>
         /// update contract

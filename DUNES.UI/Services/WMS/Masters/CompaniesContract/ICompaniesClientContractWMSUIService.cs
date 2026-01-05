@@ -58,7 +58,7 @@ namespace DUNES.UI.Services.WMS.Masters.CompaniesContract
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCompaniesContractDTO>> AddClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct);
+        Task<ApiResponse<bool>> AddClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct);
 
         /// <summary>
         /// update client company
