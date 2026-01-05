@@ -32,7 +32,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<Locations>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Locations>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct);
 
 
         /// <summary>

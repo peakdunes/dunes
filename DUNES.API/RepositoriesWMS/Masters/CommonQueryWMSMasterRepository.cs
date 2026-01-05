@@ -63,7 +63,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<Locations>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct)
+        public async Task<List<DUNES.API.ModelsWMS.Masters.Locations>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct)
         {
             var infolocations = await _wmscontext.Locations.Where(x => x.Id == companyid && x.Active == true).ToListAsync(ct);
 

@@ -18,11 +18,7 @@ public partial class Locations
     /// </summary>
     public string? Name { get; set; }
 
-    /// <summary>
-    /// DBK Name associated
-    /// </summary>
-    public string? Namedbk { get; set; }
-
+   
     /// <summary>
     /// Company ID
     /// </summary>

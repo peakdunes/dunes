@@ -34,7 +34,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.Countries
 
         public async Task<ModelsWMS.Masters.Countries> CreateAsync(ModelsWMS.Masters.Countries entity, CancellationToken ct)
         {
-            _context.Add(entity);
+            _context.Countries.Add(entity);
             await _context.SaveChangesAsync();
             return entity;
         }

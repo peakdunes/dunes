@@ -1,38 +1,38 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.Shared.DTOs.WMS;
 
-namespace DUNES.API.RepositoriesWMS.Masters.Countries
+namespace DUNES.API.RepositoriesWMS.Masters.Locations
 {
 
     /// <summary>
-    /// WMS Countries repository
+    /// Locations Interface
     /// </summary>
-    public interface ICountriesWMSAPIRepository
+    public interface ILocationsWMSAPIRepository
     {
 
         /// <summary>
-        /// get all countries
+        /// get all Locations
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Countries>> GetAllAsync(CancellationToken ct);
+        Task<List<WMSLocationsDTO>> GetAllAsync(CancellationToken ct);
 
         /// <summary>
-        /// get all active countries
+        /// get all active Locations
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Countries>> GetActiveAsync(CancellationToken ct);
+        Task<List<WMSLocationsDTO>> GetActiveAsync(CancellationToken ct);
 
         /// <summary>
-        /// get country by id
+        /// get location by id
         /// </summary>
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<DUNES.API.ModelsWMS.Masters.Countries?> GetByIdAsync(int id, CancellationToken ct);
+        Task<WMSLocationsDTO?> GetByIdAsync(int id, CancellationToken ct);
 
         /// <summary>
-        /// exist country by name
+        /// exist location by Name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="excludeId"></param>
@@ -41,20 +41,20 @@ namespace DUNES.API.RepositoriesWMS.Masters.Countries
         Task<bool> ExistsByNameAsync(string name, int? excludeId, CancellationToken ct);
 
         /// <summary>
-        /// add new country
+        /// add new location
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<DUNES.API.ModelsWMS.Masters.Countries> CreateAsync(DUNES.API.ModelsWMS.Masters.Countries entity, CancellationToken ct);
-        
+        Task<DUNES.API.ModelsWMS.Masters.Locations> CreateAsync(DUNES.API.ModelsWMS.Masters.Locations entity, CancellationToken ct);
+
         /// <summary>
-        /// update country
+        /// update location
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<DUNES.API.ModelsWMS.Masters.Countries> UpdateAsync(DUNES.API.ModelsWMS.Masters.Countries entity, CancellationToken ct);
+        Task<DUNES.API.ModelsWMS.Masters.Locations> UpdateAsync(DUNES.API.ModelsWMS.Masters.Locations entity, CancellationToken ct);
 
         /// <summary>
         /// Active / No active.

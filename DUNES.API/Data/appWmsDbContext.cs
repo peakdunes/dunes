@@ -455,9 +455,9 @@ namespace DUNES.API.Data
                 entity.Property(e => e.Name)
                     .HasMaxLength(200)
                     .HasColumnName("name");
-                entity.Property(e => e.Namedbk)
-                    .HasMaxLength(200)
-                    .HasColumnName("namedbk");
+                //entity.Property(e => e.Namedbk)
+                //    .HasMaxLength(200)
+                 //   .HasColumnName("namedbk");
                 entity.Property(e => e.Phone)
                     .HasMaxLength(100)
                     .HasColumnName("phone");
