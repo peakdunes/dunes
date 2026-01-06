@@ -1,0 +1,135 @@
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSLocationsDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+</p>
+<table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+    <thead>
+        <tr>
+            <th>Actions</th>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idcompany)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.companyname)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Idcity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.cityname)
+            </th>
+           
+            <th>
+                @Html.DisplayNameFor(model => model.Address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Zipcode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Active)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idcountry)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.countryname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Idstate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.statename)
+            </th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    <a href="#" onclick="openmodal(@item.Id)"><i class="fas fa-pencil-alt"></i></a> |
+                    <a href="#" onclick="editcompany(@item.Id)"><i class="fas fa-trash-alt"></i></a>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Idcompany)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.companyname)
+                </td>
+              
+                <td>
+                    @Html.DisplayFor(modelItem => item.Idcity)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.cityname)
+                </td>
+            
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Zipcode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Phone)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Active)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Idcountry)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.countryname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Idstate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.statename)
+                </td>
+
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+
+    <script>
+
+        $(document).ready(function(){
+
+                     $('#tablelist').DataTable
+                   ({
+
+                     scrollX: true,
+
+                   });
+
+        })
+
+    </script>
+}
