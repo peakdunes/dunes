@@ -1,6 +1,7 @@
 ﻿
 
 using AutoMapper;
+using DUNES.API.ControllersWMS.Masters.CompaniesContract;
 using DUNES.API.ControllersWMS.Masters.CompanyClientDivision;
 using DUNES.API.Data;
 using DUNES.API.Data.Interceptors;
@@ -27,6 +28,7 @@ using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
+using DUNES.API.RepositoriesWMS.Masters.Locations;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
@@ -47,6 +49,7 @@ using DUNES.API.ServicesWMS.Masters.Companies;
 using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.API.ServicesWMS.Masters.Countries;
+using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
@@ -243,6 +246,13 @@ builder.Services.AddSwaggerGen(c =>
 
             "CountriesWMS" => new[] { "WMS - Countries" },
 
+            "WmsCompanyclient" => new[] { "WMS Company Clients - CRUD" },
+
+            "CompanyClientDivisionWMS" => new[] { "WMS Company Clients Division - CRUD" },
+
+            "CompaniesContractWMS" => new[] { "WMS Company Clients Contract - CRUD" },
+
+            "LocationsWMS" => new[] { "WMS Locations - CRUD" },
 
 
             //#########
@@ -251,11 +261,11 @@ builder.Services.AddSwaggerGen(c =>
             "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
             "ConsignmentCallType" => new[] { "Inventory Calls - CRUD" },
             "TzebB2bInventoryType" => new[] { "Inventory Types - CRUD" },
-            "WmsCompanyclient" => new[] { "Company Clients - CRUD" },
+           
             "mvcGeneralParameters" => new[] { "General Parameters - CRUD" },
-            "CompanyClientDivisionWMS" => new[] { "Company Clients Division - CRUD" },
+           
 
-            
+
 
 
             //#########
@@ -332,7 +342,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSCompaniesContractDTO>, CompaniesContractWMSAPIValidator>();
-
+builder.Services.AddScoped<IValidator<WMSLocationsDTO>, LocationsWMSAPIValidator>();
 
 
 //WMS MASTER SERVICES
@@ -366,6 +376,8 @@ builder.Services.AddScoped<IStateCountriesWMSAPIService, StateCountriesWMSAPISer
 builder.Services.AddScoped<ICitiesWMSAPIRepository, CitiesWMSAPIRepository>();
 builder.Services.AddScoped<ICitiesWMSAPIService, CitiesWMSAPIService>();
 
+builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
+builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();
 
 
 //WEB SERVICE SERVICES

@@ -69,7 +69,10 @@ namespace DUNES.API.Profiles
             CreateMap<CompaniesContract, WMSCompaniesContractReadDTO>().ReverseMap();
 
             CreateMap<Company, WMSCompaniesDTO>().ReverseMap();
-            
+
+            CreateMap<Locations, WMSLocationsDTO > ().ReverseMap();
+
+
         }
 
 
