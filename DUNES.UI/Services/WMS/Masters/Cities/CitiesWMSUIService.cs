@@ -10,18 +10,12 @@ namespace DUNES.UI.Services.WMS.Masters.Cities
     public class CitiesWMSUIService: ICitiesWMSUIService
     {
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
-        private readonly IConfiguration _config;
+      
 
 
-        public CitiesWMSUIService(IConfiguration config)
+        public CitiesWMSUIService(IHttpClientFactory factory)
         {
-            _config = config;
-            _baseUrl = _config["ApiSettings:BaseUrl"]!;
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(_baseUrl)
-            };
+            _httpClient = factory.CreateClient("DUNES_API");
         }
 
         public async Task<ApiResponse<bool>> AddCityAsync(WMSCitiesDTO entity, string token, CancellationToken ct)

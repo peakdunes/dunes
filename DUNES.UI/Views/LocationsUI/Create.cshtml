@@ -1,0 +1,118 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSLocationsDTO
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>WMSLocationsDTO</h4>
+<hr />
+<form asp-action="Create">
+    <div class="row" style="display:none">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idcompany" class="control-label"></label>
+                <input asp-for="Idcompany" class="form-control" />
+                <span asp-validation-for="Idcompany" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idcountry" class="control-label"></label>
+                <select asp-for="Idcountry" class="form-control" asp-items="@ViewBag.listcountries">
+                    <option value="0" selected disabled>Select Country</option>
+                </select>
+                <span asp-validation-for="Idcountry" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idstate" class="control-label"></label>
+                <select asp-for="Idstate" class="form-control" id="Idstate" disabled>
+                    <option value="0">Select State</option>
+                </select>
+                <span asp-validation-for="Idstate" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Idcity" class="control-label"></label>
+                <select asp-for="Idcity" class="form-control" id="Idcity" disabled>
+                    <option value="0">Select City</option>
+                </select>
+                <span asp-validation-for="Idcity" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="form-group">
+                <label asp-for="Zipcode" class="control-label"></label>
+                <input asp-for="Zipcode" class="form-control" />
+                <span asp-validation-for="Zipcode" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Phone" class="control-label"></label>
+                <input asp-for="Phone" class="form-control" />
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-group form-check mt-1">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-2">
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+
+</form>
+<div class="mt-2">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

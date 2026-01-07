@@ -65,6 +65,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -113,7 +114,8 @@ builder.Services.AddDbContext<appWmsDbContext>((sp, options) =>
 
 //User administration with Identity
 builder.Services.AddDbContext<IdentityDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
+//options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 //authentication services
 
@@ -221,6 +223,12 @@ builder.Services.AddSwaggerGen(c =>
         {
 
             //#########
+            //AUTH
+            //#########
+            "UserConfiguration" => new[] { "AUTH User Configuration" },
+            "Auth" => new[] { "AUTH User Authentication" },
+            
+            //#########
             //INV
             //#########
 
@@ -290,6 +298,9 @@ builder.Services.AddSwaggerGen(c =>
 //AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+builder.Services.AddScoped<IUserConfigurationRepository, UserConfigurationRepository>();
+
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITraceProvider, TraceProvider>();
