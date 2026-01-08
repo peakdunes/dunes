@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Models.Configuration;
+using DUNES.API.ModelsWMS.Admin;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +20,74 @@ namespace DUNES.API.Data
         /// </summary>
         public DbSet<UserConfiguration> UserConfiguration { get; set; } = default!;
 
+        /// <summary>
+        /// Menu access options
+        /// </summary>
+        public virtual DbSet<Menu> Menu { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Menu>(entity =>
+            {
+                entity.ToTable("Menu");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.Id).HasColumnName("Id");
+
+                entity.Property(e => e.Code)
+                    .HasMaxLength(10)
+                    .HasColumnName("code");
+
+                entity.Property(e => e.Level1)
+                    .HasMaxLength(100)
+                    .HasColumnName("level1");
+
+                entity.Property(e => e.Level2)
+                    .HasMaxLength(100)
+                    .HasColumnName("level2");
+
+                entity.Property(e => e.Level3)
+                    .HasMaxLength(100)
+                    .HasColumnName("level3");
+
+                entity.Property(e => e.Level4)
+                    .HasMaxLength(100)
+                    .HasColumnName("level4");
+
+                entity.Property(e => e.Level5)
+                    .HasMaxLength(100)
+                    .HasColumnName("level5");
+
+                entity.Property(e => e.Roles)
+                    .HasMaxLength(500)
+                    .HasColumnName("roles");
+
+                entity.Property(e => e.Active)
+                    .HasColumnName("active");
+
+                entity.Property(e => e.Utility)
+                    .HasMaxLength(500)
+                    .HasColumnName("Utility"); // OJO: en tu diseño aparece con U mayúscula
+
+                entity.Property(e => e.Action)
+                    .HasMaxLength(100)
+                    .HasColumnName("action");
+
+                entity.Property(e => e.Controller)
+                    .HasMaxLength(100)
+                    .HasColumnName("controller");
+
+                entity.Property(e => e.Order)
+                    .HasColumnName("order"); // reserved word ok via mapping
+
+                entity.Property(e => e.Title)
+                    .HasColumnType("varchar(200)")
+                    .HasColumnName("title");
+            });
+
 
             modelBuilder.Entity<UserConfiguration>(entity =>
             {

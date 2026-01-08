@@ -138,6 +138,8 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<CompanyClientDivision> CompanyClientDivision { get; set; }
 
+      
+
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
@@ -145,6 +147,8 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+           
 
             modelBuilder.Entity<CompanyClientDivision>(entity =>
             {

@@ -14,8 +14,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.Locations
 
         public readonly IConfiguration _config;
         public readonly int _companyDefault;
-        private const string MENU_CODE_INDEX = "010202";
-        private const string MENU_CODE_CRUD = "010202ZZ";
+        private const string MENU_CODE_INDEX = "01020804";
+        private const string MENU_CODE_CRUD = "01020804ZZ";
 
         /// <summary>
         /// Contructor (DI)
