@@ -1,10 +1,9 @@
 ﻿using DUNES.API.Data;
-
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DUNES.API.Repositories.Auth
+namespace DUNES.API.RepositoriesWMS.Auth
 {
     /// <summary>
     /// Concrete repository for fetching menu items from the database.
@@ -12,13 +11,13 @@ namespace DUNES.API.Repositories.Auth
     public class MenuRepository : IMenuRepository
     {
 
-        private readonly AppDbContext _context;
+        private readonly IdentityDbContext _context;
 
         /// <summary>
         /// dependence injection
         /// </summary>
         /// <param name="context"></param>
-        public MenuRepository(AppDbContext context)
+        public MenuRepository(IdentityDbContext context)
         {
             _context = context;
         }
@@ -32,13 +31,12 @@ namespace DUNES.API.Repositories.Auth
         public async Task<List<MenuItemDto>> GetAllActiveMenusAsync(IEnumerable<string> userRoles, CancellationToken ct)
         {
             var roleList = userRoles.ToList();
-            var menus = await _context.MvcPartRunnerMenu
+            var menus = await _context.Menu
                 .Where(m => m.Active == true && m.Code.Length == 2)
                 .OrderBy(m => m.Order)
                 .ToListAsync(ct); // ejecuta la query en SQL
 
             return menus
-                .Where(m => roleList.Any(role => m.Roles.Contains(role))) // filtro en memoria
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code ?? string.Empty,
@@ -46,7 +44,6 @@ namespace DUNES.API.Repositories.Auth
                     Utility = m.Utility ?? string.Empty,
                     Controller = m.Controller ?? string.Empty,
                     Action = m.Action ?? string.Empty,
-                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = ""
@@ -71,13 +68,13 @@ namespace DUNES.API.Repositories.Auth
             int nextlevel = large + 2;
 
             var roleList = roles.ToList();
-            var menus = await _context.MvcPartRunnerMenu
+            var menus = await _context.Menu
                 .Where(m => m.Active == true && m.Code.Length == nextlevel && m.Code.StartsWith(level1.Trim()))
                   .OrderBy(m => m.Order)
                 .ToListAsync(ct); 
 
            var menu2 = menus
-                .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
+               
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code ?? string.Empty,
@@ -85,7 +82,6 @@ namespace DUNES.API.Repositories.Auth
                     Utility = m.Utility ?? string.Empty,
                     Controller = m.Controller ?? string.Empty,
                     Action = m.Action ?? string.Empty,
-                    Roles = m.Roles ?? string.Empty,
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = level1
@@ -105,13 +101,13 @@ namespace DUNES.API.Repositories.Auth
         public async Task<List<MenuItemDto>> GetAllMenusByRolesAsync(IEnumerable<string> roles, CancellationToken ct)
         {
             var roleList = roles.ToList();
-            var menus = await _context.MvcPartRunnerMenu
+            var menus = await _context.Menu
                 .Where(m => m.Active == true)
                 .OrderBy(m => m.Order)
                 .ToListAsync(ct); // ejecuta la query en SQL
 
            var menu2 = menus
-                .Where(m => roleList.Any(role => m.Roles!.Contains(role))) // filtro en memoria
+               
                 .Select(m => new MenuItemDto
                 {
                     Code = m.Code ?? string.Empty,
@@ -119,7 +115,7 @@ namespace DUNES.API.Repositories.Auth
                     Utility = m.Utility ?? string.Empty,
                     Controller = m.Controller ?? string.Empty,
                     Action = m.Action ?? string.Empty,
-                    Roles = m.Roles ?? string.Empty,
+                   
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2
@@ -141,7 +137,7 @@ namespace DUNES.API.Repositories.Auth
         public async Task<MenuItemDto> GetCodeByControllerAction(string controller, string action, CancellationToken ct)
         {
 
-            var m = await _context.MvcPartRunnerMenu
+            var m = await _context.Menu
                 .FirstOrDefaultAsync(m => m.Active == true
                     && m.Controller!.ToLower() == controller.ToLower()
                     && m.Action!.ToLower() == action.ToLower(),ct
@@ -156,7 +152,7 @@ namespace DUNES.API.Repositories.Auth
                     Utility = m.Utility ?? string.Empty,
                     Controller = m.Controller ?? string.Empty,
                     Action = m.Action ?? string.Empty,
-                    Roles = m.Roles ?? string.Empty,
+                 
                     Active = m.Active,
                     Order = m.Order,
                     previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2 ? m.Code.Substring(0, m.Code.Length - 2) : m.Code ?? string.Empty
@@ -169,7 +165,7 @@ namespace DUNES.API.Repositories.Auth
         /// <returns></returns>
         public async Task<List<MenuItemDto>> GetAllMenusAsync(CancellationToken ct)
         {
-            var menus = await _context.MvcPartRunnerMenu
+            var menus = await _context.Menu
               .Where(m => m.Active == true)
               .OrderBy(m => m.Order)
               .ToListAsync(ct); // ejecuta la query en SQL
@@ -182,7 +178,7 @@ namespace DUNES.API.Repositories.Auth
                      Utility = m.Utility ?? string.Empty,
                      Controller = m.Controller ?? string.Empty,
                      Action = m.Action ?? string.Empty,
-                     Roles = m.Roles ?? string.Empty,
+                    
                      Active = m.Active,
                      Order = m.Order,
                      previousmenu = !string.IsNullOrEmpty(m.Code) && m.Code.Length > 2

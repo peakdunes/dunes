@@ -1,5 +1,5 @@
 ﻿using DUNES.API.Models.Configuration;
-using DUNES.API.ModelsWMS.Admin;
+using DUNES.API.ModelsWMS.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -25,11 +25,179 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<Menu> Menu { get; set; }
 
+
+        /// <summary>
+        /// Permissions catalog (stable keys like: WMS.LOCATIONS.ACCESS, ADMIN.USERS.EDIT).
+        /// </summary>
+        public virtual DbSet<AuthPermission> AuthPermissions { get; set; } = null!;
+
+        /// <summary>
+        /// Role → Permission mapping (many-to-many).
+        /// Defines the base permissions granted by each Identity role.
+        /// </summary>
+        public virtual DbSet<AuthRolePermission> AuthRolePermissions { get; set; } = null!;
+
+        /// <summary>
+        /// User → Permission mapping (grants only for now).
+        /// Used for user-specific exceptions without creating new roles.
+        /// </summary>
+        public virtual DbSet<AuthUserPermission> AuthUserPermissions { get; set; } = null!;
+
+        /// <summary>
+        /// Menu → Permission mapping (usually ACCESS permissions).
+        /// Controls which menu options are visible/available based on permissions.
+        /// </summary>
+        public virtual DbSet<MenuPermission> MenuPermissions { get; set; } = null!;
+
+
+        /// <summary>
+        /// Fluent API mappings for this DbContext.
+        /// Here we configure table names, column types/lengths, keys (including composite keys),
+        /// indexes/unique constraints, and foreign-key relationships for Identity + Auth + Menu
+        /// entities without relying only on data annotations.
+        /// </summary>
+        /// <param name="modelBuilder">EF Core model builder used to configure the entity model.</param>
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Menu>(entity =>
+            //////
+
+
+            // =========================
+            // AuthPermissions
+            // =========================
+            modelBuilder.Entity<AuthPermission>(entity =>
+            {
+                entity.ToTable("AuthPermissions");
+
+                entity.HasKey(x => x.Id);
+
+                entity.Property(x => x.PermissionKey)
+                    .HasMaxLength(150)
+                    .IsRequired();
+
+                entity.HasIndex(x => x.PermissionKey)
+                    .IsUnique()
+                    .HasDatabaseName("UX_AuthPermissions_PermissionKey");
+
+                entity.Property(x => x.Description)
+                    .HasMaxLength(300);
+
+                entity.Property(x => x.IsActive)
+                    .HasDefaultValue(true);
+
+                // CreatedAt default in SQL
+                entity.Property(x => x.CreatedAt)
+                    .HasColumnType("datetime2")
+                    .HasDefaultValueSql("sysutcdatetime()");
+            });
+
+            // =========================
+            // AuthRolePermissions (RoleId, PermissionId)
+            // =========================
+            modelBuilder.Entity<AuthRolePermission>(entity =>
+            {
+                entity.ToTable("AuthRolePermissions");
+
+                entity.HasKey(x => new { x.RoleId, x.PermissionId });
+
+                entity.Property(x => x.RoleId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(x => x.PermissionId)
+                    .IsRequired();
+
+                // FK -> AspNetRoles
+                entity.HasOne<IdentityRole>()
+                    .WithMany()
+                    .HasForeignKey(x => x.RoleId)
+                    .HasConstraintName("FK_AuthRolePermissions_AspNetRoles_RoleId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // FK -> AuthPermissions
+                entity.HasOne<AuthPermission>()
+                    .WithMany()
+                    .HasForeignKey(x => x.PermissionId)
+                    .HasConstraintName("FK_AuthRolePermissions_AuthPermissions_PermissionId")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.PermissionId)
+                    .HasDatabaseName("IX_AuthRolePermissions_PermissionId");
+            });
+
+            // =========================
+            // AuthUserPermissions (UserId, PermissionId) - grants only
+            // =========================
+            modelBuilder.Entity<AuthUserPermission>(entity =>
+            {
+                entity.ToTable("AuthUserPermissions");
+
+                entity.HasKey(x => new { x.UserId, x.PermissionId });
+
+                entity.Property(x => x.UserId)
+                    .HasMaxLength(450)
+                    .IsRequired();
+
+                entity.Property(x => x.PermissionId)
+                    .IsRequired();
+
+                // FK -> AspNetUsers
+                entity.HasOne<IdentityUser>()
+                    .WithMany()
+                    .HasForeignKey(x => x.UserId)
+                    .HasConstraintName("FK_AuthUserPermissions_AspNetUsers_UserId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // FK -> AuthPermissions
+                entity.HasOne<AuthPermission>()
+                    .WithMany()
+                    .HasForeignKey(x => x.PermissionId)
+                    .HasConstraintName("FK_AuthUserPermissions_AuthPermissions_PermissionId")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.PermissionId)
+                    .HasDatabaseName("IX_AuthUserPermissions_PermissionId");
+            });
+
+            // =========================
+            // MenuPermissions (MenuId, PermissionId)
+            // =========================
+            modelBuilder.Entity<MenuPermission>(entity =>
+            {
+                entity.ToTable("MenuPermissions");
+
+                entity.HasKey(x => new { x.MenuId, x.PermissionId });
+
+                entity.Property(x => x.MenuId).IsRequired();
+                entity.Property(x => x.PermissionId).IsRequired();
+
+                // FK -> Menu
+                entity.HasOne<Menu>() // tu entity del menú
+                    .WithMany()
+                    .HasForeignKey(x => x.MenuId)
+                    .HasConstraintName("FK_MenuPermissions_Menu_MenuId")
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // FK -> AuthPermissions
+                entity.HasOne<AuthPermission>()
+                    .WithMany()
+                    .HasForeignKey(x => x.PermissionId)
+                    .HasConstraintName("FK_MenuPermissions_AuthPermissions_PermissionId")
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(x => x.PermissionId)
+                    .HasDatabaseName("IX_MenuPermissions_PermissionId");
+            });
+
+       
+
+
+        /////////////
+
+        modelBuilder.Entity<Menu>(entity =>
             {
                 entity.ToTable("Menu");
 
@@ -61,16 +229,14 @@ namespace DUNES.API.Data
                     .HasMaxLength(100)
                     .HasColumnName("level5");
 
-                entity.Property(e => e.Roles)
-                    .HasMaxLength(500)
-                    .HasColumnName("roles");
+              
 
                 entity.Property(e => e.Active)
                     .HasColumnName("active");
 
                 entity.Property(e => e.Utility)
                     .HasMaxLength(500)
-                    .HasColumnName("Utility"); // OJO: en tu diseño aparece con U mayúscula
+                    .HasColumnName("Utility"); 
 
                 entity.Property(e => e.Action)
                     .HasMaxLength(100)

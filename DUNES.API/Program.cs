@@ -1,6 +1,7 @@
 ﻿
 
 using AutoMapper;
+using DUNES.API.Auth.Authorization;
 using DUNES.API.ControllersWMS.Masters.CompaniesContract;
 using DUNES.API.ControllersWMS.Masters.CompanyClientDivision;
 using DUNES.API.Data;
@@ -8,7 +9,6 @@ using DUNES.API.Data.Interceptors;
 using DUNES.API.Models.Configuration;
 using DUNES.API.Models.Masters;
 using DUNES.API.Profiles;
-using DUNES.API.Repositories.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Transactions;
@@ -19,6 +19,7 @@ using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
 using DUNES.API.Repositories.Masters;
 using DUNES.API.Repositories.WebService.Queries;
 using DUNES.API.Repositories.WebService.Transactions;
+using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
@@ -40,6 +41,7 @@ using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.Services.WebService.Queries;
 using DUNES.API.Services.WebService.Transactions;
+using DUNES.API.ServicesWMS.Auth;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
@@ -223,7 +225,7 @@ builder.Services.AddSwaggerGen(c =>
         {
 
             //#########
-            //AUTH
+            //WMS AUTH
             //#########
             "UserConfiguration" => new[] { "AUTH User Configuration" },
             "Auth" => new[] { "AUTH User Authentication" },
@@ -300,6 +302,10 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 builder.Services.AddScoped<IUserConfigurationRepository, UserConfigurationRepository>();
+builder.Services.AddScoped<IAuthPermissionRepository, AuthPermissionRepository>();
+builder.Services.AddScoped<IAuthPermissionService, AuthPermissionService>();
+//builder.Services.AddScoped<RequiresPermissionFilter>();
+
 
 
 builder.Services.AddHttpContextAccessor();

@@ -1,6 +1,5 @@
 ﻿using DUNES.API.DTOs.B2B;
-using DUNES.API.Repositories.Auth;
-
+using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Inventory;
 using DUNES.Shared.Models;

@@ -38,11 +38,7 @@ namespace DUNES.Shared.DTOs.Auth
         [JsonPropertyName("action")]
         public string Action { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Roles that have access to this menu (comma-separated).
-        /// </summary>
-        [JsonPropertyName("roles")]
-        public string Roles { get; set; } = string.Empty;
+       
 
         /// <summary>
         /// Indicates if the menu item is active.

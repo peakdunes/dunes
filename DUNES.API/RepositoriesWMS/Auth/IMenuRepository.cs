@@ -2,7 +2,7 @@
 using DUNES.Shared.Models;
 using System.Collections.Generic;
 
-namespace DUNES.API.Repositories.Auth
+namespace DUNES.API.RepositoriesWMS.Auth
 {
     /// <summary>
     /// Repository interface for accessing menu data from the database.

@@ -1,6 +1,6 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.Models.Configuration;
-using DUNES.API.Repositories.Auth;
+using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;

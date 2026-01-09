@@ -1,4 +1,5 @@
-﻿using DUNES.API.Controllers;
+﻿using DUNES.API.Auth.Authorization;
+using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
@@ -15,6 +16,7 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
+    [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.ACCESS")]
     public class LocationsWMSController : BaseController
     {
 
@@ -105,6 +107,8 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         /// <param name="model"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
+        [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.CREATE")]
         [HttpPost("wms-create-location")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
@@ -123,6 +127,8 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         /// <param name="model"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
+        [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.UPDATE")]
         [HttpPut("wms-update-location")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
@@ -142,6 +148,8 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         /// <param name="isActive"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
+        /// 
+        [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.UPDATE")]
         [HttpPut("wms-set-active-location/{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]

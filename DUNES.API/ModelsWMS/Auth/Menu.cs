@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace DUNES.API.ModelsWMS.Admin
+namespace DUNES.API.ModelsWMS.Auth
 {
     /// <summary>
     /// Menu table entity (legacy structure: level1..level5).
@@ -48,11 +48,7 @@ namespace DUNES.API.ModelsWMS.Admin
         [MaxLength(100)]
         public string? Level5 { get; set; }
 
-        /// <summary>
-        /// Legacy roles column (comma separated). We will stop using it once permissions tables are ready.
-        /// </summary>
-        [MaxLength(500)]
-        public string? Roles { get; set; }
+       
 
         /// <summary>
         /// is active

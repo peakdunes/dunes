@@ -114,10 +114,19 @@ namespace DUNES.API.Services.Auth
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName!),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+                {
+                    // UserId (GUID) -> clave para permisos / configuraciones por usuario
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+
+                    // Opcional pero recomendado (estándar JWT)
+                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+
+                    // Username/email
+                    new Claim(ClaimTypes.Name, user.UserName!),
+
+                    // Token id
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                };
 
             //var authClaims = new List<Claim>
             //{

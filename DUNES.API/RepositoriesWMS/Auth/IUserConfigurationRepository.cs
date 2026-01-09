@@ -1,7 +1,7 @@
 ﻿using DUNES.API.Models.Configuration;
 using DUNES.Shared.DTOs.Auth;
 
-namespace DUNES.API.Repositories.Auth
+namespace DUNES.API.RepositoriesWMS.Auth
 {
     /// <summary>
     /// User Configuration Repository

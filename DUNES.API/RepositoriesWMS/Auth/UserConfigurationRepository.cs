@@ -3,7 +3,7 @@ using DUNES.API.Models.Configuration;
 using DUNES.Shared.DTOs.Auth;
 using Microsoft.EntityFrameworkCore;
 
-namespace DUNES.API.Repositories.Auth
+namespace DUNES.API.RepositoriesWMS.Auth
 {
     /// <summary>
     /// User configuration repository implementation
