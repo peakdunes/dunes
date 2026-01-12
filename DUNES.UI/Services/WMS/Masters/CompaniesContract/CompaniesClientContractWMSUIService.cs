@@ -1,75 +1,70 @@
 ﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
-using DUNES.UI.Infrastructure;
-using Newtonsoft.Json;
-using System.Net.Http.Headers;
-using System.Text;
+using DUNES.UI.Services.Common;
 
 namespace DUNES.UI.Services.WMS.Masters.CompaniesContract
 {
-    public class CompaniesClientContractWMSUIService : ICompaniesClientContractWMSUIService
+    public class CompaniesClientContractWMSUIService
+        : UIApiServiceBase, ICompaniesClientContractWMSUIService
     {
-
-
-        private readonly HttpClient _httpClient;
-      
-
         public CompaniesClientContractWMSUIService(IHttpClientFactory factory)
+            : base(factory)
         {
-            _httpClient = factory.CreateClient("DUNES_API");
         }
 
-        public async Task<ApiResponse<bool>> AddClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        public Task<ApiResponse<bool>> AddClientCompanyContractAsync(
+            WMSCompaniesContractDTO entity,
+            string token,
+            CancellationToken ct)
+            => PostApiAsync<bool, WMSCompaniesContractDTO>(
+                "/api/LocationsWMS/wms-create-location",
+                entity,
+                token,
+                ct);
 
-            var json = JsonConvert.SerializeObject(entity);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+        public Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<List<WMSCompaniesContractReadDTO>>(
+                "/api/CompaniesContractWMS/all-client-contracts",
+                token,
+                ct);
 
-            var respapi = await _httpClient.PostAsync($"/api/LocationsWMS/wms-create-location", content);
+        public Task<ApiResponse<bool>> DeleteClientCompanyContractAsync(
+            int id,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-            return await respapi.ReadAsApiResponseAsync<bool>(ct);
-        }
+        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyContractInformationByIdAsync(
+            int id,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-        public Task<ApiResponse<bool>> DeleteClientCompanyContractAsync(int id, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetClientCompanyInformationContractByCompanyIdAsync(
+            int companyclientid,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-        public async Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetAllClientCompaniesContractInformationAsync(string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberAsync(
+            string contractcode,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-           
+        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberCompanyIdAsync(
+            int companyclientid,
+            string contractcode,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-            var respapi = await _httpClient.GetAsync($"/api/CompaniesContractWMS/all-client-contracts");
-
-            return await respapi.ReadAsApiResponseAsync<List<WMSCompaniesContractReadDTO>>(ct);
-        }
-
-        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyContractInformationByIdAsync(int Id, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ApiResponse<List<WMSCompaniesContractReadDTO>>> GetClientCompanyInformationContractByCompanyIdAsync(int companyclientid, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberAsync(string contractcode, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ApiResponse<WMSCompaniesContractReadDTO>> GetClientCompanyInformationContractByNumberCompanyIdAsync(int companyclientid, string contractcode, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ApiResponse<bool>> UpdateClientCompanyContractAsync(WMSCompaniesContractDTO entity, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ApiResponse<bool>> UpdateClientCompanyContractAsync(
+            WMSCompaniesContractDTO entity,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
     }
 }

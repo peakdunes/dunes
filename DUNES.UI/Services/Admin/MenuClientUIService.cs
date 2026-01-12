@@ -1,63 +1,52 @@
 ﻿using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.UI.Models;
+using DUNES.UI.Services.Common;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using NuGet.Common;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 
 namespace DUNES.UI.Services.Admin
 {
     /// <summary>
-    /// Navegation menu
+    /// Navigation menu service (UI)
     /// </summary>
-    public class MenuClientUIService : IMenuClientUIService
+    public class MenuClientUIService: UIApiServiceBase, IMenuClientUIService
     {
-        private readonly IMemoryCache _cache;
-        private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
-        private readonly IConfiguration _config;
+        private readonly IMemoryCache _cache; //“Esta clase puede guardar y leer datos temporales en memoria.”
 
         private const string CACHE_KEY = "GLOBAL_MENU";
 
-        public MenuClientUIService(IConfiguration config, IMemoryCache cache)
+        public MenuClientUIService(
+            IHttpClientFactory factory,
+            IMemoryCache cache)
+            : base(factory)
         {
-            _config = config;
-            _baseUrl = _config["ApiSettings:BaseUrl"]!;
             _cache = cache;
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(_baseUrl)
-            };
-
-         
-
         }
-        /// <summary>
-        /// Return navegation menu (show in all views for menu navegation
-        /// </summary>
-        /// <param name="menuCode"></param>
-        /// <returns></returns>
-        public async Task<List<BreadcrumbItem>> GetBreadcrumbAsync(string token, string menuCode,  CancellationToken ct)
-        {
 
+        /// <summary>
+        /// Returns breadcrumb navigation for current menu
+        /// </summary>
+        public async Task<List<BreadcrumbItem>> GetBreadcrumbAsync(
+            string token,
+            string menuCode,
+            CancellationToken ct)
+        {
             var allMenus = await GetMenuAsync(token, ct);
 
             var breadcrumb = new List<BreadcrumbItem>
-        {
-            new BreadcrumbItem
             {
-                Text = "Home",
-                Url = "/"
-            }
-        };
+                new BreadcrumbItem
+                {
+                    Text = "Home",
+                    Url = "/"
+                }
+            };
 
             if (string.IsNullOrWhiteSpace(menuCode))
                 return breadcrumb;
 
-            // Construimos la cadena padre → hijo
+            // Build parent → child path
             var stack = new Stack<MenuItemDto>();
             var current = menuCode;
 
@@ -90,61 +79,46 @@ namespace DUNES.UI.Services.Admin
             }
 
             return breadcrumb;
-
-            //try
-            //{
-            //    if (!string.IsNullOrWhiteSpace(token))
-            //    {
-            //        _httpClient.DefaultRequestHeaders.Authorization =
-            //            new AuthenticationHeaderValue("Bearer", token);
-            //    }
-
-            //    var response = await _httpClient.GetFromJsonAsync<ApiResponse<List<MenuItemDto>>>(
-            //        $"/api/Menu/api/menu/breadcrumb/{menuCode}");
-
-            //    return response?.Success == true ? response.Data : new List<MenuItemDto>();
-            //}
-            //catch
-            //{
-            //    return new List<MenuItemDto>(); // Si falla, devuelve vacío
-            //}
         }
 
-        public async Task<string?> GetCodeByControllerActionAsync(string controller, string action, string token)
+        /// <summary>
+        /// Gets menu code by controller/action
+        /// </summary>
+        public async Task<string?> GetCodeByControllerActionAsync(
+            string controller,
+            string action,
+            string token)
         {
+            var resp = await GetApiAsync<MenuItemDto>(
+                $"/api/Menu/codeByControllerAction?controller={controller}&action={action}",
+                token,
+                CancellationToken.None);
 
-          
-
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            // endpoint que devuelva un menú por controller/action
-            var response = await _httpClient.GetAsync($"/api/Menu/codeByControllerAction?controller={controller}&action={action}");
-
-            if (!response.IsSuccessStatusCode)
-                return null;
-
-            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<MenuItemDto>>();
-
-            return apiResponse?.Success == true ? apiResponse.Data?.Code : null;
+            return resp.Success
+                ? resp.Data?.Code
+                : null;
         }
 
-        public async Task<List<MenuItemDto>> GetMenuAsync(string token, CancellationToken ct = default)
+        /// <summary>
+        /// Gets full menu (cached)
+        /// </summary>
+        public async Task<List<MenuItemDto>> GetMenuAsync(
+            string token,
+            CancellationToken ct = default)
         {
             if (_cache.TryGetValue(CACHE_KEY, out List<MenuItemDto> cached))
                 return cached;
-                        
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-           
+            var resp = await GetApiAsync<List<MenuItemDto>>(
+                "/api/Menu/all",
+                token,
+                ct);
 
-            var response = await _httpClient.GetAsync("/api/Menu/all", ct);
-            if (!response.IsSuccessStatusCode)
-                return new List<MenuItemDto>();
+            var menu = resp.Success
+                ? resp.Data ?? new List<MenuItemDto>()
+                : new List<MenuItemDto>();
 
-            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<MenuItemDto>>>(cancellationToken: ct);
-            var menu = apiResponse?.Data ?? new List<MenuItemDto>();
-
-            // Cache 30 minutos (puede ser más si el menú casi nunca cambia)
+            // Cache for 30 minutes
             _cache.Set(CACHE_KEY, menu, TimeSpan.FromMinutes(30));
 
             return menu;

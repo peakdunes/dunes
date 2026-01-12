@@ -1,99 +1,73 @@
-﻿using DUNES.Shared.DTOs.Inventory;
-using DUNES.Shared.DTOs.Masters;
+﻿using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
-using DUNES.UI.Infrastructure;
-using Newtonsoft.Json;
-using NuGet.Common;
-using System.Net.Http.Headers;
-using System.Text;
+using DUNES.UI.Services.Common;
 
 namespace DUNES.UI.Services.WMS.Masters.ClientCompanies
 {
-    public class ClientCompaniesWMSUIService : IClientCompaniesWMSUIService
+    public class ClientCompaniesWMSUIService
+        : UIApiServiceBase, IClientCompaniesWMSUIService
     {
-
-        private readonly HttpClient _httpClient;
-        private readonly string _baseUrl;
-        private readonly IConfiguration _config;
-
-
-        public ClientCompaniesWMSUIService(IConfiguration config)
+        public ClientCompaniesWMSUIService(IHttpClientFactory factory)
+            : base(factory)
         {
-            _config = config;
-            _baseUrl = _config["ApiSettings:BaseUrl"]!;
-            _httpClient = new HttpClient
-            {
-                BaseAddress = new Uri(_baseUrl)
-            };
         }
 
-        public async Task<ApiResponse<bool>> AddClientCompanyAsync(WmsCompanyclientDto entity, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        public Task<ApiResponse<bool>> AddClientCompanyAsync(
+            WmsCompanyclientDto entity,
+            string token,
+            CancellationToken ct)
+            => PostApiAsync<bool, WmsCompanyclientDto>(
+                "/api/ClientCompaniesWMS/wms-create-client-company",
+                entity,
+                token,
+                ct);
 
-            var json = JsonConvert.SerializeObject(entity);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+        public Task<ApiResponse<bool>> DeleteClientCompanyAsync(
+            int id,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
 
-            var respapi = await _httpClient.PostAsync($"/api/ClientCompaniesWMS/wms-create-client-company",content);
+        public Task<ApiResponse<List<WMSClientCompaniesReadDTO>>> GetAllClientCompaniesInformation(
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<List<WMSClientCompaniesReadDTO>>(
+                "/api/ClientCompaniesWMS/all-client-companies",
+                token,
+                ct);
 
-            return await respapi.ReadAsApiResponseAsync<bool>(ct);
-        }
+        public Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdAsync(
+            int id,
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<WMSClientCompaniesReadDTO>(
+                $"/api/ClientCompaniesWMS/wms-client-company-by-id/{id}",
+                token,
+                ct);
 
-        public Task<ApiResponse<bool>> DeleteClientCompanyAsync(int id, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdentificationAsync(
+            string companyid,
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<WMSClientCompaniesReadDTO>(
+                $"/api/ClientCompaniesWMS/wms-client-company-by-identification/{companyid}",
+                token,
+                ct);
 
-        public async Task<ApiResponse<List<WMSClientCompaniesReadDTO>>> GetAllClientCompaniesInformation(string token ,CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        public Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByNameAsync(
+            string companyname,
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<WMSClientCompaniesReadDTO>(
+                $"/api/ClientCompaniesWMS/wms-client-company-by-name/{companyname}",
+                token,
+                ct);
 
-            HttpResponseMessage resp;
-
-            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/all-client-companies");
-
-            return await resp.ReadAsApiResponseAsync<List<WMSClientCompaniesReadDTO>>(ct);
-        }
-
-        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdAsync(int Id, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            HttpResponseMessage resp;
-
-            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-id/{Id}");
-
-            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
-        }
-
-        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByIdentificationAsync(string companyid, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            HttpResponseMessage resp;
-
-            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-identification/{companyid}");
-
-            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
-        }
-
-
-        public async Task<ApiResponse<WMSClientCompaniesReadDTO>> GetClientCompanyInformationByNameAsync(string companyname, string token, CancellationToken ct)
-        {
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-            HttpResponseMessage resp;
-
-            resp = await _httpClient.GetAsync($"/api/ClientCompaniesWMS/wms-client-company-by-name/{companyname}");
-
-            return await resp.ReadAsApiResponseAsync<WMSClientCompaniesReadDTO>(ct);
-        }
-
-
-        public Task<ApiResponse<bool>> UpdateClientCompanyAsync(WmsCompanyclientDto entity, string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        public Task<ApiResponse<bool>> UpdateClientCompanyAsync(
+            WmsCompanyclientDto entity,
+            string token,
+            CancellationToken ct)
+            => throw new NotImplementedException();
     }
 }
