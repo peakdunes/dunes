@@ -13,7 +13,7 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="ct"></param>
-        Task<ApiResponse<UserConfigurationReadDto?>> GetActiveAsync(string userId, CancellationToken ct);
+        Task<ApiResponse<UserConfigurationReadDto>> GetActiveAsync(string userId, CancellationToken ct);
 
         /// <summary>
         /// Get configurations by user (Read DTO list)

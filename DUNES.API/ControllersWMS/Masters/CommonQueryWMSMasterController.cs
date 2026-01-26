@@ -159,38 +159,10 @@ namespace DUNES.API.ControllersWMS.Masters
         }
 
 
-        /// <summary>
-        /// Get All Racks for a company client 
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        [HttpGet("companyClient-racks/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
-        {
-
-            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllRacksByCompanyClient(companyid, companyClient, ct), ct);
-
-        }
+      
 
 
-        /// <summary>
-        /// Get All Active Racks for a company client 
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        [HttpGet("companyClient-active-racks/{companyid}/{companyClient}")]
-        public async Task<IActionResult> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
-        {
-
-            return await HandleApi(ct => _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(companyid, companyClient, ct), ct);
-
-           
-
-        }
+      
 
 
         /// <summary>

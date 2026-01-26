@@ -31,6 +31,9 @@
   <ItemGroup>
    
   
+    <Folder Include="ControllersWMS\Masters\Racks\" />
+   
+  
     <Folder Include="Logs\" />
    
   
@@ -40,8 +43,14 @@
     <Folder Include="Models\WebService\" />
     <Folder Include="ReadModels\WMS\" />
     <Folder Include="Utils\Responses\" />
-   
-   
+
+    
+    <Folder Include="ModelsWMS\Admin\" />
+    <Folder Include="ModelsWMS\Auth\" />
+    <Folder Include="ModelsWMS\Masters\" />
+    <Folder Include="ModelsWMS\Transactions\" />
+    
+    
   </ItemGroup>
 
   <ItemGroup>

@@ -139,10 +139,10 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<Racks>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<List<DUNES.API.ModelsWMS.Masters.Racks>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infofacks = await _wmscontext.Racks
-            .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            .Where(x => x.Id == companyid ).ToListAsync(ct);
 
             return infofacks;
 
@@ -155,10 +155,10 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<Racks>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<List<DUNES.API.ModelsWMS.Masters.Racks>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infofacks = await _wmscontext.Racks
-               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Active == true).ToListAsync(ct);
 
             return infofacks;
         }

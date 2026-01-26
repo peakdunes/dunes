@@ -86,24 +86,7 @@ namespace DUNES.API.ServicesWMS.Masters
         Task<ApiResponse<List<Itemstatus>>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
-        /// <summary>
-        /// Get all Rack for a company client by id
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<List<Racks>>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
-
-        /// <summary>
-        /// Get all actives Racks for a company by id
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<List<Racks>>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
-
+       
 
 
         /// <summary>

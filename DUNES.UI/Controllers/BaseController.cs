@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.Models;
 using DUNES.UI.Helpers; // Asegúrate de tener este using si usas MessageHelper
+using DUNES.UI.Infrastructure;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Http;
@@ -29,7 +30,10 @@ namespace DUNES.UI.Controllers
         /// <returns>El token como string o null si no existe.</returns>
         protected string? GetToken()
         {
-            return HttpContext.Session.GetString("JWToken");
+           // return HttpContext.Session.GetString("JWToken");
+
+            var session = HttpContext.GetUserSession();
+            return session?.Token;
         }
 
         /// <summary>
@@ -40,7 +44,8 @@ namespace DUNES.UI.Controllers
         protected IActionResult RedirectToLogin()
         {
             MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
-            return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Auth");
         }
 
         /// <summary>

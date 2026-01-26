@@ -123,5 +123,17 @@ namespace DUNES.UI.Services.Admin
 
             return menu;
         }
+
+        public async Task<List<MenuItemDto>> GetMenuLevel2Async(string token,string level1, CancellationToken ct = default)
+        {
+            var resp = await GetApiAsync<List<MenuItemDto>>(
+                $"/api/Menu/level2/{level1}",
+                token,
+                ct);
+
+            return resp.Success
+                ? resp.Data ?? new List<MenuItemDto>()
+                : new List<MenuItemDto>();
+        }
     }
 }

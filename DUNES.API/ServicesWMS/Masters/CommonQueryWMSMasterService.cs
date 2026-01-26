@@ -181,39 +181,7 @@ namespace DUNES.API.ServicesWMS.Masters
 
             return ApiResponseFactory.Ok(infostatus, "OK");
         }
-        /// <summary>
-        /// Get all Racks for a company client by id
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<ApiResponse<List<Racks>>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
-        {
-            var inforacks = await _repository.GetAllRacksByCompanyClient(companyid, companyClient, ct);
-
-            if (inforacks.Count <= 0)
-                return ApiResponseFactory.BadRequest<List<Racks>>($"Racks for this company client {companyClient} not found");
-
-            return ApiResponseFactory.Ok(inforacks, "OK");
-        }
-        /// <summary>
-        /// Get all actives Racks for a company client by id
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<ApiResponse<List<Racks>>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct)
-        {
-            var inforacks = await _repository.GetAllActiveRacksByCompanyClient(companyid, companyClient, ct);
-
-            if (inforacks.Count <= 0)
-                return ApiResponseFactory.BadRequest<List<Racks>>($"Racks actives for this company client {companyClient} not found");
-
-            return ApiResponseFactory.Ok(inforacks, "OK");
-        }
-        /// <summary>
+              /// <summary>
         /// Get all Bins for a company client by id
         /// </summary>
         /// <param name="companyid"></param>

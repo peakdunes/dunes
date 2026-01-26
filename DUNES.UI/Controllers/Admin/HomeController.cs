@@ -1,76 +1,36 @@
 ﻿using DUNES.Shared.DTOs.Auth;
-using DUNES.Shared.Models;
-using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace DUNES.UI.Controllers.Admin
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public readonly IConfiguration _config;
         private readonly IMenuClientUIService _menuClientService;
 
-        public HomeController(IHttpClientFactory httpClientFactory, IConfiguration config, IMenuClientUIService menuClientService)
+        public HomeController(IMenuClientUIService menuClientService)
         {
-            _httpClientFactory = httpClientFactory;
-            _config = config;
             _menuClientService = menuClientService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken ct)
         {
-
-           
-           
-
-            var token = HttpContext.Session.GetString("JWToken");
-
-            // Si no hay login, redirigimos
-            if (token == null)
+            return await HandleAsync(async ct =>
             {
-                return RedirectToAction("Login", "Auth");
-            }
 
-            var baseUrl = _config["ApiSettings:BaseUrl"];
+                // Token desde SessionDTO (no strings sueltos)
+                var token = GetToken();
 
-            // Llamamos a la API de APIZEBRA
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(baseUrl!);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                if (string.IsNullOrWhiteSpace(token))
+                    return RedirectToAction("Login", "Auth");
 
+                var menuItems = await _menuClientService.GetMenuAsync(token, ct);
 
+                return View(menuItems);
 
-
-            var response = await client.GetAsync("/api/Menu/options");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                ViewBag.Error = "Menu could not be loaded.";
-                return View(new List<MenuItemDto>());
-            }
-
-            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<MenuItemDto>>>();
-
-            if (apiResponse == null || apiResponse.Data == null || !apiResponse.Success)
-            {
-                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "No menu data received.", MessageDisplay.Inline);
-                return View(new List<MenuItemDto>());
-            }
-
-            var menuItems = apiResponse.Data;
-
-
-           // ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
-
-            return View(menuItems);
-
-         
+            }, ct);
         }
 
         public IActionResult Privacy()
@@ -81,7 +41,10 @@ namespace DUNES.UI.Controllers.Admin
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }

@@ -1,6 +1,10 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.Models.Configuration;
 using DUNES.API.RepositoriesWMS.Auth;
+using DUNES.API.ServicesWMS.Masters.ClientCompanies;
+using DUNES.API.ServicesWMS.Masters.Companies;
+using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
+using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
@@ -17,6 +21,12 @@ namespace DUNES.API.Services.Auth
         private readonly IUserConfigurationRepository _repo;
         private readonly IdentityDbContext _db;
         private readonly IValidator<UserConfigurationUpdateDto> _validator;
+        private readonly ICompaniesWMSAPIService _companiesWMSAPIService;
+        private readonly IClientCompaniesWMSAPIService _companiesClientWMSAPIService;
+        private readonly ICompaniesClientDivisionWMSAPIService _companiesClientDivisionWMSAPIService;
+
+        private readonly ILocationsWMSAPIService _locationsWMSAPIService;
+        private readonly IConfiguration _config;
 
         /// <summary>
         /// constructor (DI)
@@ -24,14 +34,31 @@ namespace DUNES.API.Services.Auth
         /// <param name="repo"></param>
         /// <param name="db"></param>
         /// <param name="validator"></param>
+        /// <param name="companiesWMSAPIService"></param>
+        /// <param name="companiesClientWMSAPIService"></param>
+        /// <param name="locationsWMSAPIService"></param>
+        /// <param name="companiesClientDivisionWMSAPIService"></param>
+        /// <param name="config"></param>
+        /// 
         public UserConfigurationService(
             IUserConfigurationRepository repo,
             IdentityDbContext db,
-            IValidator<UserConfigurationUpdateDto> validator)
+            IValidator<UserConfigurationUpdateDto> validator,
+            ICompaniesWMSAPIService companiesWMSAPIService,
+            IClientCompaniesWMSAPIService companiesClientWMSAPIService,
+            ILocationsWMSAPIService locationsWMSAPIService,
+            ICompaniesClientDivisionWMSAPIService companiesClientDivisionWMSAPIService,
+        IConfiguration config
+            )
         {
             _repo = repo;
             _db = db;
             _validator = validator;
+            _companiesWMSAPIService = companiesWMSAPIService;
+            _companiesClientWMSAPIService = companiesClientWMSAPIService;
+            _locationsWMSAPIService = locationsWMSAPIService;
+            _companiesClientDivisionWMSAPIService = companiesClientDivisionWMSAPIService;
+            _config = config;
         }
 
         /// <summary>
@@ -40,12 +67,114 @@ namespace DUNES.API.Services.Auth
         /// <param name="userId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<UserConfigurationReadDto?>> GetActiveAsync(string userId, CancellationToken ct)
+        public async Task<ApiResponse<UserConfigurationReadDto>> GetActiveAsync(string userId, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(userId))
-                return ApiResponseFactory.BadRequest<UserConfigurationReadDto?>("UserId is required.");
+                return ApiResponseFactory.BadRequest<UserConfigurationReadDto>("UserId is required.");
 
             var active = await _repo.GetActiveReadByUserIdAsync(userId, ct);
+
+            if (active is null)
+                return ApiResponseFactory.Unauthorized<UserConfigurationReadDto>(
+                    "User has no active company configuration."
+                );
+
+            if (active.Companydefault <= 0)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active company default."
+                );
+
+            if (active.Companyclientdefault <= 0)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active company client default."
+                );
+
+
+            if (active.Locationdefault <= 0)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active location default."
+                );
+            if (active.Divisiondefault <= 0)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active division default."
+                );
+
+            var company = await _companiesWMSAPIService.GetByIdAsync(active.Companydefault, ct);
+
+            if (company?.Data == null)
+            {
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+               "Company information not found.");
+            }
+            if (!company.Data.Active)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active company default."
+                );
+
+            active.CompanyName = company.Data!.Name;
+
+
+            var companyClient = await _companiesClientWMSAPIService.GetClientCompanyInformationByIdAsync(active.Companyclientdefault, ct);
+
+            if (companyClient?.Data == null)
+            {
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+               "Company Client information not found.");
+            }
+            if (!companyClient.Data.Active)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active company client default."
+                );
+
+            active.CompanyClientName = companyClient.Data!.Name;
+
+
+            var division = await _companiesClientDivisionWMSAPIService.GetCompanyClientDivisionById(active.Divisiondefault, ct);
+
+            if (division?.Data == null)
+            {
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+               "Company Division information not found.");
+            }
+            if (!division.Data.IsActive)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active division default."
+                );
+
+            if (division.Data.Idcompanyclient != active.Companyclientdefault)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "Division and company client not match."
+                );
+
+            active.DivisionName = division.Data.DivisionName;
+
+            var location = await _locationsWMSAPIService.GetByIdAsync(active.Locationdefault, ct);
+
+            if (location?.Data == null)
+            {
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+               "Location information not found.");
+            }
+            if (!location.Data.Active)
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                    "User has no active location default."
+                );
+
+            var enviromentname = _config["Application:Environment"]!;
+
+            if (string.IsNullOrEmpty(enviromentname))
+            {
+                return ApiResponseFactory.NotFound<UserConfigurationReadDto>(
+                   "Environment name not found."
+               );
+            }
+
+           
+
+            active.LocationName = location.Data!.Name;
+
+            active.Enviromentname = enviromentname;
+
             return ApiResponseFactory.Ok(active, "Active configuration loaded.");
         }
 

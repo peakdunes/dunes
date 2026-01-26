@@ -19,6 +19,7 @@ namespace DUNES.API.Services.Auth
     public class AuthService : IAuthService
     {
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IUserConfigurationService _userConfigurationService;
         private readonly IConfiguration _configuration;
 
         /// <summary>
@@ -26,10 +27,12 @@ namespace DUNES.API.Services.Auth
         /// </summary>
         /// <param name="userManager"></param>
         /// <param name="configuration"></param>
-        public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration)
+        /// <param name="userConfigurationService"></param>
+        public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration, IUserConfigurationService userConfigurationService)
         {
             _userManager = userManager;
             _configuration = configuration;
+            _userConfigurationService = userConfigurationService;
         }
 
         /// <summary>
@@ -111,6 +114,16 @@ namespace DUNES.API.Services.Auth
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 return ApiResponseFactory.Unauthorized<LoginResponseDto>("Invalid credentials");
 
+            //we search user environment
+            var userConfig = await _userConfigurationService.GetActiveAsync(user.Id, ct);
+
+            if (userConfig.Data == null)
+            {
+                return ApiResponseFactory.Unauthorized<LoginResponseDto>(
+                    "User has no active company configuration.");
+            }
+
+
             var userRoles = await _userManager.GetRolesAsync(user);
 
             var authClaims = new List<Claim>
@@ -140,6 +153,9 @@ namespace DUNES.API.Services.Auth
             foreach (var role in userRoles)
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
 
+
+
+
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
 
             var token = new JwtSecurityToken(
@@ -157,7 +173,17 @@ namespace DUNES.API.Services.Auth
             {
                 Token = tokenString,
                 Expiration = token.ValidTo,
-                UserName = user.UserName!
+                UserName = user.UserName!,
+                CompanyId = userConfig.Data!.Companydefault,
+                CompanyClientId = userConfig.Data!.Companyclientdefault,
+                LocationId = userConfig.Data!.Locationdefault,
+                companyName = userConfig.Data!.CompanyName,
+                companyClientName = userConfig.Data!.CompanyClientName,
+                LocationName = userConfig.Data!.LocationName,
+                Enviromentname = userConfig.Data!.Enviromentname,
+                RoleName = userConfig.Data.RoleName
+             
+
             });
         }
     }

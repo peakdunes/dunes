@@ -63,12 +63,18 @@ namespace DUNES.API.ServicesWMS.Masters.Countries
         /// <summary>
         /// get country by id
         /// </summary>
-        public async Task<ApiResponse<WMSCountriesDTO?>> GetByIdAsync(int id, CancellationToken ct)
+        public async Task<ApiResponse<WMSCountriesDTO>> GetByIdAsync(int id, CancellationToken ct)
         {
+            if (id <= 0)
+            {
+                return ApiResponseFactory.BadRequest<WMSCountriesDTO>("Country id required");
+            }
+
+
             var entity = await _repository.GetByIdAsync(id, ct);
 
             if (entity is null)
-                return ApiResponseFactory.NotFound<WMSCountriesDTO?>($"Country with Id {id} was not found.");
+                return ApiResponseFactory.NotFound<WMSCountriesDTO>($"Country with Id {id} was not found.");
 
             var objmap = _mapper.Map<WMSCountriesDTO>(entity);
 
@@ -80,6 +86,17 @@ namespace DUNES.API.ServicesWMS.Masters.Countries
         /// </summary>
         public async Task<ApiResponse<bool>> CreateAsync(WMSCountriesDTO entity, CancellationToken ct)
         {
+            if (string.IsNullOrEmpty(entity.Sigla))
+            {
+                return ApiResponseFactory.BadRequest<bool>("ISO Country Code is required");
+            }
+
+
+            if (string.IsNullOrEmpty(entity.Name))
+            {
+                return ApiResponseFactory.BadRequest<bool>("Country Name is required");
+            }
+
             // validar nombre duplicado
             var exists = await _repository.ExistsByNameAsync(entity.Name!, null, ct);
             if (exists)

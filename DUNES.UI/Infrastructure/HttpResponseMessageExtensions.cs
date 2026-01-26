@@ -1,10 +1,28 @@
-﻿using System.Net.Http;
-using System.Text.Json;
-using DUNES.Shared.Models;
+﻿using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http;
+using System.Runtime.ConstrainedExecution;
+using System.Text.Json;
+using static System.Net.WebRequestMethods;
 
 namespace DUNES.UI.Infrastructure
 {
+
+//    Extiende HttpResponseMessage
+
+//👉 Se usa después de hacer un HTTP request
+//👉 Vive en Infrastructure
+//👉 Ejemplo típico:
+
+//   var resp = await _httpClient.GetAsync(...);
+//   var apiResponse = await resp.ReadAsApiResponseAsync<T>(ct);
+
+//📌 Responsabilidad:
+
+//  Leer HttpResponseMessage
+//  Deserializar ApiResponse<T>
+//  Manejar errores HTTP → modelo UI
+
     public static class HttpResponseMessageExtensions
     {
         private static readonly JsonSerializerOptions JsonOpts =

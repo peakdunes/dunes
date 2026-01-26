@@ -30,6 +30,7 @@ using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.Locations;
+using DUNES.API.RepositoriesWMS.Masters.Racks;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
@@ -52,10 +53,12 @@ using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.Locations;
+using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
+using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.DTOs.Masters;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Interfaces.AuditContext;
@@ -264,6 +267,7 @@ builder.Services.AddSwaggerGen(c =>
 
             "LocationsWMS" => new[] { "WMS Locations - CRUD" },
 
+            "RacksWMS" => new[] { "WMS Racks - CRUD" },
 
             //#########
             //MASTERS
@@ -300,6 +304,8 @@ builder.Services.AddSwaggerGen(c =>
 //AUTHENTICATION SERVICES
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+builder.Services.AddScoped<IUserConfigurationService, UserConfigurationService>();
+
 
 builder.Services.AddScoped<IUserConfigurationRepository, UserConfigurationRepository>();
 builder.Services.AddScoped<IAuthPermissionRepository, AuthPermissionRepository>();
@@ -358,8 +364,10 @@ builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
+
 builder.Services.AddScoped<IValidator<WMSCompaniesContractDTO>, CompaniesContractWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSLocationsDTO>, LocationsWMSAPIValidator>();
+builder.Services.AddScoped<IValidator<UserConfigurationUpdateDto>, UserConfigurationValidator>();
 
 
 //WMS MASTER SERVICES
@@ -385,6 +393,10 @@ builder.Services.AddScoped<ICompaniesContractWMSAPIService, CompaniesContractWMS
 
 builder.Services.AddScoped<ICountriesWMSAPIRepository, CountriesWMSAPIRepository>();
 builder.Services.AddScoped<ICountriesWMSAPIService, CountriesWMSAPIService>();
+
+
+builder.Services.AddScoped<IRacksWMSAPIRepository, RacksWMSAPIRepository>();
+builder.Services.AddScoped<IRacksWMSAPIService, RacksWMSAPIService>();
 
 
 builder.Services.AddScoped<IStateCountriesWMSAPIRepository, StateCountriesWMSAPIRepository>();

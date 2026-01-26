@@ -1,0 +1,40 @@
+﻿@using DUNES.UI.Infrastructure
+@{
+    var session = Context.GetUserSession();
+}
+
+@if (session != null)
+{
+    <div class="user-context-bar">
+
+        <!-- Usuario -->
+        <span class="label">User</span>
+        <span class="user">
+            @session.UserName
+        </span>
+
+        <span class="sep">|</span>
+
+        <span class="uc-label">ROLE:</span>
+       
+
+        <span class="sep">|</span>
+        <!-- Environment -->
+        <span class="label">Env</span>
+        <span class="env @session.Environment?.ToLower()">
+            @session.Environment
+        </span>
+
+        <span class="sep">|</span>
+
+        <!-- Company -->
+        <span class="label">Company</span>
+        <span class="value">@session.companyName</span>
+
+        <span class="sep">|</span>
+
+        <!-- Client -->
+        <span class="label">Client</span>
+        <span class="value">@session.companyClientName</span>
+    </div>
+}

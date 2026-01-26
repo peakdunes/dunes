@@ -95,7 +95,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<Racks>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Racks>> GetAllRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
         /// <summary>
         /// Get all actives Racks for a company by id
@@ -104,7 +104,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<List<Racks>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
+        Task<List<DUNES.API.ModelsWMS.Masters.Racks>> GetAllActiveRacksByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
 

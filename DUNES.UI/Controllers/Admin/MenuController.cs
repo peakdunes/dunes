@@ -4,102 +4,54 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics.Eventing.Reader;
-using System.Net.Http.Headers;
-using System.Reflection;
-using System.Text.Json;
 
 namespace DUNES.UI.Controllers.Admin
 {
     public class MenuController : BaseController
     {
-        private readonly IHttpClientFactory _httpClientFactory;
-        public readonly IConfiguration _config;
         private readonly IMenuClientUIService _menuClientService;
 
-        public MenuController(IHttpClientFactory httpClientFactory, IConfiguration config, IMenuClientUIService menuClientService)
+        public MenuController(IMenuClientUIService menuClientService)
         {
-            _httpClientFactory = httpClientFactory;
-            _config = config;
             _menuClientService = menuClientService;
         }
-
-
 
         [HttpGet("Menu/Level/{level1}")]
         public async Task<IActionResult> Level(string level1, CancellationToken ct)
         {
-            string menuCode = level1;
-
-
-            if (string.IsNullOrEmpty(level1))
+            if (string.IsNullOrWhiteSpace(level1))
             {
-                ViewBag.ApiType = "warning";
-                ViewBag.ApiMessage = "Level 1 invalid.";
-                return View(); // regresar a la misma vista
-
-
+                MessageHelper.SetMessage(this, "warning", "Invalid menu level.", MessageDisplay.Inline);
+                return RedirectToAction("Index", "Home");
             }
 
-            var token = HttpContext.Session.GetString("JWToken");
-
+            // ✅ Token desde BaseController / SessionDTO
+            var token = GetToken();
             if (token == null)
-            {
+                return RedirectToLogin();
 
-                MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
-
-                return RedirectToAction("Index", "Home"); // regresar a la misma vista
-            }
-
-
-
-
-            var baseUrl = _config["ApiSettings:BaseUrl"];
-
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(baseUrl!);
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-
-            //navegation menu
-
+            // 🔹 Breadcrumb (ya usa servicio)
             var breadcrumb = await _menuClientService.GetBreadcrumbAsync(token, level1, ct);
-            breadcrumb[0].Url = Url.Action("Index", "Home"); // corrige Home
+            if (breadcrumb.Count > 0)
+                breadcrumb[0].Url = Url.Action("Index", "Home");
+
             SetBreadcrumb(breadcrumb.ToArray());
 
+            // 🔹 Obtener menú nivel 2 (idealmente esto debería moverse a un service)
 
-            //end navegation menu
+            var listmenu = await _menuClientService.GetMenuLevel2Async(token, level1, ct);
 
-            ////se busca la opcion de menu para la barra de navegacion
-
-            //var breadcrumb = await _menuClientService.GetBreadcrumbAsync(menuCode, token);
-
-            //ViewData["Breadcrumb"] = breadcrumb;
-
-            ////fin  la barra de navegacion
-
-
-            // Ahora usamos el parámetro level1, no "01" fijo
-            var response = await client.GetAsync($"/api/Menu/level2/{level1}");
-            if (!response.IsSuccessStatusCode)
-                return Json(new { });
-
-            var apiResponse = await response.Content.ReadFromJsonAsync<ApiResponse<List<MenuItemDto>>>();
-
-            if (apiResponse == null || apiResponse.Data == null || !apiResponse.Success)
+            if (listmenu == null || listmenu.Count == 0)
             {
-                MessageHelper.SetMessage(this, "danger", apiResponse?.Message ?? "Menu level2 not found.", MessageDisplay.Inline);
-                return View(new List<MenuItemDto>());
+                MessageHelper.SetMessage(
+                    this,
+                    "info",
+                    "No menu options are configured for this level.",
+                    MessageDisplay.Inline
+                );
             }
 
-            var menuItems = apiResponse.Data;
-
-
-            // ViewBag.GlobalAlert = "El sistema estará en mantenimiento hoy a las 8 PM. ¡Guarde su trabajo!";
-
-            return View(menuItems);
-
-
+            return View(listmenu);
         }
     }
 }

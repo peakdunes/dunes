@@ -226,19 +226,10 @@ namespace DUNES.API.ServicesWMS.Inventory.Transactions
                 if (info.Idrack <= 0)
                     return ApiResponseFactory.BadRequest<int>("Rack not found");
 
-                var inforack = await _commonQueryWMSMasterService.GetAllActiveRacksByCompanyClient(objcreate.hdr.Idcompany, objcreate.hdr.Codecompanyclient, ct);
+              
 
-                if (inforack.Data == null || inforack.Data.Count <= 0)
-                    return ApiResponseFactory.BadRequest<int>($"Active Racks Types for this company {objcreate.hdr.Idcompany} not found");
+                thereIsRacks = true;
 
-                foreach (var inforackline in inforack.Data)
-                {
-                    if (inforackline.Id == info.Idrack)
-                    {
-                        thereIsRacks = true;
-                        break;
-                    }
-                }
                 if (!thereIsRacks)
                 {
                     return ApiResponseFactory.BadRequest<int>($"This rack : {info.Idrack} not found or there is not active ");

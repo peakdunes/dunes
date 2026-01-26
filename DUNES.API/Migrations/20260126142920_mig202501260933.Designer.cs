@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260126142920_mig202501260933")]
+    partial class mig202501260933
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -998,9 +1001,6 @@ namespace DUNES.API.Migrations
                     b.Property<int>("Idcompany")
                         .HasColumnType("int");
 
-                    b.Property<int>("LocationsId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -1008,8 +1008,6 @@ namespace DUNES.API.Migrations
                         .HasColumnName("name");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("LocationsId");
 
                     b.HasIndex(new[] { "Idcompany" }, "IX_racks_Idcompany");
 
@@ -1639,15 +1637,7 @@ namespace DUNES.API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Locations", "Locations")
-                        .WithMany()
-                        .HasForeignKey("LocationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.Navigation("IdcompanyNavigation");
-
-                    b.Navigation("Locations");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.StatesCountries", b =>

@@ -75,6 +75,9 @@ namespace DUNES.API.RepositoriesWMS.Auth
             // This DbContext is IdentityDbContext. It can resolve RoleName (AspNetRoles),
             // but CompanyName / CompanyClientName live in the WMS DBContext (not available here).
             // For now, CompanyName / CompanyClientName will be null.
+
+
+            
             return await (
                 from uc in _ctx.UserConfiguration.AsNoTracking()
                 join r in _ctx.Roles.AsNoTracking() on uc.Roleid equals r.Id into roles
@@ -89,7 +92,7 @@ namespace DUNES.API.RepositoriesWMS.Auth
                     Datecreated = uc.Datecreated,
 
                     Companydefault = uc.Companydefault,
-                    CompanyName = null,
+                    CompanyName =  null,
 
                     Companyclientdefault = uc.Companyclientdefault,
                     CompanyClientName = null,

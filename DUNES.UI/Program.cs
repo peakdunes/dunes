@@ -3,6 +3,8 @@ using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
+using DUNES.UI.Services.Common;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
@@ -43,8 +45,7 @@ builder.Services.AddControllersWithViews(options =>
 //FIN FILTROS
 //######################
 
-
-
+builder.Services.AddScoped<IAuthUIService, AuthUIService>();
 
 builder.Services.AddScoped<IMenuClientUIService, MenuClientUIService>();
 builder.Services.AddScoped<IASNUIService, ASNUIService>();

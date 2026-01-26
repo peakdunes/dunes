@@ -72,7 +72,7 @@ namespace DUNES.API.Profiles
 
             CreateMap<Locations, WMSLocationsDTO > ().ReverseMap();
 
-
+            CreateMap<Racks, WMSRacksDTO>().ReverseMap();
         }
 
 

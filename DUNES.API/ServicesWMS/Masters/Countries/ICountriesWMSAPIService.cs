@@ -27,7 +27,7 @@ namespace DUNES.API.ServicesWMS.Masters.Countries
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSCountriesDTO?>> GetByIdAsync(int id, CancellationToken ct);
+        Task<ApiResponse<WMSCountriesDTO>> GetByIdAsync(int id, CancellationToken ct);
 
         /// <summary>
         /// add new country
