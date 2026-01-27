@@ -253,10 +253,16 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 foreach (var b in listbines.Data)
                 {
-                    WMSBinsDto objdet = new WMSBinsDto();
+                    WMSBinsDto objdet = new WMSBinsDto{
+                    
+                     Idcompany  = b.Id,
+                     Name = b.Name,
+
+                    
+                    };
 
                     objdet.Id = b.Id;
-                    objdet.TagName = b.TagName.Trim();
+                    objdet.Name = b.Name.Trim();
 
                     listbinesresult.Add(objdet);
                 }

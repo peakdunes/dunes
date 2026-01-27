@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
@@ -8,48 +9,63 @@ namespace DUNES.API.ModelsWMS.Masters;
 public partial class Bines
 {
     /// <summary>
-    /// Bin id
+    /// internal DB ID
     /// </summary>
     public int Id { get; set; }
-    /// <summary>
-    /// Bin description
-    /// </summary>
-    public string? TagName { get; set; }
-    /// <summary>
-    /// Company ID
-    /// </summary>
-    public int Idcompany { get; set; }
-    /// <summary>
-    /// Company Client Id
-    /// </summary>
-    public string? Idcompanyclient { get; set; }
-    /// <summary>
-    /// Observations
-    /// </summary>
-    public string? Observations { get; set; }
-    /// <summary>
-    /// Bin Active?
-    /// </summary>
-    public bool Active { get; set; }
-    /// <summary>
-    /// Included in precompumption process
-    /// </summary>
-    public bool IncludeInConsumption { get; set; }
 
     /// <summary>
-    /// Company navegation property
+    /// rack Name
+    /// </summary>
+    [Required]
+    [Display(Name = "Bin Name")]
+    public required string Name { get; set; }
+
+    /// <summary>
+    /// Company 
+    /// </summary>
+    [Required]
+    [Display(Name = "Company")]
+    public required int Idcompany { get; set; }
+
+    /// <summary>
+    /// location when this rack is
+    /// </summary>
+    [Required]
+    [Display(Name = "Location")]
+    public int LocationsId { get; set; }
+
+
+    /// <summary>
+    /// location when this rack is
+    /// </summary>
+    [Required]
+    [Display(Name = "Racks")]
+    public int RacksId { get; set; }
+
+
+    /// <summary>
+    /// this rack is active
+    /// </summary>
+    [Display(Name = "Is Active")]
+    public bool Active { get; set; }
+
+
+    /// <summary>
+    /// company navegation property
     /// </summary>
     public virtual Company IdcompanyNavigation { get; set; } = null!;
+
     /// <summary>
-    /// Inventory detail navegation Property
+    /// location navegation property
     /// </summary>
-    public virtual ICollection<Inventorydetail> Inventorydetail { get; set; } = new List<Inventorydetail>();
+    public virtual Locations Locations { get; set; } = null!;
+
+
     /// <summary>
-    /// Inventory Movement Navegacion Property
+    /// location navegation property
     /// </summary>
-    public virtual ICollection<Inventorymovement> Inventorymovement { get; set; } = new List<Inventorymovement>();
-    /// <summary>
-    /// Inventory Detail transaction Navegation Property
-    /// </summary>
-    public virtual ICollection<InventorytransactionDetail> InventorytransactionDetail { get; set; } = new List<InventorytransactionDetail>();
+    public virtual Racks Racks { get; set; } = null!;
+
+
+
 }

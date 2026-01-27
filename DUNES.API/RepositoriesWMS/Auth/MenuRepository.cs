@@ -32,7 +32,7 @@ namespace DUNES.API.RepositoriesWMS.Auth
         {
             var roleList = userRoles.ToList();
             var menus = await _context.Menu
-                .Where(m => m.Active == true && m.Code.Length == 2)
+                .Where(m => m.Active == true && m.Code!.Length == 2)
                 .OrderBy(m => m.Order)
                 .ToListAsync(ct); // ejecuta la query en SQL
 

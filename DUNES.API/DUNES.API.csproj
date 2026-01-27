@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
@@ -31,9 +31,6 @@
   <ItemGroup>
    
   
-    <Folder Include="ControllersWMS\Masters\Racks\" />
-   
-  
     <Folder Include="Logs\" />
    
   
@@ -47,7 +44,6 @@
     
     <Folder Include="ModelsWMS\Admin\" />
     <Folder Include="ModelsWMS\Auth\" />
-    <Folder Include="ModelsWMS\Masters\" />
     <Folder Include="ModelsWMS\Transactions\" />
     
     

@@ -364,7 +364,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
                 objdet.locationname = item.IdlocationNavigation.Name!;
                 objdet.qty = item.TotalQty;
                 objdet.binid = item.Idbin;
-                objdet.binname = item.IdbinNavigation.TagName!;
+                objdet.binname = "";
                 objdet.inventorytypeid = item.Idtype;
                 objdet.inventoryname = item.IdtypeNavigation.Name!;
                 objdet.statusid = item.Idstatus;
@@ -410,7 +410,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
                 objdet.locationname = item.IdlocationNavigation.Name!;
                 objdet.qty = item.TotalQty;
                 objdet.binid = item.Idbin;
-                objdet.binname = item.IdbinNavigation.TagName!;
+                objdet.binname = "";
                 objdet.inventorytypeid = item.Idtype;
                 objdet.inventoryname = item.IdtypeNavigation.Name!;
                 objdet.statusid = item.Idstatus;
@@ -504,7 +504,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
                 objdet.Iditem = item.Iditem;
                 objdet.TotalQty = item.TotalQty;
                 objdet.Idbin = item.Idbin;
-                objdet.binName = string.IsNullOrEmpty(item.IdbinNavigation.TagName) ? "" : item.IdbinNavigation.TagName.Trim();
+                objdet.binName = "";
                 objdet.Idstatus = item.Idstatus;
                 objdet.statusName = string.IsNullOrEmpty(item.IdstatusNavigation.Name) ? "" : item.IdstatusNavigation.Name.Trim();
                 objdet.Serialid = item.Serialid;
@@ -531,7 +531,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
                 objmov.Idrack = item.Idrack;
                 objmov.Level = item.Level;
                 objmov.Idbin = item.Idbin;
-                objmov.binName = string.IsNullOrEmpty(item.IdbinNavigation.TagName) ? "" : item.IdbinNavigation.TagName.Trim();
+                objmov.binName = "";
                 objmov.Iditem = item.Iditem;
                 objmov.Idstatus = item.Idstatus;
                 objmov.statusName = string.IsNullOrEmpty(item.IdstatusNavigation.Name) ? "" : item.IdstatusNavigation.Name.Trim();

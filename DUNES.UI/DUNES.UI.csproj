@@ -18,6 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Services\WMS\Masters\Bins\" />
+    <Folder Include="Services\WMS\Masters\Racks\" />
     <Folder Include="WiewModels\" />
   </ItemGroup>
 

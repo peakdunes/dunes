@@ -80,7 +80,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <returns></returns>
         public async Task<List<InventoryTypes>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var infotypes = await _wmscontext.InventoryTypes.Where(x => x.Id == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            var infotypes = await _wmscontext.InventoryTypes.Where(x => x.Id == companyid ).ToListAsync(ct);
 
             return infotypes;
         }
@@ -94,7 +94,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<InventoryTypes>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _wmscontext.InventoryTypes
-                .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+                .Where(x => x.Idcompany == companyid  && x.Active == true).ToListAsync(ct);
 
             return infotypes;
         }
@@ -109,7 +109,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Itemstatus>> GetAllItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infostatus = await _wmscontext.Itemstatus
-            .Where(x => x.Id == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            .Where(x => x.Id == companyid ).ToListAsync(ct);
 
             return infostatus;
 
@@ -125,7 +125,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Itemstatus>> GetAllActiveItemStatusByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infostatus = await _wmscontext.Itemstatus
-               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Active == true).ToListAsync(ct);
 
             return infostatus;
         }
@@ -173,7 +173,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Bines>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _wmscontext.Bines
-            .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            .Where(x => x.Idcompany == companyid ).ToListAsync(ct);
 
             return infobins;
 
@@ -188,7 +188,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         public async Task<List<Bines>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infobins = await _wmscontext.Bines
-               .Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient && x.Active == true).ToListAsync(ct);
+               .Where(x => x.Idcompany == companyid && x.Active == true).ToListAsync(ct);
 
             return infobins;
         }

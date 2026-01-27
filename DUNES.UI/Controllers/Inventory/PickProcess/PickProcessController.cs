@@ -457,10 +457,16 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 foreach (var b in listbines.Data)
                 {
-                    WMSBinsDto objdet = new WMSBinsDto();
+                    WMSBinsDto objdet = new WMSBinsDto
+                    {
+                       Id = b.Id,
+                        Name = b.Name,
+                       Idcompany = b.Idcompany,
+                       LocationsId = b.LocationsId,
+                      
+                    };
 
-                    objdet.Id = b.Id;
-                    objdet.TagName = b.TagName.Trim();
+                  
 
                     listbinesresult.Add(objdet);
                 }

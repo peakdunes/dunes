@@ -38,7 +38,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
 
             var listbines = await _wmscontext.Bines
             .Where(x => x.Idcompany == companyid
-            && x.Idcompanyclient == companyClient
+         
             && x.Active == true).ToListAsync(ct);
 
             return listbines;
@@ -55,7 +55,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         /// <returns></returns>
         public async Task<List<Bines>> GetAllBinsByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
-            var listbines = await _wmscontext.Bines.Where(x => x.Idcompany == companyid && x.Idcompanyclient == companyClient).ToListAsync(ct);
+            var listbines = await _wmscontext.Bines.Where(x => x.Idcompany == companyid ).ToListAsync(ct);
 
             return listbines;
         }
@@ -166,7 +166,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         {
             var listinventorytype = await _wmscontext.InventoryTypes
           .Where(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient
               && x.Active == true
           ).ToListAsync(ct);
 
@@ -183,7 +182,6 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         {
             var listinventorytype = await _wmscontext.InventoryTypes
           .Where(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient
               && x.Active == true
               && x.IsOnHand == true
           ).ToListAsync(ct);
@@ -202,7 +200,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         {
             var listinventorytype = await _wmscontext.InventoryTypes
                .Where(x => x.Idcompany == companyid
-                   && x.Idcompanyclient == companyClient
+                  
 
                ).ToListAsync(ct);
 
@@ -220,7 +218,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         {
             var listitemstatus = await _wmscontext.Itemstatus
                .Where(x => x.Idcompany == companyid
-                   && x.Idcompanyclient == companyClient
+                  
                    && x.Active == true
                ).ToListAsync(ct);
 
@@ -238,7 +236,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         {
             var listitemstatus = await _wmscontext.Itemstatus
                .Where(x => x.Idcompany == companyid
-                   && x.Idcompanyclient == companyClient
+                  
 
                ).ToListAsync(ct);
 
@@ -326,7 +324,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
                                               Idcompanyclient = companyClient,
                                               BinesId = enc.BinesId,
                                               Itemid = enc.Itemid,
-                                              tagName = det.TagName!
+                                              tagName = ""
                                           }).ToListAsync(ct);
 
             return listdistribution;

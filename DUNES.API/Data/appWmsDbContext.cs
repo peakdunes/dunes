@@ -113,6 +113,11 @@ namespace DUNES.API.Data
 
 
         /// <summary>
+        /// items master
+        /// </summary>
+        public virtual DbSet<Items> items { get; set; }
+
+        /// <summary>
         /// multilanguage 
         /// </summary>
         public virtual DbSet<ui_translation> Ui_translation { get; set; }
@@ -147,8 +152,19 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Items>(entity =>
+            {
+                entity.HasKey(x => x.Id);
 
-           
+                entity.HasIndex(x => new { x.Idcompany, x.sku })
+                    .IsUnique();
+
+                entity.HasOne(x => x.CompanyClient)
+                      .WithMany(c => c.Items)
+                      .HasForeignKey(x => x.CompanyClientId)
+                      .OnDelete(DeleteBehavior.Restrict); // importante
+            });
+
 
             modelBuilder.Entity<CompanyClientDivision>(entity =>
             {
@@ -385,10 +401,9 @@ namespace DUNES.API.Data
                 entity.HasIndex(e => e.Idcompany, "IX_bines_Idcompany");
 
                 entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
-                entity.Property(e => e.IncludeInConsumption).HasColumnName("include_in_consumption");
-                entity.Property(e => e.Observations).HasMaxLength(1000);
-                entity.Property(e => e.TagName).HasMaxLength(100);
+               
+             
+               
 
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Bines).HasForeignKey(d => d.Idcompany);
             });
@@ -400,13 +415,10 @@ namespace DUNES.API.Data
                 entity.HasIndex(e => e.Idcompany, "IX_inventoryTypes_Idcompany");
 
                 entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
-                entity.Property(e => e.Itemstatusid).HasColumnName("itemstatusid");
                 entity.Property(e => e.Name)
                     .HasMaxLength(200)
                     .HasColumnName("name");
                 entity.Property(e => e.Observations).HasMaxLength(1000);
-                entity.Property(e => e.Updateitemstatus).HasColumnName("updateitemstatus");
                 entity.Property(e => e.Zebrainvassociated).HasColumnName("zebrainvassociated");
 
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.InventoryTypes).HasForeignKey(d => d.Idcompany);
@@ -433,7 +445,6 @@ namespace DUNES.API.Data
                 entity.HasIndex(e => e.Idcompany, "IX_itemstatus_Idcompany");
 
                 entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
                 entity.Property(e => e.Name).HasMaxLength(200);
                 entity.Property(e => e.Observations).HasMaxLength(1000);
 
@@ -579,9 +590,7 @@ namespace DUNES.API.Data
                     .HasColumnName("serialid");
                 entity.Property(e => e.TotalQty).HasColumnName("totalQty");
 
-                entity.HasOne(d => d.IdbinNavigation).WithMany(p => p.Inventorydetail)
-                    .HasForeignKey(d => d.Idbin)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+             
 
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Inventorydetail).HasForeignKey(d => d.Idcompany);
 
@@ -589,15 +598,9 @@ namespace DUNES.API.Data
                     .HasForeignKey(d => d.Idlocation)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-               
+             
 
-                entity.HasOne(d => d.IdstatusNavigation).WithMany(p => p.Inventorydetail)
-                    .HasForeignKey(d => d.Idstatus)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.IdtypeNavigation).WithMany(p => p.Inventorydetail)
-                    .HasForeignKey(d => d.Idtype)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+              
             });
 
             modelBuilder.Entity<Inventorymovement>(entity =>
@@ -640,7 +643,7 @@ namespace DUNES.API.Data
                     .HasMaxLength(200)
                     .HasColumnName("serialid");
 
-                entity.HasOne(d => d.IdbinNavigation).WithMany(p => p.Inventorymovement).HasForeignKey(d => d.Idbin);
+               
 
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Inventorymovement)
                     .HasForeignKey(d => d.Idcompany)
@@ -648,12 +651,6 @@ namespace DUNES.API.Data
 
                 entity.HasOne(d => d.IdlocationNavigation).WithMany(p => p.Inventorymovement)
                     .HasForeignKey(d => d.Idlocation)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-               
-
-                entity.HasOne(d => d.IdstatusNavigation).WithMany(p => p.Inventorymovement)
-                    .HasForeignKey(d => d.Idstatus)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.HasOne(d => d.IdtransactionDetailNavigation).WithMany(p => p.Inventorymovement)
@@ -672,9 +669,7 @@ namespace DUNES.API.Data
                     .HasForeignKey(d => d.Idtransactiontype)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.IdtypeNavigation).WithMany(p => p.Inventorymovement)
-                    .HasForeignKey(d => d.Idtype)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                
             });
 
             modelBuilder.Entity<InventorytransactionDetail>(entity =>
@@ -706,10 +701,7 @@ namespace DUNES.API.Data
                     .HasColumnName("serialid");
                 entity.Property(e => e.TotalQty).HasColumnName("totalQty");
 
-                entity.HasOne(d => d.IdbinNavigation).WithMany(p => p.InventorytransactionDetail)
-                    .HasForeignKey(d => d.Idbin)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
+               
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.InventorytransactionDetail)
                     .HasForeignKey(d => d.Idcompany)
                     .OnDelete(DeleteBehavior.ClientSetNull);
@@ -720,16 +712,6 @@ namespace DUNES.API.Data
 
                 entity.HasOne(d => d.IdlocationNavigation).WithMany(p => p.InventorytransactionDetail)
                     .HasForeignKey(d => d.Idlocation)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-               
-
-                entity.HasOne(d => d.IdstatusNavigation).WithMany(p => p.InventorytransactionDetail)
-                    .HasForeignKey(d => d.Idstatus)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.IdtypeNavigation).WithMany(p => p.InventorytransactionDetail)
-                    .HasForeignKey(d => d.Idtype)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
                 entity.HasOne(d => d.IdtypetransactionNavigation).WithMany(p => p.InventorytransactionDetail)

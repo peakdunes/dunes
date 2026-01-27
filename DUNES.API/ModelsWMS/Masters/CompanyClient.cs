@@ -109,4 +109,7 @@ public partial class CompanyClient
     /// </summary>
     [ForeignKey(nameof(Idcity))]
     public virtual Cities CityNavegation { get; set; } = null!;
+
+
+    public virtual ICollection<Items> Items { get; set; } = new List<Items>();
 }

@@ -269,6 +269,12 @@ builder.Services.AddSwaggerGen(c =>
 
             "RacksWMS" => new[] { "WMS Racks - CRUD" },
 
+            "BinsWMS" => new[] { "WMS Bins - CRUD" },
+
+            
+
+
+
             //#########
             //MASTERS
             //#########
