@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.Locations
 {
-
     /// <summary>
     /// locations controller
     /// </summary>
@@ -19,9 +18,7 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
     [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.ACCESS")]
     public class LocationsWMSController : BaseController
     {
-
         private readonly ILocationsWMSAPIService _service;
-
 
         /// <summary>
         /// constructor (DI)
@@ -30,7 +27,6 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         public LocationsWMSController(ILocationsWMSAPIService service)
         {
             _service = service;
-            
         }
 
         /// <summary>
@@ -45,7 +41,7 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         public async Task<IActionResult> GetAllLocationsAsync(CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetAllAsync(ct),
+                ct => _service.GetAllAsync(CurrentCompanyId, ct),
                 ct);
         }
 
@@ -61,7 +57,7 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         public async Task<IActionResult> GetActiveCountriesAsync(CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetActiveAsync(ct),
+                ct => _service.GetActiveAsync(CurrentCompanyId, ct),
                 ct);
         }
 
@@ -78,10 +74,9 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         public async Task<IActionResult> GetLocationByIdAsync(int id, CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetByIdAsync(id, ct),
+                ct => _service.GetByIdAsync(CurrentCompanyId, id, ct),
                 ct);
         }
-
 
         /// <summary>
         /// Return location information by id
@@ -94,10 +89,13 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> ExistsByNameAsync([FromQuery] string name, [FromQuery] int? excludeId, CancellationToken ct)
+        public async Task<IActionResult> ExistsByNameAsync(
+            [FromQuery] string name,
+            [FromQuery] int? excludeId,
+            CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.ExistsByNameAsync(name, excludeId, ct),
+                ct => _service.ExistsByNameAsync(CurrentCompanyId, name, excludeId, ct),
                 ct);
         }
 
@@ -113,11 +111,13 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateLocationAsync([FromBody] WMSLocationsDTO model, CancellationToken ct)
+        public async Task<IActionResult> CreateLocationAsync(
+            [FromBody] WMSLocationsDTO model,
+            CancellationToken ct)
         {
             // Si tienes [ApiController] y DataAnnotations en el modelo, aquí ya viene validado.
             return await HandleApi(
-                ct => _service.CreateAsync(model, ct),
+                ct => _service.CreateAsync(CurrentCompanyId, model, ct),
                 ct);
         }
 
@@ -134,10 +134,12 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateCountryAsync([FromBody] WMSLocationsDTO model, CancellationToken ct)
+        public async Task<IActionResult> UpdateCountryAsync(
+            [FromBody] WMSLocationsDTO model,
+            CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.UpdateAsync(model, ct),
+                ct => _service.UpdateAsync(CurrentCompanyId, model, ct),
                 ct);
         }
 
@@ -154,12 +156,14 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SetActiveCountryAsync(int id, [FromQuery] bool isActive, CancellationToken ct)
+        public async Task<IActionResult> SetActiveCountryAsync(
+            int id,
+            [FromQuery] bool isActive,
+            CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.SetActiveAsync(id, isActive, ct),
+                ct => _service.SetActiveAsync(CurrentCompanyId, id, isActive, ct),
                 ct);
         }
     }
 }
-

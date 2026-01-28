@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128122823_mig202601280730")]
+    partial class mig202601280730
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -903,7 +906,10 @@ namespace DUNES.API.Migrations
                     b.Property<int?>("CompanyClientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("InventorycategoriesId")
+                    b.Property<int?>("InventoryCategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InventorycategoriestId")
                         .HasColumnType("int");
 
                     b.Property<bool>("active")
@@ -934,7 +940,7 @@ namespace DUNES.API.Migrations
 
                     b.HasIndex("CompanyClientId");
 
-                    b.HasIndex("InventorycategoriesId");
+                    b.HasIndex("InventoryCategoryId");
 
                     b.HasIndex("companyId", "sku")
                         .IsUnique()
@@ -1669,9 +1675,7 @@ namespace DUNES.API.Migrations
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Inventorycategories", "InventoryCategory")
                         .WithMany()
-                        .HasForeignKey("InventorycategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("InventoryCategoryId");
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
                         .WithMany()

@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260128122007_mig202601280718")]
+    partial class mig202601280718
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -497,6 +500,13 @@ namespace DUNES.API.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("active");
 
+                    b.Property<int>("Idcompany")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Idcompanyclient")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<string>("Name")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
@@ -505,12 +515,9 @@ namespace DUNES.API.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<int>("companyId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "companyId" }, "IX_inventorycategories_Idcompany");
+                    b.HasIndex(new[] { "Idcompany" }, "IX_inventorycategories_Idcompany");
 
                     b.ToTable("inventorycategories", (string)null);
                 });
@@ -903,9 +910,6 @@ namespace DUNES.API.Migrations
                     b.Property<int?>("CompanyClientId")
                         .HasColumnType("int");
 
-                    b.Property<int>("InventorycategoriesId")
-                        .HasColumnType("int");
-
                     b.Property<bool>("active")
                         .HasColumnType("bit");
 
@@ -933,8 +937,6 @@ namespace DUNES.API.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyClientId");
-
-                    b.HasIndex("InventorycategoriesId");
 
                     b.HasIndex("companyId", "sku")
                         .IsUnique()
@@ -1469,7 +1471,7 @@ namespace DUNES.API.Migrations
                 {
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
                         .WithMany("Inventorycategories")
-                        .HasForeignKey("companyId")
+                        .HasForeignKey("Idcompany")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1667,12 +1669,6 @@ namespace DUNES.API.Migrations
                         .HasForeignKey("CompanyClientId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Inventorycategories", "InventoryCategory")
-                        .WithMany()
-                        .HasForeignKey("InventorycategoriesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
                         .WithMany()
                         .HasForeignKey("companyId")
@@ -1682,8 +1678,6 @@ namespace DUNES.API.Migrations
                     b.Navigation("CompanyClient");
 
                     b.Navigation("IdcompanyNavigation");
-
-                    b.Navigation("InventoryCategory");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Itemstatus", b =>

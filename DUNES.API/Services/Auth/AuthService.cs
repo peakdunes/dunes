@@ -84,7 +84,7 @@ namespace DUNES.API.Services.Auth
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="UnauthorizedAccessException"></exception>
-      
+
 
 
         public async Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginModel model, CancellationToken ct)
@@ -138,7 +138,18 @@ namespace DUNES.API.Services.Auth
                     new Claim(ClaimTypes.Name, user.UserName!),
 
                     // Token id
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+
+
+                     // Company Default
+                    new Claim("companyId", userConfig.Data!.Companydefault.ToString()),
+
+                    // Company Client Default
+                    new Claim("companyClientId", userConfig.Data!.Companyclientdefault.ToString()),
+
+                    // Location ID
+                    new Claim("locationId", userConfig.Data!.Locationdefault.ToString())
+
                 };
 
             //var authClaims = new List<Claim>
@@ -182,7 +193,7 @@ namespace DUNES.API.Services.Auth
                 LocationName = userConfig.Data!.LocationName,
                 Enviromentname = userConfig.Data!.Enviromentname,
                 RoleName = userConfig.Data.RoleName
-             
+
 
             });
         }

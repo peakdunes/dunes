@@ -18,6 +18,16 @@ namespace DUNES.API.Controllers
     {
         #region Private Helpers
 
+        /// <summary>
+        /// toma del token el company id
+        /// </summary>
+        protected int CurrentCompanyId => int.Parse(User.FindFirst("companyId")!.Value);
+
+        /// <summary>
+        /// toma del token el company client id
+        /// </summary>
+        protected int CurrentCompanyClientId => int.Parse(User.FindFirst("companyClientId")!.Value);
+
         private string GetTraceId()
         {
             // Usa el X-Trace-Id si viene del middleware; si no, usa el TraceIdentifier del framework

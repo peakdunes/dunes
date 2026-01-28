@@ -148,7 +148,7 @@ namespace DUNES.API.Services.Auth
 
             active.DivisionName = division.Data.DivisionName;
 
-            var location = await _locationsWMSAPIService.GetByIdAsync(active.Locationdefault, ct);
+            var location = await _locationsWMSAPIService.GetByIdAsync(active.Companydefault,active.Locationdefault, ct);
 
             if (location?.Data == null)
             {

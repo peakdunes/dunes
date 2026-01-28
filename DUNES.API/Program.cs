@@ -521,6 +521,8 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthentication();
 
+app.UseMiddleware<CompanyContextMiddleware>();
+
 app.UseAuthorization();
 app.MapControllers();
 

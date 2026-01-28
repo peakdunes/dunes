@@ -72,7 +72,7 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
                 return ApiResponseFactory.BadRequest<bool>($"Company {entity.IdcompanyNavigation.Name} is not active");
             }
 
-            var ExistLocation = await _locationRepository.GetByIdAsync(entity.LocationsId,ct);
+            var ExistLocation = await _locationRepository.GetByIdAsync(ExistCompany.Id, entity.LocationsId,ct);
 
             if (ExistLocation == null)
             {
@@ -285,7 +285,7 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
                 return ApiResponseFactory.BadRequest<bool>($"Company {entity.IdcompanyNavigation.Name} is not active");
             }
 
-            var ExistLocation = await _locationRepository.GetByIdAsync(entity.LocationsId, ct);
+            var ExistLocation = await _locationRepository.GetByIdAsync(ExistCompany.Id, entity.LocationsId, ct);
 
             if (ExistLocation == null)
             {

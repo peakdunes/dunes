@@ -156,7 +156,7 @@ namespace DUNES.API.Data
             {
                 entity.HasKey(x => x.Id);
 
-                entity.HasIndex(x => new { x.Idcompany, x.sku })
+                entity.HasIndex(x => new { x.companyId, x.sku })
                     .IsUnique();
 
                 entity.HasOne(x => x.CompanyClient)
@@ -428,14 +428,14 @@ namespace DUNES.API.Data
             {
                 entity.ToTable("inventorycategories");
 
-                entity.HasIndex(e => e.Idcompany, "IX_inventorycategories_Idcompany");
+                entity.HasIndex(e => e.companyId, "IX_inventorycategories_Idcompany");
 
                 entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
+                
                 entity.Property(e => e.Name).HasMaxLength(200);
                 entity.Property(e => e.Observations).HasMaxLength(1000);
 
-                entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Inventorycategories).HasForeignKey(d => d.Idcompany);
+                entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Inventorycategories).HasForeignKey(d => d.companyId);
             });
 
             modelBuilder.Entity<Itemstatus>(entity =>
