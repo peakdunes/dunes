@@ -17,166 +17,210 @@ namespace DUNES.API.ServicesWMS.Masters.Locations
     /// </summary>
     public class LocationsWMSAPIService : ILocationsWMSAPIService
     {
-        private readonly IValidator<WMSLocationsDTO> _validator;
+        /// <summary>
+        /// Locations service implementation.
+        /// Handles business rules for WMS locations scoped by Company.
+        /// </summary>
+
+        private readonly IValidator<WMSLocationsUpdateDTO> _validator;
         private readonly ILocationsWMSAPIRepository _repository;
-        private readonly ICompaniesWMSAPIService _companiesWMSAPIService;
-        private readonly ICountriesWMSAPIService _countriesWMSAPIService;
+        private readonly ICountriesWMSAPIService _countriesService;
         private readonly IStateCountriesWMSAPIService _statesService;
-        private readonly ICitiesWMSAPIService _citiesWMSAPIService;
+        private readonly ICitiesWMSAPIService _citiesService;
         private readonly IMapper _mapper;
 
         /// <summary>
-        /// constructor
+        /// Initializes a new instance of the <see cref="LocationsWMSAPIService"/> class.
         /// </summary>
+        /// <param name="validator">FluentValidation validator for location DTO.</param>
+        /// <param name="repository">Locations repository.</param>
+        /// <param name="mapper">AutoMapper instance.</param>
+        /// <param name="countriesService">Countries service.</param>
+        /// <param name="statesService">States service.</param>
+        /// <param name="citiesService">Cities service.</param>
         public LocationsWMSAPIService(
-            IValidator<WMSLocationsDTO> validator,
+            IValidator<WMSLocationsUpdateDTO> validator,
             ILocationsWMSAPIRepository repository,
             IMapper mapper,
-            ICompaniesWMSAPIService companiesWMSAPIService,
-            ICountriesWMSAPIService countriesWMSAPIService,
+            ICountriesWMSAPIService countriesService,
             IStateCountriesWMSAPIService statesService,
-            ICitiesWMSAPIService citiesWMSAPIService)
+            ICitiesWMSAPIService citiesService)
         {
+            _validator = validator;
             _repository = repository;
             _mapper = mapper;
-            _validator = validator;
-            _companiesWMSAPIService = companiesWMSAPIService;
-            _countriesWMSAPIService = countriesWMSAPIService;
+            _countriesService = countriesService;
             _statesService = statesService;
-            _citiesWMSAPIService = citiesWMSAPIService;
+            _citiesService = citiesService;
         }
 
         /// <summary>
-        /// add new location
+        /// Creates a new location for the specified company.
         /// </summary>
+        /// <param name="companyId">Company identifier (from token).</param>
+        /// <param name="dto">Location data transfer object.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Operation result.</returns>
         public async Task<ApiResponse<bool>> CreateAsync(
             int companyId,
-            WMSLocationsDTO entity,
+            WMSLocationsUpdateDTO dto,
             CancellationToken ct)
         {
-            var validation = await _validator.ValidateAsync(entity, o =>
+            var validation = await _validator.ValidateAsync(dto, o =>
                 o.IncludeRuleSets("Create")
                  .IncludeRulesNotInRuleSet());
 
             if (!validation.IsValid)
             {
-                var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
+                var errors = string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage));
                 return ApiResponseFactory.BadRequest<bool>(errors);
             }
 
-            var infocompany = await _companiesWMSAPIService.GetByIdAsync(companyId, ct);
+            // Validate hierarchy (Country → State → City)
+            var country = await _countriesService.GetByIdAsync(dto.Idcountry, ct);
+            if (country.Data == null || !country.Data.Active)
+                return ApiResponseFactory.NotFound<bool>("Invalid or inactive country.");
 
-            if (infocompany.Data == null)
-                return ApiResponseFactory.NotFound<bool>($"Company with Id {companyId} was not found.");
+            var state = await _statesService.GetByIdAsync(dto.Idstate, ct);
+            if (state.Data == null || !state.Data.Active)
+                return ApiResponseFactory.NotFound<bool>("Invalid or inactive state.");
 
-            if (!infocompany.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"Company with Id {companyId} is not active.");
+            var city = await _citiesService.GetByIdAsync(dto.Idcity, ct);
+            if (city.Data == null || !city.Data.Active)
+                return ApiResponseFactory.NotFound<bool>("Invalid or inactive city.");
 
-            var infocountry = await _countriesWMSAPIService.GetByIdAsync(entity.Idcountry, ct);
-            if (infocountry.Data == null || !infocountry.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"Country with Id {entity.Idcountry} was not found or is not active.");
-
-            var infostate = await _statesService.GetByIdAsync(entity.Idstate, ct);
-            if (infostate.Data == null || !infostate.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"State with Id {entity.Idstate} was not found or is not active.");
-
-            var infocity = await _citiesWMSAPIService.GetByIdAsync(entity.Idcity, ct);
-            if (infocity.Data == null || !infocity.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"City with Id {entity.Idcity} was not found or is not active.");
-
-            var locExist = await _repository.ExistsByNameAsync(
+            var exists = await _repository.ExistsByNameAsync(
                 companyId,
-                entity.Name!,
+                dto.Name!,
                 null,
                 ct);
 
-            if (locExist)
+            if (exists)
             {
                 return ApiResponseFactory.Fail<bool>(
                     error: "DUPLICATE_LOCATION_NAME",
-                    message: $"There is already a location with the name '{entity.Name}'.",
+                    message: $"There is already a location with the name '{dto.Name}'.",
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
-            var entityMap = _mapper.Map<DUNES.API.ModelsWMS.Masters.Locations>(entity);
-            entityMap.Idcompany = companyId;
+            var entity = _mapper.Map<ModelsWMS.Masters.Locations>(dto);
+            entity.Idcompany = companyId;
 
-            await _repository.CreateAsync(entityMap, ct);
+            await _repository.CreateAsync(entity, ct);
 
             return ApiResponseFactory.Ok(true, "Location created successfully.");
         }
 
         /// <summary>
-        /// search location by name
+        /// Gets all locations for the specified company.
         /// </summary>
-        public async Task<ApiResponse<bool>> ExistsByNameAsync(
-            int companyId,
-            string name,
-            int? excludeId,
-            CancellationToken ct)
-        {
-            if (string.IsNullOrEmpty(name))
-            {
-                return ApiResponseFactory.Fail<bool>(
-                    error: "Name is required",
-                    message: "Location name is required",
-                    statusCode: (int)HttpStatusCode.Conflict);
-            }
-
-            var locExist = await _repository.ExistsByNameAsync(
-                companyId,
-                name,
-                excludeId,
-                ct);
-
-            return ApiResponseFactory.Ok(locExist, "");
-        }
-
-        /// <summary>
-        /// get all active locations
-        /// </summary>
-        public async Task<ApiResponse<List<WMSLocationsDTO>>> GetActiveAsync(
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of locations.</returns>
+        public async Task<ApiResponse<List<WMSLocationsReadDTO>>> GetAllAsync(
             int companyId,
             CancellationToken ct)
         {
-            var locList = await _repository.GetActiveAsync(companyId, ct);
-            return ApiResponseFactory.Ok(locList, "");
+            var list = await _repository.GetAllAsync(companyId, ct);
+            return ApiResponseFactory.Ok(list);
         }
 
         /// <summary>
-        /// get all locations
+        /// Gets all active locations for the specified company.
         /// </summary>
-        public async Task<ApiResponse<List<WMSLocationsDTO>>> GetAllAsync(
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of active locations.</returns>
+        public async Task<ApiResponse<List<WMSLocationsReadDTO>>> GetActiveAsync(
             int companyId,
             CancellationToken ct)
         {
-            var locList = await _repository.GetAllAsync(companyId, ct);
-            return ApiResponseFactory.Ok(locList, "");
+            var list = await _repository.GetActiveAsync(companyId, ct);
+            return ApiResponseFactory.Ok(list);
         }
 
         /// <summary>
-        /// get location by id
+        /// Gets a location by its identifier.
         /// </summary>
-        public async Task<ApiResponse<WMSLocationsDTO?>> GetByIdAsync(
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="id">Location identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Location information.</returns>
+        public async Task<ApiResponse<WMSLocationsReadDTO?>> GetByIdAsync(
             int companyId,
             int id,
             CancellationToken ct)
         {
             if (id <= 0)
-            {
-                return ApiResponseFactory.Fail<WMSLocationsDTO?>(
-                    error: "ID is required",
-                    message: "Location ID is required",
-                    statusCode: (int)HttpStatusCode.Conflict);
-            }
+                return ApiResponseFactory.BadRequest<WMSLocationsReadDTO?>("Location id is required.");
 
-            var infoLoc = await _repository.GetByIdAsync(companyId, id, ct);
-            return ApiResponseFactory.Ok(infoLoc, "");
+            var data = await _repository.GetByIdAsync(companyId, id, ct);
+            return ApiResponseFactory.Ok(data);
         }
 
         /// <summary>
-        /// active no active location
+        /// Updates an existing location.
         /// </summary>
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="id">Location identifier.</param>
+        /// <param name="dto">Updated location data.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Operation result.</returns>
+        public async Task<ApiResponse<bool>> UpdateAsync(
+            int companyId,
+            int id,
+            WMSLocationsUpdateDTO dto,
+            CancellationToken ct)
+        {
+            var validation = await _validator.ValidateAsync(dto, o =>
+                o.IncludeRuleSets("Update")
+                 .IncludeRulesNotInRuleSet());
+
+            if (!validation.IsValid)
+            {
+                var errors = string.Join(" | ", validation.Errors.Select(e => e.ErrorMessage));
+                return ApiResponseFactory.BadRequest<bool>(errors);
+            }
+
+            var existing = await _repository.GetByIdAsync(companyId, id, ct);
+            if (existing == null)
+                return ApiResponseFactory.NotFound<bool>("Location not found.");
+
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                dto.Name!,
+                id,
+                ct);
+
+            if (exists)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "DUPLICATE_LOCATION_NAME",
+                    message: $"There is already a location with the name '{dto.Name}'.",
+                    statusCode: (int)HttpStatusCode.Conflict);
+            }
+
+            // Map only allowed fields (ownership is preserved)
+          //  _mapper.Map(dto, existing);
+          
+            var entity = _mapper.Map<ModelsWMS.Masters.Locations>(dto);
+
+            entity.Idcompany = companyId;
+
+
+            await _repository.UpdateAsync(entity, ct);
+
+            return ApiResponseFactory.Ok(true, "Location updated successfully.");
+        }
+
+        /// <summary>
+        /// Activates or deactivates a location.
+        /// </summary>
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="id">Location identifier.</param>
+        /// <param name="isActive">Activation state.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Operation result.</returns>
         public async Task<ApiResponse<bool>> SetActiveAsync(
             int companyId,
             int id,
@@ -186,74 +230,40 @@ namespace DUNES.API.ServicesWMS.Masters.Locations
             var ok = await _repository.SetActiveAsync(companyId, id, isActive, ct);
 
             if (!ok)
-                return ApiResponseFactory.NotFound<bool>($"Location with Id {id} was not found.");
+                return ApiResponseFactory.NotFound<bool>("Location not found.");
 
-            var msg = isActive
-                ? "Location has been activated successfully."
-                : "Location has been deactivated successfully.";
+            var message = isActive
+                ? "Location activated successfully."
+                : "Location deactivated successfully.";
 
-            return ApiResponseFactory.Ok(true, msg);
+            return ApiResponseFactory.Ok(true, message);
         }
 
         /// <summary>
-        /// update location
+        /// Checks if a location with the same name already exists.
         /// </summary>
-        public async Task<ApiResponse<bool>> UpdateAsync(
+        /// <param name="companyId">Company identifier.</param>
+        /// <param name="name">Location name.</param>
+        /// <param name="excludeId">Optional location id to exclude.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if exists; otherwise false.</returns>
+        public async Task<ApiResponse<bool>> ExistsByNameAsync(
             int companyId,
-            WMSLocationsDTO entity,
+            string name,
+            int? excludeId,
             CancellationToken ct)
         {
-            var validation = await _validator.ValidateAsync(entity, o =>
-                o.IncludeRuleSets("Update")
-                 .IncludeRulesNotInRuleSet());
+            if (string.IsNullOrWhiteSpace(name))
+                return ApiResponseFactory.BadRequest<bool>("Location name is required.");
 
-            if (!validation.IsValid)
-            {
-                var errors = string.Join(" |", validation.Errors.Select(e => e.ErrorMessage));
-                return ApiResponseFactory.BadRequest<bool>(errors);
-            }
-
-            var existEntity = await _repository.GetByIdAsync(companyId, entity.Id, ct);
-
-            if (existEntity == null)
-                return ApiResponseFactory.NotFound<bool>($"Location with id '{entity.Id}' was not found.");
-
-            var infocompany = await _companiesWMSAPIService.GetByIdAsync(companyId, ct);
-            if (infocompany.Data == null || !infocompany.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"Company with Id {companyId} was not found or is not active.");
-
-            var infocountry = await _countriesWMSAPIService.GetByIdAsync(entity.Idcountry, ct);
-            if (infocountry.Data == null || !infocountry.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"Country with Id {entity.Idcountry} was not found or is not active.");
-
-            var infostate = await _statesService.GetByIdAsync(entity.Idstate, ct);
-            if (infostate.Data == null || !infostate.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"State with Id {entity.Idstate} was not found or is not active.");
-
-            var infocity = await _citiesWMSAPIService.GetByIdAsync(entity.Idcity, ct);
-            if (infocity.Data == null || !infocity.Data.Active)
-                return ApiResponseFactory.NotFound<bool>($"City with Id {entity.Idcity} was not found or is not active.");
-
-            var locExist = await _repository.ExistsByNameAsync(
+            var exists = await _repository.ExistsByNameAsync(
                 companyId,
-                entity.Name!,
-                entity.Id,
+                name,
+                excludeId,
                 ct);
 
-            if (locExist)
-            {
-                return ApiResponseFactory.Fail<bool>(
-                    error: "DUPLICATE_LOCATION_NAME",
-                    message: $"There is already a location with the name '{entity.Name}'.",
-                    statusCode: (int)HttpStatusCode.Conflict);
-            }
-
-            var location = _mapper.Map<DUNES.API.ModelsWMS.Masters.Locations>(entity);
-                      
-
-            await _repository.UpdateAsync(location, ct);
-
-            return ApiResponseFactory.Ok(true, "Location updated successfully.");
+            return ApiResponseFactory.Ok(exists);
         }
     }
 }
+

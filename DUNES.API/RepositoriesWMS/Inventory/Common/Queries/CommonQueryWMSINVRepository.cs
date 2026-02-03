@@ -69,8 +69,8 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactionconcepts>> GetAllActiveTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
             var listconcepts = await _wmscontext.Transactionconcepts
-               .Where(x => x.Idcompany == companyid
-               && x.Idcompanyclient == companyClient
+               .Where(x => x.companyId == companyid
+             
                && x.Active == true).ToListAsync(ct);
 
             return listconcepts;
@@ -85,8 +85,8 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactionconcepts>> GetAllTransactionsConcept(int companyid, string companyClient, CancellationToken ct)
         {
             var listconcepts = await _wmscontext.Transactionconcepts
-               .Where(x => x.Idcompany == companyid
-               && x.Idcompanyclient == companyClient
+               .Where(x => x.companyId == companyid
+               
                ).ToListAsync(ct);
 
             return listconcepts;
@@ -100,8 +100,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-              .Where(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient
+              .Where(x => x.companyId == companyid
               && x.Isinput == true
               ).ToListAsync(ct);
 
@@ -116,8 +115,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-             .Where(x => x.Idcompany == companyid
-             && x.Idcompanyclient == companyClient
+             .Where(x => x.companyId == companyid
              && x.Isinput == true && x.Active == true
              ).ToListAsync(ct);
 
@@ -133,8 +131,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-            .Where(x => x.Idcompany == companyid
-            && x.Idcompanyclient == companyClient
+            .Where(x => x.companyId == companyid
             && x.Isoutput == true
             ).ToListAsync(ct);
 
@@ -149,8 +146,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-            .Where(x => x.Idcompany == companyid
-            && x.Idcompanyclient == companyClient
+            .Where(x => x.companyId == companyid
             && x.Isoutput == true && x.Active == true
             ).ToListAsync(ct);
 
@@ -402,8 +398,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-               .Where(x => x.Idcompany == companyid
-               && x.Idcompanyclient == companyClient
+               .Where(x => x.companyId == companyid
                && x.Isinput == true && x.Active == true && x.Match != "" && x.Match != null
                ).ToListAsync(ct);
             return listtransactions;
@@ -420,8 +415,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-              .Where(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient
+              .Where(x => x.companyId == companyid
               && x.Isinput == true && x.Match != "" && x.Match != null
               ).ToListAsync(ct);
             return listtransactions;
@@ -439,8 +433,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-               .Where(x => x.Idcompany == companyid
-               && x.Idcompanyclient == companyClient
+               .Where(x => x.companyId == companyid
                && x.Isoutput == true && x.Active == true && x.Match != "" && x.Match != null
                ).ToListAsync(ct);
             return listtransactions;
@@ -457,8 +450,7 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<List<Transactiontypes>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var listtransactions = await _wmscontext.Transactiontypes
-              .Where(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient
+              .Where(x => x.companyId == companyid
               && x.Isoutput == true && x.Match != "" && x.Match != null
               ).ToListAsync(ct);
             return listtransactions;
@@ -477,8 +469,8 @@ namespace DUNES.API.RepositoriesWMS.Inventory.Common.Queries
         public async Task<Transactiontypes> GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct)
         {
             var uniquetransaction = await _wmscontext.Transactiontypes
-              .FirstOrDefaultAsync(x => x.Idcompany == companyid
-              && x.Idcompanyclient == companyClient && x.Id == id, ct);
+              .FirstOrDefaultAsync(x => x.companyId == companyid
+               && x.Id == id, ct);
 
 
             return uniquetransaction;

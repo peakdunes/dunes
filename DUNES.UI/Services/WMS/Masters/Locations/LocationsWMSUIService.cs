@@ -13,10 +13,10 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
         }
 
         public Task<ApiResponse<bool>> CreateAsync(
-            WMSLocationsDTO entity,
+            WMSLocationsUpdateDTO entity,
             string token,
             CancellationToken ct)
-            => PostApiAsync<bool, WMSLocationsDTO>(
+            => PostApiAsync<bool, WMSLocationsUpdateDTO>(
                 "/api/LocationsWMS/wms-create-location",
                 entity,
                 token,
@@ -32,27 +32,27 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSLocationsDTO>>> GetActiveAsync(
+        public Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetActiveAsync(
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSLocationsDTO>>(
+            => GetApiAsync<List<WMSLocationsUpdateDTO>>(
                 "/api/LocationsWMS/wms-active-locations",
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSLocationsDTO>>> GetAllAsync(
+        public Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllAsync(
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSLocationsDTO>>(
+            => GetApiAsync<List<WMSLocationsUpdateDTO>>(
                 "/api/LocationsWMS/wms-all-locations",
                 token,
                 ct);
 
-        public Task<ApiResponse<WMSLocationsDTO?>> GetByIdAsync(
+        public Task<ApiResponse<WMSLocationsUpdateDTO?>> GetByIdAsync(
             int id,
             string token,
             CancellationToken ct)
-            => GetApiAsync<WMSLocationsDTO?>(
+            => GetApiAsync<WMSLocationsUpdateDTO?>(
                 $"/api/LocationsWMS/wms-location-by-id/{id}",
                 token,
                 ct);
@@ -69,10 +69,10 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
                 ct);
 
         public Task<ApiResponse<bool>> UpdateAsync(
-            WMSLocationsDTO entity,
+            WMSLocationsUpdateDTO entity,
             string token,
             CancellationToken ct)
-            => PostApiAsync<bool, WMSLocationsDTO>(
+            => PostApiAsync<bool, WMSLocationsUpdateDTO>(
                 "/api/LocationsWMS/wms-update-location",
                 entity,
                 token,

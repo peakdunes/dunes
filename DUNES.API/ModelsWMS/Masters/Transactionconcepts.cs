@@ -2,32 +2,39 @@
 using System.Collections.Generic;
 
 namespace DUNES.API.ModelsWMS.Masters;
-
+/// <summary>
+/// inventory transactions concept
+/// </summary>
 public partial class Transactionconcepts
 {
+    /// <summary>
+    /// internal database id
+    /// </summary>
     public int Id { get; set; }
 
-    public string? Name { get; set; }
+    /// <summary>
+    /// concept name
+    /// </summary>
+    public required string Name { get; set; }
 
-    public int Idcompany { get; set; }
+    /// <summary>
+    /// company id
+    /// </summary>
+    public int companyId { get; set; }
 
-    public string? Idcompanyclient { get; set; }
+    /// <summary>
+    /// boservations
+    /// </summary>
+    public string? Observations { get; set; }
 
+    /// <summary>
+    /// is active
+    /// </summary>
     public bool Active { get; set; }
 
-    public int CallType { get; set; }
 
-    public int ZebraInventoryAssociated { get; set; }
-
-    public bool IsInternal { get; set; }
-
-    public bool CreateZebraCall { get; set; }
-
-    public bool CreateZebraInvTran { get; set; }
-
+    /// <summary>
+    /// company navegation
+    /// </summary>
     public virtual Company IdcompanyNavigation { get; set; } = null!;
-
-    public virtual ICollection<Inventorymovement> Inventorymovement { get; set; } = new List<Inventorymovement>();
-
-    public virtual ICollection<InventorytransactionHdr> InventorytransactionHdr { get; set; } = new List<InventorytransactionHdr>();
 }

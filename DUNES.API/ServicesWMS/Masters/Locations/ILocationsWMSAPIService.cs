@@ -4,74 +4,53 @@ using DUNES.Shared.Models;
 namespace DUNES.API.ServicesWMS.Masters.Locations
 {
     /// <summary>
-    /// location interface service
+    /// Locations Service
+    /// Business logic layer scoped by Company (STANDARD COMPANYID)
     /// </summary>
     public interface ILocationsWMSAPIService
     {
         /// <summary>
-        /// get all locations
+        /// Get all locations for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllAsync(
+        Task<ApiResponse<List<WMSLocationsReadDTO>>> GetAllAsync(
             int companyId,
             CancellationToken ct);
 
         /// <summary>
-        /// get all active locations
+        /// Get all active locations for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetActiveAsync(
+        Task<ApiResponse<List<WMSLocationsReadDTO>>> GetActiveAsync(
             int companyId,
             CancellationToken ct);
 
         /// <summary>
-        /// get location by id
+        /// Get location by id validating ownership
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<ApiResponse<WMSLocationsDTO?>> GetByIdAsync(
+        Task<ApiResponse<WMSLocationsReadDTO?>> GetByIdAsync(
             int companyId,
             int id,
             CancellationToken ct);
 
         /// <summary>
-        /// add new location
+        /// Create a new location
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<ApiResponse<bool>> CreateAsync(
             int companyId,
-            WMSLocationsDTO entity,
+            WMSLocationsUpdateDTO dto,
             CancellationToken ct);
 
         /// <summary>
-        /// update location
+        /// Update an existing location
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<ApiResponse<bool>> UpdateAsync(
             int companyId,
-            WMSLocationsDTO entity,
+            int id,
+            WMSLocationsUpdateDTO dto,
             CancellationToken ct);
 
         /// <summary>
-        /// Active / No active.
+        /// Activate or deactivate a location
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<ApiResponse<bool>> SetActiveAsync(
             int companyId,
             int id,
@@ -79,13 +58,8 @@ namespace DUNES.API.ServicesWMS.Masters.Locations
             CancellationToken ct);
 
         /// <summary>
-        /// validate if exists a location with the same name
+        /// Validate if a location name already exists for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="name"></param>
-        /// <param name="excludeId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<ApiResponse<bool>> ExistsByNameAsync(
             int companyId,
             string name,

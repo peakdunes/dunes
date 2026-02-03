@@ -5,34 +5,29 @@ using DUNES.API.RepositoriesWMS.Masters.Racks;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
-using NuGet.Protocol.Core.Types;
 using System.Net;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DUNES.API.ServicesWMS.Masters.Racks
 {
-
     /// <summary>
     /// Racks Service
+    /// STANDARD COMPANYID compliant
     /// </summary>
     public class RacksWMSAPIService : IRacksWMSAPIService
     {
-
-
         private readonly IRacksWMSAPIRepository _repository;
         private readonly ICompaniesWMSAPIRepository _companyRepository;
         private readonly ILocationsWMSAPIRepository _locationRepository;
-
         private readonly IMapper _mapper;
+
         /// <summary>
-        /// contructor (DI)
+        /// Constructor (DI)
         /// </summary>
-        /// <param name="repository"></param>
-        /// <param name="mapper"></param>
-        ///   /// <param name="companyRepository"></param>
-        /// <param name="locationRepository"></param>
-        public RacksWMSAPIService(IRacksWMSAPIRepository repository, IMapper mapper,
-             ICompaniesWMSAPIRepository companyRepository, ILocationsWMSAPIRepository locationRepository)
+        public RacksWMSAPIService(
+            IRacksWMSAPIRepository repository,
+            IMapper mapper,
+            ICompaniesWMSAPIRepository companyRepository,
+            ILocationsWMSAPIRepository locationRepository)
         {
             _repository = repository;
             _mapper = mapper;
@@ -40,75 +35,122 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
             _locationRepository = locationRepository;
         }
 
+       
         /// <summary>
-        /// add new rack
+        /// Create a new rack for a specific company and location
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<bool>> CreateAsync(WMSRacksDTO entity, CancellationToken ct)
+        public async Task<ApiResponse<WMSRacksCreateDTO>> CreateAsync(
+            int companyId,
+            int locationId,
+            WMSRacksCreateDTO dto,
+            CancellationToken ct)
         {
-            if (entity.Idcompany <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
-            }
+            // 1️⃣ Validar Company
+            var company = await _companyRepository.GetByIdAsync(companyId, ct);
+            if (company == null)
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>($"Company {companyId} does not exist");
 
-            var ExistCompany = await _companyRepository.GetByIdAsync(entity.Idcompany, ct);
+            if (!company.Active)
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>($"Company {company.Name} is not active");
 
-            if (ExistCompany == null)
-            {
+            // 2️⃣ Validar Location
+            var location = await _locationRepository.GetByIdAsync(companyId, locationId, ct);
+            if (location == null)
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>($"Location {locationId} does not exist");
 
-                return ApiResponseFactory.BadRequest<bool>($"Company {entity.Idcompany} don't exist");
-            }
+            if (!location.Active)
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>($"Location {location.Name} is not active");
 
-            if (entity.LocationsId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Location is required");
-            }
+            // 3️⃣ Validar datos
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>("Rack name is required");
 
-            if (!ExistCompany.Active)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Company {entity.IdcompanyNavigation.Name} is not active");
-            }
+            // 4️⃣ Validar duplicado
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                locationId,
+                dto.Name.Trim(),
+                null,
+                ct);
 
-            var ExistLocation = await _locationRepository.GetByIdAsync(ExistCompany.Id, entity.LocationsId,ct);
-
-            if (ExistLocation == null)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Location {entity.LocationsId} don't exist");
-            }
-
-            if (!ExistLocation.Active)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Location {entity.Locations.Name} is not active");
-            }
-
-
-            if (string.IsNullOrEmpty(entity.Name))
-            {
-                return ApiResponseFactory.BadRequest<bool>("Rack Name is required");
-            }
-
-
-            // validar nombre duplicado
-            var exists = await _repository.ExistsByNameAsync(entity.Idcompany, entity.LocationsId, entity.Name!, null, ct);
             if (exists)
             {
-                return ApiResponseFactory.Fail<bool>(
-                         error: "DUPLICATE_RACK_NAME",
-                         message: $"There is already a rack with the name '{entity.Name}'.",
-                         statusCode: (int)HttpStatusCode.Conflict);
+                return ApiResponseFactory.Fail<WMSRacksCreateDTO>(
+                    error: "DUPLICATE_RACK_NAME",
+                    message: $"There is already a rack with the name '{dto.Name}'.",
+                    statusCode: (int)HttpStatusCode.Conflict);
             }
 
-            var objmap = _mapper.Map<DUNES.API.ModelsWMS.Masters.Racks>(entity);
+            // 5️⃣ Map DTO → Entity
+            var entity = _mapper.Map<ModelsWMS.Masters.Racks>(dto);
+            entity.Idcompany = companyId;
+            entity.LocationsId = locationId;
+            entity.Active = true;
 
-            await _repository.CreateAsync(objmap, ct);
-            return ApiResponseFactory.Ok(true, "Rack created successfully.");
-          
+            // 6️⃣ Persistir
+            await _repository.CreateAsync(entity, ct);
+
+            // 7️⃣ Map Entity → DTO
+            var resultDto = _mapper.Map<WMSRacksCreateDTO>(entity);
+
+            return ApiResponseFactory.Ok(resultDto, "Rack created successfully.");
         }
+
+       
         /// <summary>
-        /// Check if exist a rack with the same number
+        /// Update an existing rack
+        /// </summary>
+        public async Task<ApiResponse<WMSRacksCreateDTO>> UpdateAsync(
+            int companyId,
+            int locationId,
+            int id,
+            WMSRacksCreateDTO dto,
+            CancellationToken ct)
+        {
+            // 1️⃣ Buscar rack actual (con ownership)
+            var current = await _repository.GetByIdAsync(companyId, locationId, id, ct);
+            if (current == null)
+                return ApiResponseFactory.NotFound<WMSRacksCreateDTO>($"Rack with Id {id} was not found.");
+
+            // 2️⃣ Validar nombre
+            if (string.IsNullOrWhiteSpace(dto.Name))
+                return ApiResponseFactory.BadRequest<WMSRacksCreateDTO>("Rack name is required");
+
+            // 3️⃣ Validar duplicado (excluyendo el actual)
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                locationId,
+                dto.Name.Trim(),
+                id,
+                ct);
+
+            if (exists)
+            {
+                return ApiResponseFactory.Fail<WMSRacksCreateDTO>(
+                    error: "DUPLICATE_RACK_NAME",
+                    message: $"There is already a rack with the name '{dto.Name}'.",
+                    statusCode: (int)HttpStatusCode.Conflict);
+            }
+
+            // 4️⃣ Actualizar campos permitidos
+            current.Name = dto.Name.Trim();
+            current.LocationsId = locationId;
+            current.Active = dto.Active;
+
+            var infoupdate = _mapper.Map<DUNES.API.ModelsWMS.Masters.Racks>(current);
+
+            await _repository.UpdateAsync(infoupdate, ct);
+
+            // 5️⃣ Map Entity → DTO
+            var resultDto = _mapper.Map<WMSRacksCreateDTO>(infoupdate);
+
+            return ApiResponseFactory.Ok(resultDto, "Rack updated successfully.");
+        }
+
+      
+
+        /// <summary>
+        /// exist by name
         /// </summary>
         /// <param name="companyId"></param>
         /// <param name="locationId"></param>
@@ -116,22 +158,24 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
         /// <param name="excludeId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<bool>> ExistsByNameAsync(int companyId, int locationId, string name, int? excludeId, CancellationToken ct)
+        public async Task<ApiResponse<bool>> ExistsByNameAsync(
+            int companyId,
+            int locationId,
+            string name,
+            int? excludeId,
+            CancellationToken ct)
         {
-            if (companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
-            }
+            if (string.IsNullOrWhiteSpace(name))
+                return ApiResponseFactory.BadRequest<bool>("Rack name is required");
 
-            if (string.IsNullOrEmpty(name))
-            {
-                return ApiResponseFactory.BadRequest<bool>("Rack Name is required");
-            }
-            var exists = await _repository.ExistsByNameAsync(companyId, locationId, name!, null, ct);
-           
-            
-            return ApiResponseFactory.Ok(exists, "");
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                locationId,
+                name.Trim(),
+                excludeId,
+                ct);
+
+            return ApiResponseFactory.Ok(exists);
         }
         /// <summary>
         /// get all active racks by company
@@ -140,26 +184,18 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
         /// <param name="locationId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSRacksDTO>>> GetActiveAsync(int companyId, int locationId, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSRacksQueryDTO>>> GetActiveAsync(
+            int companyId,
+            int locationId,
+            CancellationToken ct)
         {
-            if (companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<List<WMSRacksDTO>>("Company is required");
-            }
-
             var data = await _repository.GetActiveAsync(companyId, locationId, ct);
 
             if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSRacksDTO>>("No active racks found.");
+                return ApiResponseFactory.NotFound<List<WMSRacksQueryDTO>>("No active racks found.");
 
-            var objlist = _mapper.Map<List<WMSRacksDTO>>(data);
-
-            return ApiResponseFactory.Ok(objlist);
-
+            return ApiResponseFactory.Ok(_mapper.Map<List<WMSRacksQueryDTO>>(data));
         }
-
-
         /// <summary>
         /// get all racks by company
         /// </summary>
@@ -167,57 +203,43 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
         /// <param name="locationId"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSRacksDTO>>> GetAllAsync(int companyId, int locationId, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSRacksQueryDTO>>> GetAllAsync(
+            int companyId,
+            int locationId,
+            CancellationToken ct)
         {
-            if (companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<List<WMSRacksDTO>>("Company is required");
-            }
-
             var data = await _repository.GetAllAsync(companyId, locationId, ct);
 
             if (data == null || data.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSRacksDTO>>("No racks found.");
+                return ApiResponseFactory.NotFound<List<WMSRacksQueryDTO>>("No racks found.");
 
-            var objlist = _mapper.Map<List<WMSRacksDTO>>(data);
-
-            return ApiResponseFactory.Ok(objlist);
+            return ApiResponseFactory.Ok(_mapper.Map<List<WMSRacksQueryDTO>>(data));
         }
 
         /// <summary>
-        /// get a rack by id and company id
+        /// get rack by id and company
         /// </summary>
         /// <param name="companyId"></param>
         /// <param name="locationId"></param>
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<WMSRacksDTO>> GetByIdAsync(int companyId, int locationId, int id, CancellationToken ct)
+        public async Task<ApiResponse<WMSRacksQueryDTO>> GetByIdAsync(
+            int companyId,
+            int locationId,
+            int id,
+            CancellationToken ct)
         {
-            if (companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<WMSRacksDTO>("Company is required");
-            }
-
-            if (id <= 0)
-            {
-                return ApiResponseFactory.BadRequest<WMSRacksDTO>("Rack is required");
-            }
-
             var entity = await _repository.GetByIdAsync(companyId, locationId, id, ct);
 
-            if (entity is null)
-                return ApiResponseFactory.NotFound<WMSRacksDTO>($"Rack with Id {id} was not found.");
+            if (entity == null)
+                return ApiResponseFactory.NotFound<WMSRacksQueryDTO>($"Rack with Id {id} was not found.");
 
-            var objmap = _mapper.Map<WMSRacksDTO>(entity);
-
-            return ApiResponseFactory.Ok(objmap);
+            return ApiResponseFactory.Ok(_mapper.Map<WMSRacksQueryDTO>(entity));
         }
 
         /// <summary>
-        /// set active / no activa a rack
+        /// Active no active change for a rack
         /// </summary>
         /// <param name="companyId"></param>
         /// <param name="locationId"></param>
@@ -225,19 +247,13 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
         /// <param name="isActive"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<bool>> SetActiveAsync(int companyId, int locationId, int id, bool isActive, CancellationToken ct)
+        public async Task<ApiResponse<bool>> SetActiveAsync(
+            int companyId,
+            int locationId,
+            int id,
+            bool isActive,
+            CancellationToken ct)
         {
-            if (companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
-            }
-
-            if (id <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Rack is required");
-            }
-
             var ok = await _repository.SetActiveAsync(companyId, locationId, id, isActive, ct);
 
             if (!ok)
@@ -248,84 +264,6 @@ namespace DUNES.API.ServicesWMS.Masters.Racks
                 : "Rack has been deactivated successfully.";
 
             return ApiResponseFactory.Ok(true, msg);
-
-
-        }
-
-
-        /// <summary>
-        /// update rack information
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<bool>> UpdateAsync(WMSRacksDTO entity, CancellationToken ct)
-        {
-            if (entity.Idcompany <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
-            }
-
-            var ExistCompany = await _companyRepository.GetByIdAsync(entity.Idcompany, ct);
-
-            if (ExistCompany == null)
-            {
-
-                return ApiResponseFactory.BadRequest<bool>($"Company {entity.Idcompany} don't exist");
-            }
-
-            if (entity.LocationsId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Location is required");
-            }
-
-            if (!ExistCompany.Active)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Company {entity.IdcompanyNavigation.Name} is not active");
-            }
-
-            var ExistLocation = await _locationRepository.GetByIdAsync(ExistCompany.Id, entity.LocationsId, ct);
-
-            if (ExistLocation == null)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Location {entity.LocationsId} don't exist");
-            }
-
-            if (!ExistLocation.Active)
-            {
-                return ApiResponseFactory.BadRequest<bool>($"Location {entity.Locations.Name} is not active");
-            }
-
-
-            if (string.IsNullOrEmpty(entity.Name))
-            {
-                return ApiResponseFactory.BadRequest<bool>("Rack Name is required");
-            }
-
-            // validar nombre duplicado excluyendo el propio Id
-            var exists = await _repository.ExistsByNameAsync(entity.Idcompany, entity.LocationsId, entity.Name!, entity.Id, ct);
-            if (exists)
-            {
-                return ApiResponseFactory.Fail<bool>(
-                         error: "DUPLICATE_RACK_NAME",
-                         message: $"There is already a rack with the name '{entity.Name}'.",
-                         statusCode: (int)HttpStatusCode.Conflict);
-            }
-
-            var current = await _repository.GetByIdAsync(entity.Idcompany, entity.LocationsId, entity.Id, ct);
-            if (current is null)
-            {
-                return ApiResponseFactory.NotFound<bool>($"Rack with Id {entity.Id} was not found.");
-            }
-
-           
-            current.Name = entity.Name;
-            current.Active = entity.Active;
-
-            await _repository.UpdateAsync(current, ct);
-
-            return ApiResponseFactory.Ok(true, "Rack updated successfully.");
         }
     }
 }

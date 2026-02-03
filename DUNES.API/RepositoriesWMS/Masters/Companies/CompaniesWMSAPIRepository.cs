@@ -126,5 +126,17 @@ namespace DUNES.API.RepositoriesWMS.Masters.Companies
             await _wmscontext.SaveChangesAsync(ct);
             return entity;
         }
+        /// <summary>
+        /// validation for a active company
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<bool> IsActiveAsync(int companyId, CancellationToken ct)
+        {
+            return await _wmscontext.Company
+                .AsNoTracking()
+                .AnyAsync(x => x.Id == companyId && x.Active, ct);
+        }
     }
 }

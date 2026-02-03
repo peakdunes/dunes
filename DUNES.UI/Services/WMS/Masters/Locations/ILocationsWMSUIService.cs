@@ -14,13 +14,13 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllAsync(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllAsync(string token, CancellationToken ct);
         /// <summary>
         /// get all active locations
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetActiveAsync(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetActiveAsync(string token, CancellationToken ct);
 
         /// <summary>
         /// get location by id
@@ -28,7 +28,7 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
         /// <param name="id"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<WMSLocationsDTO?>> GetByIdAsync(int id, string token, CancellationToken ct);
+        Task<ApiResponse<WMSLocationsUpdateDTO?>> GetByIdAsync(int id, string token, CancellationToken ct);
 
         /// <summary>
         /// add new location
@@ -36,14 +36,14 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> CreateAsync(WMSLocationsDTO entity, string token, CancellationToken ct);
+        Task<ApiResponse<bool>> CreateAsync(WMSLocationsUpdateDTO entity, string token, CancellationToken ct);
         /// <summary>
         /// update location
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<bool>> UpdateAsync(WMSLocationsDTO entity, string token, CancellationToken ct);
+        Task<ApiResponse<bool>> UpdateAsync(WMSLocationsUpdateDTO entity, string token, CancellationToken ct);
         /// <summary>
         /// Active / No active.
         /// </summary>

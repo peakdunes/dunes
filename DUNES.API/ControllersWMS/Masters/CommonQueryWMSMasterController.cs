@@ -71,7 +71,7 @@ namespace DUNES.API.ControllersWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WMSLocationsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSLocationsUpdateDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("company-locations/{companyid}")]
@@ -87,7 +87,7 @@ namespace DUNES.API.ControllersWMS.Masters
         /// <param name="locationid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        [ProducesResponseType(typeof(List<WMSLocationsDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(List<WMSLocationsUpdateDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [HttpGet("companyclients-active-by-locations/{companyid}/{locationid}")]

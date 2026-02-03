@@ -70,9 +70,17 @@ namespace DUNES.API.Profiles
 
             CreateMap<Company, WMSCompaniesDTO>().ReverseMap();
 
-            CreateMap<Locations, WMSLocationsDTO > ().ReverseMap();
+            CreateMap<Locations, WMSLocationsUpdateDTO > ().ReverseMap();
 
-            CreateMap<Racks, WMSRacksDTO>().ReverseMap();
+            CreateMap<Racks, WMSRacksCreateDTO>().ReverseMap();
+            CreateMap<Racks, WMSRacksQueryDTO>().ReverseMap();
+
+            CreateMap<Bines, WMSBinsCreateDto>().ReverseMap();
+            
+
+            CreateMap<Inventorycategories, WMSInventoryCategoriesDTO>().ReverseMap();
+
+            CreateMap<Items, WMSItemsDTO>().ReverseMap();
         }
 
 

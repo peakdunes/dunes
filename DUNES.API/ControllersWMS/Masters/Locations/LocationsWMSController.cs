@@ -10,10 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 namespace DUNES.API.ControllersWMS.Masters.Locations
 {
     /// <summary>
-    /// locations controller
+    /// Locations WMS Controller
+    /// Scoped by Company (CompanyId from token)
     /// </summary>
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     [Authorize]
     [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.ACCESS")]
     public class LocationsWMSController : BaseController
@@ -21,22 +22,21 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         private readonly ILocationsWMSAPIService _service;
 
         /// <summary>
-        /// constructor (DI)
+        /// Initializes a new instance of the <see cref="LocationsWMSController"/> class.
         /// </summary>
-        /// <param name="service"></param>
+        /// <param name="service">Locations service</param>
         public LocationsWMSController(ILocationsWMSAPIService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Return all locations
+        /// Gets all locations for the current company.
         /// </summary>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of locations</returns>
         [HttpGet("wms-all-locations")]
-        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsDTO>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsDTO>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsUpdateDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAllLocationsAsync(CancellationToken ct)
         {
@@ -46,15 +46,14 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         }
 
         /// <summary>
-        /// Return all active locations
+        /// Gets all active locations for the current company.
         /// </summary>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of active locations</returns>
         [HttpGet("wms-active-locations")]
-        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsDTO>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsDTO>>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<List<WMSLocationsUpdateDTO>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetActiveCountriesAsync(CancellationToken ct)
+        public async Task<IActionResult> GetActiveLocationsAsync(CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.GetActiveAsync(CurrentCompanyId, ct),
@@ -62,16 +61,18 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         }
 
         /// <summary>
-        /// Return country information by id
+        /// Gets location information by identifier.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <param name="id">Location identifier</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Location details</returns>
         [HttpGet("wms-location-by-id/{id:int}")]
-        [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<WMSLocationsUpdateDTO?>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> GetLocationByIdAsync(int id, CancellationToken ct)
+        public async Task<IActionResult> GetLocationByIdAsync(
+            int id,
+            CancellationToken ct)
         {
             return await HandleApi(
                 ct => _service.GetByIdAsync(CurrentCompanyId, id, ct),
@@ -79,15 +80,14 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         }
 
         /// <summary>
-        /// Return location information by id
+        /// Checks if a location with the same name already exists.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="excludeId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+        /// <param name="name">Location name</param>
+        /// <param name="excludeId">Optional location id to exclude from validation</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>True if exists, otherwise false</returns>
         [HttpGet("wms-location-exists-by-name")]
-        [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse<WMSLocationsDTO?>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ExistsByNameAsync(
             [FromQuery] string name,
@@ -100,63 +100,59 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
         }
 
         /// <summary>
-        /// Create a new location
+        /// Creates a new location.
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// 
+        /// <param name="model">Location data</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Creation result</returns>
         [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.CREATE")]
         [HttpPost("wms-create-location")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateLocationAsync(
-            [FromBody] WMSLocationsDTO model,
+            [FromBody] WMSLocationsUpdateDTO model,
             CancellationToken ct)
         {
-            // Si tienes [ApiController] y DataAnnotations en el modelo, aquí ya viene validado.
             return await HandleApi(
                 ct => _service.CreateAsync(CurrentCompanyId, model, ct),
                 ct);
         }
 
         /// <summary>
-        /// Update country
+        /// Updates an existing location.
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// 
+        /// <param name="model">Updated location data</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Update result</returns>
         [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.UPDATE")]
         [HttpPut("wms-update-location")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> UpdateCountryAsync(
-            [FromBody] WMSLocationsDTO model,
+        public async Task<IActionResult> UpdateLocationAsync(
+            [FromBody] WMSLocationsUpdateDTO model,
             CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.UpdateAsync(CurrentCompanyId, model, ct),
+                ct => _service.UpdateAsync(CurrentCompanyId,model.Id, model, ct),
                 ct);
         }
 
         /// <summary>
-        /// Activate / Deactivate Location
+        /// Activates or deactivates a location.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// 
+        /// <param name="id">Location identifier</param>
+        /// <param name="isActive">Activation state</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Operation result</returns>
         [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.UPDATE")]
         [HttpPut("wms-set-active-location/{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SetActiveCountryAsync(
+        public async Task<IActionResult> SetActiveLocationAsync(
             int id,
             [FromQuery] bool isActive,
             CancellationToken ct)

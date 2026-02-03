@@ -424,7 +424,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
             ASNProcessInformationDto objinformation = new ASNProcessInformationDto();
 
-            List<WMSBinsDto> listbinesresult = new List<WMSBinsDto>();
+            List<WMSBinsCreateDto> listbinesresult = new List<WMSBinsCreateDto>();
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
@@ -457,12 +457,12 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 foreach (var b in listbines.Data)
                 {
-                    WMSBinsDto objdet = new WMSBinsDto
+                    WMSBinsCreateDto objdet = new WMSBinsCreateDto
                     {
-                       Id = b.Id,
+                       //Id = b.Id,
                         Name = b.Name,
-                       Idcompany = b.Idcompany,
-                       LocationsId = b.LocationsId,
+                      // Idcompany = b.Idcompany,
+                      // LocationsId = b.LocationsId,
                       
                     };
 

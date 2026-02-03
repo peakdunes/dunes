@@ -17,12 +17,12 @@ namespace DUNES.UI.Services.Inventory.Common
         {
         }
 
-        public Task<ApiResponse<List<WMSBinsDto>>> GetAllActiveBinsByCompanyClient(
+        public Task<ApiResponse<List<WMSBinsCreateDto>>> GetAllActiveBinsByCompanyClient(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSBinsDto>>(
+            => GetApiAsync<List<WMSBinsCreateDto>>(
                 $"/api/CommonQueryWMSINV/wms-act-bins/{companyid}/{companyClient}",
                 token,
                 ct);
@@ -190,11 +190,11 @@ namespace DUNES.UI.Services.Inventory.Common
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(
+        public Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllActiveLocationsByCompany(
             int companyid,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSLocationsDTO>>(
+            => GetApiAsync<List<WMSLocationsUpdateDTO>>(
                 $"/api/CommonQueryWMSMaster/company-locations/{companyid}",
                 token,
                 ct);

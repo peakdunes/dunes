@@ -528,41 +528,25 @@ namespace DUNES.API.Data
                     .OnDelete(DeleteBehavior.ClientSetNull);
             });
 
-            modelBuilder.Entity<Transactionconcepts>(entity =>
-            {
-                entity.ToTable("transactionconcepts");
-
-                entity.HasIndex(e => e.Idcompany, "IX_transactionconcepts_Idcompany");
-
-                entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.CallType).HasColumnName("callType");
-                entity.Property(e => e.CreateZebraCall).HasColumnName("createZebraCall");
-                entity.Property(e => e.CreateZebraInvTran).HasColumnName("createZebraInvTran");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
-                entity.Property(e => e.IsInternal).HasColumnName("isInternal");
-                entity.Property(e => e.Name).HasMaxLength(200);
-                entity.Property(e => e.ZebraInventoryAssociated).HasColumnName("zebraInventoryAssociated");
-
-                entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Transactionconcepts).HasForeignKey(d => d.Idcompany);
-            });
+           
 
             modelBuilder.Entity<Transactiontypes>(entity =>
             {
                 entity.ToTable("transactiontypes");
 
-                entity.HasIndex(e => e.Idcompany, "IX_transactiontypes_Idcompany");
+               
 
                 entity.Property(e => e.Active).HasColumnName("active");
-                entity.Property(e => e.Idcompanyclient).HasMaxLength(200);
+               
                 entity.Property(e => e.Isinput).HasColumnName("isinput");
                 entity.Property(e => e.Isoutput).HasColumnName("isoutput");
-                entity.Property(e => e.Ispreconsumption).HasColumnName("ispreconsumption");
+              
                 entity.Property(e => e.Match)
                     .HasMaxLength(1)
                     .HasColumnName("match");
                 entity.Property(e => e.Name).HasMaxLength(200);
 
-                entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.Transactiontypes).HasForeignKey(d => d.Idcompany);
+                
             });
 
             modelBuilder.Entity<Inventorydetail>(entity =>
@@ -661,13 +645,8 @@ namespace DUNES.API.Data
                     .HasForeignKey(d => d.IdtransactionHead)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.IdtransactionconceptNavigation).WithMany(p => p.Inventorymovement)
-                    .HasForeignKey(d => d.Idtransactionconcept)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
-
-                entity.HasOne(d => d.IdtransactiontypeNavigation).WithMany(p => p.Inventorymovement)
-                    .HasForeignKey(d => d.Idtransactiontype)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+             
+             
 
                 
             });
@@ -714,9 +693,7 @@ namespace DUNES.API.Data
                     .HasForeignKey(d => d.Idlocation)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.IdtypetransactionNavigation).WithMany(p => p.InventorytransactionDetail)
-                    .HasForeignKey(d => d.Idtypetransaction)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+              
             });
 
             modelBuilder.Entity<InventorytransactionHdr>(entity =>
@@ -743,9 +720,7 @@ namespace DUNES.API.Data
 
                 entity.HasOne(d => d.IdcompanyNavigation).WithMany(p => p.InventorytransactionHdr).HasForeignKey(d => d.Idcompany);
 
-                entity.HasOne(d => d.IdtransactionconceptNavigation).WithMany(p => p.InventorytransactionHdr)
-                    .HasForeignKey(d => d.Idtransactionconcept)
-                    .OnDelete(DeleteBehavior.ClientSetNull);
+                
             });
         }
 

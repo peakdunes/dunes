@@ -1,19 +1,18 @@
-﻿using DUNES.API.ServicesWMS.Masters.Racks;
+﻿using DUNES.API.Controllers;
+using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.Shared.DTOs.WMS;
-using Microsoft.AspNetCore.Http;
+using Humanizer;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.Racks
 {
-
     /// <summary>
     /// Racks Controller
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
-    public class RacksWMSController : ControllerBase
+    public class RacksWMSController : BaseController
     {
-
         private readonly IRacksWMSAPIService _service;
 
         /// <summary>
@@ -27,108 +26,121 @@ namespace DUNES.API.ControllersWMS.Masters.Racks
         /// <summary>
         /// Get all racks by company and location
         /// </summary>
-        [HttpGet("wms-all-racks")]
+        [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll(
-            int companyId,
             int locationId,
             CancellationToken ct)
         {
-            var result = await _service.GetAllAsync(companyId, locationId, ct);
-            return StatusCode(result.StatusCode, result);
+            
+            return await Handle(
+               ct => _service.GetAllAsync(CurrentCompanyId, locationId, ct),
+               ct);
+
         }
 
         /// <summary>
         /// Get all active racks by company and location
         /// </summary>
-        [HttpGet("wms-active_racks")]
+        [HttpGet("GetActive")]
         public async Task<IActionResult> GetActive(
-            int companyId,
             int locationId,
             CancellationToken ct)
         {
-            var result = await _service.GetActiveAsync(companyId, locationId, ct);
-            return StatusCode(result.StatusCode, result);
+            
+
+            return await Handle(
+                ct => _service.GetActiveAsync(CurrentCompanyId, locationId, ct),
+                ct);
+
+
         }
 
         /// <summary>
         /// Get rack by id
         /// </summary>
-        [HttpGet("wms-rack-by-id/{id:int}")]
+        [HttpGet("GetById/{id:int}")]
         public async Task<IActionResult> GetById(
-            int companyId,
-            int locationId,
             int id,
+            int locationId,
             CancellationToken ct)
         {
-            var result = await _service.GetByIdAsync(companyId, locationId, id, ct);
-            return StatusCode(result.StatusCode, result);
+            
+            return await Handle(
+               ct => _service.GetByIdAsync(CurrentCompanyId, locationId, id, ct),
+               ct);
+
+
         }
 
         /// <summary>
         /// Create new rack
         /// </summary>
-        [HttpPost("wms-create-rack")]
+        [HttpPost("Create")]
         public async Task<IActionResult> Create(
-            int companyId,
             int locationId,
-            [FromBody] WMSRacksDTO dto,
+            [FromBody] WMSRacksCreateDTO dto,
             CancellationToken ct)
         {
-            dto.Idcompany = companyId;
-            dto.LocationsId = locationId;
-
-            var result = await _service.CreateAsync(dto, ct);
-            return StatusCode(result.StatusCode, result);
+            return await HandleApi(
+                ct => _service.CreateAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    dto,
+                    ct),
+                ct);
         }
 
         /// <summary>
         /// Update rack
         /// </summary>
-        [HttpPut("wms-update-rack/{id:int}")]
+        [HttpPut("Update/{id:int}")]
         public async Task<IActionResult> Update(
-            int companyId,
-            int locationId,
             int id,
-            [FromBody] WMSRacksDTO dto,
+            int locationId,
+            [FromBody] WMSRacksCreateDTO dto,
             CancellationToken ct)
         {
-            dto.Idcompany = companyId;
-            dto.LocationsId = locationId;
-            dto.Id = id;
-
-            var result = await _service.UpdateAsync(dto, ct);
-            return StatusCode(result.StatusCode, result);
+            return await HandleApi(
+                ct => _service.UpdateAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    id,
+                    dto,
+                    ct),
+                ct);
         }
 
         /// <summary>
         /// Activate / Deactivate rack
         /// </summary>
-        [HttpPatch("wms-set-active-rack/{id:int}")]
+        [HttpPatch("SetActive/{id:int}")]
         public async Task<IActionResult> SetActive(
-            int companyId,
-            int locationId,
             int id,
+            int locationId,
             [FromQuery] bool isActive,
             CancellationToken ct)
         {
-            var result = await _service.SetActiveAsync(companyId, locationId, id, isActive, ct);
-            return StatusCode(result.StatusCode, result);
+           
+
+            return await Handle(
+          ct => _service.SetActiveAsync(CurrentCompanyId, locationId, id, isActive, ct),
+          ct);
         }
 
         /// <summary>
         /// Check if rack name exists for company and location
         /// </summary>
-        [HttpGet("wms-rack-exists-by-name")]
+        [HttpGet("ExistsByName")]
         public async Task<IActionResult> ExistsByName(
-            int companyId,
             int locationId,
             [FromQuery] string name,
             [FromQuery] int? excludeId,
             CancellationToken ct)
         {
-            var result = await _service.ExistsByNameAsync(companyId, locationId, name, excludeId, ct);
-            return StatusCode(result.StatusCode, result);
-        }
+           
 
+            return await Handle(ct => _service.ExistsByNameAsync(CurrentCompanyId,locationId,name,excludeId,ct),ct);
+
+        }
     }
 }

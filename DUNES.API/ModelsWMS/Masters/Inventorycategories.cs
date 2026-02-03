@@ -15,7 +15,7 @@ public class Inventorycategories
     /// <summary>
     /// category name
     /// </summary>
-    public string? Name { get; set; }
+    public required string Name { get; set; }
 
     /// <summary>
     /// company id

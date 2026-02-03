@@ -20,7 +20,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllActiveLocationsByCompany(int companyid, string token, CancellationToken ct);
 
 
 
@@ -66,7 +66,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSBinsDto>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSBinsCreateDto>>> GetAllActiveBinsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
         /// <summary>
         /// All active Transaction Inventory Concepts for a company client

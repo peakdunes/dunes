@@ -7,17 +7,14 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.WMS
 {
-    /// <summary>
-    /// DTO table Locations
-    /// </summary>
-    public class WMSLocationsDTO
+    public class WMSLocationsReadDTO
     {
 
         /// <summary>
         /// Location Id
         /// </summary>
         /// 
-        [Display(Name ="ID")]
+        [Display(Name = "ID")]
         public int Id { get; set; }
         /// <summary>
         /// Location Description
@@ -99,7 +96,5 @@ namespace DUNES.Shared.DTOs.WMS
         /// 
         [Display(Name = "State Name")]
         public string? statename { get; set; }
-      
-
     }
 }

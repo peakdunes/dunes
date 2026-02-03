@@ -1,58 +1,60 @@
-﻿
-using DUNES.API.Data;
+﻿using DUNES.API.Data;
+using DUNES.Shared.DTOs.WMS;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.Racks
 {
-
     /// <summary>
     /// Racks Repository
+    /// 
+    /// IMPORTANT:
+    /// This layer is the last line of defense for multi-tenant security.
+    /// All queries MUST filter by CompanyId and LocationId.
     /// </summary>
     public class RacksWMSAPIRepository : IRacksWMSAPIRepository
     {
-
-
         private readonly appWmsDbContext _context;
 
         /// <summary>
-        /// contructor DI
+        /// Constructor (DI)
         /// </summary>
-        /// <param name="context"></param>
         public RacksWMSAPIRepository(appWmsDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// add new Racks
+        /// Create a new rack.
+        /// 
+        /// IMPORTANT:
+        /// - Entity must already contain CompanyId and LocationId.
+        /// - Repository must not infer ownership.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ModelsWMS.Masters.Racks> CreateAsync(ModelsWMS.Masters.Racks entity, CancellationToken ct)
+        public async Task<ModelsWMS.Masters.Racks> CreateAsync(
+            ModelsWMS.Masters.Racks entity,
+            CancellationToken ct)
         {
             _context.Racks.Add(entity);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(ct);
             return entity;
-
-           
         }
 
         /// <summary>
-        /// check if exist a Rack by Name
+        /// Check if a rack name already exists for the same company and location.
         /// </summary>
-        ///  <param name="companyId"></param>
-        ///  <param name="locationId"></param>
-        /// <param name="name"></param>
-        /// <param name="excludeId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> ExistsByNameAsync(int companyId, int locationId, string name, int? excludeId, CancellationToken ct)
+        public async Task<bool> ExistsByNameAsync(
+            int companyId,
+            int locationId,
+            string name,
+            int? excludeId,
+            CancellationToken ct)
         {
-            var query = _context.Racks.AsNoTracking()
-                .Where(x => x.Idcompany == companyId && x.LocationsId == locationId  && x.Name == name);
+            var query = _context.Racks
+                .AsNoTracking()
+                .Where(x =>
+                    x.Idcompany == companyId &&
+                    x.LocationsId == locationId &&
+                    x.Name == name);
 
             if (excludeId.HasValue)
             {
@@ -61,64 +63,116 @@ namespace DUNES.API.RepositoriesWMS.Masters.Racks
 
             return await query.AnyAsync(ct);
         }
-        /// <summary>
-        /// Get all acive racks
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="locationId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.Racks>> GetActiveAsync(int companyId, int locationId, CancellationToken ct)
-        {
-            var query = await _context.Racks.Where(x => x.Idcompany == companyId && x.LocationsId == locationId && x.Active == true).ToListAsync();
-
-            return query;
-        }
-        /// <summary>
-        /// get all racks
-        /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="locationId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<List<ModelsWMS.Masters.Racks>> GetAllAsync(int companyId, int locationId, CancellationToken ct)
-        {
-            var query = await _context.Racks.Where(x => x.Idcompany == companyId && x.LocationsId == locationId).ToListAsync();
-
-            return query;
-        }
 
         /// <summary>
-        /// get a rack by companyid by id
+        /// Get all active racks for a company and location.
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="locationId"></param>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ModelsWMS.Masters.Racks?> GetByIdAsync(int companyId, int locationId, int id, CancellationToken ct)
+        public async Task<List<WMSRacksQueryDTO>> GetActiveAsync(
+            int companyId,
+            int locationId,
+            CancellationToken ct)
         {
-            var info = await _context.Racks.FirstOrDefaultAsync(x => x.Id == id && x.LocationsId == locationId);
-
-            return info;
+            return await _context.Racks
+         .AsNoTracking()
+         .Where(r =>
+             r.Idcompany == companyId &&
+             r.LocationsId == locationId 
+             && r.Active)
+         .Select(r => new WMSRacksQueryDTO
+         {
+             Id = r.Id,
+             Name = r.Name,
+             Active = r.Active,
+             LocationsId = r.LocationsId,
+             LocationName = r.Locations.Name,
+             Idcompany = r.Idcompany,
+             CompanyName = r.IdcompanyNavigation.Name
+         })
+         .OrderBy(r => r.Name)
+         .ToListAsync(ct);
         }
 
         /// <summary>
-        /// Active no active rack
+        /// Get all racks for a company and location.
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="locationId"></param>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<bool> SetActiveAsync(int companyId, int locationId, int id, bool isActive, CancellationToken ct)
+        public async Task<List<WMSRacksQueryDTO>> GetAllAsync(
+            int companyId,
+            int locationId,
+            CancellationToken ct)
         {
-            var entity = await _context.Racks.FirstOrDefaultAsync(x => x.Idcompany == companyId && x.LocationsId == locationId &&  x.Id == id, ct);
+            return await _context.Racks
+         .AsNoTracking()
+         .Where(r =>
+             r.Idcompany == companyId &&
+             r.LocationsId == locationId)
+         .Select(r => new WMSRacksQueryDTO
+         {
+             Id = r.Id,
+             Name = r.Name,
+             Active = r.Active,
+             LocationsId = r.LocationsId,
+             LocationName = r.Locations.Name,
+             Idcompany = r.Idcompany,
+             CompanyName = r.IdcompanyNavigation.Name
+         })
+         .OrderBy(r => r.Name)
+         .ToListAsync(ct);
+        }
+
+        /// <summary>
+        /// Get a rack by id validating company and location ownership.
+        /// 
+        /// IMPORTANT:
+        /// - Must filter by Id, CompanyId and LocationId.
+        /// </summary>
+        public async Task<WMSRacksQueryDTO?> GetByIdAsync(
+            int companyId,
+            int locationId,
+            int id,
+            CancellationToken ct)
+        {
+            return await _context.Racks
+    .AsNoTracking()
+    .Where(x =>
+        x.Id == id &&
+        x.Idcompany == companyId &&
+        x.LocationsId == locationId)
+    .Select(x => new WMSRacksQueryDTO
+    {
+        Id = x.Id,
+        Name = x.Name,
+        Active = x.Active,
+        LocationsId = x.LocationsId,
+        LocationName = x.Locations.Name,
+        Idcompany = x.Idcompany,
+        CompanyName = x.IdcompanyNavigation.Name
+    })
+    .FirstOrDefaultAsync(ct);
+
+
+
+
+
+
+        }
+
+        /// <summary>
+        /// Activate or deactivate a rack.
+        /// </summary>
+        public async Task<bool> SetActiveAsync(
+            int companyId,
+            int locationId,
+            int id,
+            bool isActive,
+            CancellationToken ct)
+        {
+            var entity = await _context.Racks
+                .FirstOrDefaultAsync(x =>
+                    x.Idcompany == companyId &&
+                    x.LocationsId == locationId &&
+                    x.Id == id,
+                    ct);
+
             if (entity is null)
                 return false;
 
@@ -128,13 +182,14 @@ namespace DUNES.API.RepositoriesWMS.Masters.Racks
         }
 
         /// <summary>
-        /// update rack information
+        /// Update an existing rack.
+        /// 
+        /// IMPORTANT:
+        /// - Entity ownership must not be changed here.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ModelsWMS.Masters.Racks> UpdateAsync(ModelsWMS.Masters.Racks entity, CancellationToken ct)
+        public async Task<ModelsWMS.Masters.Racks> UpdateAsync(
+            ModelsWMS.Masters.Racks entity,
+            CancellationToken ct)
         {
             _context.Update(entity);
             await _context.SaveChangesAsync(ct);

@@ -23,15 +23,19 @@ using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
 using DUNES.API.RepositoriesWMS.Inventory.Transactions;
 using DUNES.API.RepositoriesWMS.Masters;
+using DUNES.API.RepositoriesWMS.Masters.Bins;
 using DUNES.API.RepositoriesWMS.Masters.Cities;
 using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
+using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
+using DUNES.API.RepositoriesWMS.Masters.Items;
 using DUNES.API.RepositoriesWMS.Masters.Locations;
 using DUNES.API.RepositoriesWMS.Masters.Racks;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
+using DUNES.API.RepositoriesWMS.Masters.TransactionConcepts;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
@@ -46,15 +50,19 @@ using DUNES.API.ServicesWMS.Auth;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
 using DUNES.API.ServicesWMS.Masters;
+using DUNES.API.ServicesWMS.Masters.Bins;
 using DUNES.API.ServicesWMS.Masters.Cities;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
 using DUNES.API.ServicesWMS.Masters.Companies;
 using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.API.ServicesWMS.Masters.Countries;
+using DUNES.API.ServicesWMS.Masters.InventoryCategories;
+using DUNES.API.ServicesWMS.Masters.Items;
 using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
+using DUNES.API.ServicesWMS.Masters.TransactionConcepts;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
@@ -271,7 +279,11 @@ builder.Services.AddSwaggerGen(c =>
 
             "BinsWMS" => new[] { "WMS Bins - CRUD" },
 
-            
+            "ItemsWMS" => new[] { "WMS Items - CRUD" },
+
+            "TransactionConceptsWMS" => new[] { "WMS Transaction Concepts - CRUD" },
+
+            "InventoryCategoriesWMS" => new[] { "WMS Inventory Categories - CRUD" },
 
 
 
@@ -372,11 +384,18 @@ builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMS
 builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
 
 builder.Services.AddScoped<IValidator<WMSCompaniesContractDTO>, CompaniesContractWMSAPIValidator>();
-builder.Services.AddScoped<IValidator<WMSLocationsDTO>, LocationsWMSAPIValidator>();
+builder.Services.AddScoped<IValidator<WMSLocationsUpdateDTO>, LocationsWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<UserConfigurationUpdateDto>, UserConfigurationValidator>();
 
 
 //WMS MASTER SERVICES
+
+builder.Services.AddScoped<IStateCountriesWMSAPIRepository, StateCountriesWMSAPIRepository>();
+builder.Services.AddScoped<IStateCountriesWMSAPIService, StateCountriesWMSAPIService>();
+
+builder.Services.AddScoped<ICitiesWMSAPIRepository, CitiesWMSAPIRepository>();
+builder.Services.AddScoped<ICitiesWMSAPIService, CitiesWMSAPIService>();
+
 
 builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
 builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterService>();
@@ -395,24 +414,27 @@ builder.Services.AddScoped<ICommandCompaniesContractWMSAPIRepository, CommandCom
 builder.Services.AddScoped<IQueryCompaniesContractWMSAPIRepository, QueryCompaniesContractWMSAPIRepository>();
 builder.Services.AddScoped<ICompaniesContractWMSAPIService, CompaniesContractWMSAPIService>();
 
-
-
 builder.Services.AddScoped<ICountriesWMSAPIRepository, CountriesWMSAPIRepository>();
 builder.Services.AddScoped<ICountriesWMSAPIService, CountriesWMSAPIService>();
-
 
 builder.Services.AddScoped<IRacksWMSAPIRepository, RacksWMSAPIRepository>();
 builder.Services.AddScoped<IRacksWMSAPIService, RacksWMSAPIService>();
 
+builder.Services.AddScoped<IBinsWMSAPIRepository, BinsWMSAPIRepository>();
+builder.Services.AddScoped<IBinsWMSAPIService, BinsWMSAPIService>();
 
-builder.Services.AddScoped<IStateCountriesWMSAPIRepository, StateCountriesWMSAPIRepository>();
-builder.Services.AddScoped<IStateCountriesWMSAPIService, StateCountriesWMSAPIService>();
+builder.Services.AddScoped<ITransactionConceptsWMSAPIRepository, TransactionConceptsWMSAPIRepository>();
+builder.Services.AddScoped<ITransactionConceptsWMSAPIService, TransactionConceptsWMSAPIService>();
 
-builder.Services.AddScoped<ICitiesWMSAPIRepository, CitiesWMSAPIRepository>();
-builder.Services.AddScoped<ICitiesWMSAPIService, CitiesWMSAPIService>();
+builder.Services.AddScoped<IInventoryCategoriesWMSAPIRepository, InventoryCategoriesWMSAPIRepository>();
+builder.Services.AddScoped<IInventoryCategoriesWMSAPIService, InventoryCategoriesWMSAPIService>();
 
 builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();
+
+builder.Services.AddScoped<IItemsWMSAPIRepository, ItemsWMSAPIRepository>();
+builder.Services.AddScoped<IItemsWMSAPIService, ItemsWMSAPIService>();
+
 
 
 //WEB SERVICE SERVICES

@@ -1,44 +1,53 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
 {
     /// <summary>
-    /// Inventory categories interface service
+    /// Inventory Categories Service
+    /// Scoped by Company
     /// </summary>
     public interface IInventoryCategoriesWMSAPIService
     {
         /// <summary>
-        /// Inventory categories service interface
+        /// Get all inventory categories by company
         /// </summary>
-        public interface IInventoryCategoriesWMSAPIService
-        {
-           
-            /// <summary>
-            /// Get all inventory categories by company
-            /// </summary>
-            ApiResponse<List<Inventorycategories>> GetAllByCompany(int companyId);
+        Task<ApiResponse<List<WMSInventoryCategoriesDTO>>> GetAllAsync(
+            int companyId,
+            CancellationToken ct);
 
-            /// <summary>
-            /// Get inventory category by id and company
-            /// </summary>
-            ApiResponse<Inventorycategories> GetById(int id, int companyId);
-          
+        /// <summary>
+        /// Get inventory category by id
+        /// </summary>
+        Task<ApiResponse<WMSInventoryCategoriesDTO>> GetByIdAsync(
+            int companyId,
+            int id,
+            CancellationToken ct);
 
-            /// <summary>
-            /// Create inventory category
-            /// </summary>
-            ApiResponse<Inventorycategories> Create(Inventorycategories entity);
+        /// <summary>
+        /// Create inventory category
+        /// </summary>
+        Task<ApiResponse<bool>> CreateAsync(
+            int companyId,
+            WMSInventoryCategoriesDTO dto,
+            CancellationToken ct);
 
-            /// <summary>
-            /// Update inventory category
-            /// </summary>
-            ApiResponse<bool> Update(Inventorycategories entity);
+        /// <summary>
+        /// Update inventory category
+        /// </summary>
+        Task<ApiResponse<bool>> UpdateAsync(
+            int companyId,
+            int id,
+            WMSInventoryCategoriesDTO dto,
+            CancellationToken ct);
 
-            /// <summary>
-            /// Delete inventory category
-            /// </summary>
-            ApiResponse<bool> Delete(int id, int companyId);
-        }
+        /// <summary>
+        /// Activate / Deactivate inventory category
+        /// </summary>
+        Task<ApiResponse<bool>> SetActiveAsync(
+            int companyId,
+            int id,
+            bool isActive,
+            CancellationToken ct);
     }
 }

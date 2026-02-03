@@ -10,7 +10,7 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
     /// Scoped by Company (from token) + Location + Rack
     /// </summary>
     [ApiController]
-    [Route("api/wms/locations/{locationId:int}/racks/{rackId:int}/bins")]
+    [Route("api/[controller]")]
     public class BinsWMSController : BaseController
     {
         private readonly IBinsWMSAPIService _service;
@@ -32,13 +32,13 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             int rackId,
             CancellationToken ct)
         {
-            var result = await _service.GetAllAsync(
-                CurrentCompanyId,
-                locationId,
-                rackId,
+            return await HandleApi(
+                ct => _service.GetAllAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    ct),
                 ct);
-
-            return StatusCode(result.StatusCode, result);
         }
 
         /// <summary>
@@ -50,13 +50,13 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             int rackId,
             CancellationToken ct)
         {
-            var result = await _service.GetActiveAsync(
-                CurrentCompanyId,
-                locationId,
-                rackId,
+            return await HandleApi(
+                ct => _service.GetActiveAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    ct),
                 ct);
-
-            return StatusCode(result.StatusCode, result);
         }
 
         /// <summary>
@@ -69,14 +69,14 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             int id,
             CancellationToken ct)
         {
-            var result = await _service.GetByIdAsync(
-                CurrentCompanyId,
-                locationId,
-                rackId,
-                id,
+            return await HandleApi(
+                ct => _service.GetByIdAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    id,
+                    ct),
                 ct);
-
-            return StatusCode(result.StatusCode, result);
         }
 
         /// <summary>
@@ -86,15 +86,17 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
         public async Task<IActionResult> Create(
             int locationId,
             int rackId,
-            [FromBody] WMSBinsDto dto,
+            [FromBody] WMSBinsCreateDto dto,
             CancellationToken ct)
         {
-            dto.Idcompany = CurrentCompanyId;
-            dto.LocationsId = locationId;
-            dto.RacksId = rackId;
-
-            var result = await _service.CreateAsync(dto, ct);
-            return StatusCode(result.StatusCode, result);
+            return await HandleApi(
+                ct => _service.CreateAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    dto,
+                    ct),
+                ct);
         }
 
         /// <summary>
@@ -105,16 +107,18 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             int locationId,
             int rackId,
             int id,
-            [FromBody] WMSBinsDto dto,
+            [FromBody] WMSBinsCreateDto dto,
             CancellationToken ct)
         {
-            dto.Id = id;
-            dto.Idcompany = CurrentCompanyId;
-            dto.LocationsId = locationId;
-            dto.RacksId = rackId;
-
-            var result = await _service.UpdateAsync(dto, ct);
-            return StatusCode(result.StatusCode, result);
+            return await HandleApi(
+                ct => _service.UpdateAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    id,
+                    dto,
+                    ct),
+                ct);
         }
 
         /// <summary>
@@ -128,15 +132,15 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             [FromQuery] bool isActive,
             CancellationToken ct)
         {
-            var result = await _service.SetActiveAsync(
-                CurrentCompanyId,
-                locationId,
-                rackId,
-                id,
-                isActive,
+            return await HandleApi(
+                ct => _service.SetActiveAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    id,
+                    isActive,
+                    ct),
                 ct);
-
-            return StatusCode(result.StatusCode, result);
         }
 
         /// <summary>
@@ -150,15 +154,15 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
             [FromQuery] int? excludeId,
             CancellationToken ct)
         {
-            var result = await _service.ExistsByNameAsync(
-                CurrentCompanyId,
-                locationId,
-                rackId,
-                name,
-                excludeId,
+            return await HandleApi(
+                ct => _service.ExistsByNameAsync(
+                    CurrentCompanyId,
+                    locationId,
+                    rackId,
+                    name,
+                    excludeId,
+                    ct),
                 ct);
-
-            return StatusCode(result.StatusCode, result);
         }
     }
 }

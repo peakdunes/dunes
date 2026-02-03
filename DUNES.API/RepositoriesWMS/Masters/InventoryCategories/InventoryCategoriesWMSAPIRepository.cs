@@ -5,136 +5,143 @@ using Microsoft.EntityFrameworkCore;
 namespace DUNES.API.RepositoriesWMS.Masters.InventoryCategories
 {
     /// <summary>
-    /// inventory category repository implementation
+    /// Inventory Categories Repository
+    /// 
+    /// Scoped by:
+    /// Company (tenant)
+    /// 
+    /// IMPORTANT:
+    /// This repository is the last line of defense for multi-tenant security.
+    /// All operations MUST be filtered by CompanyId.
     /// </summary>
     public class InventoryCategoriesWMSAPIRepository : IInventoryCategoriesWMSAPIRepository
     {
-
         private readonly appWmsDbContext _db;
 
-
         /// <summary>
-        /// constructor (DI)
+        /// Constructor (DI)
         /// </summary>
-        /// <param name="db"></param>
         public InventoryCategoriesWMSAPIRepository(appWmsDbContext db)
         {
             _db = db;
         }
 
         /// <summary>
-        /// get all categories for company
+        /// Get all inventory categories for a company.
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-
-        public async Task<List<Inventorycategories>> GetAllByCompanyAsync(int companyId)
+        public async Task<List<Inventorycategories>> GetAllAsync(
+            int companyId,
+            CancellationToken ct)
         {
             return await _db.Inventorycategories
                 .AsNoTracking()
                 .Where(x => x.companyId == companyId)
                 .OrderBy(x => x.Name)
-                .ToListAsync();
+                .ToListAsync(ct);
         }
 
         /// <summary>
-        /// get category by company and id
+        /// Get all active inventory categories for a company.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public async Task<Inventorycategories?> GetByIdAsync(int id, int companyId)
+        public async Task<List<Inventorycategories>> GetActiveAsync(
+            int companyId,
+            CancellationToken ct)
         {
             return await _db.Inventorycategories
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId);
-        }
-
-      /// <summary>
-      /// add new category
-      /// </summary>
-      /// <param name="entity"></param>
-      /// <returns></returns>
-
-        public async Task<Inventorycategories> CreateAsync(Inventorycategories entity)
-        {
-            _db.Inventorycategories.Add(entity);
-            await _db.SaveChangesAsync();
-            return entity;
+                .Where(x => x.companyId == companyId && x.Active)
+                .OrderBy(x => x.Name)
+                .ToListAsync(ct);
         }
 
         /// <summary>
-        /// update category
+        /// Get inventory category by id validating ownership.
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-
-        public async Task<bool> UpdateAsync(Inventorycategories entity)
-        {
-            var exists = await _db.Inventorycategories
-                .AnyAsync(x => x.Id == entity.Id && x.companyId == entity.companyId);
-
-            if (!exists)
-                return false;
-
-            _db.Inventorycategories.Update(entity);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-        /// <summary>
-        /// delete category
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public async Task<bool> DeleteAsync(int id, int companyId)
-        {
-            var entity = await _db.Inventorycategories
-                .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId);
-
-            if (entity == null)
-                return false;
-
-            _db.Inventorycategories.Remove(entity);
-            await _db.SaveChangesAsync();
-            return true;
-        }
-
-      
-        /// <summary>
-        /// Exist category by id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public async Task<bool> ExistsAsync(int id, int companyId)
+        public async Task<Inventorycategories?> GetByIdAsync(
+            int companyId,
+            int id,
+            CancellationToken ct)
         {
             return await _db.Inventorycategories
-                .AnyAsync(x => x.Id == id && x.companyId == companyId);
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    x => x.Id == id && x.companyId == companyId,
+                    ct);
         }
 
         /// <summary>
-        /// Exist category by id
+        /// Check if an inventory category name already exists for a company.
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="companyId"></param>
-        /// <param name="excludeId"></param>
-        /// <returns></returns>
-        public async Task<bool> NameExistsAsync(string name, int companyId, int? excludeId = null)
+        public async Task<bool> ExistsByNameAsync(
+            int companyId,
+            string name,
+            int? excludeId,
+            CancellationToken ct)
         {
             var query = _db.Inventorycategories
                 .AsNoTracking()
                 .Where(x =>
                     x.companyId == companyId &&
                     x.Name != null &&
-                    x.Name.ToLower() == name.ToLower()
-                );
+                    x.Name.ToLower() == name.ToLower());
 
             if (excludeId.HasValue)
                 query = query.Where(x => x.Id != excludeId.Value);
 
-            return await query.AnyAsync();
+            return await query.AnyAsync(ct);
+        }
+
+        /// <summary>
+        /// Create a new inventory category.
+        /// 
+        /// IMPORTANT:
+        /// - Entity must already contain CompanyId
+        /// - Repository must NOT infer ownership
+        /// </summary>
+        public async Task<Inventorycategories> CreateAsync(
+            Inventorycategories entity,
+            CancellationToken ct)
+        {
+            _db.Inventorycategories.Add(entity);
+            await _db.SaveChangesAsync(ct);
+            return entity;
+        }
+
+        /// <summary>
+        /// Update an existing inventory category.
+        /// 
+        /// IMPORTANT:
+        /// - Ownership (CompanyId) must NOT be changed here
+        /// </summary>
+        public async Task<Inventorycategories> UpdateAsync(
+            Inventorycategories entity,
+            CancellationToken ct)
+        {
+            _db.Inventorycategories.Update(entity);
+            await _db.SaveChangesAsync(ct);
+            return entity;
+        }
+
+        /// <summary>
+        /// Activate or deactivate an inventory category.
+        /// </summary>
+        public async Task<bool> SetActiveAsync(
+            int companyId,
+            int id,
+            bool isActive,
+            CancellationToken ct)
+        {
+            var entity = await _db.Inventorycategories
+                .FirstOrDefaultAsync(
+                    x => x.Id == id && x.companyId == companyId,
+                    ct);
+
+            if (entity is null)
+                return false;
+
+            entity.Active = isActive;
+            await _db.SaveChangesAsync(ct);
+            return true;
         }
     }
 }

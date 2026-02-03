@@ -46,7 +46,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct);
 
         /// <summary>
         /// Get all inventory type for a company client by id

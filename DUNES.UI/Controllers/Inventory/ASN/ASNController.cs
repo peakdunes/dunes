@@ -215,7 +215,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             ASNProcessInformationDto objinformation = new ASNProcessInformationDto();
 
-            List<WMSBinsDto> listbinesresult = new List<WMSBinsDto>();
+            List<WMSBinsCreateDto> listbinesresult = new List<WMSBinsCreateDto>();
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
@@ -253,15 +253,15 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 foreach (var b in listbines.Data)
                 {
-                    WMSBinsDto objdet = new WMSBinsDto{
+                    WMSBinsCreateDto objdet = new WMSBinsCreateDto{
                     
-                     Idcompany  = b.Id,
+                     //Idcompany  = b.Id,
                      Name = b.Name,
 
                     
                     };
 
-                    objdet.Id = b.Id;
+                   // objdet.Id = b.Id;
                     objdet.Name = b.Name.Trim();
 
                     listbinesresult.Add(objdet);

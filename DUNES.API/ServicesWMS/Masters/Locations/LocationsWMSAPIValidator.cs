@@ -7,14 +7,14 @@ namespace DUNES.API.ServicesWMS.Masters.Locations
     /// locations validator
     /// </summary>
 
-    public class LocationsWMSAPIValidator :AbstractValidator<WMSLocationsDTO>
+    public class LocationsWMSAPIValidator :AbstractValidator<WMSLocationsUpdateDTO>
     {
         /// <summary>
         /// validation rules
         /// </summary>
         public LocationsWMSAPIValidator()
         {
-            RuleFor(x => x.Idcompany).NotEmpty().WithMessage("Company is required");
+           
             RuleFor(x => x.Name).NotEmpty().WithMessage("Location name is required");
             RuleFor(x => x.Idcountry).NotEmpty().WithMessage("Country is required");
             RuleFor(x => x.Idstate).NotEmpty().WithMessage("State is required");

@@ -3,50 +3,44 @@
 namespace DUNES.API.RepositoriesWMS.Masters.Locations
 {
     /// <summary>
-    /// Locations Interface
+    /// Locations Repository
+    /// 
+    /// Scoped by Company (STANDARD COMPANYID)
+    /// 
+    /// Notes:
+    /// - Query methods return WMSLocationsDTO (read-optimized projections)
+    /// - Command methods work with entity and expect CompanyId already set
     /// </summary>
     public interface ILocationsWMSAPIRepository
     {
         /// <summary>
-        /// get all Locations
+        /// Get all locations for a company
+        /// (Query DTO projection)
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<List<WMSLocationsDTO>> GetAllAsync(
+        Task<List<WMSLocationsReadDTO>> GetAllAsync(
             int companyId,
             CancellationToken ct);
 
         /// <summary>
-        /// get all active Locations
+        /// Get all active locations for a company
+        /// (Query DTO projection)
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<List<WMSLocationsDTO>> GetActiveAsync(
+        Task<List<WMSLocationsReadDTO>> GetActiveAsync(
             int companyId,
             CancellationToken ct);
 
         /// <summary>
-        /// get location by id
+        /// Get location by id validating ownership
+        /// (Query DTO projection)
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<WMSLocationsDTO?> GetByIdAsync(
+        Task<WMSLocationsReadDTO?> GetByIdAsync(
             int companyId,
             int id,
             CancellationToken ct);
 
         /// <summary>
-        /// exist location by Name
+        /// Check if a location name already exists for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="name"></param>
-        /// <param name="excludeId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<bool> ExistsByNameAsync(
             int companyId,
             string name,
@@ -54,33 +48,29 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
             CancellationToken ct);
 
         /// <summary>
-        /// add new location
+        /// Create a new location
+        /// 
+        /// IMPORTANT:
+        /// - Entity must already contain CompanyId
+        /// - Repository must NOT infer ownership
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<DUNES.API.ModelsWMS.Masters.Locations> CreateAsync(
-            DUNES.API.ModelsWMS.Masters.Locations entity,
+        Task<ModelsWMS.Masters.Locations> CreateAsync(
+            ModelsWMS.Masters.Locations entity,
             CancellationToken ct);
 
         /// <summary>
-        /// update location
+        /// Update an existing location
+        /// 
+        /// IMPORTANT:
+        /// - CompanyId must NOT be changed here
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        Task<DUNES.API.ModelsWMS.Masters.Locations> UpdateAsync(
-            DUNES.API.ModelsWMS.Masters.Locations entity,
+        Task<ModelsWMS.Masters.Locations> UpdateAsync(
+            ModelsWMS.Masters.Locations entity,
             CancellationToken ct);
 
         /// <summary>
-        /// Active / No active.
+        /// Activate or deactivate a location
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         Task<bool> SetActiveAsync(
             int companyId,
             int id,

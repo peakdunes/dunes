@@ -3,25 +3,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.Bins
 {
-
     /// <summary>
-    /// Bins repository
+    /// Bins Repository
+    /// 
+    /// Scoped by:
+    /// Company (tenant) + Location + Rack
+    /// 
+    /// IMPORTANT:
+    /// This repository is the last line of defense for multi-tenant security.
+    /// Every query MUST be filtered by CompanyId, LocationId and RackId.
     /// </summary>
     public class BinsWMSAPIRepository : IBinsWMSAPIRepository
     {
         private readonly appWmsDbContext _context;
 
         /// <summary>
-        /// Constructor DI
+        /// Constructor (DI)
         /// </summary>
+        /// <param name="context">WMS DbContext</param>
         public BinsWMSAPIRepository(appWmsDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Add new Bin
+        /// Create a new bin.
+        /// 
+        /// IMPORTANT:
+        /// - The entity must already contain CompanyId, LocationId and RackId
+        /// - Ownership must NOT be inferred or modified here
         /// </summary>
+        /// <param name="entity">Bin entity with ownership already set</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Created bin entity</returns>
         public async Task<ModelsWMS.Masters.Bines> CreateAsync(
             ModelsWMS.Masters.Bines entity,
             CancellationToken ct)
@@ -32,8 +46,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Check if a Bin exists by name (Company + Location + Rack)
+        /// Validate if a bin name already exists within the same company, location and rack.
         /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <param name="locationId">Location identifier</param>
+        /// <param name="rackId">Rack identifier</param>
+        /// <param name="name">Bin name</param>
+        /// <param name="excludeId">Optional bin id to exclude (used on update)</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>True if exists, otherwise false</returns>
         public async Task<bool> ExistsByNameAsync(
             int companyId,
             int locationId,
@@ -59,8 +80,13 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Get all active bins (Company + Location + Rack)
+        /// Get all active bins for a specific company, location and rack.
         /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <param name="locationId">Location identifier</param>
+        /// <param name="rackId">Rack identifier</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of active bins</returns>
         public async Task<List<ModelsWMS.Masters.Bines>> GetActiveAsync(
             int companyId,
             int locationId,
@@ -78,8 +104,13 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Get all bins (Company + Location + Rack)
+        /// Get all bins for a specific company, location and rack.
         /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <param name="locationId">Location identifier</param>
+        /// <param name="rackId">Rack identifier</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of bins</returns>
         public async Task<List<ModelsWMS.Masters.Bines>> GetAllAsync(
             int companyId,
             int locationId,
@@ -96,8 +127,14 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Get bin by id (Company + Location + Rack)
+        /// Get a bin by id validating ownership.
         /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <param name="locationId">Location identifier</param>
+        /// <param name="rackId">Rack identifier</param>
+        /// <param name="id">Bin identifier</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Bin entity or null if not found in scope</returns>
         public async Task<ModelsWMS.Masters.Bines?> GetByIdAsync(
             int companyId,
             int locationId,
@@ -116,8 +153,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Activate / Deactivate bin
+        /// Activate or deactivate a bin.
         /// </summary>
+        /// <param name="companyId">Company identifier</param>
+        /// <param name="locationId">Location identifier</param>
+        /// <param name="rackId">Rack identifier</param>
+        /// <param name="id">Bin identifier</param>
+        /// <param name="isActive">Active flag</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>True if updated, false if not found</returns>
         public async Task<bool> SetActiveAsync(
             int companyId,
             int locationId,
@@ -143,8 +187,14 @@ namespace DUNES.API.RepositoriesWMS.Masters.Bins
         }
 
         /// <summary>
-        /// Update bin
+        /// Update an existing bin.
+        /// 
+        /// IMPORTANT:
+        /// - Entity ownership (CompanyId, LocationId, RackId) must NOT be modified here
         /// </summary>
+        /// <param name="entity">Bin entity to update</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Updated bin entity</returns>
         public async Task<ModelsWMS.Masters.Bines> UpdateAsync(
             ModelsWMS.Masters.Bines entity,
             CancellationToken ct)

@@ -88,18 +88,18 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyid"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<WMSLocationsDTO>>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllActiveLocationsByCompany(int companyid, CancellationToken ct)
         {
             var infoloc = await _repository.GetAllActiveLocationsByCompany(companyid,ct);
 
             if (infoloc.Count <= 0)
-                return ApiResponseFactory.BadRequest<List<WMSLocationsDTO>>($"Locations for this company {companyid} not found");
+                return ApiResponseFactory.BadRequest<List<WMSLocationsUpdateDTO>>($"Locations for this company {companyid} not found");
 
-            List<WMSLocationsDTO> locationslist = new List<WMSLocationsDTO>();
+            List<WMSLocationsUpdateDTO> locationslist = new List<WMSLocationsUpdateDTO>();
 
             foreach (var location in infoloc)
             {
-                WMSLocationsDTO objdet = new WMSLocationsDTO();
+                WMSLocationsUpdateDTO objdet = new WMSLocationsUpdateDTO();
 
                 objdet.Id = location.Id;
                 objdet.Name = location.Name;

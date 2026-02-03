@@ -1,262 +1,257 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using AutoMapper;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using System.Net;
 
 namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
 {
     /// <summary>
-    /// inventory categories service implementation
+    /// Inventory Categories Service
+    /// Business logic layer for inventory categories.
+    /// Scoped strictly by Company (STANDARD COMPANYID).
     /// </summary>
     public class InventoryCategoriesWMSAPIService : IInventoryCategoriesWMSAPIService
     {
         private readonly IInventoryCategoriesWMSAPIRepository _repository;
-        private readonly ILogger<InventoryCategoriesWMSAPIService> _logger;
+        private readonly IMapper _mapper;
 
         /// <summary>
-        /// constructor (DI)
+        /// Constructor (Dependency Injection)
         /// </summary>
-        /// <param name="repository"></param>
-        /// <param name="logger"></param>
+        /// <param name="repository">Inventory categories repository</param>
+        /// <param name="mapper">AutoMapper instance</param>
         public InventoryCategoriesWMSAPIService(
             IInventoryCategoriesWMSAPIRepository repository,
-            ILogger<InventoryCategoriesWMSAPIService> logger)
+            IMapper mapper)
         {
             _repository = repository;
-            _logger = logger;
+            _mapper = mapper;
         }
 
-
         /// <summary>
-        /// get all categories by company
+        /// Get all inventory categories for a specific company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-
-        public ApiResponse<List<Inventorycategories>> GetAllByCompany(int companyId)
+        /// <param name="companyId">Company identifier (from token)</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>List of inventory categories</returns>
+        public async Task<ApiResponse<List<WMSInventoryCategoriesDTO>>> GetAllAsync(
+            int companyId,
+            CancellationToken ct)
         {
-
             if (companyId <= 0)
             {
-                return ApiResponseFactory.BadRequest<List<Inventorycategories>>("Company is required");
+                return ApiResponseFactory.BadRequest<List<WMSInventoryCategoriesDTO>>(
+                    "Company is required");
             }
 
-            var data = _repository
-                .GetAllByCompanyAsync(companyId)
-                .GetAwaiter()
-                .GetResult();
+            var data = await _repository.GetAllAsync(companyId, ct);
 
-            return ApiResponseFactory.Success(
-                data,
-                "Inventory categories retrieved successfully."
-            );
+            if (data == null || data.Count == 0)
+            {
+                return ApiResponseFactory.NotFound<List<WMSInventoryCategoriesDTO>>(
+                    "No inventory categories found.");
+            }
 
+            var result = _mapper.Map<List<WMSInventoryCategoriesDTO>>(data);
+            return ApiResponseFactory.Ok(result);
         }
 
         /// <summary>
-        /// get category by id
+        /// Get inventory category by id (scoped by company)
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public ApiResponse<Inventorycategories> GetById(int id, int companyId)
+        /// <param name="companyId">Company identifier (from token)</param>
+        /// <param name="id">Inventory category id</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Inventory category data</returns>
+        public async Task<ApiResponse<WMSInventoryCategoriesDTO>> GetByIdAsync(
+            int companyId,
+            int id,
+            CancellationToken ct)
         {
-
             if (companyId <= 0)
             {
-                return ApiResponseFactory.BadRequest<Inventorycategories>("Company is required");
+                return ApiResponseFactory.BadRequest<WMSInventoryCategoriesDTO>(
+                    "Company is required");
             }
 
             if (id <= 0)
             {
-                return ApiResponseFactory.BadRequest<Inventorycategories>("Category Id is required");
+                return ApiResponseFactory.BadRequest<WMSInventoryCategoriesDTO>(
+                    "Category Id is required");
             }
 
+            var entity = await _repository.GetByIdAsync(companyId, id, ct);
 
-            var entity = _repository
-                .GetByIdAsync(id, companyId)
-                .GetAwaiter()
-                .GetResult();
-
-            if (entity == null)
+            if (entity is null)
             {
-                return ApiResponseFactory.NotFound<Inventorycategories>("Inventory category not found.");
-
+                return ApiResponseFactory.NotFound<WMSInventoryCategoriesDTO>(
+                    "Inventory category not found.");
             }
 
-            return ApiResponseFactory.Success(
-                entity,
-                "Inventory category retrieved successfully."
-            );
-
+            var result = _mapper.Map<WMSInventoryCategoriesDTO>(entity);
+            return ApiResponseFactory.Ok(result);
         }
 
-
         /// <summary>
-        /// add new inventory category
+        /// Create a new inventory category
         /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public ApiResponse<Inventorycategories> Create(Inventorycategories entity)
+        /// <param name="companyId">Company identifier (from token)</param>
+        /// <param name="dto">Inventory category DTO</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Operation result</returns>
+        public async Task<ApiResponse<bool>> CreateAsync(
+            int companyId,
+            WMSInventoryCategoriesDTO dto,
+            CancellationToken ct)
         {
-
-            if (entity.companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<Inventorycategories>("Company is required");
-            }
-            if (entity.Id <= 0)
-            {
-                return ApiResponseFactory.BadRequest<Inventorycategories>("Category Id is required");
-            }
-
-            if (string.IsNullOrEmpty(entity.Name))
-            {
-                return ApiResponseFactory.BadRequest<Inventorycategories>("Category Name is required");
-            }
-
-
-            var nameExists = _repository
-                .NameExistsAsync(entity.Name ?? string.Empty, entity.companyId)
-                .GetAwaiter()
-                .GetResult();
-
-            if (nameExists)
-            {
-
-                return ApiResponseFactory.Fail<Inventorycategories>("DUPLICATE_CATEGORY", "An inventory category with the same name already exists.",
-                       Convert.ToInt32(StatusCodes.Status409Conflict));
-            }
-
-            var created = _repository
-                .CreateAsync(entity)
-                .GetAwaiter()
-                .GetResult();
-
-            return ApiResponseFactory.Success(
-                created,
-                "Inventory category created successfully."
-            );
-
-        }
-        /// <summary>
-        /// update category
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns></returns>
-        public ApiResponse<bool> Update(Inventorycategories entity)
-        {
-
-            if (entity.companyId <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
-            }
-            if (entity.Id <= 0)
-            {
-                return ApiResponseFactory.BadRequest<bool>("Category Id is required");
-            }
-
-            if (string.IsNullOrEmpty(entity.Name))
-            {
-                return ApiResponseFactory.BadRequest<bool>("Category Name is required");
-            }
-
-            var exists = _repository
-                    .ExistsAsync(entity.Id, entity.companyId)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (!exists)
-                {
-                    return ApiResponseFactory.NotFound<bool>(
-                        "Inventory category not found."
-                    );
-                }
-
-                var nameExists = _repository
-                    .NameExistsAsync(
-                        entity.Name ?? string.Empty,
-                        entity.companyId,
-                        entity.Id)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (nameExists)
-                {
-                return ApiResponseFactory.Fail<bool>("DUPLICATE_CATEGORY", "An inventory category with the same name already exists.",
-                    Convert.ToInt32(StatusCodes.Status409Conflict));
-            }
-
-                var updated = _repository
-                    .UpdateAsync(entity)
-                    .GetAwaiter()
-                    .GetResult();
-
-                if (!updated)
-                {
-
-                return ApiResponseFactory.Fail<bool>("UPDATE_ERROR", "Inventory category could not be updated..",
-                   Convert.ToInt32(StatusCodes.Status409Conflict));
-
-                
-                }
-
-                return ApiResponseFactory.Success(
-                    true,
-                    "Inventory category updated successfully."
-                );
-         
-        }
-        /// <summary>
-        /// delete category
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="companyId"></param>
-        /// <returns></returns>
-        public ApiResponse<bool> Delete(int id, int companyId)
-        {
-
             if (companyId <= 0)
             {
-                return ApiResponseFactory.BadRequest<bool>("Company is required");
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Company is required");
             }
+
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Category name is required");
+            }
+
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                dto.Name,
+                null,
+                ct);
+
+            if (exists)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "DUPLICATE_CATEGORY",
+                    message: $"An inventory category with the name '{dto.Name}' already exists.",
+                    statusCode: (int)HttpStatusCode.Conflict);
+            }
+
+            var entity = _mapper.Map<Inventorycategories>(dto);
+            entity.companyId = companyId;
+            //entity.Active = true;
+
+            await _repository.CreateAsync(entity, ct);
+
+            return ApiResponseFactory.Ok(
+                true,
+                "Inventory category created successfully.");
+        }
+
+        /// <summary>
+        /// Update an existing inventory category
+        /// </summary>
+        /// <param name="companyId">Company identifier (from token)</param>
+        /// <param name="id">Inventory category id</param>
+        /// <param name="dto">Inventory category DTO</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Operation result</returns>
+        public async Task<ApiResponse<bool>> UpdateAsync(
+            int companyId,
+            int id,
+            WMSInventoryCategoriesDTO dto,
+            CancellationToken ct)
+        {
+            if (companyId <= 0)
+            {
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Company is required");
+            }
+
             if (id <= 0)
             {
-                return ApiResponseFactory.BadRequest<bool>("Category Id is required");
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Category Id is required");
             }
 
-         
+            if (string.IsNullOrWhiteSpace(dto.Name))
+            {
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Category name is required");
+            }
 
-            var exists = _repository
-                    .ExistsAsync(id, companyId)
-                    .GetAwaiter()
-                    .GetResult();
+            var current = await _repository.GetByIdAsync(companyId, id, ct);
 
-                if (!exists)
-                {
-                    return ApiResponseFactory.NotFound<bool>(
-                        "Inventory category not found."
-                    );
-                }
+            if (current is null)
+            {
+                return ApiResponseFactory.NotFound<bool>(
+                    "Inventory category not found.");
+            }
 
-                var deleted = _repository
-                    .DeleteAsync(id, companyId)
-                    .GetAwaiter()
-                    .GetResult();
+            var exists = await _repository.ExistsByNameAsync(
+                companyId,
+                dto.Name,
+                id,
+                ct);
 
-                if (!deleted)
-                {
-                    return ApiResponseFactory.Fail<bool>("DELETE_ERROR",
-                        "Inventory category could not be deleted.", StatusCodes.Status409Conflict
-                    );
-                }
+            if (exists)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "DUPLICATE_CATEGORY",
+                    message: $"An inventory category with the name '{dto.Name}' already exists.",
+                    statusCode: (int)HttpStatusCode.Conflict);
+            }
 
-                return ApiResponseFactory.Success(
-                    true,
-                    "Inventory category deleted successfully."
-                );
-            
+            current.Name = dto.Name;
+            current.Observations = dto.Observations;
+            current.Active = dto.Active;
+
+            await _repository.UpdateAsync(current, ct);
+
+            return ApiResponseFactory.Ok(
+                true,
+                "Inventory category updated successfully.");
+        }
+
+        /// <summary>
+        /// Activate or deactivate an inventory category
+        /// </summary>
+        /// <param name="companyId">Company identifier (from token)</param>
+        /// <param name="id">Inventory category id</param>
+        /// <param name="isActive">Activation flag</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Operation result</returns>
+        public async Task<ApiResponse<bool>> SetActiveAsync(
+            int companyId,
+            int id,
+            bool isActive,
+            CancellationToken ct)
+        {
+            if (companyId <= 0)
+            {
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Company is required");
+            }
+
+            if (id <= 0)
+            {
+                return ApiResponseFactory.BadRequest<bool>(
+                    "Category Id is required");
+            }
+
+            var ok = await _repository.SetActiveAsync(
+                companyId,
+                id,
+                isActive,
+                ct);
+
+            if (!ok)
+            {
+                return ApiResponseFactory.NotFound<bool>(
+                    "Inventory category not found.");
+            }
+
+            var message = isActive
+                ? "Inventory category activated successfully."
+                : "Inventory category deactivated successfully.";
+
+            return ApiResponseFactory.Ok(true, message);
         }
     }
 }
-

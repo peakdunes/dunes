@@ -62,5 +62,14 @@ namespace DUNES.API.RepositoriesWMS.Masters.Companies
         /// </summary>
         Task<bool> SetActiveAsync(int id, bool isActive, CancellationToken ct);
 
+
+        /// <summary>
+        /// validate if a company is active
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<bool> IsActiveAsync(int companyId, CancellationToken ct);
+
     }
 }

@@ -666,7 +666,13 @@ namespace DUNES.API.Migrations
                     b.Property<int>("Idtransactionconcept")
                         .HasColumnType("int");
 
+                    b.Property<int?>("IdtransactionconceptNavigationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Idtransactiontype")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdtransactiontypeNavigationId")
                         .HasColumnType("int");
 
                     b.Property<int>("Idtype")
@@ -703,6 +709,10 @@ namespace DUNES.API.Migrations
                     b.HasIndex("IdrackNavigationId");
 
                     b.HasIndex("IdstatusNavigationId");
+
+                    b.HasIndex("IdtransactionconceptNavigationId");
+
+                    b.HasIndex("IdtransactiontypeNavigationId");
 
                     b.HasIndex("IdtypeNavigationId");
 
@@ -785,6 +795,9 @@ namespace DUNES.API.Migrations
                     b.Property<int>("Idtypetransaction")
                         .HasColumnType("int");
 
+                    b.Property<int?>("IdtypetransactionNavigationId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Level")
                         .HasColumnType("int")
                         .HasColumnName("level");
@@ -807,6 +820,8 @@ namespace DUNES.API.Migrations
                     b.HasIndex("IdstatusNavigationId");
 
                     b.HasIndex("IdtypeNavigationId");
+
+                    b.HasIndex("IdtypetransactionNavigationId");
 
                     b.HasIndex(new[] { "Idbin" }, "IX_inventorytransactionDetail_Idbin");
 
@@ -870,6 +885,9 @@ namespace DUNES.API.Migrations
                     b.Property<int>("Idtransactionconcept")
                         .HasColumnType("int");
 
+                    b.Property<int?>("IdtransactionconceptNavigationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Observations")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)")
@@ -880,6 +898,8 @@ namespace DUNES.API.Migrations
                         .HasColumnName("processed");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IdtransactionconceptNavigationId");
 
                     b.HasIndex(new[] { "Idcompany" }, "IX_inventorytransactionHdr_Idcompany");
 
@@ -1137,45 +1157,22 @@ namespace DUNES.API.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<bool>("Active")
-                        .HasColumnType("bit")
-                        .HasColumnName("active");
-
-                    b.Property<int>("CallType")
-                        .HasColumnType("int")
-                        .HasColumnName("callType");
-
-                    b.Property<bool>("CreateZebraCall")
-                        .HasColumnType("bit")
-                        .HasColumnName("createZebraCall");
-
-                    b.Property<bool>("CreateZebraInvTran")
-                        .HasColumnType("bit")
-                        .HasColumnName("createZebraInvTran");
-
-                    b.Property<int>("Idcompany")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Idcompanyclient")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<bool>("IsInternal")
-                        .HasColumnType("bit")
-                        .HasColumnName("isInternal");
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ZebraInventoryAssociated")
-                        .HasColumnType("int")
-                        .HasColumnName("zebraInventoryAssociated");
+                    b.Property<string>("Observations")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("companyId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Idcompany" }, "IX_transactionconcepts_Idcompany");
+                    b.HasIndex("companyId");
 
-                    b.ToTable("transactionconcepts", (string)null);
+                    b.ToTable("Transactionconcepts");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Transactiontypes", b =>
@@ -1190,13 +1187,6 @@ namespace DUNES.API.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("active");
 
-                    b.Property<int>("Idcompany")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Idcompanyclient")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<bool>("Isinput")
                         .HasColumnType("bit")
                         .HasColumnName("isinput");
@@ -1204,10 +1194,6 @@ namespace DUNES.API.Migrations
                     b.Property<bool>("Isoutput")
                         .HasColumnType("bit")
                         .HasColumnName("isoutput");
-
-                    b.Property<bool>("Ispreconsumption")
-                        .HasColumnType("bit")
-                        .HasColumnName("ispreconsumption");
 
                     b.Property<string>("Match")
                         .HasMaxLength(1)
@@ -1218,9 +1204,12 @@ namespace DUNES.API.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<int>("companyId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.HasIndex(new[] { "Idcompany" }, "IX_transactiontypes_Idcompany");
+                    b.HasIndex("companyId");
 
                     b.ToTable("transactiontypes", (string)null);
                 });
@@ -1553,14 +1542,12 @@ namespace DUNES.API.Migrations
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Transactionconcepts", "IdtransactionconceptNavigation")
-                        .WithMany("Inventorymovement")
-                        .HasForeignKey("Idtransactionconcept")
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("IdtransactionconceptNavigationId");
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Transactiontypes", "IdtransactiontypeNavigation")
-                        .WithMany("Inventorymovement")
-                        .HasForeignKey("Idtransactiontype")
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("IdtransactiontypeNavigationId");
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.InventoryTypes", "IdtypeNavigation")
                         .WithMany()
@@ -1621,9 +1608,8 @@ namespace DUNES.API.Migrations
                         .HasForeignKey("IdtypeNavigationId");
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Transactiontypes", "IdtypetransactionNavigation")
-                        .WithMany("InventorytransactionDetail")
-                        .HasForeignKey("Idtypetransaction")
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("IdtypetransactionNavigationId");
 
                     b.Navigation("IdbinNavigation");
 
@@ -1651,9 +1637,8 @@ namespace DUNES.API.Migrations
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Transactionconcepts", "IdtransactionconceptNavigation")
-                        .WithMany("InventorytransactionHdr")
-                        .HasForeignKey("Idtransactionconcept")
-                        .IsRequired();
+                        .WithMany()
+                        .HasForeignKey("IdtransactionconceptNavigationId");
 
                     b.Navigation("IdcompanyNavigation");
 
@@ -1762,7 +1747,7 @@ namespace DUNES.API.Migrations
                 {
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
                         .WithMany("Transactionconcepts")
-                        .HasForeignKey("Idcompany")
+                        .HasForeignKey("companyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1773,7 +1758,7 @@ namespace DUNES.API.Migrations
                 {
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "IdcompanyNavigation")
                         .WithMany("Transactiontypes")
-                        .HasForeignKey("Idcompany")
+                        .HasForeignKey("companyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1858,20 +1843,6 @@ namespace DUNES.API.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Locations");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Transactionconcepts", b =>
-                {
-                    b.Navigation("Inventorymovement");
-
-                    b.Navigation("InventorytransactionHdr");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Transactiontypes", b =>
-                {
-                    b.Navigation("Inventorymovement");
-
-                    b.Navigation("InventorytransactionDetail");
                 });
 #pragma warning restore 612, 618
         }

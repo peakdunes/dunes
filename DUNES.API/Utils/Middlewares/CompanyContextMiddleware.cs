@@ -1,4 +1,6 @@
-﻿namespace DUNES.API.Utils.Middlewares
+﻿using DUNES.API.RepositoriesWMS.Masters.Companies;
+
+namespace DUNES.API.Utils.Middlewares
 {
     /// <summary>
     /// valida que todos los requests envien el claim del companyid
@@ -49,6 +51,22 @@
                     );
                     return;
                 }
+
+                var ct = context.RequestAborted;
+
+                // ✅ Resolver repo desde el RequestServices (scoped)
+                var companiesRepo = context.RequestServices.GetRequiredService<ICompaniesWMSAPIRepository>();
+
+                var companyIsActive = await companiesRepo.IsActiveAsync(companyId, ct);
+
+                if (!companyIsActive)
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    await context.Response.WriteAsync("Company does not exist or is inactive.");
+                    return;
+                }
+
+
             }
 
             await _next(context);

@@ -32,14 +32,14 @@ namespace DUNES.API.ModelsWMS.Masters
         /// </summary>
         [Display(Name = "Inventory Category")]
         public int InventorycategoriesId { get; set; }
-                  
 
 
- /// <summary>
- ///  SKU (Stock Keeping Unit)
- /// </summary>
- [MaxLength(50)]
-        [Display(Name ="SKU")]
+
+        /// <summary>
+        ///  SKU (Stock Keeping Unit)
+        /// </summary>
+        [MaxLength(50)]
+        [Display(Name = "SKU")]
         public required string sku { get; set; }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace DUNES.API.ModelsWMS.Masters
         /// <summary>
         /// Navegation inventory category
         /// </summary>
-        public virtual Inventorycategories InventoryCategory { get; set; } 
+        public virtual Inventorycategories InventoryCategory { get; set; }
 
     }
 }

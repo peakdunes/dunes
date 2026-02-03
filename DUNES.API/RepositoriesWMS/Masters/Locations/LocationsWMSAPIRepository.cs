@@ -12,20 +12,19 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
         private readonly appWmsDbContext _context;
 
         /// <summary>
-        /// constructor
+        /// Constructor (DI)
         /// </summary>
-        /// <param name="context"></param>
         public LocationsWMSAPIRepository(appWmsDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Add new location
+        /// Create a new location
+        /// 
+        /// IMPORTANT:
+        /// - Entity must already contain CompanyId
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         public async Task<ModelsWMS.Masters.Locations> CreateAsync(
             ModelsWMS.Masters.Locations entity,
             CancellationToken ct)
@@ -36,13 +35,8 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
         }
 
         /// <summary>
-        /// Search location by name
+        /// Check if a location name already exists for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="name"></param>
-        /// <param name="excludeId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         public async Task<bool> ExistsByNameAsync(
             int companyId,
             string name,
@@ -51,7 +45,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
         {
             var query = _context.Locations
                 .AsNoTracking()
-                .Where(x => x.Idcompany == companyId && x.Name == name);
+                .Where(x =>
+                    x.Idcompany == companyId &&
+                    x.Name.ToLower() == name.ToLower());
 
             if (excludeId.HasValue)
             {
@@ -62,19 +58,16 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
         }
 
         /// <summary>
-        /// get active locations
+        /// Get all active locations for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<List<WMSLocationsDTO>> GetActiveAsync(
+        public async Task<List<WMSLocationsReadDTO>> GetActiveAsync(
             int companyId,
             CancellationToken ct)
         {
-            var query = await _context.Locations
+            return await _context.Locations
                 .AsNoTracking()
                 .Where(x => x.Idcompany == companyId && x.Active)
-                .Select(l => new WMSLocationsDTO
+                .Select(l => new WMSLocationsReadDTO
                 {
                     Id = l.Id,
                     Name = l.Name,
@@ -92,24 +85,19 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
                     statename = l.IdstateNavigation.Name
                 })
                 .ToListAsync(ct);
-
-            return query;
         }
 
         /// <summary>
-        /// get all locations
+        /// Get all locations for a company
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<List<WMSLocationsDTO>> GetAllAsync(
+        public async Task<List<WMSLocationsReadDTO>> GetAllAsync(
             int companyId,
             CancellationToken ct)
         {
-            var query = await _context.Locations
+            return await _context.Locations
                 .AsNoTracking()
                 .Where(x => x.Idcompany == companyId)
-                .Select(l => new WMSLocationsDTO
+                .Select(l => new WMSLocationsReadDTO
                 {
                     Id = l.Id,
                     Name = l.Name,
@@ -127,26 +115,20 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
                     statename = l.IdstateNavigation.Name
                 })
                 .ToListAsync(ct);
-
-            return query;
         }
 
         /// <summary>
-        /// get location information by id
+        /// Get location by id validating ownership
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        public async Task<WMSLocationsDTO?> GetByIdAsync(
+        public async Task<WMSLocationsReadDTO?> GetByIdAsync(
             int companyId,
             int id,
             CancellationToken ct)
         {
-            var info = await _context.Locations
+            return await _context.Locations
                 .AsNoTracking()
                 .Where(l => l.Idcompany == companyId && l.Id == id)
-                .Select(l => new WMSLocationsDTO
+                .Select(l => new WMSLocationsReadDTO
                 {
                     Id = l.Id,
                     Name = l.Name,
@@ -164,18 +146,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
                     statename = l.IdstateNavigation.Name
                 })
                 .FirstOrDefaultAsync(ct);
-
-            return info;
         }
 
         /// <summary>
-        /// Active no active location
+        /// Activate or deactivate a location
         /// </summary>
-        /// <param name="companyId"></param>
-        /// <param name="id"></param>
-        /// <param name="isActive"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         public async Task<bool> SetActiveAsync(
             int companyId,
             int id,
@@ -183,7 +158,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
             CancellationToken ct)
         {
             var entity = await _context.Locations
-                .FirstOrDefaultAsync(x => x.Idcompany == companyId && x.Id == id, ct);
+                .FirstOrDefaultAsync(
+                    x => x.Idcompany == companyId && x.Id == id,
+                    ct);
 
             if (entity is null)
                 return false;
@@ -194,18 +171,19 @@ namespace DUNES.API.RepositoriesWMS.Masters.Locations
         }
 
         /// <summary>
-        /// update location information
+        /// Update an existing location
+        /// 
+        /// IMPORTANT:
+        /// - CompanyId must NOT be changed here
         /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
         public async Task<ModelsWMS.Masters.Locations> UpdateAsync(
             ModelsWMS.Masters.Locations entity,
             CancellationToken ct)
         {
-            _context.Update(entity);
+            _context.Locations.Update(entity);
             await _context.SaveChangesAsync(ct);
             return entity;
         }
     }
 }
+
