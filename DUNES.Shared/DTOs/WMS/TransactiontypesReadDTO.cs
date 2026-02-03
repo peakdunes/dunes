@@ -55,10 +55,7 @@ namespace DUNES.Shared.DTOs.WMS
         [MaxLength(3)]
         public string? Match { get; set; }
 
-        /// <summary>
-        /// company name
-        /// </summary>
-        public string companyname { get; set; } = null!;
+      
 
 
     }
