@@ -105,147 +105,7 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
             return ApiResponseFactory.Ok(info, "OK");
         }
 
-        /// <summary>
-        /// get all active input type transactions
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
-        {
-            var info = await _repository.GetAllActiveTransactionsInputType(companyid, companyClient, ct);
-
-            if (info == null)
-            {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not active input transactions for this company client {companyClient}");
-            }
-
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
-
-            foreach(var det in info)
-            {
-
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
-
-                objdet.Id = det.Id;
-                objdet.Name = det.Name!;
-                objdet.match = det.Match??"";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
-                    
-                objlist.Add(objdet);
-            }
-
-            return ApiResponseFactory.Ok(objlist, "OK");
-        }
-        /// <summary>
-        /// get all input type transactions
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
-        {
-            var info = await _repository.GetAllTransactionsInputType(companyid, companyClient, ct);
-
-            if (info == null)
-            {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not input transactions for this company client {companyClient}");
-            }
-
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
-
-            foreach (var det in info)
-            {
-
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
-
-                objdet.Id = det.Id;
-                objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
-
-                objlist.Add(objdet);
-            }
-
-
-            return ApiResponseFactory.Ok(objlist, "OK");
-        }
-
-        /// <summary>
-        /// get all active output type transactions
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
-        {
-            var info = await _repository.GetAllActiveTransactionsOutputType(companyid, companyClient, ct);
-
-            if (info == null)
-            {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not active output transactions for this company client {companyClient}");
-            }
-
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
-
-            foreach (var det in info)
-            {
-
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
-
-                objdet.Id = det.Id;
-                objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
-
-                objlist.Add(objdet);
-            }
-
-
-            return ApiResponseFactory.Ok(objlist, "OK");
-        }
-        /// <summary>
-        /// get all output type transactions
-        /// </summary>
-        /// <param name="companyid"></param>
-        /// <param name="companyClient"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
-        {
-            var info = await _repository.GetAllTransactionsOutputType(companyid, companyClient, ct);
-
-            if (info == null)
-            {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not output transactions for this company client {companyClient}");
-            }
-
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
-
-            foreach (var det in info)
-            {
-
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
-
-                objdet.Id = det.Id;
-                objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
-
-                objlist.Add(objdet);
-            }
-
-
-            return ApiResponseFactory.Ok(objlist, "OK");
-        }
-        /// <summary>
+             /// <summary>
         /// Get all active Inventory Types for a client company 
         /// </summary>
         /// <param name="companyid"></param>
@@ -564,27 +424,27 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var info = await _repository.GetAllActiveTransferTransactionsInputType (companyid, companyClient, ct);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not input transfer transactions for this company client {companyClient}");
+                return ApiResponseFactory.NotFound<List<WMSTransactionTypesUpdateDTO>>($"there is not input transfer transactions for this company client {companyClient}");
             }
 
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> objlist = new List<WMSTransactionTypesUpdateDTO>();
 
             foreach (var det in info)
             {
 
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
+                WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
                 objdet.Id = det.Id;
                 objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
+                objdet.Match = det.Match ?? "";
+                objdet.Isinput = det.Isinput;
+                objdet.Isoutput = det.Isoutput;
 
                 objlist.Add(objdet);
             }
@@ -600,27 +460,27 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
         {
             var info = await _repository.GetAllTransferTransactionsInputType(companyid, companyClient, ct);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not input transfer transactions for this company client {companyClient}");
+                return ApiResponseFactory.NotFound<List<WMSTransactionTypesUpdateDTO>>($"there is not input transfer transactions for this company client {companyClient}");
             }
 
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> objlist = new List<WMSTransactionTypesUpdateDTO>();
 
             foreach (var det in info)
             {
 
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
+                WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
                 objdet.Id = det.Id;
                 objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
+                objdet.Match = det.Match ?? "";
+                objdet.Isinput = det.Isinput;
+                objdet.Isoutput = det.Isoutput;
 
                 objlist.Add(objdet);
             }
@@ -636,27 +496,27 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var info = await _repository.GetAllActiveTransferTransactionsOutputType(companyid, companyClient, ct);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not output transfer transactions for this company client {companyClient}");
+                return ApiResponseFactory.NotFound<List<WMSTransactionTypesUpdateDTO>>($"there is not output transfer transactions for this company client {companyClient}");
             }
 
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> objlist = new List<WMSTransactionTypesUpdateDTO>();
 
             foreach (var det in info)
             {
 
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
+                WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
                 objdet.Id = det.Id;
                 objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
+                objdet.Match = det.Match ?? "";
+                objdet.Isinput = det.Isinput;
+                objdet.Isoutput = det.Isoutput;
 
                 objlist.Add(objdet);
             }
@@ -672,27 +532,27 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
         {
             var info = await _repository.GetAllTransferTransactionsOutputType(companyid, companyClient, ct);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<List<WMSTransactionsDto>>($"there is not output transfer transactions for this company client {companyClient}");
+                return ApiResponseFactory.NotFound<List<WMSTransactionTypesUpdateDTO>>($"there is not output transfer transactions for this company client {companyClient}");
             }
 
-            List<WMSTransactionsDto> objlist = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> objlist = new List<WMSTransactionTypesUpdateDTO>();
 
             foreach (var det in info)
             {
 
-                WMSTransactionsDto objdet = new WMSTransactionsDto();
+                WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
                 objdet.Id = det.Id;
                 objdet.Name = det.Name!;
-                objdet.match = det.Match ?? "";
-                objdet.isInput = det.Isinput;
-                objdet.isOutput = det.Isoutput;
+                objdet.Match = det.Match ?? "";
+                objdet.Isinput = det.Isinput;
+                objdet.Isoutput = det.Isoutput;
 
                 objlist.Add(objdet);
             }
@@ -709,22 +569,22 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public async Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct)
+        public async Task<ApiResponse<WMSTransactionTypesUpdateDTO>> GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct)
         {
             var info = await _repository.GetTransactionsTypeById(companyid, companyClient, id, ct);
 
             if (info == null)
             {
-                return ApiResponseFactory.NotFound<WMSTransactionsDto>($"there is not transaction for this company client {companyClient} and this id {id}");
+                return ApiResponseFactory.NotFound<WMSTransactionTypesUpdateDTO>($"there is not transaction for this company client {companyClient} and this id {id}");
             }
 
-            WMSTransactionsDto objdet = new WMSTransactionsDto();
+            WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
             objdet.Id = info.Id;
             objdet.Name = info.Name!;
-            objdet.match = info.Match ?? "";
-            objdet.isInput = info.Isinput;
-            objdet.isOutput = info.Isoutput;
+            objdet.Match = info.Match ?? "";
+            objdet.Isinput = info.Isinput;
+            objdet.Isoutput = info.Isoutput;
 
 
             return ApiResponseFactory.Ok(objdet, "OK");
@@ -750,6 +610,51 @@ namespace DUNES.API.ServicesWMS.Inventory.Common.Queries
 
             return ApiResponseFactory.Ok(info, "OK");
             //throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> ICommonQueryWMSINVService.GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> ICommonQueryWMSINVService.GetAllTransferTransactionsInputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> ICommonQueryWMSINVService.GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> ICommonQueryWMSINVService.GetAllTransferTransactionsOutputType(int companyid, string companyClient, CancellationToken ct)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<ApiResponse<WMSTransactionTypesUpdateDTO>> ICommonQueryWMSINVService.GetTransactionsTypeById(int companyid, string companyClient, int id, CancellationToken ct)
+        {
+            throw new NotImplementedException();
         }
     }
 }

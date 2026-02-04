@@ -219,7 +219,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
-            List<WMSTransactionsDto> listinputtransactionsresult = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> listinputtransactionsresult = new List<WMSTransactionTypesUpdateDTO>();
 
             List<InventoryTypeDto> listinventorytypesresult = new List<InventoryTypeDto>();
 
@@ -303,15 +303,15 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
                 foreach (var b in listtransactions.Data)
                 {
-                    WMSTransactionsDto objdet = new WMSTransactionsDto();
+                    WMSTransactionTypesUpdateDTO objdet = new WMSTransactionTypesUpdateDTO();
 
                     objdet.Id = b.Id;
                     objdet.Name = b.Name.Trim();
-                    objdet.match = b.match.Trim();
-                    objdet.isInput = b.isInput;
-                    objdet.isOutput = b.isOutput;
+                    objdet.Match = b.Match.Trim();
+                    objdet.Isinput = b.Isinput;
+                    objdet.Isoutput = b.Isoutput;
 
-                    listinputtransactionsresult.Add(objdet);
+                    //listinputtransactionsresult.Add(objdet);
                 }
 
                 objinformation.listinputtransactions = listinputtransactionsresult;
@@ -936,7 +936,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                     return Ok(new { status = $"Transction type Id {transactionid} not found " });
                 }
 
-                if (!infotraninput.Data.isInput)
+                if (!infotraninput.Data.Isinput)
                 {
                     return Ok(new { status = $"Transction type Id {transactionid} is not valid (you need a input type transaction " });
                 }

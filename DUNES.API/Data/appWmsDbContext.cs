@@ -143,7 +143,16 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<CompanyClientDivision> CompanyClientDivision { get; set; }
 
-      
+
+        /// <summary>
+        /// Defines the relationship between a Transaction Types
+        /// </summary>
+        public DbSet<TransactionTypeClient> TransactionTypeClients { get; set; }
+
+        /// <summary>
+        ///  Defines the relationship between a Transaction Concept
+        /// </summary>
+        public DbSet<TransactionConceptClient> TransactionConceptClients { get; set; }
 
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
@@ -152,6 +161,59 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TransactionTypeClient>(entity =>
+            {
+                entity.HasOne(e => e.Company)
+                      .WithMany()
+                      .HasForeignKey(e => e.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CompanyClient)
+                      .WithMany()
+                      .HasForeignKey(e => e.CompanyClientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.TransactionType)
+                      .WithMany()
+                      .HasForeignKey(e => e.TransactionTypeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new
+                {
+                    e.CompanyId,
+                    e.CompanyClientId,
+                    e.TransactionTypeId
+                }).IsUnique();
+            });
+
+            modelBuilder.Entity<TransactionConceptClient>(entity =>
+            {
+                entity.HasOne(e => e.Company)
+                      .WithMany()
+                      .HasForeignKey(e => e.CompanyId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CompanyClient)
+                      .WithMany()
+                      .HasForeignKey(e => e.CompanyClientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.TransactionConcept)
+                      .WithMany()
+                      .HasForeignKey(e => e.TransactionConceptId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new
+                {
+                    e.CompanyId,
+                    e.CompanyClientId,
+                    e.TransactionConceptId
+                }).IsUnique();
+            });
+
+
+
+
             modelBuilder.Entity<Items>(entity =>
             {
                 entity.HasKey(x => x.Id);

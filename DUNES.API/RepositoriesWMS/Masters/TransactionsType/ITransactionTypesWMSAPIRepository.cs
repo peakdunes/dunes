@@ -2,7 +2,6 @@
 
 namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
 {
-
     /// <summary>
     /// Transaction Types Repository Interface
     /// 
@@ -11,9 +10,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
     /// 
     /// IMPORTANT:
     /// This repository is the last line of defense for multi-tenant security.
-    /// ALL queries MUST be filtered by CompanyId.
+    /// ALL operations MUST be filtered by CompanyId.
     /// </summary>
-    public interface IITransactionTypesWMSAPIRepository
+    public interface ITransactionTypesWMSAPIRepository
     {
         /// <summary>
         /// Get all transaction types for a company.
@@ -48,11 +47,13 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
             CancellationToken ct);
 
         /// <summary>
-        /// Check if a transaction type name already exists for a company.
+        /// Check if a transaction type with the same name already exists for a company.
         /// </summary>
         /// <param name="companyId">Company identifier (tenant)</param>
         /// <param name="name">Transaction type name</param>
-        /// <param name="excludeId">Optional id to exclude (used on update)</param>
+        /// <param name="excludeId">
+        /// Optional transaction type id to exclude (used during update).
+        /// </param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>True if exists, otherwise false</returns>
         Task<bool> ExistsByNameAsync(
@@ -66,7 +67,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         /// 
         /// IMPORTANT:
         /// - Entity MUST already contain CompanyId.
-        /// - Repository MUST NOT infer or override ownership.
+        /// - Repository MUST NOT infer or override CompanyId.
         /// </summary>
         /// <param name="entity">Transaction type entity</param>
         /// <param name="ct">Cancellation token</param>
@@ -79,7 +80,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         /// Update an existing transaction type.
         /// 
         /// IMPORTANT:
-        /// - Ownership (CompanyId) MUST NOT be changed.
+        /// - Ownership (CompanyId) MUST NOT be modified here.
         /// </summary>
         /// <param name="entity">Transaction type entity</param>
         /// <param name="ct">Cancellation token</param>
@@ -93,7 +94,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         /// </summary>
         /// <param name="companyId">Company identifier (tenant)</param>
         /// <param name="id">Transaction type identifier</param>
-        /// <param name="isActive">Active flag</param>
+        /// <param name="isActive">Activation flag</param>
         /// <param name="ct">Cancellation token</param>
         /// <returns>True if updated, false if not found</returns>
         Task<bool> SetActiveAsync(
@@ -102,4 +103,5 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
             bool isActive,
             CancellationToken ct);
     }
+
 }

@@ -7,8 +7,15 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.WMS
 {
-    public class TransactiontypesCreateDTO
+    public class WMSTransactiontypesReadDTO
     {
+
+
+        /// <summary>
+        /// internal database id
+        /// </summary>
+        public int Id { get; set; }
+
 
         /// <summary>
         /// transaction name
@@ -20,6 +27,12 @@ namespace DUNES.Shared.DTOs.WMS
         /// company id
         /// </summary>
         public int companyId { get; set; }
+
+        /// <summary>
+        /// company name
+        /// </summary>
+        public string companyname { get; set; } = null!;
+
 
         /// <summary>
         /// this type is input
@@ -41,6 +54,9 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         [MaxLength(3)]
         public string? Match { get; set; }
+
+      
+
 
     }
 }

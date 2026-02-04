@@ -48,12 +48,12 @@ namespace DUNES.UI.Services.Inventory.Common
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveInputTransactionsByCompanyClient(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/active-input-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
@@ -120,12 +120,12 @@ namespace DUNES.UI.Services.Inventory.Common
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveOutputTransactionsByCompanyClient(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/active-output-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
@@ -139,53 +139,53 @@ namespace DUNES.UI.Services.Inventory.Common
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsInputType(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsInputType(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/active-transfer-input-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsInputType(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsInputType(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/all-transfer-input-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsOutputType(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsOutputType(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/active-transfer-output-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsOutputType(
+        public Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsOutputType(
             int companyid,
             string companyClient,
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSTransactionsDto>>(
+            => GetApiAsync<List<WMSTransactionTypesUpdateDTO>>(
                 $"/api/CommonQueryWMSINV/all-transfer-output-transaction/{companyid}/{companyClient}",
                 token,
                 ct);
 
-        public Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(
+        public Task<ApiResponse<WMSTransactionTypesUpdateDTO>> GetTransactionsTypeById(
             int companyid,
             string companyClient,
             int id,
             string token,
             CancellationToken ct)
-            => GetApiAsync<WMSTransactionsDto>(
+            => GetApiAsync<WMSTransactionTypesUpdateDTO>(
                 $"/api/CommonQueryWMSINV/transaction-by-id/{companyid}/{companyClient}/{id}",
                 token,
                 ct);

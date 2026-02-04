@@ -428,7 +428,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
             List<WMSConceptsDto> listconceptsresult = new List<WMSConceptsDto>();
 
-            List<WMSTransactionsDto> listinputtransactionsresult = new List<WMSTransactionsDto>();
+            List<WMSTransactionTypesUpdateDTO> listinputtransactionsresult = new List<WMSTransactionTypesUpdateDTO>();
 
 
 
@@ -660,7 +660,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
                 foreach (var info in infotranoutput.Data)
                 {
-                    if (info.match.ToUpper().Trim() == infotraninput.Data!.match.ToUpper().Trim())
+                    if (info.Match.ToUpper().Trim() == infotraninput.Data!.Match.ToUpper().Trim())
                     {
                         OutPutTransactionId = info.Id;
 

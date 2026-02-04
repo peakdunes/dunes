@@ -234,7 +234,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                         {
                             PickProcessWm objdet = new PickProcessWm();
 
-                            if (tran.isInput)
+                            if (tran.Isinput)
                             {
                                 foreach (var type in infoInvType.Data)
                                 {
@@ -254,7 +254,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                             objdet.InvDest = 0;
                             objdet.qty = info.TotalQty;
                             objdet.typetransactionid = info.Idtypetransaction;
-                            objdet.match = tran.match;
+                            objdet.match = tran.Match;
                             objdet.notes = DeliveryId.ToString().Trim();
                             objdet.serialnumber = info.Serialid ?? "";
                             listInvProcess.Add(objdet);
@@ -270,7 +270,7 @@ namespace DUNES.API.Services.Inventory.PickProcess.Transactions
                 {
                     foreach (var tran in infoTransacOutput.Data)
                     {
-                        if (tran.match == listp.match)
+                        if (tran.Match == listp.match)
                         {
                             foreach (var info in objInvData.Listdetails)
                             {

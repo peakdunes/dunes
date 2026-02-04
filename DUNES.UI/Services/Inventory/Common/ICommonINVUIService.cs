@@ -87,7 +87,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveInputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="token"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveOutputTransactionsByCompanyClient(int companyid, string companyClient, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsInputType(int companyid, string companyClient, string token, CancellationToken ct);
 
 
 
@@ -132,7 +132,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllActiveTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
 
         /// <summary>
         /// Get All Output Type Transfer transactions
@@ -142,7 +142,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        Task<ApiResponse<List<WMSTransactionsDto>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSTransactionTypesUpdateDTO>>> GetAllTransferTransactionsOutputType(int companyid, string companyClient, string token, CancellationToken ct);
 
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace DUNES.UI.Services.Inventory.Common
         /// <param name="ct"></param>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        Task<ApiResponse<WMSTransactionsDto>> GetTransactionsTypeById(int companyid, string companyClient, int id, string token, CancellationToken ct);
+        Task<ApiResponse<WMSTransactionTypesUpdateDTO>> GetTransactionsTypeById(int companyid, string companyClient, int id, string token, CancellationToken ct);
 
 
 

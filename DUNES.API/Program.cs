@@ -35,7 +35,10 @@ using DUNES.API.RepositoriesWMS.Masters.Items;
 using DUNES.API.RepositoriesWMS.Masters.Locations;
 using DUNES.API.RepositoriesWMS.Masters.Racks;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
+using DUNES.API.RepositoriesWMS.Masters.TransactionConceptClient;
 using DUNES.API.RepositoriesWMS.Masters.TransactionConcepts;
+using DUNES.API.RepositoriesWMS.Masters.TransactionsType;
+using DUNES.API.RepositoriesWMS.Masters.TransactionTypeClient;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
@@ -62,7 +65,10 @@ using DUNES.API.ServicesWMS.Masters.Items;
 using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
+using DUNES.API.ServicesWMS.Masters.TransactionConceptClient;
 using DUNES.API.ServicesWMS.Masters.TransactionConcepts;
+using DUNES.API.ServicesWMS.Masters.TransactionsType;
+using DUNES.API.ServicesWMS.Masters.TransactionTypeClient;
 using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
@@ -285,7 +291,9 @@ builder.Services.AddSwaggerGen(c =>
 
             "InventoryCategoriesWMS" => new[] { "WMS Inventory Categories - CRUD" },
 
+            "TransactionTypesWMS" => new[] { "WMS Transaction Types - CRUD" },
 
+            
 
             //#########
             //MASTERS
@@ -426,8 +434,26 @@ builder.Services.AddScoped<IBinsWMSAPIService, BinsWMSAPIService>();
 builder.Services.AddScoped<ITransactionConceptsWMSAPIRepository, TransactionConceptsWMSAPIRepository>();
 builder.Services.AddScoped<ITransactionConceptsWMSAPIService, TransactionConceptsWMSAPIService>();
 
+
+builder.Services.AddScoped<ITransactionConceptClientWMSAPIRepository, TransactionConceptClientWMSAPIRepository>();
+builder.Services.AddScoped<ITransactionConceptClientWMSAPIService, TransactionConceptClientWMSAPIService>();
+
+
+
+builder.Services.AddScoped<ITransactionTypesWMSAPIRepository, TransactionTypesWMSAPIRepository>();
+builder.Services.AddScoped<ITransactionsTypeWMSAPIService, TransactionsTypeWMSAPIService>();
+
+
+builder.Services.AddScoped<TransactionTypeClientWMSAPIRepository, TransactionTypeClientWMSAPIRepository>();
+builder.Services.AddScoped<ITransactionTypeClientWMSAPIService, TransactionTypeClientWMSAPIService>();
+
+
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIRepository, InventoryCategoriesWMSAPIRepository>();
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIService, InventoryCategoriesWMSAPIService>();
+
+
+builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository,TransactionTypeClientWMSAPIRepository>();
+
 
 builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace DUNES.Shared.DTOs.WMS
 {
-    public class WMSTransactionTypesUpdateDto
+    public class WMSTransactionTypesUpdateDTO
     {
+
+        public int Id { get; set; }
 
         /// <summary>
         /// transaction name

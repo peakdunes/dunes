@@ -16,7 +16,7 @@ namespace DUNES.Shared.DTOs.Inventory
         
         public List<WMSBinsCreateDto> listbines {  get; set; } = new();
         public List<WMSConceptsDto> listconcepts { get; set; } = new();
-        public List<WMSTransactionTypesUpdateDto> listinputtransactions { get; set; } = new();
+        public List<WMSTransactionTypesUpdateDTO> listinputtransactions { get; set; } = new();
         public List<InventoryTypeDto> listinventorytype { get; set; } = new();
         public List<WMSInventoryTypeDto> listwmsinventorytype { get; set; } = new();
         public List<itemstatusDto> listitemstatus { get; set; } = new();
