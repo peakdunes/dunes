@@ -31,7 +31,9 @@ using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
+using DUNES.API.RepositoriesWMS.Masters.InventoryTypes;
 using DUNES.API.RepositoriesWMS.Masters.Items;
+using DUNES.API.RepositoriesWMS.Masters.ItemStatus;
 using DUNES.API.RepositoriesWMS.Masters.Locations;
 using DUNES.API.RepositoriesWMS.Masters.Racks;
 using DUNES.API.RepositoriesWMS.Masters.StateCountries;
@@ -61,7 +63,9 @@ using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.InventoryCategories;
+using DUNES.API.ServicesWMS.Masters.InventoryTypes;
 using DUNES.API.ServicesWMS.Masters.Items;
+using DUNES.API.ServicesWMS.Masters.ItemStatus;
 using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.API.ServicesWMS.Masters.StateCountries;
@@ -293,6 +297,10 @@ builder.Services.AddSwaggerGen(c =>
 
             "TransactionTypesWMS" => new[] { "WMS Transaction Types - CRUD" },
 
+            "ItemStatusWMS" => new[] { "WMS Item Status - CRUD" },
+
+
+            "InventoryTypesWMS" => new[] { "WMS Inventory Types - CRUD" },
             
 
             //#########
@@ -450,6 +458,14 @@ builder.Services.AddScoped<ITransactionTypeClientWMSAPIService, TransactionTypeC
 
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIRepository, InventoryCategoriesWMSAPIRepository>();
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIService, InventoryCategoriesWMSAPIService>();
+
+
+builder.Services.AddScoped<IInventoryTypesWMSAPIRepository, InventoryTypesWMSAPIRepository>();
+builder.Services.AddScoped<IInventoryTypesWMSAPIService, InventoryTypesWMSAPIService>();
+
+builder.Services.AddScoped<IItemStatusWMSAPIRepository, ItemStatusWMSAPIRepository>();
+builder.Services.AddScoped<IItemStatusWMSAPIService, ItemStatusWMSAPIService>();
+
 
 
 builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository,TransactionTypeClientWMSAPIRepository>();

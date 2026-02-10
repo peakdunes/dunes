@@ -119,12 +119,12 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<API.ModelsWMS.Masters.InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _repository.GetAllInventoryTypesByCompanyClient(companyid, companyClient, ct);
 
             if (infotypes.Count <= 0)
-                return ApiResponseFactory.BadRequest<List<InventoryTypes>>($"Inventory types for this company client {companyClient} not found");
+                return ApiResponseFactory.BadRequest<List<API.ModelsWMS.Masters.InventoryTypes>>($"Inventory types for this company client {companyClient} not found");
 
             return ApiResponseFactory.Ok(infotypes, "OK");
         }
@@ -136,12 +136,12 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<ApiResponse<List<API.ModelsWMS.Masters.InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _repository.GetAllActiveInventoryTypesByCompanyClient(companyid, companyClient, ct);
 
             if (infotypes.Count <= 0)
-                return ApiResponseFactory.BadRequest<List<InventoryTypes>>($"Inventory types actives for this company client {companyClient} not found");
+                return ApiResponseFactory.BadRequest<List<API.ModelsWMS.Masters.InventoryTypes>>($"Inventory types actives for this company client {companyClient} not found");
 
             return ApiResponseFactory.Ok(infotypes, "OK");
         }

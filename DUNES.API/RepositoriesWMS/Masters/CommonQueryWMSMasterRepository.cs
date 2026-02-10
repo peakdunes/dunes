@@ -78,7 +78,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<InventoryTypes>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<List<DUNES.API.ModelsWMS.Masters.InventoryTypes>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _wmscontext.InventoryTypes.Where(x => x.Id == companyid ).ToListAsync(ct);
 
@@ -91,7 +91,7 @@ namespace DUNES.API.RepositoriesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        public async Task<List<InventoryTypes>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
+        public async Task<List<DUNES.API.ModelsWMS.Masters.InventoryTypes>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct)
         {
             var infotypes = await _wmscontext.InventoryTypes
                 .Where(x => x.Idcompany == companyid  && x.Active == true).ToListAsync(ct);

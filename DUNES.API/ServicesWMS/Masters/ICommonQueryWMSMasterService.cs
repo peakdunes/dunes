@@ -55,7 +55,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
+        Task<ApiResponse<List<API.ModelsWMS.Masters.InventoryTypes>>> GetAllInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
         /// <summary>
         /// Get all actives inventory type for a company client by id
@@ -64,7 +64,7 @@ namespace DUNES.API.ServicesWMS.Masters
         /// <param name="companyClient"></param>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
+        Task<ApiResponse<List<API.ModelsWMS.Masters.InventoryTypes>>> GetAllActiveInventoryTypesByCompanyClient(int companyid, string companyClient, CancellationToken ct);
 
 
         /// <summary>

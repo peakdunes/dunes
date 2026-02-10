@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205135357_migInventoryCategory2")]
+    partial class migInventoryCategory2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,8 +240,7 @@ namespace DUNES.API.Migrations
 
                     b.HasIndex("CompanyClientId");
 
-                    b.HasIndex("CompanyId", "CompanyClientId")
-                        .IsUnique();
+                    b.HasIndex("CompanyId");
 
                     b.ToTable("CompaniesContract");
                 });
@@ -390,93 +392,6 @@ namespace DUNES.API.Migrations
                     b.HasIndex(new[] { "Idcompanyclient" }, "IX_companyClientDivision_Idcompanyclient");
 
                     b.ToTable("companyClientDivision", (string)null);
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientInventoryCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompaniesContractId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InventoryCategoryId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InventoryCategoryId");
-
-                    b.HasIndex("CompaniesContractId", "InventoryCategoryId")
-                        .IsUnique();
-
-                    b.HasIndex("CompaniesContractId", "IsActive");
-
-                    b.ToTable("CompanyClientInventoryCategories", (string)null);
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompaniesContractId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("InventoryTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InventoryTypeId");
-
-                    b.HasIndex("CompaniesContractId", "InventoryTypeId")
-                        .IsUnique();
-
-                    b.HasIndex("CompaniesContractId", "IsActive");
-
-                    b.ToTable("CompanyClientInventoryTypes", (string)null);
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompaniesContractId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("ItemStatusId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ItemStatusId");
-
-                    b.HasIndex("CompaniesContractId", "IsActive");
-
-                    b.HasIndex("CompaniesContractId", "ItemStatusId")
-                        .IsUnique();
-
-                    b.ToTable("CompanyClientItemStatuses", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Countries", b =>
@@ -1535,13 +1450,13 @@ namespace DUNES.API.Migrations
                     b.HasOne("DUNES.API.ModelsWMS.Masters.CompanyClient", "CompanyClientNavegation")
                         .WithMany()
                         .HasForeignKey("CompanyClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "CompanyNavegation")
                         .WithMany()
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CompanyClientNavegation");
@@ -1599,63 +1514,6 @@ namespace DUNES.API.Migrations
                     b.Navigation("CountryNavegation");
 
                     b.Navigation("StateNavegation");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientInventoryCategory", b =>
-                {
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.CompaniesContract", "CompaniesContractNavigation")
-                        .WithMany("InventoryCategoryMappings")
-                        .HasForeignKey("CompaniesContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Inventorycategories", "InventoryCategoryNavigation")
-                        .WithMany()
-                        .HasForeignKey("InventoryCategoryId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CompaniesContractNavigation");
-
-                    b.Navigation("InventoryCategoryNavigation");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType", b =>
-                {
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.CompaniesContract", "CompaniesContractNavigation")
-                        .WithMany("InventoryTypeMappings")
-                        .HasForeignKey("CompaniesContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.InventoryTypes", "InventoryTypeNavigation")
-                        .WithMany()
-                        .HasForeignKey("InventoryTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CompaniesContractNavigation");
-
-                    b.Navigation("InventoryTypeNavigation");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus", b =>
-                {
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.CompaniesContract", "CompaniesContractNavigation")
-                        .WithMany("ItemStatusMappings")
-                        .HasForeignKey("CompaniesContractId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Itemstatus", "ItemStatusNavigation")
-                        .WithMany()
-                        .HasForeignKey("ItemStatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CompaniesContractNavigation");
-
-                    b.Navigation("ItemStatusNavigation");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.InventoryTypes", b =>
@@ -2039,15 +1897,6 @@ namespace DUNES.API.Migrations
                     b.Navigation("Company");
 
                     b.Navigation("Locations");
-                });
-
-            modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.CompaniesContract", b =>
-                {
-                    b.Navigation("InventoryCategoryMappings");
-
-                    b.Navigation("InventoryTypeMappings");
-
-                    b.Navigation("ItemStatusMappings");
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Company", b =>

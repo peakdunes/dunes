@@ -7,7 +7,7 @@ namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
 /// item status model
 /// </summary>
-public partial class Itemstatus
+public class Itemstatus
 {
 
     /// <summary>

@@ -155,12 +155,106 @@ namespace DUNES.API.Data
         public DbSet<TransactionConceptClient> TransactionConceptClients { get; set; }
 
         /// <summary>
+        /// client inventory types configuration
+        /// </summary>
+        public DbSet<CompanyClientInventoryType> CompanyClientInventoryTypes { get; set; } = null!;
+        /// <summary>
+        /// client item status configurattion
+        /// </summary>
+        public DbSet<CompanyClientItemStatus> CompanyClientItemStatuses { get; set; } = null!;
+        /// <summary>
+        /// client Inventory categories configuration
+        /// </summary>
+        public DbSet<CompanyClientInventoryCategory> CompanyClientInventoryCategories { get; set; } = null!;
+
+
+
+        /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
         /// </summary>
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Enforce a single contract row per (CompanyId, CompanyClientId)
+            modelBuilder.Entity<CompaniesContract>(e =>
+            {
+                e.HasIndex(x => new { x.CompanyId, x.CompanyClientId }).IsUnique();
+
+                // These likely already exist; keep Restrict to avoid accidental deletes.
+                e.HasOne(x => x.CompanyNavegation)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.CompanyClientNavegation)
+                    .WithMany()
+                    .HasForeignKey(x => x.CompanyClientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // CompanyClientInventoryType
+            modelBuilder.Entity<CompanyClientInventoryType>(e =>
+            {
+                e.ToTable("CompanyClientInventoryTypes");
+                e.HasKey(x => x.Id);
+
+                e.HasIndex(x => new { x.CompaniesContractId, x.InventoryTypeId }).IsUnique();
+                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
+
+                e.HasOne(x => x.CompaniesContractNavigation)
+                    .WithMany(c => c.InventoryTypeMappings)
+                    .HasForeignKey(x => x.CompaniesContractId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.InventoryTypeNavigation)
+                    .WithMany()
+                    .HasForeignKey(x => x.InventoryTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // CompanyClientItemStatus
+            modelBuilder.Entity<CompanyClientItemStatus>(e =>
+            {
+                e.ToTable("CompanyClientItemStatuses");
+                e.HasKey(x => x.Id);
+
+                e.HasIndex(x => new { x.CompaniesContractId, x.ItemStatusId }).IsUnique();
+                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
+
+                e.HasOne(x => x.CompaniesContractNavigation)
+                    .WithMany(c => c.ItemStatusMappings)
+                    .HasForeignKey(x => x.CompaniesContractId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.ItemStatusNavigation)
+                    .WithMany()
+                    .HasForeignKey(x => x.ItemStatusId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // CompanyClientInventoryCategory
+            modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
+            {
+                e.ToTable("CompanyClientInventoryCategories");
+                e.HasKey(x => x.Id);
+
+                e.HasIndex(x => new { x.CompaniesContractId, x.InventoryCategoryId }).IsUnique();
+                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
+
+                e.HasOne(x => x.CompaniesContractNavigation)
+                    .WithMany(c => c.InventoryCategoryMappings)
+                    .HasForeignKey(x => x.CompaniesContractId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                e.HasOne(x => x.InventoryCategoryNavigation)
+                    .WithMany()
+                    .HasForeignKey(x => x.InventoryCategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+
+
             modelBuilder.Entity<TransactionTypeClient>(entity =>
             {
                 entity.HasOne(e => e.Company)

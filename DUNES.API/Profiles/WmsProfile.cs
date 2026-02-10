@@ -77,10 +77,22 @@ namespace DUNES.API.Profiles
 
             CreateMap<Bines, WMSBinsCreateDto>().ReverseMap();
             
+            CreateMap<Inventorycategories, WMSInventorycategoriesReadDTO>().ReverseMap();
 
-            CreateMap<Inventorycategories, WMSInventoryCategoriesDTO>().ReverseMap();
+            CreateMap<Inventorycategories, WMSInventorycategoriesUpdateDTO>().ReverseMap();
+
+            CreateMap<Inventorycategories, WMSInventorycategoriesCreateDTO>().ReverseMap();
 
             CreateMap<Items, WMSItemsDTO>().ReverseMap();
+
+            CreateMap<InventoryTypes, WMSInventoryTypesReadDTO>();
+            CreateMap<WMSInventoryTypesCreateDTO, InventoryTypes>();
+            CreateMap<WMSInventoryTypesUpdateDTO, InventoryTypes>();
+
+            CreateMap<Itemstatus, WMSItemStatusReadDTO>();
+            CreateMap<WMSItemStatusCreateDTO, Itemstatus>();
+            CreateMap<WMSItemStatusUpdateDTO, Itemstatus>();
+
         }
 
 

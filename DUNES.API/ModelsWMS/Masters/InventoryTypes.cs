@@ -8,7 +8,7 @@ namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
 /// inventory types
 /// </summary>
-public partial class InventoryTypes
+public class InventoryTypes
 {
 
     /// <summary>

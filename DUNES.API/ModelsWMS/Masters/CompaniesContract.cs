@@ -90,5 +90,20 @@ namespace DUNES.API.ModelsWMS.Masters
         /// </summary>
         [ForeignKey(nameof(CompanyClientId))]
         public virtual CompanyClient CompanyClientNavegation { get; set; } = null!;
+
+        /// <summary>
+        /// client inventory type navegation
+        /// </summary>
+        public virtual ICollection<CompanyClientInventoryType> InventoryTypeMappings { get; set; } = new List<CompanyClientInventoryType>();
+        /// <summary>
+        /// client item status navegation
+        /// </summary>
+        public virtual ICollection<CompanyClientItemStatus> ItemStatusMappings { get; set; } = new List<CompanyClientItemStatus>();
+       /// <summary>
+       /// client categories navegation
+       /// </summary>
+        public virtual ICollection<CompanyClientInventoryCategory> InventoryCategoryMappings { get; set; } = new List<CompanyClientInventoryCategory>();
+
+
     }
 }

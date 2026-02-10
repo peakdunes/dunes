@@ -1,82 +1,71 @@
-﻿using DUNES.API.Data;
+﻿using AutoMapper;
+using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
+using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
+using DUNES.Shared.DTOs.WMS;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.InventoryCategories
 {
     /// <summary>
-    /// Inventory Categories Repository
-    /// 
-    /// Scoped by:
-    /// Company (tenant)
-    /// 
-    /// IMPORTANT:
-    /// This repository is the last line of defense for multi-tenant security.
-    /// All operations MUST be filtered by CompanyId.
+    /// Repository implementation for managing Inventory Categories.
+    /// Scoped per company (tenant). All methods enforce multi-tenant security.
     /// </summary>
     public class InventoryCategoriesWMSAPIRepository : IInventoryCategoriesWMSAPIRepository
     {
         private readonly appWmsDbContext _db;
+        private readonly IMapper _mapper;
 
         /// <summary>
-        /// Constructor (DI)
+        /// Constructor with dependency injection.
         /// </summary>
-        public InventoryCategoriesWMSAPIRepository(appWmsDbContext db)
+        /// <param name="db">WMS database context</param>
+        /// <param name="mapper">AutoMapper instance</param>
+        public InventoryCategoriesWMSAPIRepository(appWmsDbContext db, IMapper mapper)
         {
             _db = db;
+            _mapper = mapper;
         }
 
-        /// <summary>
-        /// Get all inventory categories for a company.
-        /// </summary>
-        public async Task<List<Inventorycategories>> GetAllAsync(
-            int companyId,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<List<WMSInventorycategoriesReadDTO>> GetAllAsync(int companyId, CancellationToken ct)
         {
-            return await _db.Inventorycategories
+            var entities = await _db.Inventorycategories
                 .AsNoTracking()
+                .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
+
+            return _mapper.Map<List<WMSInventorycategoriesReadDTO>>(entities);
         }
 
-        /// <summary>
-        /// Get all active inventory categories for a company.
-        /// </summary>
-        public async Task<List<Inventorycategories>> GetActiveAsync(
-            int companyId,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<List<WMSInventorycategoriesReadDTO>> GetActiveAsync(int companyId, CancellationToken ct)
         {
-            return await _db.Inventorycategories
+            var entities = await _db.Inventorycategories
                 .AsNoTracking()
+                .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId && x.Active)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
+
+            return _mapper.Map<List<WMSInventorycategoriesReadDTO>>(entities);
         }
 
-        /// <summary>
-        /// Get inventory category by id validating ownership.
-        /// </summary>
-        public async Task<Inventorycategories?> GetByIdAsync(
-            int companyId,
-            int id,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<WMSInventorycategoriesReadDTO?> GetByIdAsync(int companyId, int id, CancellationToken ct)
         {
-            return await _db.Inventorycategories
+            var entity = await _db.Inventorycategories
                 .AsNoTracking()
-                .FirstOrDefaultAsync(
-                    x => x.Id == id && x.companyId == companyId,
-                    ct);
+                .Include(x => x.IdcompanyNavigation)
+                .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId, ct);
+
+            return entity is null ? null : _mapper.Map<WMSInventorycategoriesReadDTO>(entity);
         }
 
-        /// <summary>
-        /// Check if an inventory category name already exists for a company.
-        /// </summary>
-        public async Task<bool> ExistsByNameAsync(
-            int companyId,
-            string name,
-            int? excludeId,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<bool> ExistsByNameAsync(int companyId, string name, int? excludeId, CancellationToken ct)
         {
             var query = _db.Inventorycategories
                 .AsNoTracking()
@@ -91,50 +80,41 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryCategories
             return await query.AnyAsync(ct);
         }
 
-        /// <summary>
-        /// Create a new inventory category.
-        /// 
-        /// IMPORTANT:
-        /// - Entity must already contain CompanyId
-        /// - Repository must NOT infer ownership
-        /// </summary>
-        public async Task<Inventorycategories> CreateAsync(
-            Inventorycategories entity,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<WMSInventorycategoriesReadDTO> CreateAsync(WMSInventorycategoriesCreateDTO dto, int companyId, CancellationToken ct)
         {
+            var entity = _mapper.Map<Inventorycategories>(dto);
+            entity.companyId = companyId;
+            entity.Active = true;
+
             _db.Inventorycategories.Add(entity);
             await _db.SaveChangesAsync(ct);
-            return entity;
+
+            await _db.Entry(entity).Reference(x => x.IdcompanyNavigation).LoadAsync(ct);
+            return _mapper.Map<WMSInventorycategoriesReadDTO>(entity);
         }
 
-        /// <summary>
-        /// Update an existing inventory category.
-        /// 
-        /// IMPORTANT:
-        /// - Ownership (CompanyId) must NOT be changed here
-        /// </summary>
-        public async Task<Inventorycategories> UpdateAsync(
-            Inventorycategories entity,
-            CancellationToken ct)
-        {
-            _db.Inventorycategories.Update(entity);
-            await _db.SaveChangesAsync(ct);
-            return entity;
-        }
-
-        /// <summary>
-        /// Activate or deactivate an inventory category.
-        /// </summary>
-        public async Task<bool> SetActiveAsync(
-            int companyId,
-            int id,
-            bool isActive,
-            CancellationToken ct)
+        /// <inheritdoc />
+        public async Task<WMSInventorycategoriesReadDTO> UpdateAsync(WMSInventorycategoriesUpdateDTO dto, int companyId, CancellationToken ct)
         {
             var entity = await _db.Inventorycategories
-                .FirstOrDefaultAsync(
-                    x => x.Id == id && x.companyId == companyId,
-                    ct);
+                .FirstOrDefaultAsync(x => x.Id == dto.Id && x.companyId == companyId, ct);
+
+            if (entity is null)
+                throw new KeyNotFoundException("Inventory category not found.");
+
+            _mapper.Map(dto, entity);
+            await _db.SaveChangesAsync(ct);
+
+            await _db.Entry(entity).Reference(x => x.IdcompanyNavigation).LoadAsync(ct);
+            return _mapper.Map<WMSInventorycategoriesReadDTO>(entity);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct)
+        {
+            var entity = await _db.Inventorycategories
+                .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId, ct);
 
             if (entity is null)
                 return false;
