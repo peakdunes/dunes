@@ -43,7 +43,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -67,7 +67,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -88,7 +88,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> create(WMSCompaniesContractDTO dto, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();

@@ -26,7 +26,7 @@ namespace DUNES.UI.Controllers.Admin
             }
 
             // ✅ Token desde BaseController / SessionDTO
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
 

@@ -38,7 +38,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         // GET: CompaniesClientDivisionUIController
         public async Task<IActionResult> Index(int? companyclientid, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -97,7 +97,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         // GET: CompaniesClientDivisionUIController/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -123,7 +123,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCompanyClientDivisionDTO dto, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();

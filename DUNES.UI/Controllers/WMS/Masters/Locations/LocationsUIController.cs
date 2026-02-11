@@ -34,7 +34,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Locations
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();

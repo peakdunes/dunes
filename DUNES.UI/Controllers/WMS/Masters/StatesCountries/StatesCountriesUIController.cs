@@ -44,7 +44,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
         // GET: StatesCountriesUIController
         public async Task<IActionResult> Index(int? countryId, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
 
             if (token == null)
@@ -85,7 +85,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
         // GET: StatesCountriesUIController/Create
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -110,7 +110,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
         {
 
 
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();

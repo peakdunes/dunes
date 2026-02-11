@@ -61,7 +61,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         // GET: ClientCompaniesUIController
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -91,7 +91,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -129,7 +129,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         {
 
 
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -207,7 +207,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         [HttpGet]
         public async Task<IActionResult> GetStatesByCountry(int countryId, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return Unauthorized();
 
@@ -231,7 +231,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         [HttpGet]
         public async Task<IActionResult> GetCitiesByState(int stateId, int countryId, CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return Unauthorized();
 

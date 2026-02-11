@@ -34,7 +34,7 @@ namespace DUNES.UI.Controllers.Inventory.CurrentInventory
         // GET: CurrentInventoryController
         public async Task<ActionResult> Index(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
             
             if (token == null)
                 return (ActionResult)RedirectToLogin();

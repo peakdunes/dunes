@@ -40,7 +40,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Companies
         }
         public async Task<IActionResult> Index(CancellationToken ct)
         {
-            var token = GetToken();
+            var token = CurrentToken;
 
             await SetMenuBreadcrumbAsync(
         MENU_CODE_INDEX,

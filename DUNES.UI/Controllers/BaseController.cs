@@ -28,13 +28,18 @@ namespace DUNES.UI.Controllers
         /// Obtiene el token JWT almacenado en la sesión.
         /// </summary>
         /// <returns>El token como string o null si no existe.</returns>
-        protected string? GetToken()
-        {
-           // return HttpContext.Session.GetString("JWToken");
+        protected string? CurrentToken => HttpContext.GetUserSession()?.Token;
 
-            var session = HttpContext.GetUserSession();
-            return session?.Token;
-        }
+        /// <summary>
+        /// Gets the current CompanyId from the session.
+        /// </summary>
+        protected int CurrentCompanyId => HttpContext.GetUserSession()?.CompanyId ?? 0;
+
+        /// <summary>
+        /// Gets the current CompanyClientId from the session.
+        /// </summary>
+        protected int CurrentCompanyClientId => HttpContext.GetUserSession()?.CompanyClientId ?? 0;
+
 
         /// <summary>
         /// Redirige al usuario a la pantalla de login en caso de token inválido.

@@ -75,7 +75,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
                 if (string.IsNullOrWhiteSpace(asnnumber))
                     return View(objresult);
 
-                var token = GetToken();
+                var token = CurrentToken;
                 if (token == null)
                     return RedirectToLogin();
 
@@ -235,7 +235,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             //return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
 
             // 2) Token (estándar de tu BaseController)
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
 
@@ -778,7 +778,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
         public async Task<IActionResult> checkInventoryByPartNumber(string companyclient, string partnumber, int lineid, CancellationToken ct)
         {
 
-            var token = GetToken();
+            var token = CurrentToken;
 
             // partnumber = "ZEBRA-16H.062SC.0004";
 
@@ -813,7 +813,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
             string errormessage = string.Empty;
 
-            var token = GetToken();
+            var token = CurrentToken;
 
             if (token == null)
                 return RedirectToLogin();
@@ -914,7 +914,7 @@ namespace DUNES.UI.Controllers.Inventory.ASN
             return await HandleAsync(async ct =>
             {
 
-                var token = GetToken();
+                var token = CurrentToken;
                 if (token == null)
                     return RedirectToLogin();
 

@@ -21,7 +21,7 @@ namespace DUNES.UI.Controllers.Admin
             {
 
                 // Token desde SessionDTO (no strings sueltos)
-                var token = GetToken();
+                var token = CurrentToken;
 
                 if (string.IsNullOrWhiteSpace(token))
                     return RedirectToAction("Login", "Auth");

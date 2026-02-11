@@ -99,7 +99,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 if (string.IsNullOrWhiteSpace(pickprocessnumber))
                     return View(objresult);
 
-                var token = GetToken();
+                var token = CurrentToken;
                 if (token == null)
                     return RedirectToLogin();
 
@@ -225,7 +225,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         public async Task<IActionResult> checkInventoryByPartNumber(string companyclient, string partnumber, int lineid, CancellationToken ct)
         {
 
-            var token = GetToken();
+            var token = CurrentToken;
 
 
             if (token == null)
@@ -253,7 +253,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
             int typeid = 0;
 
-            var token = GetToken();
+            var token = CurrentToken;
 
 
             List<WMSInventoryTypeDto> listInvNoHand = new List<WMSInventoryTypeDto>();
@@ -385,7 +385,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
 
             // 2) Token (estándar de tu BaseController)
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
 
@@ -436,7 +436,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
                 return BadRequest(new { message = "Parámetros inválidos.", error = "VALIDATION", data = Array.Empty<object>() });
 
             // 2) Token (estándar de tu BaseController)
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
 
@@ -627,7 +627,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
             return await HandleAsync(async ct =>
             {
 
-                var token = GetToken();
+                var token = CurrentToken;
                 if (token == null)
                     return RedirectToLogin();
 
@@ -871,7 +871,7 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         public async Task<IActionResult> searchAllPickProcess(DateTime dateSearch, CancellationToken ct)
         {
 
-            var token = GetToken();
+            var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
 

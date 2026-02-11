@@ -29,6 +29,9 @@ using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
 using DUNES.API.RepositoriesWMS.Masters.Companies;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.RepositoriesWMS.Masters.CompaniesContract;
+using DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory;
+using DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType;
+using DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
 using DUNES.API.RepositoriesWMS.Masters.InventoryTypes;
@@ -61,6 +64,9 @@ using DUNES.API.ServicesWMS.Masters.ClientCompanies;
 using DUNES.API.ServicesWMS.Masters.Companies;
 using DUNES.API.ServicesWMS.Masters.CompaniesClientDivision;
 using DUNES.API.ServicesWMS.Masters.CompaniesContract;
+using DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory;
+using DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType;
+using DUNES.API.ServicesWMS.Masters.CompanyClientItemStatus;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.InventoryCategories;
 using DUNES.API.ServicesWMS.Masters.InventoryTypes;
@@ -299,9 +305,13 @@ builder.Services.AddSwaggerGen(c =>
 
             "ItemStatusWMS" => new[] { "WMS Item Status - CRUD" },
 
-
             "InventoryTypesWMS" => new[] { "WMS Inventory Types - CRUD" },
-            
+
+            "CompanyClientInventoryCategoryWMS" => new[] { "WMS Inventory Categories per Client - CRUD" },
+
+            "CompanyClientInventoryTypeWMS" => new[] { "WMS Inventory Types per client - CRUD" },
+
+            "CompanyClientItemStatusWMS" => new[] { "WMS Item Status per client - CRUD" },
 
             //#########
             //MASTERS
@@ -466,6 +476,14 @@ builder.Services.AddScoped<IInventoryTypesWMSAPIService, InventoryTypesWMSAPISer
 builder.Services.AddScoped<IItemStatusWMSAPIRepository, ItemStatusWMSAPIRepository>();
 builder.Services.AddScoped<IItemStatusWMSAPIService, ItemStatusWMSAPIService>();
 
+builder.Services.AddScoped<ICompanyClientInventoryCategoryWMSAPIRepository, CompanyClientInventoryCategoryWMSAPIRepository> ();
+builder.Services.AddScoped<ICompanyClientInventoryCategoryService, CompanyClientInventoryCategoryService>();
+
+builder.Services.AddScoped<ICompanyClientInventoryTypeWMSAPIRepository, CompanyClientInventoryTypeWMSAPIRepository>();
+builder.Services.AddScoped<ICompanyClientInventoryTypeService, CompanyClientInventoryTypeService>();
+
+builder.Services.AddScoped<ICompanyClientItemStatusWMSAPIRepository, CompanyClientItemStatusWMSAPIRepository>();
+builder.Services.AddScoped<ICompanyClientItemStatusService, CompanyClientItemStatusService>();
 
 
 builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository,TransactionTypeClientWMSAPIRepository>();
