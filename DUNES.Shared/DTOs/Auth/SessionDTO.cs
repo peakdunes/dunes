@@ -23,5 +23,7 @@ namespace DUNES.Shared.DTOs.Auth
 
         // Ambiente
         public string Environment { get; set; } = "UAT"; // PROD | UAT | DEV
+
+        public int companiesContractId { get; set; }
     }
 }

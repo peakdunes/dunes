@@ -21,9 +21,6 @@ namespace DUNES.UI.Controllers
     public class BaseController : Controller
     {
 
-
-
-
         /// <summary>
         /// Obtiene el token JWT almacenado en la sesión.
         /// </summary>
@@ -39,6 +36,12 @@ namespace DUNES.UI.Controllers
         /// Gets the current CompanyClientId from the session.
         /// </summary>
         protected int CurrentCompanyClientId => HttpContext.GetUserSession()?.CompanyClientId ?? 0;
+
+
+        /// <summary>
+        /// Gets the current CompanyClientId from the session.
+        /// </summary>
+        protected int CurrentcompaniesContractId => HttpContext.GetUserSession()?.companiesContractId ?? 0;
 
 
         /// <summary>

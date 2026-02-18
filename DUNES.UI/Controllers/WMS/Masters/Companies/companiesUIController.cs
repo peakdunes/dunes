@@ -13,61 +13,46 @@ namespace DUNES.UI.Controllers.WMS.Masters.Companies
 {
     [Route("api/[controller]")]
     [ApiController]
-   
     public class companiesUIController : BaseController
     {
-
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ICompaniesWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
-        private readonly IConfiguration _config;
-        private readonly int _companyDefault;
-
         private const string MENU_CODE_INDEX = "010201";
         private const string MENU_CODE_CRUD = "010201ZZ";
 
-
-        public companiesUIController(IHttpClientFactory httpClientFactory, IConfiguration config,
-            ICompaniesWMSUIService service, IMenuClientUIService menuClientService)
+        public companiesUIController(
+            IHttpClientFactory httpClientFactory,
+            ICompaniesWMSUIService service,
+            IMenuClientUIService menuClientService)
         {
             _httpClientFactory = httpClientFactory;
-            _config = config;
             _service = service;
-            _companyDefault = _config.GetValue("companyDefault", 1);
-          _menuClientService = menuClientService;
-
+            _menuClientService = menuClientService;
         }
+
         public async Task<IActionResult> Index(CancellationToken ct)
         {
             var token = CurrentToken;
 
             await SetMenuBreadcrumbAsync(
-        MENU_CODE_INDEX,
-       _menuClientService, ct, token,
-       new BreadcrumbItem
-       {
-           Text = " List",   // actual
-           Url = null
-       });
-
+                MENU_CODE_INDEX,
+                _menuClientService, ct, token,
+                new BreadcrumbItem
+                {
+                    Text = "List",
+                    Url = null
+                });
 
             if (token == null)
                 return RedirectToLogin();
 
             return await HandleAsync(async ct =>
             {
-
-             
                 var listcompanies = await _service.GetAllCompaniesInformation(token, ct);
-
                 return View(listcompanies.Data);
-
             }, ct);
-
-
-          
         }
-
     }
 }

@@ -24,7 +24,11 @@ namespace DUNES.API.Services.Auth
                 .GreaterThan(0).WithMessage("Companydefault is required.");
 
             RuleFor(x => x.Companyclientdefault)
-                .GreaterThan(0).WithMessage("Companyclientdefault is required.");
+                .GreaterThan(0).WithMessage("Company clientdefault is required.");
+
+
+            RuleFor(x => x.companiesContractId)
+               .GreaterThan(0).WithMessage("Company contract is required.");
 
             RuleFor(x => x.Binesdistribution)
                 .MaximumLength(1000).WithMessage("Binesdistribution max length is 1000.")

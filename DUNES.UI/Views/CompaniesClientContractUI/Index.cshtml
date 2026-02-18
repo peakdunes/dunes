@@ -8,6 +8,31 @@
 <p>
     <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
 </p>
+
+<div class="row">
+    @using (Html.BeginForm("Index", "CompanyClientInventoryCategoryUI", FormMethod.Get))
+    {
+
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="control-label">Client Companies</label>
+
+                @Html.DropDownList(
+                "companyclientid",
+                (SelectList)ViewBag.companiesclient,
+                "Select Company Client",
+                new {
+                    @class = "form-control",
+                    onchange = "this.form.submit();"
+            })
+
+            </div>
+        </div>
+    }
+</div>
+
+
+
 <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
     <thead>
         <tr>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,13 +12,12 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSCompanyClientItemStatusUpdateDTO
     {
-        /// <summary>Mapping ID to update.</summary>
+        /// <summary>Mapping ID.</summary>
+        [Required]
+        [Range(1, int.MaxValue)]
         public int Id { get; set; }
 
-        /// <summary>Item Status ID (FK).</summary>
-        public int ItemStatusId { get; set; }
-
-        /// <summary>New active state to apply.</summary>
-        public bool IsActive { get; set; }
+        /// <summary>Mapping-level enable flag.</summary>
+        public bool IsActive { get; set; } = true;
     }
 }

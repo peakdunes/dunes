@@ -5,42 +5,42 @@ using Microsoft.EntityFrameworkCore;
 namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
 {
     /// <summary>
-    /// Repository implementation for item status mappings per client.
-    /// All access is scoped by CompanyId and CompanyClientId.
+    /// Repository implementation for managing item status enablement per client.
+    /// Strictly scoped by CompanyId + CompanyClientId (from token).
     /// </summary>
     public class CompanyClientItemStatusWMSAPIRepository : ICompanyClientItemStatusWMSAPIRepository
     {
         private readonly appWmsDbContext _db;
 
-
-        /// <summary>
-        /// constructor(DI)
-        /// </summary>
-        /// <param name="db"></param>
+        /// <summary>Constructor (DI).</summary>
         public CompanyClientItemStatusWMSAPIRepository(appWmsDbContext db)
         {
             _db = db;
         }
 
         /// <inheritdoc/>
-        public async Task<List<WMSCompanyClientItemStatusReadDTO>> GetAllAsync(
+        public async Task<List<WMSCompanyClientItemStatusReadDTO>> GetEnabledAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
         {
+            // Enabled = mapping active AND master active
             return await _db.CompanyClientItemStatuses
                 .AsNoTracking()
-                .Where(x =>
-                    x.CompaniesContractNavigation.CompanyId == companyId &&
-                    x.CompaniesContractId == companyClientId)
-                .Select(x => new WMSCompanyClientItemStatusReadDTO
-                {
-                    Id = x.Id,
-                    CompaniesContractId = x.CompaniesContractId,
-                    ItemStatusId = x.ItemStatusId,
-                    ItemStatusName = x.ItemStatusNavigation.Name,
-                    IsActive = x.IsActive
-                })
+                .Where(m => m.CompanyId == companyId
+                         && m.CompanyClientId == companyClientId
+                         && m.IsActive)
+                .Join(
+                    _db.Itemstatus.AsNoTracking().Where(s => s.Active),
+                    m => m.ItemStatusId,
+                    s => s.Id,
+                    (m, s) => new WMSCompanyClientItemStatusReadDTO
+                    {
+                        Id = m.Id,
+                        ItemStatusId = s.Id,
+                        ItemStatusName = s.Name,
+                        IsActive = m.IsActive
+                    })
                 .OrderBy(x => x.ItemStatusName)
                 .ToListAsync(ct);
         }
@@ -52,20 +52,23 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             int id,
             CancellationToken ct)
         {
+            // Consistent with enabled logic: require master active.
             return await _db.CompanyClientItemStatuses
                 .AsNoTracking()
-                .Where(x =>
-                    x.Id == id &&
-                    x.CompaniesContractNavigation.CompanyId == companyId &&
-                    x.CompaniesContractId == companyClientId)
-                .Select(x => new WMSCompanyClientItemStatusReadDTO
-                {
-                    Id = x.Id,
-                    CompaniesContractId = x.CompaniesContractId,
-                    ItemStatusId = x.ItemStatusId,
-                    ItemStatusName = x.ItemStatusNavigation.Name,
-                    IsActive = x.IsActive
-                })
+                .Where(m => m.Id == id
+                         && m.CompanyId == companyId
+                         && m.CompanyClientId == companyClientId)
+                .Join(
+                    _db.Itemstatus.AsNoTracking().Where(s => s.Active),
+                    m => m.ItemStatusId,
+                    s => s.Id,
+                    (m, s) => new WMSCompanyClientItemStatusReadDTO
+                    {
+                        Id = m.Id,
+                        ItemStatusId = s.Id,
+                        ItemStatusName = s.Name,
+                        IsActive = m.IsActive
+                    })
                 .FirstOrDefaultAsync(ct);
         }
 
@@ -79,13 +82,13 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
         {
             var query = _db.CompanyClientItemStatuses
                 .AsNoTracking()
-                .Where(x =>
-                    x.CompaniesContractNavigation.CompanyId == companyId &&
-                    x.CompaniesContractId == companyClientId &&
-                    x.ItemStatusId == itemStatusId);
+                .Where(m =>
+                    m.CompanyId == companyId &&
+                    m.CompanyClientId == companyClientId &&
+                    m.ItemStatusId == itemStatusId);
 
             if (excludeId.HasValue)
-                query = query.Where(x => x.Id != excludeId.Value);
+                query = query.Where(m => m.Id != excludeId.Value);
 
             return await query.AnyAsync(ct);
         }
@@ -97,52 +100,46 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             int companyClientId,
             CancellationToken ct)
         {
+            // Anti-error: master must be active
+            var master = await _db.Itemstatus
+                .AsNoTracking()
+                .Where(s => s.Id == dto.ItemStatusId && s.Active)
+                .Select(s => new { s.Id, s.Name })
+                .FirstOrDefaultAsync(ct);
+
+            if (master is null)
+                throw new InvalidOperationException("Cannot create mapping: master item status is invalid or inactive.");
+
+            // Anti-error: avoid duplicates (unique index should also exist)
+            var exists = await _db.CompanyClientItemStatuses
+                .AsNoTracking()
+                .AnyAsync(m =>
+                    m.CompanyId == companyId &&
+                    m.CompanyClientId == companyClientId &&
+                    m.ItemStatusId == dto.ItemStatusId,
+                    ct);
+
+            if (exists)
+                throw new InvalidOperationException("Mapping already exists for this client and item status.");
+
             var entity = new ModelsWMS.Masters.CompanyClientItemStatus
             {
-                CompaniesContractId = companyClientId,
+                CompanyId = companyId,
+                CompanyClientId = companyClientId,
                 ItemStatusId = dto.ItemStatusId,
-                IsActive = true
+                IsActive = dto.IsActive
             };
 
             _db.CompanyClientItemStatuses.Add(entity);
             await _db.SaveChangesAsync(ct);
 
-            var itemName = await _db.Itemstatus
-                .Where(x => x.Id == dto.ItemStatusId)
-                .Select(x => x.Name)
-                .FirstOrDefaultAsync(ct) ?? string.Empty;
-
             return new WMSCompanyClientItemStatusReadDTO
             {
                 Id = entity.Id,
-                CompaniesContractId = entity.CompaniesContractId,
-                ItemStatusId = entity.ItemStatusId,
-                ItemStatusName = itemName,
+                ItemStatusId = master.Id,
+                ItemStatusName = master.Name,
                 IsActive = entity.IsActive
             };
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> UpdateAsync(
-            WMSCompanyClientItemStatusUpdateDTO dto,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct)
-        {
-            var entity = await _db.CompanyClientItemStatuses
-                .Where(x =>
-                    x.Id == dto.Id &&
-                    x.CompaniesContractId == companyClientId &&
-                    x.CompaniesContractNavigation.CompanyId == companyId)
-                .FirstOrDefaultAsync(ct);
-
-            if (entity is null)
-                return false;
-
-            entity.IsActive = dto.IsActive;
-            await _db.SaveChangesAsync(ct);
-
-            return true;
         }
 
         /// <inheritdoc/>
@@ -154,18 +151,101 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             CancellationToken ct)
         {
             var entity = await _db.CompanyClientItemStatuses
-                .FirstOrDefaultAsync(
-                    x => x.Id == id &&
-                         x.CompaniesContractId == companyClientId &&
-                         x.CompaniesContractNavigation.CompanyId == companyId,
+                .FirstOrDefaultAsync(m =>
+                    m.Id == id &&
+                    m.CompanyId == companyId &&
+                    m.CompanyClientId == companyClientId,
                     ct);
 
             if (entity is null)
                 return false;
 
+            // Anti-error: do not allow activation if master is inactive
+            if (isActive)
+            {
+                var masterActive = await IsMasterActiveAsync(companyId, entity.ItemStatusId, ct);
+                if (!masterActive)
+                    throw new InvalidOperationException("Cannot activate mapping: master item status is inactive.");
+            }
+
             entity.IsActive = isActive;
             await _db.SaveChangesAsync(ct);
             return true;
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> SetEnabledSetAsync(
+            int companyId,
+            int companyClientId,
+            List<int> itemStatusIds,
+            CancellationToken ct)
+        {
+            itemStatusIds ??= new List<int>();
+            itemStatusIds = itemStatusIds.Where(x => x > 0).Distinct().ToList();
+
+            // Validate all provided IDs are master-active
+            if (itemStatusIds.Count > 0)
+            {
+                var activeIds = await _db.Itemstatus
+                    .AsNoTracking()
+                    .Where(s => s.Active && itemStatusIds.Contains(s.Id))
+                    .Select(s => s.Id)
+                    .ToListAsync(ct);
+
+                var missingOrInactive = itemStatusIds.Except(activeIds).ToList();
+                if (missingOrInactive.Count > 0)
+                    throw new InvalidOperationException($"Invalid/inactive master item statuses: {string.Join(",", missingOrInactive)}");
+            }
+
+            // Load current mappings
+            var current = await _db.CompanyClientItemStatuses
+                .Where(m => m.CompanyId == companyId && m.CompanyClientId == companyClientId)
+                .ToListAsync(ct);
+
+            var currentByStatusId = current.ToDictionary(x => x.ItemStatusId, x => x);
+
+            // 1) Ensure all provided IDs exist and are active
+            foreach (var statusId in itemStatusIds)
+            {
+                if (currentByStatusId.TryGetValue(statusId, out var existing))
+                {
+                    if (!existing.IsActive)
+                        existing.IsActive = true;
+                }
+                else
+                {
+                    _db.CompanyClientItemStatuses.Add(new ModelsWMS.Masters.CompanyClientItemStatus
+                    {
+                        CompanyId = companyId,
+                        CompanyClientId = companyClientId,
+                        ItemStatusId = statusId,
+                        IsActive = true
+                    });
+                }
+            }
+
+            // 2) Deactivate anything not included
+            var finalSet = itemStatusIds.ToHashSet();
+            foreach (var m in current)
+            {
+                if (!finalSet.Contains(m.ItemStatusId) && m.IsActive)
+                    m.IsActive = false;
+            }
+
+            await _db.SaveChangesAsync(ct);
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public async Task<bool> IsMasterActiveAsync(
+            int companyId,
+            int itemStatusId,
+            CancellationToken ct)
+        {
+            // If Itemstatus is tenant-scoped, add: && s.CompanyId == companyId
+            return await _db.Itemstatus
+                .AsNoTracking()
+                .AnyAsync(s => s.Id == itemStatusId && s.Active, ct);
         }
     }
 }

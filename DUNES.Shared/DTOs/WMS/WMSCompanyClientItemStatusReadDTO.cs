@@ -14,16 +14,13 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>Mapping ID.</summary>
         public int Id { get; set; }
 
-        /// <summary>Client contract ID (CompanyClientId).</summary>
-        public int CompaniesContractId { get; set; }
-
-        /// <summary>Master Item Status ID.</summary>
+        /// <summary>Master ItemStatus ID.</summary>
         public int ItemStatusId { get; set; }
 
-        /// <summary>Item Status Name (readable).</summary>
+        /// <summary>Status name (from master catalog).</summary>
         public string ItemStatusName { get; set; } = string.Empty;
 
-        /// <summary>Indicates if the mapping is currently active.</summary>
+        /// <summary>Mapping-level enable flag.</summary>
         public bool IsActive { get; set; }
     }
 }

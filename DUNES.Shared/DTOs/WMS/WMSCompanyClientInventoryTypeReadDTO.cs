@@ -11,24 +11,16 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSCompanyClientInventoryTypeReadDTO
     {
-        /// <summary>
-        /// Mapping identity.
-        /// </summary>
+        /// <summary>Mapping ID.</summary>
         public int Id { get; set; }
 
-        /// <summary>
-        /// Inventory type master ID.
-        /// </summary>
+        /// <summary>Master InventoryType ID.</summary>
         public int InventoryTypeId { get; set; }
 
-        /// <summary>
-        /// Inventory type name (from master).
-        /// </summary>
+        /// <summary>Type name (from master catalog).</summary>
         public string InventoryTypeName { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Active flag for this client mapping.
-        /// </summary>
+        /// <summary>Mapping-level enable flag.</summary>
         public bool IsActive { get; set; }
     }
 }

@@ -70,7 +70,8 @@ namespace DUNES.UI.Controllers.Auth
                 LocationName = login.LocationName,
                 Expiration = login.Expiration,
                 Environment = login.Enviromentname!,
-                RoleName = login.RoleName!
+                RoleName = login.RoleName!,
+                companiesContractId = login.companiesContractId
 
 
 

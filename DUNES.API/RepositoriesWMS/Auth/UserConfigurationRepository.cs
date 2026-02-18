@@ -117,7 +117,8 @@ namespace DUNES.API.RepositoriesWMS.Auth
 
                     AllowChangeSettings = uc.AllowChangeSettings,
                     Deleteonlymytran = uc.Deleteonlymytran,
-                    Processonlymytran = uc.Processonlymytran
+                    Processonlymytran = uc.Processonlymytran,
+                    companiesContractId = uc.CompaniesContractId
                 }
             ).FirstOrDefaultAsync(ct);
         }

@@ -199,13 +199,7 @@ namespace DUNES.API.Data
                 e.ToTable("CompanyClientInventoryTypes");
                 e.HasKey(x => x.Id);
 
-                e.HasIndex(x => new { x.CompaniesContractId, x.InventoryTypeId }).IsUnique();
-                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
-
-                e.HasOne(x => x.CompaniesContractNavigation)
-                    .WithMany(c => c.InventoryTypeMappings)
-                    .HasForeignKey(x => x.CompaniesContractId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                            
 
                 e.HasOne(x => x.InventoryTypeNavigation)
                     .WithMany()
@@ -218,15 +212,7 @@ namespace DUNES.API.Data
             {
                 e.ToTable("CompanyClientItemStatuses");
                 e.HasKey(x => x.Id);
-
-                e.HasIndex(x => new { x.CompaniesContractId, x.ItemStatusId }).IsUnique();
-                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
-
-                e.HasOne(x => x.CompaniesContractNavigation)
-                    .WithMany(c => c.ItemStatusMappings)
-                    .HasForeignKey(x => x.CompaniesContractId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
+                              
                 e.HasOne(x => x.ItemStatusNavigation)
                     .WithMany()
                     .HasForeignKey(x => x.ItemStatusId)
@@ -239,14 +225,7 @@ namespace DUNES.API.Data
                 e.ToTable("CompanyClientInventoryCategories");
                 e.HasKey(x => x.Id);
 
-                e.HasIndex(x => new { x.CompaniesContractId, x.InventoryCategoryId }).IsUnique();
-                e.HasIndex(x => new { x.CompaniesContractId, x.IsActive });
-
-                e.HasOne(x => x.CompaniesContractNavigation)
-                    .WithMany(c => c.InventoryCategoryMappings)
-                    .HasForeignKey(x => x.CompaniesContractId)
-                    .OnDelete(DeleteBehavior.Cascade);
-
+              
                 e.HasOne(x => x.InventoryCategoryNavigation)
                     .WithMany()
                     .HasForeignKey(x => x.InventoryCategoryId)

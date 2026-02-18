@@ -68,6 +68,26 @@ namespace DUNES.API.ControllersWMS.Masters.InventoryCategories
         }
 
         /// <summary>
+        /// Obtain category by name
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="name"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("GetByName/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetByName(int companyId, string name, CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.ExistsByNameAsync(CurrentCompanyId, name,0, ct),
+                ct);
+        }
+
+
+        /// <summary>
         /// Creates a new inventory category for the current company (tenant).
         /// </summary>
         /// <param name="dto">Category creation DTO.</param>

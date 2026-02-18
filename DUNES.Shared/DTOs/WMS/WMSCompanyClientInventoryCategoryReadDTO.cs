@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,24 +12,16 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSCompanyClientInventoryCategoryReadDTO
     {
-        /// <summary>
-        /// Mapping identity.
-        /// </summary>
+        /// <summary>Mapping ID.</summary>
         public int Id { get; set; }
 
-        /// <summary>
-        /// Master inventory category ID.
-        /// </summary>
+        /// <summary>Master InventoryCategory ID.</summary>
         public int InventoryCategoryId { get; set; }
 
-        /// <summary>
-        /// Name of the inventory category.
-        /// </summary>
+        /// <summary>Category name (from master catalog).</summary>
         public string InventoryCategoryName { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Active flag for this client mapping.
-        /// </summary>
+        /// <summary>Mapping-level enable flag.</summary>
         public bool IsActive { get; set; }
     }
 }

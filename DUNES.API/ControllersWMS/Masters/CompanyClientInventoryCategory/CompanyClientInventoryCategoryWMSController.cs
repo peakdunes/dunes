@@ -8,12 +8,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
 {
     /// <summary>
-    /// API controller for managing inventory categories assigned to a client.
-    /// 
+    /// API controller for managing inventory categories enabled for the current client.
+    ///
     /// All actions are scoped by:
     /// - CompanyId (from token)
     /// - CompanyClientId (from token)
-    /// 
+    ///
     /// This controller contains NO business logic.
     /// </summary>
     [Authorize]
@@ -23,28 +23,40 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
     {
         private readonly ICompanyClientInventoryCategoryService _service;
 
-        /// <summary>
-        /// Constructor (DI)
-        /// </summary>
-        public CompanyClientInventoryCategoryWMSController(
-            ICompanyClientInventoryCategoryService service)
+        /// <summary>Constructor (DI).</summary>
+        public CompanyClientInventoryCategoryWMSController(ICompanyClientInventoryCategoryService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Get all inventory categories assigned to this client.
+        /// Get enabled inventory categories for this client.
+        /// Returns only:
+        /// - mapping IsActive=true AND
+        /// - master catalog IsActive=true
+        /// </summary>
+        [HttpGet("GetEnabled")]
+        public async Task<IActionResult> GetEnabled(CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
+                ct);
+        }
+
+        /// <summary>
+        /// (Optional backwards compatibility)
+        /// If you previously used GetAll, you can keep this route but return enabled results.
         /// </summary>
         [HttpGet("GetAll")]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
             return await HandleApi(
-                ct => _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
+                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
                 ct);
         }
 
         /// <summary>
-        /// Get a specific client-category mapping by Id.
+        /// Get a specific client-category mapping by Id (scoped).
         /// </summary>
         [HttpGet("GetById/{id:int}")]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
@@ -56,6 +68,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
 
         /// <summary>
         /// Create a new client-category mapping.
+        /// Note: Master catalog must be active to allow creation/enabling.
         /// </summary>
         [HttpPost("Create")]
         public async Task<IActionResult> Create(
@@ -68,20 +81,8 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
         }
 
         /// <summary>
-        /// Update an existing client-category mapping.
-        /// </summary>
-        [HttpPut("Update")]
-        public async Task<IActionResult> Update(
-            [FromBody] WMSCompanyClientInventoryCategoryUpdateDTO dto,
-            CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.UpdateAsync(CurrentCompanyId, CurrentCompanyClientId, dto, ct),
-                ct);
-        }
-
-        /// <summary>
-        /// Activate or deactivate a client-category mapping.
+        /// Activate or deactivate a client-category mapping by mapping Id.
+        /// Note: Activation must be rejected if master category is inactive.
         /// </summary>
         [HttpPatch("SetActive/{id:int}")]
         public async Task<IActionResult> SetActive(
@@ -91,6 +92,20 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
         {
             return await HandleApi(
                 ct => _service.SetActiveAsync(CurrentCompanyId, CurrentCompanyClientId, id, isActive, ct),
+                ct);
+        }
+
+        /// <summary>
+        /// Replace the enabled set for the current client (bulk, anti-error).
+        /// Body: list of master InventoryCategoryIds that should be enabled.
+        /// </summary>
+        [HttpPut("SetEnabledSet")]
+        public async Task<IActionResult> SetEnabledSet(
+            [FromBody] List<int> inventoryCategoryIds,
+            CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.SetEnabledSetAsync(CurrentCompanyId, CurrentCompanyClientId, inventoryCategoryIds, ct),
                 ct);
         }
     }

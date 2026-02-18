@@ -26,6 +26,8 @@ namespace DUNES.Shared.DTOs.Auth
         public int Locationdefault { get; set; }
         public string? LocationName { get; set; }
 
+        public int companiesContractId { get; set; }
+
         // Bin (optional display)
         public int Wmsbin { get; set; }
         public string? WmsBinName { get; set; }

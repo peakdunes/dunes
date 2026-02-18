@@ -12,6 +12,8 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// internal id
         /// </summary>
+        /// 
+        [Display(Name ="ID")]
         public int Id { get; set; }
 
         /// <summary>

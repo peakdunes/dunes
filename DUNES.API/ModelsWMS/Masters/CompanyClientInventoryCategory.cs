@@ -7,26 +7,42 @@ namespace DUNES.API.ModelsWMS.Masters
     /// </summary>
     public class CompanyClientInventoryCategory
     {
-        /// <summary>Identity.</summary>
+        /// <summary>Identity (surrogate key).</summary>
         public int Id { get; set; }
 
-        /// <summary>FK to CompaniesContract (client profile).</summary>
-        public int CompaniesContractId { get; set; }
+        /// <summary>
+        /// Company scope (multi-tenant). 
+        /// Value always comes from the token (never from body/query).
+        /// </summary>
+        public int CompanyId { get; set; }
 
-        /// <summary>FK to master Inventorycategories.</summary>
+        /// <summary>
+        /// Client scope within the company.
+        /// Value always comes from the token (never from body/query).
+        /// </summary>
+        public int CompanyClientId { get; set; }
+
+        /// <summary>
+        /// FK to master InventoryCategories catalog.
+        /// Only categories with master IsActive=true can be enabled for a client.
+        /// </summary>
         public int InventoryCategoryId { get; set; }
 
         /// <summary>
-        /// Mapping-level active flag.
-        /// Master also must be Active=true.
+        /// Mapping-level active flag (client enable/disable).
+        /// Note: master catalog must also be IsActive=true to be considered enabled.
         /// </summary>
         public bool IsActive { get; set; } = true;
 
-        /// <summary>Navigation: CompaniesContract.</summary>
-        [ForeignKey(nameof(CompaniesContractId))]
-        public virtual CompaniesContract CompaniesContractNavigation { get; set; } = null!;
+        /// <summary>
+        /// Navigation: Client entity (optional but useful for FK integrity and joins).
+        /// </summary>
+        [ForeignKey(nameof(CompanyClientId))]
+        public virtual CompanyClient CompanyClientNavigation { get; set; } = null!;
 
-        /// <summary>Navigation: Inventorycategories master.</summary>
+        /// <summary>
+        /// Navigation: InventoryCategories master catalog.
+        /// </summary>
         [ForeignKey(nameof(InventoryCategoryId))]
         public virtual Inventorycategories InventoryCategoryNavigation { get; set; } = null!;
     }

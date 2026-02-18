@@ -17,6 +17,7 @@ namespace DUNES.Shared.DTOs.Auth
         public int Companyclientdefault { get; set; }
         public int Locationdefault { get; set; }
         public int Bindcr1default { get; set; }
+        public int companiesContractId { get; set; }
         public int Wmsbin { get; set; }
         public int Divisiondefault { get; set; }
         public bool Isactive { get; set; }

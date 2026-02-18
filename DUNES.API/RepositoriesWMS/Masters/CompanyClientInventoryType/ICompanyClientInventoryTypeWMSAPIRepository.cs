@@ -2,22 +2,29 @@
 
 namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
 {
+
     /// <summary>
-    /// Repository for managing inventory types assigned to a client.
-    /// Scoped by CompanyId and CompanyClientId.
+    /// Repository contract for client-level inventory type enablement.
+    /// Anti-error principles:
+    /// - CompanyId and CompanyClientId are always taken from the token (never from body/query).
+    /// - No Update method is exposed to avoid changing InventoryTypeId by mistake.
+    /// - Master catalog must be IsActive=true to allow enabling and to appear in enabled lists.
     /// </summary>
     public interface ICompanyClientInventoryTypeWMSAPIRepository
     {
         /// <summary>
-        /// Get all inventory types assigned to a client.
+        /// Returns only the inventory types enabled for the current client:
+        /// - Mapping IsActive=true AND
+        /// - Master InventoryType IsActive=true
         /// </summary>
-        Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetAllAsync(
+        Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetEnabledAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Get a specific client-inventory type mapping by ID.
+        /// Gets a mapping by Id (scoped by CompanyId + CompanyClientId).
+        /// Recommended behavior: if master is inactive, treat as not-enabled (return null).
         /// </summary>
         Task<WMSCompanyClientInventoryTypeReadDTO?> GetByIdAsync(
             int companyId,
@@ -26,7 +33,10 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
             CancellationToken ct);
 
         /// <summary>
-        /// Create a new mapping between a client and an inventory type.
+        /// Creates a new mapping between the current client and a master inventory type.
+        /// Service must enforce:
+        /// - Master type exists and IsActive=true
+        /// - Uniqueness (CompanyId, CompanyClientId, InventoryTypeId)
         /// </summary>
         Task<WMSCompanyClientInventoryTypeReadDTO> CreateAsync(
             WMSCompanyClientInventoryTypeCreateDTO dto,
@@ -35,16 +45,8 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
             CancellationToken ct);
 
         /// <summary>
-        /// Update the active state of an existing mapping.
-        /// </summary>
-        Task<bool> UpdateAsync(
-            WMSCompanyClientInventoryTypeUpdateDTO dto,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Activate or deactivate an inventory type for the client.
+        /// Activates or deactivates a mapping by mapping Id.
+        /// CRITICAL: activation must be rejected if master inventory type IsActive=false.
         /// </summary>
         Task<bool> SetActiveAsync(
             int companyId,
@@ -54,13 +56,35 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
             CancellationToken ct);
 
         /// <summary>
-        /// Check if a mapping already exists for a given inventory type.
+        /// Replaces the enabled set for the client (bulk, anti-error).
+        /// Implementation should:
+        /// - Validate all IDs exist and are master-active (Service or Repo safety)
+        /// - Enable/create mappings for provided IDs
+        /// - Disable mappings not included in the provided list
+        /// </summary>
+        Task<bool> SetEnabledSetAsync(
+            int companyId,
+            int companyClientId,
+            List<int> inventoryTypeIds,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Checks if a mapping exists for a given client and master inventory type.
         /// </summary>
         Task<bool> ExistsAsync(
             int companyId,
             int companyClientId,
             int inventoryTypeId,
             int? excludeId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Validates that the master inventory type exists and is active.
+        /// Supports the business rule: master inactive => cannot be enabled for a client.
+        /// </summary>
+        Task<bool> IsMasterActiveAsync(
+            int companyId,
+            int inventoryTypeId,
             CancellationToken ct);
     }
 }

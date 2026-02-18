@@ -5,7 +5,8 @@ using DUNES.UI.Services.Common;
 namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
 {
     /// <summary>
-    /// UI service implementation for managing inventory category mappings per client.
+    /// UI service implementation for managing inventory category enablement for the current client.
+    /// CompanyId / CompanyClientId are resolved from token by the API.
     /// </summary>
     public class CompanyClientInventoryCategoryWMSUIService
         : UIApiServiceBase, ICompanyClientInventoryCategoryWMSUIService
@@ -14,12 +15,11 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
             : base(factory) { }
 
         /// <inheritdoc/>
-        public Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetAllAsync(
-            int companyClientId,
+        public Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetEnabledAsync(
             string token,
             CancellationToken ct)
             => GetApiAsync<List<WMSCompanyClientInventoryCategoryReadDTO>>(
-                $"/api/wms/masters/company-client/inventory-categories/GetAll?companyClientId={companyClientId}",
+                "/api/wms/masters/company-client/inventory-categories/GetEnabled",
                 token,
                 ct);
 
@@ -45,17 +45,6 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
                 ct);
 
         /// <inheritdoc/>
-        public Task<ApiResponse<bool>> UpdateAsync(
-            WMSCompanyClientInventoryCategoryUpdateDTO dto,
-            string token,
-            CancellationToken ct)
-            => PutApiAsync<bool, WMSCompanyClientInventoryCategoryUpdateDTO>(
-                "/api/wms/masters/company-client/inventory-categories/Update",
-                dto,
-                token,
-                ct);
-
-        /// <inheritdoc/>
         public Task<ApiResponse<bool>> SetActiveAsync(
             int id,
             bool isActive,
@@ -63,6 +52,17 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
             CancellationToken ct)
             => PatchApiAsync<bool>(
                 $"/api/wms/masters/company-client/inventory-categories/SetActive/{id}?isActive={isActive.ToString().ToLower()}",
+                token,
+                ct);
+
+        /// <inheritdoc/>
+        public Task<ApiResponse<bool>> SetEnabledSetAsync(
+            List<int> inventoryCategoryIds,
+            string token,
+            CancellationToken ct)
+            => PutApiAsync<bool, List<int>>(
+                "/api/wms/masters/company-client/inventory-categories/SetEnabledSet",
+                inventoryCategoryIds ?? new List<int>(),
                 token,
                 ct);
     }

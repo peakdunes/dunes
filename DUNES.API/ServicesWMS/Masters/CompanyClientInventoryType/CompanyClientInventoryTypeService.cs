@@ -6,27 +6,24 @@ using System.Net;
 
 namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
 {
-
     /// <summary>
-    /// Service implementation for client-inventory type mappings.
-    /// Enforces validation and scoped access control by company and client.
+    /// Service implementation for client-inventory type enablement.
+    /// Anti-error design:
+    /// - No UpdateAsync (avoid changing InventoryTypeId accidentally).
+    /// - Use GetEnabledAsync and SetEnabledSetAsync.
     /// </summary>
     public class CompanyClientInventoryTypeService : ICompanyClientInventoryTypeService
     {
         private readonly ICompanyClientInventoryTypeWMSAPIRepository _repository;
 
-
-        /// <summary>
-        /// constructor (DI)
-        /// </summary>
-        /// <param name="repository"></param>
+        /// <summary>Constructor (DI).</summary>
         public CompanyClientInventoryTypeService(ICompanyClientInventoryTypeWMSAPIRepository repository)
         {
             _repository = repository;
         }
 
         /// <inheritdoc/>
-        public async Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetAllAsync(
+        public async Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetEnabledAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
@@ -34,10 +31,10 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
             if (companyId <= 0 || companyClientId <= 0)
                 return ApiResponseFactory.BadRequest<List<WMSCompanyClientInventoryTypeReadDTO>>("Invalid company or client context.");
 
-            var result = await _repository.GetAllAsync(companyId, companyClientId, ct);
+            var result = await _repository.GetEnabledAsync(companyId, companyClientId, ct);
 
             if (result is null || result.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryTypeReadDTO>>("No mappings found.");
+                return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryTypeReadDTO>>("No enabled mappings found.");
 
             return ApiResponseFactory.Ok(result);
         }
@@ -73,11 +70,24 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
             if (companyId <= 0 || companyClientId <= 0)
                 return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("Invalid company or client context.");
 
+            if (dto is null)
+                return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("Payload is required.");
+
             if (dto.InventoryTypeId <= 0)
-                return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("Inventory Type is required.");
+                return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("InventoryTypeId is required.");
 
+            // Enforce: master must be active
+            var masterActive = await _repository.IsMasterActiveAsync(companyId, dto.InventoryTypeId, ct);
+            if (!masterActive)
+            {
+                return ApiResponseFactory.Fail<WMSCompanyClientInventoryTypeReadDTO>(
+                    error: "MASTER_INACTIVE",
+                    message: "The selected inventory type is inactive (master catalog).",
+                    statusCode: (int)HttpStatusCode.BadRequest);
+            }
+
+            // Enforce: no duplicates
             var exists = await _repository.ExistsAsync(companyId, companyClientId, dto.InventoryTypeId, null, ct);
-
             if (exists)
             {
                 return ApiResponseFactory.Fail<WMSCompanyClientInventoryTypeReadDTO>(
@@ -86,36 +96,18 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
                     statusCode: (int)HttpStatusCode.Conflict);
             }
 
-            var created = await _repository.CreateAsync(dto, companyId, companyClientId, ct);
-            return ApiResponseFactory.Ok(created, "Mapping created successfully.");
-        }
-
-        /// <inheritdoc/>
-        public async Task<ApiResponse<bool>> UpdateAsync(
-            int companyId,
-            int companyClientId,
-            WMSCompanyClientInventoryTypeUpdateDTO dto,
-            CancellationToken ct)
-        {
-            if (companyId <= 0 || companyClientId <= 0 || dto.Id <= 0)
-                return ApiResponseFactory.BadRequest<bool>("Invalid context or mapping ID.");
-
-            var exists = await _repository.ExistsAsync(companyId, companyClientId, dto.InventoryTypeId, dto.Id, ct);
-
-            if (exists)
+            try
             {
-                return ApiResponseFactory.Fail<bool>(
-                    error: "DUPLICATE_MAPPING",
-                    message: "This inventory type is already assigned to the client.",
-                    statusCode: (int)HttpStatusCode.Conflict);
+                var created = await _repository.CreateAsync(dto, companyId, companyClientId, ct);
+                return ApiResponseFactory.Created(created, "Mapping created successfully.");
             }
-
-            var updated = await _repository.UpdateAsync(dto, companyId, companyClientId, ct);
-
-            if (!updated)
-                return ApiResponseFactory.NotFound<bool>("Mapping not found or unauthorized.");
-
-            return ApiResponseFactory.Ok(true, "Mapping updated successfully.");
+            catch (InvalidOperationException ex)
+            {
+                return ApiResponseFactory.Fail<WMSCompanyClientInventoryTypeReadDTO>(
+                    error: "CREATE_FAILED",
+                    message: ex.Message,
+                    statusCode: (int)HttpStatusCode.BadRequest);
+            }
         }
 
         /// <inheritdoc/>
@@ -129,13 +121,61 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
             if (companyId <= 0 || companyClientId <= 0 || id <= 0)
                 return ApiResponseFactory.BadRequest<bool>("Invalid identifiers.");
 
-            var ok = await _repository.SetActiveAsync(companyId, companyClientId, id, isActive, ct);
+            try
+            {
+                var ok = await _repository.SetActiveAsync(companyId, companyClientId, id, isActive, ct);
 
-            if (!ok)
-                return ApiResponseFactory.NotFound<bool>("Mapping not found.");
+                if (!ok)
+                    return ApiResponseFactory.NotFound<bool>("Mapping not found.");
 
-            var msg = isActive ? "Mapping activated." : "Mapping deactivated.";
-            return ApiResponseFactory.Ok(true, msg);
+                var msg = isActive ? "Mapping activated." : "Mapping deactivated.";
+                return ApiResponseFactory.Ok(true, msg);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Typically: trying to activate while master is inactive
+                return ApiResponseFactory.Fail<bool>(
+                    error: "MASTER_INACTIVE",
+                    message: ex.Message,
+                    statusCode: (int)HttpStatusCode.BadRequest);
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<ApiResponse<bool>> SetEnabledSetAsync(
+            int companyId,
+            int companyClientId,
+            List<int> inventoryTypeIds,
+            CancellationToken ct)
+        {
+            if (companyId <= 0 || companyClientId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Invalid company or client context.");
+
+            inventoryTypeIds ??= new List<int>();
+
+            // sanitize
+            inventoryTypeIds = inventoryTypeIds
+                .Where(x => x > 0)
+                .Distinct()
+                .ToList();
+
+            try
+            {
+                var ok = await _repository.SetEnabledSetAsync(companyId, companyClientId, inventoryTypeIds, ct);
+
+                if (!ok)
+                    return ApiResponseFactory.BadRequest<bool>("Unable to update enabled inventory types.");
+
+                return ApiResponseFactory.Ok(true, "Enabled inventory types updated.");
+            }
+            catch (InvalidOperationException ex)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "INVALID_OR_INACTIVE_MASTER",
+                    message: ex.Message,
+                    statusCode: (int)HttpStatusCode.BadRequest);
+            }
         }
     }
+
 }

@@ -1,0 +1,78 @@
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSCompanyClientInventoryCategoryReadDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<div class="row">
+    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InventoryCategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.InventoryCategoryName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsActive)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InventoryCategoryId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.InventoryCategoryName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsActive)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+</div>
+@section Scripts {
+
+
+
+
+    <script>
+
+
+        $(document).ready(function(){
+
+                     $('#tablelist').DataTable
+                   ({
+
+                     scrollX: true,
+
+                   });
+
+        })
+
+
+    </script>
+}

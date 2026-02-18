@@ -18,7 +18,10 @@ public partial class UserConfiguration
 
     public int Companyclientdefault { get; set; }
 
+
     public int Locationdefault { get; set; }
+
+    public int CompaniesContractId { get; set;}
 
     public int Bindcr1default { get; set; }
 

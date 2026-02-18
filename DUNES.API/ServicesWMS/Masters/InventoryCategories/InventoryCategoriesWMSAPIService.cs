@@ -2,7 +2,9 @@
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using Humanizer;
 using System.Net;
+using static Azure.Core.HttpHeader;
 
 namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
 {
@@ -204,6 +206,34 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
                 : "Inventory category deactivated successfully.";
 
             return ApiResponseFactory.Ok(true, message);
+        }
+        /// <summary>
+        /// check if exist in our system a category with the same name by company
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="name"></param>
+        /// <param name="excludeId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<ApiResponse<bool>> ExistsByNameAsync(int companyId, string name, int? excludeId, CancellationToken ct)
+        {
+            if (companyId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Company is required");
+
+            if (string.IsNullOrEmpty(name))
+                return ApiResponseFactory.BadRequest<bool>("Category Name is required");
+
+            var duplicate = await _repository.ExistsByNameAsync(companyId, name, excludeId, ct);
+            if (duplicate)
+            {
+                return ApiResponseFactory.Ok(true, "Category name found in our system");
+            }
+            else
+            {
+
+                return ApiResponseFactory.Ok(false, "Category name NOT FOUND in our system");
+            }
         }
     }
 }

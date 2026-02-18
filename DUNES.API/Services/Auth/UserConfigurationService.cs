@@ -243,7 +243,8 @@ namespace DUNES.API.Services.Auth
                     Transactiontransferdefault = entity.Transactiontransferdefault,
                     AllowChangeSettings = entity.AllowChangeSettings,
                     Deleteonlymytran = entity.Deleteonlymytran,
-                    Processonlymytran = entity.Processonlymytran
+                    Processonlymytran = entity.Processonlymytran,
+                    companiesContractId = entity.CompaniesContractId
                 };
             }
 
@@ -308,7 +309,8 @@ namespace DUNES.API.Services.Auth
                 Datecreated = DateTime.UtcNow,
                 Processonlymytran = upsert.Processonlymytran,
                 Roleid = upsert.Roleid,
-                Isdepot = upsert.Isdepot
+                Isdepot = upsert.Isdepot,
+                CompaniesContractId = upsert.companiesContractId
             };
 
             await _repo.CreateAsync(entity, ct);
@@ -518,7 +520,8 @@ namespace DUNES.API.Services.Auth
                 Deleteonlymytran = dto.Deleteonlymytran,
                 Processonlymytran = dto.Processonlymytran,
                 Roleid = dto.Roleid,
-                Isdepot = dto.Isdepot
+                Isdepot = dto.Isdepot,
+                companiesContractId = dto.companiesContractId
             };
         }
     }

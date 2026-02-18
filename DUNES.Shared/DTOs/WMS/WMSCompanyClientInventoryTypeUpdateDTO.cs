@@ -12,21 +12,12 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSCompanyClientInventoryTypeUpdateDTO
     {
-        /// <summary>
-        /// Mapping identity (required).
-        /// </summary>
+        /// <summary>Mapping ID.</summary>
         [Required]
+        [Range(1, int.MaxValue)]
         public int Id { get; set; }
 
-        /// <summary>
-        /// Inventory type ID (must stay the same).
-        /// </summary>
-        [Required]
-        public int InventoryTypeId { get; set; }
-
-        /// <summary>
-        /// Flag to activate or deactivate the mapping.
-        /// </summary>
-        public bool IsActive { get; set; }
+        /// <summary>Mapping-level enable flag.</summary>
+        public bool IsActive { get; set; } = true;
     }
 }

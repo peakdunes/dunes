@@ -148,7 +148,10 @@ namespace DUNES.API.Services.Auth
                     new Claim("companyClientId", userConfig.Data!.Companyclientdefault.ToString()),
 
                     // Location ID
-                    new Claim("locationId", userConfig.Data!.Locationdefault.ToString())
+                    new Claim("locationId", userConfig.Data!.Locationdefault.ToString()),
+
+                        // Contract ID
+                    new Claim("companiesContractId", userConfig.Data!.companiesContractId.ToString())
 
                 };
 
@@ -192,7 +195,8 @@ namespace DUNES.API.Services.Auth
                 companyClientName = userConfig.Data!.CompanyClientName,
                 LocationName = userConfig.Data!.LocationName,
                 Enviromentname = userConfig.Data!.Enviromentname,
-                RoleName = userConfig.Data.RoleName
+                RoleName = userConfig.Data.RoleName,
+                companiesContractId = userConfig.Data.companiesContractId
 
 
             });

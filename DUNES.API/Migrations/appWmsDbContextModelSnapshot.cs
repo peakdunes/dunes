@@ -240,7 +240,7 @@ namespace DUNES.API.Migrations
                     b.HasIndex("CompanyId", "CompanyClientId")
                         .IsUnique();
 
-                    b.ToTable("CompaniesContract");
+                    b.ToTable("CompaniesContract", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Company", b =>
@@ -1054,7 +1054,7 @@ namespace DUNES.API.Migrations
                         .IsUnique()
                         .HasFilter("[sku] IS NOT NULL");
 
-                    b.ToTable("items");
+                    b.ToTable("items", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Itemstatus", b =>
@@ -1271,7 +1271,7 @@ namespace DUNES.API.Migrations
                     b.HasIndex("CompanyId", "CompanyClientId", "TransactionConceptId")
                         .IsUnique();
 
-                    b.ToTable("TransactionConceptClients");
+                    b.ToTable("TransactionConceptClients", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.TransactionTypeClient", b =>
@@ -1303,7 +1303,7 @@ namespace DUNES.API.Migrations
                     b.HasIndex("CompanyId", "CompanyClientId", "TransactionTypeId")
                         .IsUnique();
 
-                    b.ToTable("TransactionTypeClients");
+                    b.ToTable("TransactionTypeClients", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Transactionconcepts", b =>
@@ -1330,7 +1330,7 @@ namespace DUNES.API.Migrations
 
                     b.HasIndex("companyId");
 
-                    b.ToTable("Transactionconcepts");
+                    b.ToTable("Transactionconcepts", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Masters.Transactiontypes", b =>
@@ -1439,7 +1439,7 @@ namespace DUNES.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ui_translation");
+                    b.ToTable("Ui_translation", (string)null);
                 });
 
             modelBuilder.Entity("DUNES.API.ModelsWMS.Transactions.Itemsbybin", b =>

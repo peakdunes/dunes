@@ -23,5 +23,6 @@ namespace DUNES.Shared.DTOs.Auth
         public string? LocationName { get; set; }
         public string? Enviromentname { get; set; }
         public string? RoleName { get; set; }
+        public int companiesContractId { get; set; }
     }
 }

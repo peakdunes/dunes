@@ -31,14 +31,27 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
             int id,
             CancellationToken ct);
 
+
         /// <summary>
-        /// Creates a new inventory category for the given company.
+        /// check if a category already exist in our system searching by name 
         /// </summary>
-        /// <param name="companyId">The company (tenant) identifier</param>
-        /// <param name="dto">Create DTO with inventory category data</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>ApiResponse with success flag</returns>
-        Task<ApiResponse<bool>> CreateAsync(
+        /// <param name="companyId"></param>
+        /// <param name="name"></param>
+        /// <param name="excludeId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<bool>> ExistsByNameAsync(int companyId, string name, int? excludeId, CancellationToken ct);
+        
+
+
+            /// <summary>
+            /// Creates a new inventory category for the given company.
+            /// </summary>
+            /// <param name="companyId">The company (tenant) identifier</param>
+            /// <param name="dto">Create DTO with inventory category data</param>
+            /// <param name="ct">Cancellation token</param>
+            /// <returns>ApiResponse with success flag</returns>
+            Task<ApiResponse<bool>> CreateAsync(
             int companyId,
             WMSInventorycategoriesCreateDTO dto,
             CancellationToken ct);

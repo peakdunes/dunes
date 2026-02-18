@@ -3,21 +3,27 @@
 namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
 {
     /// <summary>
-    /// Repository for managing item status mappings per client (CompaniesContract).
-    /// All queries must be scoped by CompanyId and CompanyClientId.
+    /// Repository contract for client-level item status enablement.
+    /// Anti-error principles:
+    /// - CompanyId and CompanyClientId are always taken from the token (never from body/query).
+    /// - No Update method is exposed to avoid changing ItemStatusId by mistake.
+    /// - Master catalog must be IsActive=true to allow enabling and to appear in enabled lists.
     /// </summary>
     public interface ICompanyClientItemStatusWMSAPIRepository
     {
         /// <summary>
-        /// Get all item status mappings assigned to the client.
+        /// Returns only the item statuses enabled for the current client:
+        /// - Mapping IsActive=true AND
+        /// - Master ItemStatus IsActive=true
         /// </summary>
-        Task<List<WMSCompanyClientItemStatusReadDTO>> GetAllAsync(
+        Task<List<WMSCompanyClientItemStatusReadDTO>> GetEnabledAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Get a specific item status mapping by ID.
+        /// Gets a mapping by Id (scoped by CompanyId + CompanyClientId).
+        /// Recommended behavior: if master is inactive, treat as not-enabled (return null).
         /// </summary>
         Task<WMSCompanyClientItemStatusReadDTO?> GetByIdAsync(
             int companyId,
@@ -26,7 +32,43 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             CancellationToken ct);
 
         /// <summary>
-        /// Check if a mapping already exists (excluding a specific ID if provided).
+        /// Creates a new mapping between the current client and a master item status.
+        /// Service must enforce:
+        /// - Master status exists and IsActive=true
+        /// - Uniqueness (CompanyId, CompanyClientId, ItemStatusId)
+        /// </summary>
+        Task<WMSCompanyClientItemStatusReadDTO> CreateAsync(
+            WMSCompanyClientItemStatusCreateDTO dto,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Activates or deactivates a mapping by mapping Id.
+        /// CRITICAL: activation must be rejected if master item status IsActive=false.
+        /// </summary>
+        Task<bool> SetActiveAsync(
+            int companyId,
+            int companyClientId,
+            int id,
+            bool isActive,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Replaces the enabled set for the client (bulk, anti-error).
+        /// Implementation should:
+        /// - Validate all IDs exist and are master-active
+        /// - Enable/create mappings for provided IDs
+        /// - Disable mappings not included in the provided list
+        /// </summary>
+        Task<bool> SetEnabledSetAsync(
+            int companyId,
+            int companyClientId,
+            List<int> itemStatusIds,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Checks if a mapping exists for a given client and master item status.
         /// </summary>
         Task<bool> ExistsAsync(
             int companyId,
@@ -36,31 +78,12 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             CancellationToken ct);
 
         /// <summary>
-        /// Create a new item status mapping for the client.
+        /// Validates that the master item status exists and is active.
+        /// Supports the business rule: master inactive => cannot be enabled for a client.
         /// </summary>
-        Task<WMSCompanyClientItemStatusReadDTO> CreateAsync(
-            WMSCompanyClientItemStatusCreateDTO dto,
+        Task<bool> IsMasterActiveAsync(
             int companyId,
-            int companyClientId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Update the IsActive flag of an existing mapping.
-        /// </summary>
-        Task<bool> UpdateAsync(
-            WMSCompanyClientItemStatusUpdateDTO dto,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Activate or deactivate a specific mapping.
-        /// </summary>
-        Task<bool> SetActiveAsync(
-            int companyId,
-            int companyClientId,
-            int id,
-            bool isActive,
+            int itemStatusId,
             CancellationToken ct);
     }
 }

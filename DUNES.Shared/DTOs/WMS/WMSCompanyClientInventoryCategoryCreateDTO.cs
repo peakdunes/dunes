@@ -12,15 +12,12 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSCompanyClientInventoryCategoryCreateDTO
     {
-        /// <summary>
-        /// Inventory category master ID to assign to the client.
-        /// </summary>
+        /// <summary>Master InventoryCategory ID to enable.</summary>
         [Required]
+        [Range(1, int.MaxValue)]
         public int InventoryCategoryId { get; set; }
 
-        /// <summary>
-        /// Optional initial active flag (default true).
-        /// </summary>
+        /// <summary>Mapping-level enable flag (default true).</summary>
         public bool IsActive { get; set; } = true;
     }
 }
