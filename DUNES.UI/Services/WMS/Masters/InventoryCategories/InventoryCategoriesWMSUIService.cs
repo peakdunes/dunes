@@ -1,6 +1,7 @@
 ﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.UI.Services.Common;
+using System.Xml.Linq;
 
 namespace DUNES.UI.Services.WMS.Masters.InventoryCategories
 {
@@ -36,9 +37,12 @@ namespace DUNES.UI.Services.WMS.Masters.InventoryCategories
         
 
         public Task<ApiResponse<List<WMSInventorycategoriesReadDTO>>> GetActiveAsync(string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        
+            => GetApiAsync<List<WMSInventorycategoriesReadDTO>>(
+                $"/api/wms/masters/inventory-categories/GetAll",
+                token,
+                ct);
+        
 
         public Task<ApiResponse<List<WMSInventorycategoriesReadDTO>>> GetAllAsync(string token, CancellationToken ct)
         {

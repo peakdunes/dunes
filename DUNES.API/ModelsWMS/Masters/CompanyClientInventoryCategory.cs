@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DUNES.API.ModelsWMS.Masters
 {
@@ -26,6 +27,8 @@ namespace DUNES.API.ModelsWMS.Masters
         /// FK to master InventoryCategories catalog.
         /// Only categories with master IsActive=true can be enabled for a client.
         /// </summary>
+        /// 
+        [Display(Name ="Category ID")]
         public int InventoryCategoryId { get; set; }
 
         /// <summary>
@@ -33,6 +36,13 @@ namespace DUNES.API.ModelsWMS.Masters
         /// Note: master catalog must also be IsActive=true to be considered enabled.
         /// </summary>
         public bool IsActive { get; set; } = true;
+
+        /// <summary>
+        /// Navigation: Compay entity (optional but useful for FK integrity and joins).
+        /// </summary>
+        [ForeignKey(nameof(CompanyId))]
+        public virtual Company CompanyNavigation { get; set; } = null!;
+
 
         /// <summary>
         /// Navigation: Client entity (optional but useful for FK integrity and joins).

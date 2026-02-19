@@ -1,6 +1,4 @@
-﻿
-
-using AutoMapper;
+﻿using AutoMapper;
 using DUNES.API.Auth.Authorization;
 using DUNES.API.ControllersWMS.Masters.CompaniesContract;
 using DUNES.API.ControllersWMS.Masters.CompanyClientDivision;
@@ -54,6 +52,7 @@ using DUNES.API.Services.Inventory.PickProcess.Transactions;
 using DUNES.API.Services.Masters;
 using DUNES.API.Services.WebService.Queries;
 using DUNES.API.Services.WebService.Transactions;
+using DUNES.API.ServicesWMS.Admin;
 using DUNES.API.ServicesWMS.Auth;
 using DUNES.API.ServicesWMS.Inventory.Common.Queries;
 using DUNES.API.ServicesWMS.Inventory.Transactions;
@@ -98,120 +97,103 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using System;
 using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.RateLimiting;
-
-
-
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ***** (1) Apaga providers por defecto del host (console/debug), para que solo Serilog loguee
+builder.Logging.ClearProviders();
 
+// ***** (2) Serilog: inicializa desde appsettings y opcionalmente a consola
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.Console()
+    .WriteTo.Console() // opcional (útil en DEV)
     .CreateLogger();
 
-builder.Host.UseSerilog();
+// ***** (3) Serilog reemplaza al logger del host y lee DI (evita logs del host fuera de Serilog)
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext();
+});
 
 //GET HTTP Information SERVICE (Auditory)
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IRequestInfo, RequestInfo>();
 builder.Services.AddScoped<IAuditContext, AuditContext>();
 builder.Services.AddScoped<AuditSaveChangesInterceptor>();
 
-
-
-
-//DBK database conection
+// DBK database connection
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-//DBKWMS database conecton
+// DBKWMS database connection
 builder.Services.AddDbContext<appWmsDbContext>((sp, options) =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection"));
-    //interceptor do auditory insert record for Insert, Update and Delete transactions
+    // interceptor auditoría
     options.AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
 });
 
-//User administration with Identity
+// User administration with Identity
 builder.Services.AddDbContext<IdentityDbContext>(options =>
-options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
-//options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
 
-//authentication services
-
+// Authentication services
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
-
-
 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
-    .AddJwtBearer(options =>
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = "DUNES.API",
-            ValidAudience = "DUNES.API",
-            IssuerSigningKey = new SymmetricSecurityKey(
-           Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
-        };
- 
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = "DUNES.API",
+        ValidAudience = "DUNES.API",
+        IssuerSigningKey = new SymmetricSecurityKey(
+            Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]))
+    };
 });
 
-
-
-// Add services to the container.
-
-
-
+// Controllers + JSON
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
-        //Convierte los nombres de las propiedades a camelCase (ej: processDate en vez de ProcessDate) — esto es lo esperado por JSON estándar
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
-        //Evita errores por ciclos de referencia al serializar relaciones (útil si en algún modelo tienes navegación entre entidades)
-        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-        //asegura que nada se omita, incluso si está null, false, 0, etc. — necesario para que ProcessDate, Warnings y Error aparezcan siempre
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
     });
 
-
-
 builder.Services.AddEndpointsApiExplorer();
 
-//para mostrar swagger
-
-//builder.Services.AddSwaggerGen();
+// Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     c.IncludeXmlComments(xmlPath);
 
-
-    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "DUNES.API",
         Version = "v1",
         Description = "API to repair process and inventory administration",
-        Contact = new Microsoft.OpenApi.Models.OpenApiContact
+        Contact = new OpenApiContact
         {
             Name = "Soporte DUNES",
             Email = "herledy.lopez@peaktech.com"
@@ -247,24 +229,20 @@ builder.Services.AddSwaggerGen(c =>
     c.TagActionsBy(api =>
     {
         var controllerName = api.GroupName ?? api.ActionDescriptor.RouteValues["controller"];
-
         return controllerName switch
         {
-
             //#########
             //WMS AUTH
             //#########
             "UserConfiguration" => new[] { "AUTH User Configuration" },
             "Auth" => new[] { "AUTH User Authentication" },
-            
+
             //#########
             //INV
             //#########
-
             "CommonQueryINV" => new[] { "Inventory - Common Queries" },
             "PickProcessINV" => new[] { "Inventory - Pick Process" },
             "CommonQueryASNINV" => new[] { "Inventory ASN - Common queries" },
-
 
             //#########
             //INV WMS
@@ -276,41 +254,23 @@ builder.Services.AddSwaggerGen(c =>
             //WMS MASTERS
             //#########
             "ClientCompaniesWMS" => new[] { "WMS - Client Companies" },
-
             "StatesCountriesWMS" => new[] { "WMS - States (Countries)" },
-
             "CitiesWMS" => new[] { "WMS - Cities" },
-
             "CountriesWMS" => new[] { "WMS - Countries" },
-
             "WmsCompanyclient" => new[] { "WMS Company Clients - CRUD" },
-
             "CompanyClientDivisionWMS" => new[] { "WMS Company Clients Division - CRUD" },
-
             "CompaniesContractWMS" => new[] { "WMS Company Clients Contract - CRUD" },
-
             "LocationsWMS" => new[] { "WMS Locations - CRUD" },
-
             "RacksWMS" => new[] { "WMS Racks - CRUD" },
-
             "BinsWMS" => new[] { "WMS Bins - CRUD" },
-
             "ItemsWMS" => new[] { "WMS Items - CRUD" },
-
             "TransactionConceptsWMS" => new[] { "WMS Transaction Concepts - CRUD" },
-
             "InventoryCategoriesWMS" => new[] { "WMS Inventory Categories - CRUD" },
-
             "TransactionTypesWMS" => new[] { "WMS Transaction Types - CRUD" },
-
             "ItemStatusWMS" => new[] { "WMS Item Status - CRUD" },
-
             "InventoryTypesWMS" => new[] { "WMS Inventory Types - CRUD" },
-
             "CompanyClientInventoryCategoryWMS" => new[] { "WMS Inventory Categories per Client - CRUD" },
-
             "CompanyClientInventoryTypeWMS" => new[] { "WMS Inventory Types per client - CRUD" },
-
             "CompanyClientItemStatusWMS" => new[] { "WMS Item Status per client - CRUD" },
 
             //#########
@@ -319,12 +279,7 @@ builder.Services.AddSwaggerGen(c =>
             "MasterInventory" => new[] { "Inventory Item Master - CRUD" },
             "ConsignmentCallType" => new[] { "Inventory Calls - CRUD" },
             "TzebB2bInventoryType" => new[] { "Inventory Types - CRUD" },
-           
             "mvcGeneralParameters" => new[] { "General Parameters - CRUD" },
-           
-
-
-
 
             //#########
             //B2B
@@ -334,228 +289,172 @@ builder.Services.AddSwaggerGen(c =>
             "TzebWorkCodesTargets" => new[] { "B2B - Work Target Codes CRUD" },
             "CommonQueryB2B" => new[] { "B2B - Common queries" },
             "CommonQueryWMSMaster" => new[] { "WMS Master Tables - Common queries" },
-            
+
             _ => new[] { controllerName }
         };
     });
 });
 
+//SERVICES 
+//#######################
+//ADMIN SERVICES
+//#######################
 
-//SERVICES
+builder.Services.AddScoped<IErrorLogService, ErrorLogService>();
+
+//#######################
+//END ADMIN SERVICES
+//#######################
 
 
-
+//#######################
 //AUTHENTICATION SERVICES
+//#######################
+
+
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 builder.Services.AddScoped<IUserConfigurationService, UserConfigurationService>();
-
-
 builder.Services.AddScoped<IUserConfigurationRepository, UserConfigurationRepository>();
 builder.Services.AddScoped<IAuthPermissionRepository, AuthPermissionRepository>();
 builder.Services.AddScoped<IAuthPermissionService, AuthPermissionService>();
-//builder.Services.AddScoped<RequiresPermissionFilter>();
-
-
-
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITraceProvider, TraceProvider>();
-
-
-
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
-
-
-//save error exception log in database table dbk_mvc_logs_api
 builder.Services.AddScoped<LogHelper>();
 
+//#######################
+//END AUTHENTICATION SERVICES
+//#######################
+
+//#######################
 //B2B SERVICES
-//Query services and repository
+//#######################
+
+
 builder.Services.AddScoped<ICommonQueryB2BRepository, CommonQueryB2BRepository>();
 builder.Services.AddScoped<ICommonQueryB2BService, CommonQueryB2BService>();
-
-//INV SERVICES
-
 builder.Services.AddScoped<ICommonQueryASNINVRepository, CommonQueryASNINVRepository>();
 builder.Services.AddScoped<ICommonQueryASNINVService, CommonQueryASNINVService>();
-
 builder.Services.AddScoped<ICommonQueryPickProcessINVRepository, CommonQueryPickProcessINVRepository>();
 builder.Services.AddScoped<ICommonQueryPickProcessINVService, CommonQueryPickProcessINVService>();
-                             
 
-builder.Services.AddScoped<ITransactionsPickProcessINVRepository, TransactionsPickProcessINVRepository>();
-builder.Services.AddScoped<ITransactionsPickProcessINVService, TransactionsPickProcessINVService>();
+//builder.Services.AddScoped<ITransactionsPickProcessINVRepository, TransactionsPickProcessINVRepository>();
 
+//builder.Services.AddScoped<ITransactionsPickProcessINVService, TransactionsPickProcessINVService>();
 
-builder.Services.AddScoped<ITransactionsASNINVRepository, TransactionsASNINVRepository>();
-builder.Services.AddScoped<ITransactionsASNINVService, TransactionsASNINVService>();
+//builder.Services.AddScoped<ITransactionsASNINVRepository, TransactionsASNINVRepository>();
+//builder.Services.AddScoped<ITransactionsASNINVService, TransactionsASNINVService>();
 
 builder.Services.AddScoped<ITransactionsCommonINVRepository, TransactionsCommonINVRepository>();
-
-
-
 builder.Services.AddScoped<ICommonQueryINVRepository, CommonQueryINVRepository>();
 builder.Services.AddScoped<ICommonQueryINVService, CommonQueryINVService>();
-
-//generic service for master tables
 builder.Services.AddScoped(typeof(IMasterRepository<>), typeof(MasterRepository<>));
-
-//para usar en el CRUD de las tablas maestras
 builder.Services.AddScoped(typeof(IMasterService<,>), typeof(MasterService<,>));
-
-//VALIDATOR SERVICES
 builder.Services.AddFluentValidationAutoValidation();
+
+//#######################
+//END B2B SERVICES
+//#######################
+
+//#######################
+//WMS SERVICES
+//#######################
+
+
 builder.Services.AddScoped<IValidator<WMSClientCompaniesDTO>, ClientCompaniesWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSCompanyClientDivisionDTO>, CompaniesClientDivisionWMSAPIValidator>();
-
 builder.Services.AddScoped<IValidator<WMSCompaniesContractDTO>, CompaniesContractWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<WMSLocationsUpdateDTO>, LocationsWMSAPIValidator>();
 builder.Services.AddScoped<IValidator<UserConfigurationUpdateDto>, UserConfigurationValidator>();
 
-
-//WMS MASTER SERVICES
-
 builder.Services.AddScoped<IStateCountriesWMSAPIRepository, StateCountriesWMSAPIRepository>();
 builder.Services.AddScoped<IStateCountriesWMSAPIService, StateCountriesWMSAPIService>();
-
 builder.Services.AddScoped<ICitiesWMSAPIRepository, CitiesWMSAPIRepository>();
 builder.Services.AddScoped<ICitiesWMSAPIService, CitiesWMSAPIService>();
-
-
 builder.Services.AddScoped<ICommonQueryWMSMasterRepository, CommonQueryWMSMasterRepository>();
 builder.Services.AddScoped<ICommonQueryWMSMasterService, CommonQueryWMSMasterService>();
-
 builder.Services.AddScoped<ICompaniesWMSAPIRepository, CompaniesWMSAPIRepository>();
-
 builder.Services.AddScoped<IClientCompaniesWMSAPIRepository, ClientCompaniesWMSAPIRepository>();
 builder.Services.AddScoped<IClientCompaniesWMSAPIService, ClientCompaniesWMSAPIService>();
 builder.Services.AddScoped<ICompaniesWMSAPIService, CompaniesWMSAPIService>();
-
 builder.Services.AddScoped<ICommandCompaniesClientDivisionWMSAPIRepository, CommandCompaniesClientDivisionWMSAPIRepository>();
 builder.Services.AddScoped<IQueryCompaniesClientDivisionWMSAPIRepository, QueryCompaniesClientDivisionWMSAPIRepository>();
 builder.Services.AddScoped<ICompaniesClientDivisionWMSAPIService, CompaniesClientDivisionWMSAPIService>();
-
 builder.Services.AddScoped<ICommandCompaniesContractWMSAPIRepository, CommandCompaniesContractWMSAPIRepository>();
 builder.Services.AddScoped<IQueryCompaniesContractWMSAPIRepository, QueryCompaniesContractWMSAPIRepository>();
 builder.Services.AddScoped<ICompaniesContractWMSAPIService, CompaniesContractWMSAPIService>();
-
 builder.Services.AddScoped<ICountriesWMSAPIRepository, CountriesWMSAPIRepository>();
 builder.Services.AddScoped<ICountriesWMSAPIService, CountriesWMSAPIService>();
-
 builder.Services.AddScoped<IRacksWMSAPIRepository, RacksWMSAPIRepository>();
 builder.Services.AddScoped<IRacksWMSAPIService, RacksWMSAPIService>();
-
 builder.Services.AddScoped<IBinsWMSAPIRepository, BinsWMSAPIRepository>();
 builder.Services.AddScoped<IBinsWMSAPIService, BinsWMSAPIService>();
-
 builder.Services.AddScoped<ITransactionConceptsWMSAPIRepository, TransactionConceptsWMSAPIRepository>();
 builder.Services.AddScoped<ITransactionConceptsWMSAPIService, TransactionConceptsWMSAPIService>();
-
-
 builder.Services.AddScoped<ITransactionConceptClientWMSAPIRepository, TransactionConceptClientWMSAPIRepository>();
 builder.Services.AddScoped<ITransactionConceptClientWMSAPIService, TransactionConceptClientWMSAPIService>();
-
-
-
 builder.Services.AddScoped<ITransactionTypesWMSAPIRepository, TransactionTypesWMSAPIRepository>();
 builder.Services.AddScoped<ITransactionsTypeWMSAPIService, TransactionsTypeWMSAPIService>();
-
-
 builder.Services.AddScoped<TransactionTypeClientWMSAPIRepository, TransactionTypeClientWMSAPIRepository>();
 builder.Services.AddScoped<ITransactionTypeClientWMSAPIService, TransactionTypeClientWMSAPIService>();
-
-
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIRepository, InventoryCategoriesWMSAPIRepository>();
 builder.Services.AddScoped<IInventoryCategoriesWMSAPIService, InventoryCategoriesWMSAPIService>();
-
-
 builder.Services.AddScoped<IInventoryTypesWMSAPIRepository, InventoryTypesWMSAPIRepository>();
 builder.Services.AddScoped<IInventoryTypesWMSAPIService, InventoryTypesWMSAPIService>();
-
 builder.Services.AddScoped<IItemStatusWMSAPIRepository, ItemStatusWMSAPIRepository>();
 builder.Services.AddScoped<IItemStatusWMSAPIService, ItemStatusWMSAPIService>();
-
-builder.Services.AddScoped<ICompanyClientInventoryCategoryWMSAPIRepository, CompanyClientInventoryCategoryWMSAPIRepository> ();
+builder.Services.AddScoped<ICompanyClientInventoryCategoryWMSAPIRepository, CompanyClientInventoryCategoryWMSAPIRepository>();
 builder.Services.AddScoped<ICompanyClientInventoryCategoryService, CompanyClientInventoryCategoryService>();
-
 builder.Services.AddScoped<ICompanyClientInventoryTypeWMSAPIRepository, CompanyClientInventoryTypeWMSAPIRepository>();
 builder.Services.AddScoped<ICompanyClientInventoryTypeService, CompanyClientInventoryTypeService>();
-
 builder.Services.AddScoped<ICompanyClientItemStatusWMSAPIRepository, CompanyClientItemStatusWMSAPIRepository>();
 builder.Services.AddScoped<ICompanyClientItemStatusService, CompanyClientItemStatusService>();
-
-
-builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository,TransactionTypeClientWMSAPIRepository>();
-
-
+builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository, TransactionTypeClientWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();
-
 builder.Services.AddScoped<IItemsWMSAPIRepository, ItemsWMSAPIRepository>();
 builder.Services.AddScoped<IItemsWMSAPIService, ItemsWMSAPIService>();
 
-
-
-//WEB SERVICE SERVICES
-
-builder.Services.AddScoped<ICommonQueryWebServiceRepository, CommonQueryWebServiceRepository>();
-builder.Services.AddScoped<ITransactionsWebServiceRepository, TransactionsWebServiceRepository>();
-
-
-builder.Services.AddScoped<ICommonQueryWebServiceService, CommonQueryWebServiceService>();
-builder.Services.AddScoped<ITransactionsWebServiceService, TransactionsWebServiceService>();
+//#######################
+//END WMS SERVICES
+//#######################
 
 
 
-//WMS INV SERVICES
-
-builder.Services.AddScoped<ICommonQueryWMSINVRepository, CommonQueryWMSINVRepository>();
-builder.Services.AddScoped<ICommonQueryWMSINVService, CommonQueryWMSINVService>();
-builder.Services.AddScoped<ITransactionsWMSINVService, TransactionsWMSINVService>();
-builder.Services.AddScoped<ITransactionsWMSINVRepository, TransactionsWMSINVRepository>();
-
-
-
-
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 
 var app = builder.Build();
 
+// Swagger solo en Development (evita duplicados y exposición en Prod)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "DUNES.API v1");
-        c.RoutePrefix = "docs"; // 👉 la doc estará en /docs
+        c.RoutePrefix = "docs"; // la doc estará en /docs
         c.DocumentTitle = "DUNES.API Docs";
-        c.InjectStylesheet("/swagger-ui/custom.css"); // CSS custom (lo haremos ahora)
+        c.InjectStylesheet("/swagger-ui/custom.css");
     });
 }
 
+// ***** (4) Orden del pipeline recomendado
 
-// Middleware: obtiene informacion de la transaccion 
+app.UseRouting();
+
+// (A) Middleware de traza/correlación (X-Trace-Id)
 app.Use(async (ctx, next) =>
 {
-    //esta variable "reqInfo" toma los datos claves del request 
-    //(Method, Path, Query) para dejarlos en un servicio scoped (IRequestInfo)
-    //para que por ID podamos mostrarlos en cualquier parte del API
-
     var reqInfo = ctx.RequestServices.GetRequiredService<IRequestInfo>();
     reqInfo.Path = ctx.Request.Path.Value;
     reqInfo.Method = ctx.Request.Method;
     reqInfo.Query = ctx.Request.QueryString.Value;
 
-    // TraceId: toma del header o genera
     var traceId = ctx.Request.Headers["X-Trace-Id"].FirstOrDefault() ?? Guid.NewGuid().ToString();
-    ctx.Items["TraceId"] = traceId; // disponible para el resto del pipeline
+    ctx.Items["TraceId"] = traceId;
 
-    // Escribir el header justo antes de enviar la respuesta (evita el error de headers read-only)
     ctx.Response.OnStarting(() =>
     {
         if (!ctx.Response.Headers.ContainsKey("X-Trace-Id"))
@@ -563,16 +462,12 @@ app.Use(async (ctx, next) =>
         return Task.CompletedTask;
     });
 
-
     await next();
 });
 
-//escribe log de transacciones usando Serilog, y aqui en opts adicionamos 
-//TraceId UserName CLienteIp y queryString al archivo de log
+// (B) Serilog request logging: 1 línea por request con TraceId/User/IP
 app.UseSerilogRequestLogging(opts =>
 {
-
-    //este es el formato del log que muestra en cada linea del archivo.
     opts.MessageTemplate =
         "HTTP {RequestMethod} {RequestPath}{QueryString} responded {StatusCode} in {Elapsed:0.0000} ms | TraceId={TraceId} User={UserName} Ip={ClientIp}";
 
@@ -590,23 +485,16 @@ app.UseSerilogRequestLogging(opts =>
     };
 });
 
-
-
-app.UseSwagger();
-app.UseSwaggerUI();
-
-
-
-app.UseRouting();
-
+// (C) Manejo global de excepciones (tu middleware limpio y centralizado)
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseAuthentication();
 
+// (D) Contexto de compañía (siempre después de autenticación)
 app.UseMiddleware<CompanyContextMiddleware>();
 
 app.UseAuthorization();
-app.MapControllers();
 
+app.MapControllers();
 
 app.Run();

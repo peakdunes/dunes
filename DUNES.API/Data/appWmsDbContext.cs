@@ -220,18 +220,46 @@ namespace DUNES.API.Data
             });
 
             // CompanyClientInventoryCategory
+            //modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
+            //{
+            //    e.ToTable("CompanyClientInventoryCategories");
+            //    e.HasKey(x => x.Id);
+
+            //    e.HasOne<Company>()
+            //       .WithMany()
+            //       .HasForeignKey(x => x.CompanyId)
+            //       .OnDelete(DeleteBehavior.Restrict);
+
+            //    e.HasOne(x => x.InventoryCategoryNavigation)
+            //        .WithMany()
+            //        .HasForeignKey(x => x.InventoryCategoryId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+            //});
+
             modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
             {
                 e.ToTable("CompanyClientInventoryCategories");
                 e.HasKey(x => x.Id);
 
-              
-                e.HasOne(x => x.InventoryCategoryNavigation)
-                    .WithMany()
-                    .HasForeignKey(x => x.InventoryCategoryId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+                e.HasOne(x => x.CompanyNavigation)
+                 .WithMany()
+                 .HasForeignKey(x => x.CompanyId)
+                 .OnDelete(DeleteBehavior.Restrict);
 
+                e.HasOne(x => x.CompanyClientNavigation)
+                 .WithMany()
+                 .HasForeignKey(x => x.CompanyClientId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasOne(x => x.InventoryCategoryNavigation)
+                 .WithMany()
+                 .HasForeignKey(x => x.InventoryCategoryId)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+                e.HasIndex(x => new { x.CompanyId, x.CompanyClientId, x.InventoryCategoryId })
+                 .IsUnique()
+                 .HasDatabaseName("UX_CCInvCat_Company_Client_Category");
+            });
 
 
             modelBuilder.Entity<TransactionTypeClient>(entity =>

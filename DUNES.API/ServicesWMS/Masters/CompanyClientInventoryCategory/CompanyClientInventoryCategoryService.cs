@@ -33,8 +33,8 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
 
             var result = await _repository.GetEnabledAsync(companyId, companyClientId, ct);
 
-            if (result.Count == 0)
-                return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryCategoryReadDTO>>("No enabled categories found.");
+            //if (result.Count == 0)
+            //    return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryCategoryReadDTO>>("No enabled categories found.");
 
             return ApiResponseFactory.Ok(result);
         }

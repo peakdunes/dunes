@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260219132040_mig202602190819")]
+    partial class mig202602190819
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -422,10 +425,6 @@ namespace DUNES.API.Migrations
                     b.HasIndex("CompanyClientId");
 
                     b.HasIndex("InventoryCategoryId");
-
-                    b.HasIndex("CompanyId", "CompanyClientId", "InventoryCategoryId")
-                        .IsUnique()
-                        .HasDatabaseName("UX_CCInvCat_Company_Client_Category");
 
                     b.ToTable("CompanyClientInventoryCategories", (string)null);
                 });
@@ -1629,13 +1628,7 @@ namespace DUNES.API.Migrations
                     b.HasOne("DUNES.API.ModelsWMS.Masters.CompanyClient", "CompanyClientNavigation")
                         .WithMany()
                         .HasForeignKey("CompanyClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "CompanyNavigation")
-                        .WithMany()
-                        .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Inventorycategories", "InventoryCategoryNavigation")
@@ -1645,8 +1638,6 @@ namespace DUNES.API.Migrations
                         .IsRequired();
 
                     b.Navigation("CompanyClientNavigation");
-
-                    b.Navigation("CompanyNavigation");
 
                     b.Navigation("InventoryCategoryNavigation");
                 });

@@ -12,7 +12,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 {
     public class CompanyClientInventoryCategoryUIController : BaseController
     {
-        private readonly ICompanyClientInventoryCategoryWMSUIService _service;
+      
         private readonly ICompanyClientInventoryCategoryWMSUIService _inventoryCategoriesService;
         private readonly IInventoryCategoriesWMSUIService _masterCategoriesService;
         private readonly IMenuClientUIService _menuClientService;
@@ -21,12 +21,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
         private const string MENU_CODE_CRUD = "01020304ZZ";
 
         public CompanyClientInventoryCategoryUIController(
-            ICompanyClientInventoryCategoryWMSUIService service,
             ICompanyClientInventoryCategoryWMSUIService inventoryCategoriesService,
             IInventoryCategoriesWMSUIService masterCategoriesService,
             IMenuClientUIService menuClientService)
         {
-            _service = service;
             _inventoryCategoriesService = inventoryCategoriesService;
             _menuClientService = menuClientService;
             _masterCategoriesService = masterCategoriesService;
@@ -49,7 +47,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 
             return await HandleAsync(async ct =>
             {
-                var result = await _service.GetEnabledAsync(CurrentToken, ct);
+                var result = await _inventoryCategoriesService.GetEnabledAsync(CurrentToken, ct);
 
                 if (result.Data is null)
                 {
@@ -96,12 +94,13 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
             if (!ModelState.IsValid)
             {
                 await LoadCategoryDropdownAsync(CurrentToken, ct);
+
                 return View(dto);
             }
 
             return await HandleAsync(async ct =>
             {
-                var created = await _service.CreateAsync(dto, CurrentToken, ct);
+                var created = await _inventoryCategoriesService.CreateAsync(dto, CurrentToken, ct);
 
                 if (created.Data is null)
                 {
@@ -129,7 +128,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 
             return await HandleAsync(async ct =>
             {
-                var result = await _service.SetActiveAsync(id, isActive, CurrentToken, ct);
+                var result = await _inventoryCategoriesService.SetActiveAsync(id, isActive, CurrentToken, ct);
 
                 if (!result.Data)
                 {
@@ -158,7 +157,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
                 
 
             // 2) Existing enabled mappings (enough to prevent duplicates)
-            var mapped = await _service.GetEnabledAsync(token, ct);
+            var mapped = await _inventoryCategoriesService.GetEnabledAsync(token, ct);
             var mappedIds = (mapped.Data ?? new List<WMSCompanyClientInventoryCategoryReadDTO>())
                 .Select(x => x.InventoryCategoryId)
                 .ToHashSet();

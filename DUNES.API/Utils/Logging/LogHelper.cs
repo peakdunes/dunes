@@ -12,6 +12,11 @@ namespace DUNES.API.Utils.Logging
     {
         private readonly IConfiguration _config;
 
+
+        /// <summary>
+        /// constructor (DI)
+        /// </summary>
+        /// <param name="config"></param>
         public LogHelper(IConfiguration config)
         {
             _config = config;
@@ -32,7 +37,9 @@ namespace DUNES.API.Utils.Logging
         {
             try
             {
-                var cs = _config.GetConnectionString("DefaultConnection");
+              
+                var cs = _config.GetConnectionString("DefaultWMSConnection");
+
                 using var conn = new SqlConnection(cs);
                 await conn.OpenAsync(ct);
 
