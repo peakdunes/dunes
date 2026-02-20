@@ -113,6 +113,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
             };
 
             _db.CompanyClientInventoryCategories.Add(entity);
+
+           
+
             await _db.SaveChangesAsync(ct);
 
             return new WMSCompanyClientInventoryCategoryReadDTO

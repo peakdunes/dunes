@@ -80,6 +80,82 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
             return View(new WMSCompanyClientInventoryCategoryCreateDTO());
         }
 
+
+        public async Task<IActionResult> Edit(int id, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Edit Inventory Category Mapping", Url = null });
+
+
+
+            return await HandleAsync(async ct =>
+            {
+                var result = await _inventoryCategoriesService.GetByIdAsync(id, CurrentToken, ct);
+
+                if (result.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
+                    return View(new WMSCompanyClientInventoryCategoryReadDTO());
+                }
+
+                return View(result.Data);
+            }, ct);
+        }
+
+        // POST: DepotController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+      //  public async Task <IActionResult> Edit(int id, IFormCollection collection, CancellationToken ct)
+             public async Task<IActionResult> Edit(int id, WMSCompanyClientInventoryCategoryReadDTO collection, CancellationToken ct)
+        {
+            try
+            {
+                if (CurrentToken is null)
+                    return RedirectToLogin();
+
+                await SetMenuBreadcrumbAsync(
+                    MENU_CODE_CRUD,
+                    _menuClientService,
+                    ct,
+                    CurrentToken,
+                    new BreadcrumbItem { Text = "Edit Inventory Category Mapping", Url = null });
+
+                return await HandleAsync(async ct =>
+                {
+                    var result = await _inventoryCategoriesService.SetActiveAsync(id,  collection.IsActive, CurrentToken, ct);
+
+                    if (!result.Data)
+                    {
+                        MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
+                    }
+                    else
+                    {
+                        MessageHelper.SetMessage(this, "success",
+                            collection.IsActive ? "Mapping activated." : "Mapping deactivated.",
+                            MessageDisplay.Inline);
+                    }
+
+                    return RedirectToAction(nameof(Index));
+                }, ct);
+
+
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+
+
+
         /// <summary>
         /// Creates a new mapping (scoped by token).
         /// </summary>

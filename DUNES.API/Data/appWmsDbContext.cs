@@ -219,27 +219,15 @@ namespace DUNES.API.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // CompanyClientInventoryCategory
-            //modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
-            //{
-            //    e.ToTable("CompanyClientInventoryCategories");
-            //    e.HasKey(x => x.Id);
 
-            //    e.HasOne<Company>()
-            //       .WithMany()
-            //       .HasForeignKey(x => x.CompanyId)
-            //       .OnDelete(DeleteBehavior.Restrict);
-
-            //    e.HasOne(x => x.InventoryCategoryNavigation)
-            //        .WithMany()
-            //        .HasForeignKey(x => x.InventoryCategoryId)
-            //        .OnDelete(DeleteBehavior.Restrict);
-            //});
 
             modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
             {
                 e.ToTable("CompanyClientInventoryCategories");
                 e.HasKey(x => x.Id);
+
+                //e.Ignore("CompaniesContractId"); // TEMPORAL para matar shadow property vieja
+                //e.Ignore("CompaniesContractId1"); // TEMPORAL para matar shadow property vieja
 
                 e.HasOne(x => x.CompanyNavigation)
                  .WithMany()

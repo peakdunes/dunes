@@ -78,23 +78,16 @@ namespace DUNES.API.Controllers
 
         /// <summary>
         /// Registra el error en archivo (Serilog).
-        /// <para>
-        /// Incluye: TraceId, Route y mensaje base.
-        /// </para>
-        /// <para>
-        /// Nota: aquí sí pasamos la excepción como primer parámetro para que Serilog tenga el stack,
-        /// pero el mensaje base se mantiene corto.
-        /// </para>
+        /// En Development incluye stack trace completo; en Production solo headline.
         /// </summary>
-        /// <param name="ex">Excepción.</param>
-        /// <param name="origen">Etiqueta de origen (ej. [HANDLE]).</param>
         private void LogError(Exception ex, string origen = "[HELPER]")
         {
             var traceId = GetTraceId();
             var route = $"{Request?.Method} {Request?.Path}{Request?.QueryString}";
             var baseMsg = CleanBaseMessage(ex);
 
-            Log.Error(ex,
+            // Siempre headline limpio (sin stack)
+            Log.Error(
                 "{Origen} TraceId: {TraceId} | Route: {Route} | {Message}",
                 origen, traceId, route, baseMsg);
         }
@@ -145,7 +138,7 @@ namespace DUNES.API.Controllers
             // 4) Respuesta estándar
             return StatusCode(statusCode, ApiResponseFactory.Fail<T>(
                 baseMsg,
-                customMessage ?? "❌ Internal Server Error",
+                customMessage ?? "❌ Something went wrong while processing your request. If the issue continues, contact support.",
                 statusCode,
                 traceId
             ));

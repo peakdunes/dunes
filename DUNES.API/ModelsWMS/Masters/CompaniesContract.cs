@@ -102,7 +102,7 @@ namespace DUNES.API.ModelsWMS.Masters
        /// <summary>
        /// client categories navegation
        /// </summary>
-        public virtual ICollection<CompanyClientInventoryCategory> InventoryCategoryMappings { get; set; } = new List<CompanyClientInventoryCategory>();
+     //   public virtual ICollection<CompanyClientInventoryCategory> InventoryCategoryMappings { get; set; } = new List<CompanyClientInventoryCategory>();
 
 
     }
