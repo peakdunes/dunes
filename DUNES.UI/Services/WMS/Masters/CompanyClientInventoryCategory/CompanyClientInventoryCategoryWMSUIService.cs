@@ -14,6 +14,16 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
         public CompanyClientInventoryCategoryWMSUIService(IHttpClientFactory factory)
             : base(factory) { }
 
+
+        /// <inheritdoc/>
+        public Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetAllAsync(
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<List<WMSCompanyClientInventoryCategoryReadDTO>>(
+                "/api/wms/masters/company-client/inventory-categories/GetAll",
+                token,
+                ct);
+
         /// <inheritdoc/>
         public Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetEnabledAsync(
             string token,

@@ -30,6 +30,20 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
         }
 
         /// <summary>
+        /// Get all inventory categories for this client.
+        /// Returns only:
+        /// - mapping IsActive=true AND
+        /// - master catalog IsActive=true
+        [HttpGet("GetAll")]
+        public async Task<IActionResult> GetAll(CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
+                ct);
+        }
+
+
+        /// <summary>
         /// Get enabled inventory categories for this client.
         /// Returns only:
         /// - mapping IsActive=true AND
@@ -43,17 +57,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
                 ct);
         }
 
-        /// <summary>
-        /// (Optional backwards compatibility)
-        /// If you previously used GetAll, you can keep this route but return enabled results.
-        /// </summary>
-        [HttpGet("GetAll")]
-        public async Task<IActionResult> GetAll(CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
-                ct);
-        }
+      
 
         /// <summary>
         /// Get a specific client-category mapping by Id (scoped).

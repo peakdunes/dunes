@@ -19,6 +19,35 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
         }
 
         /// <inheritdoc />
+        public async Task<List<WMSCompanyClientInventoryCategoryReadDTO>> GetAllAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            // Enabled means: mapping IsActive=true AND master IsActive=true
+            return await _db.CompanyClientInventoryCategories
+                .AsNoTracking()
+                .Where(m => m.CompanyId == companyId
+                         && m.CompanyClientId == companyClientId
+                         )
+                .Join(
+                    _db.Inventorycategories.AsNoTracking()
+                        .Where(c => c.Active),
+                    m => m.InventoryCategoryId,
+                    c => c.Id,
+                    (m, c) => new WMSCompanyClientInventoryCategoryReadDTO
+                    {
+                        Id = m.Id,
+                        InventoryCategoryId = c.Id,
+                        InventoryCategoryName = c.Name,
+                        IsActive = m.IsActive
+                    })
+                .OrderBy(x => x.InventoryCategoryName)
+                .ToListAsync(ct);
+        }
+
+
+        /// <inheritdoc />
         public async Task<List<WMSCompanyClientInventoryCategoryReadDTO>> GetEnabledAsync(
             int companyId,
             int companyClientId,

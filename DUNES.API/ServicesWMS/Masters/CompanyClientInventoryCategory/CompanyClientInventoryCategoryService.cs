@@ -23,6 +23,24 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
         }
 
         /// <inheritdoc/>
+        public async Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetAllAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            if (companyId <= 0 || companyClientId <= 0)
+                return ApiResponseFactory.BadRequest<List<WMSCompanyClientInventoryCategoryReadDTO>>("Company or Client is required.");
+
+            var result = await _repository.GetAllAsync(companyId, companyClientId, ct);
+
+            //if (result.Count == 0)
+            //    return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryCategoryReadDTO>>("No enabled categories found.");
+
+            return ApiResponseFactory.Ok(result);
+        }
+
+
+        /// <inheritdoc/>
         public async Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetEnabledAsync(
             int companyId,
             int companyClientId,

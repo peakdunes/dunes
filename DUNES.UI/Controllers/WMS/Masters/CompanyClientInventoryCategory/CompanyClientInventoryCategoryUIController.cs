@@ -47,7 +47,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 
             return await HandleAsync(async ct =>
             {
-                var result = await _inventoryCategoriesService.GetEnabledAsync(CurrentToken, ct);
+                var result = await _inventoryCategoriesService.GetAllAsync(CurrentToken, ct);
 
                 if (result.Data is null)
                 {

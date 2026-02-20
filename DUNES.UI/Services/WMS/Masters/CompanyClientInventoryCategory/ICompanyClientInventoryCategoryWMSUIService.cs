@@ -9,6 +9,18 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
     /// </summary>
     public interface ICompanyClientInventoryCategoryWMSUIService
     {
+
+        /// <summary>
+        /// Get all inventory categories for the current client.
+        /// Returns only:
+        /// - mapping IsActive=true AND
+        /// - master catalog IsActive=true
+        /// </summary>
+        Task<ApiResponse<List<WMSCompanyClientInventoryCategoryReadDTO>>> GetAllAsync(
+            string token,
+            CancellationToken ct);
+
+
         /// <summary>
         /// Get enabled inventory categories for the current client.
         /// Returns only:

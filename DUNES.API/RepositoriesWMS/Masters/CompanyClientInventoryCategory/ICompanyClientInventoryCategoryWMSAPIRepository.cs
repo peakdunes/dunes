@@ -13,6 +13,22 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
     /// </summary>
     public interface ICompanyClientInventoryCategoryWMSAPIRepository
     {
+
+        /// <summary>
+        /// Returns all categories for the current client.
+        /// Only returns rows where:
+        /// - Mapping IsActive=true AND
+        /// - Master InventoryCategory IsActive=true
+        /// </summary>
+        /// <param name="companyId">Company scope (from token).</param>
+        /// <param name="companyClientId">Client scope (from token).</param>
+        /// <param name="ct">Cancellation token.</param>
+        Task<List<WMSCompanyClientInventoryCategoryReadDTO>> GetAllAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+
         /// <summary>
         /// Returns the enabled categories for the current client.
         /// Only returns rows where:
