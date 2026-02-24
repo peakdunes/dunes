@@ -10,7 +10,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
     /// - No Update method is exposed to avoid changing InventoryCategoryId by mistake.
     /// - Master catalog must be IsActive=true to allow enabling and to appear in enabled lists.
     /// </summary>
-    public interface ICompanyClientInventoryCategoryService
+    public interface ICompanyClientInventoryCategoryWMSAPIService
     {
         /// <summary>
         /// Returns all categories for the current client:

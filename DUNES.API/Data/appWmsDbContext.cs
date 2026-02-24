@@ -176,22 +176,22 @@ namespace DUNES.API.Data
         /// <param name="modelBuilder">The builder used to construct the model for the context.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Enforce a single contract row per (CompanyId, CompanyClientId)
-            modelBuilder.Entity<CompaniesContract>(e =>
-            {
-                e.HasIndex(x => new { x.CompanyId, x.CompanyClientId }).IsUnique();
+            //// Enforce a single contract row per (CompanyId, CompanyClientId)
+            //modelBuilder.Entity<CompaniesContract>(e =>
+            //{
+            //    e.HasIndex(x => new { x.CompanyId, x.CompanyClientId }).IsUnique();
 
-                // These likely already exist; keep Restrict to avoid accidental deletes.
-                e.HasOne(x => x.CompanyNavegation)
-                    .WithMany()
-                    .HasForeignKey(x => x.CompanyId)
-                    .OnDelete(DeleteBehavior.Restrict);
+            //    // These likely already exist; keep Restrict to avoid accidental deletes.
+            //    e.HasOne(x => x.CompanyNavegation)
+            //        .WithMany()
+            //        .HasForeignKey(x => x.CompanyId)
+            //        .OnDelete(DeleteBehavior.Restrict);
 
-                e.HasOne(x => x.CompanyClientNavegation)
-                    .WithMany()
-                    .HasForeignKey(x => x.CompanyClientId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
+            //    e.HasOne(x => x.CompanyClientNavegation)
+            //        .WithMany()
+            //        .HasForeignKey(x => x.CompanyClientId)
+            //        .OnDelete(DeleteBehavior.Restrict);
+            //});
 
             // CompanyClientInventoryType
             modelBuilder.Entity<CompanyClientInventoryType>(e =>
@@ -207,18 +207,36 @@ namespace DUNES.API.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
-            // CompanyClientItemStatus
-            modelBuilder.Entity<CompanyClientItemStatus>(e =>
-            {
-                e.ToTable("CompanyClientItemStatuses");
-                e.HasKey(x => x.Id);
-                              
-                e.HasOne(x => x.ItemStatusNavigation)
-                    .WithMany()
-                    .HasForeignKey(x => x.ItemStatusId)
-                    .OnDelete(DeleteBehavior.Restrict);
-            });
 
+            modelBuilder.Entity<CompanyClientItemStatus>(entity =>
+            {
+                entity.ToTable("CompanyClientItemStatuses");
+
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.CompanyId).IsRequired();
+                entity.Property(e => e.CompanyClientId).IsRequired();
+                entity.Property(e => e.ItemStatusId).IsRequired();
+                entity.Property(e => e.IsActive).IsRequired();
+
+                // Mata propiedades sombra legacy (importante)
+                entity.Ignore("CompaniesContractId");
+                entity.Ignore("CompaniesContractId1");
+
+                entity.HasOne(e => e.CompanyClientNavigation)
+                      .WithMany()
+                      .HasForeignKey(e => e.CompanyClientId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ItemStatusNavigation)
+                      .WithMany()
+                      .HasForeignKey(e => e.ItemStatusId)
+                      .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasIndex(e => new { e.CompanyId, e.CompanyClientId });
+                entity.HasIndex(e => new { e.CompanyId, e.CompanyClientId, e.ItemStatusId })
+                      .IsUnique();
+            });
 
 
             modelBuilder.Entity<CompanyClientInventoryCategory>(e =>
@@ -226,7 +244,7 @@ namespace DUNES.API.Data
                 e.ToTable("CompanyClientInventoryCategories");
                 e.HasKey(x => x.Id);
 
-                //e.Ignore("CompaniesContractId"); // TEMPORAL para matar shadow property vieja
+                // // TEMPORAL para matar shadow property vieja
                 //e.Ignore("CompaniesContractId1"); // TEMPORAL para matar shadow property vieja
 
                 e.HasOne(x => x.CompanyNavigation)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,9 +7,9 @@ using System.Threading.Tasks;
 namespace DUNES.Shared.DTOs.WMS
 {
     /// <summary>
-    /// Request DTO to update an existing ItemStatus mapping for a client.
+    /// Request DTO to activate or deactivate an existing ItemStatus mapping.
     /// </summary>
-    public class WMSCompanyClientItemStatusUpdateDTO
+    public class WMSCompanyClientItemStatusSetActiveDTO
     {
         /// <summary>
         /// Mapping identifier (surrogate key).
@@ -18,12 +17,7 @@ namespace DUNES.Shared.DTOs.WMS
         public int Id { get; set; }
 
         /// <summary>
-        /// FK to master Itemstatus catalog.
-        /// </summary>
-        public int ItemStatusId { get; set; }
-
-        /// <summary>
-        /// Mapping-level active flag.
+        /// New active status for the mapping.
         /// </summary>
         public bool IsActive { get; set; }
     }

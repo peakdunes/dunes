@@ -143,5 +143,44 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryTypes
 
             return ApiResponseFactory.Ok(true, message);
         }
+        /// <summary>
+        /// Deletes an inventory type master record physically only when it is not referenced
+        /// by client mappings or transactional records.
+        /// </summary>
+        /// <param name="id">Inventory type id.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <see cref="ApiResponse{T}"/> with <c>true</c> when deleted successfully.
+        /// Returns a failure response when the record is not found or has dependencies.
+        /// </returns>
+        public async Task<ApiResponse<bool>> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            // 1) Validate existence first (clear response instead of generic exception path)
+            var current = await _repository.GetByIdAsync(companyId, id, ct);
+            if (current is null)
+            {
+                return ApiResponseFactory.NotFound<bool>("Inventory type not found.");
+            }
+
+            // 2) Validate dependencies across all clients for the company
+            var hasDependencies = await _repository.HasDependenciesAsync(companyId, id, ct);
+            if (hasDependencies)
+            {
+                return ApiResponseFactory.Fail<bool>(error: "INVENTORY_IN_USE",
+                     message: "Inventory type is in use and cannot be deleted. Deactivate it instead.",
+                     statusCode: 409);
+
+
+            }
+            // 3) Physical delete
+            var deleted = await _repository.DeleteAsync(companyId, id, ct);
+
+            // 4) Return standard response
+            return ApiResponseFactory.Success(
+                data: deleted,
+                message: "Inventory type deleted successfully.",
+                statusCode: 200);
+        }
     }
 }

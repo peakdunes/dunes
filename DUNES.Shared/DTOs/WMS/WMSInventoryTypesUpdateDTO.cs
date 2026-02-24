@@ -41,5 +41,7 @@ namespace DUNES.Shared.DTOs.WMS
         /// Zebra integration association flag/value.
         /// </summary>
         public int Zebrainvassociated { get; set; }
+
+     
     }
 }

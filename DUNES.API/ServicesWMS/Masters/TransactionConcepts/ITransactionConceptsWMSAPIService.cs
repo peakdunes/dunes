@@ -1,4 +1,4 @@
-﻿using DUNES.API.ModelsWMS.Masters;
+﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
@@ -28,9 +28,9 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse containing a list of transaction concepts.
+        /// ApiResponse containing a list of transaction concepts (read DTO).
         /// </returns>
-        Task<ApiResponse<List<Transactionconcepts>>> GetAllAsync(
+        Task<ApiResponse<List<WMSTransactionconceptsReadDTO>>> GetAllAsync(
             int companyId,
             CancellationToken ct);
 
@@ -44,9 +44,9 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse containing a list of active transaction concepts.
+        /// ApiResponse containing a list of active transaction concepts (read DTO).
         /// </returns>
-        Task<ApiResponse<List<Transactionconcepts>>> GetActiveAsync(
+        Task<ApiResponse<List<WMSTransactionconceptsReadDTO>>> GetActiveAsync(
             int companyId,
             CancellationToken ct);
 
@@ -64,10 +64,10 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse containing the transaction concept if found;
-        /// otherwise, a NotFound or Forbidden response.
+        /// ApiResponse containing the transaction concept (read DTO) if found;
+        /// otherwise, a NotFound response.
         /// </returns>
-        Task<ApiResponse<Transactionconcepts>> GetByIdAsync(
+        Task<ApiResponse<WMSTransactionconceptsReadDTO>> GetByIdAsync(
             int companyId,
             int id,
             CancellationToken ct);
@@ -78,25 +78,24 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// BUSINESS RULES:
         /// - Name must be unique per CompanyId.
         /// - CompanyId must be assigned from the authenticated context.
-        /// - The transaction concept is created as Active by default
-        ///   unless specified otherwise.
+        /// - The transaction concept can be created active/inactive
+        ///   according to the request DTO.
         /// </summary>
+        /// <param name="request">
+        /// DTO containing the data required to create the transaction concept.
+        /// </param>
         /// <param name="companyId">
         /// Company (tenant) identifier provided by the Controller.
-        /// </param>
-        /// <param name="entity">
-        /// Transaction concept entity to be created.
-        /// The CompanyId property will be validated and enforced.
         /// </param>
         /// <param name="ct">
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse containing the newly created transaction concept.
+        /// ApiResponse containing the newly created transaction concept (read DTO).
         /// </returns>
-        Task<ApiResponse<Transactionconcepts>> CreateAsync(
+        Task<ApiResponse<WMSTransactionconceptsReadDTO>> CreateAsync(
+            WMSTransactionconceptsCreateDTO request,
             int companyId,
-            Transactionconcepts entity,
             CancellationToken ct);
 
         /// <summary>
@@ -107,26 +106,25 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// - CompanyId cannot be modified.
         /// - Name uniqueness must be preserved per CompanyId.
         /// </summary>
-        /// <param name="companyId">
-        /// Company (tenant) identifier provided by the Controller.
-        /// </param>
         /// <param name="id">
         /// Internal identifier of the transaction concept.
         /// </param>
-        /// <param name="entity">
-        /// Transaction concept entity containing updated values.
-        /// CompanyId will be validated and must not change.
+        /// <param name="request">
+        /// DTO containing updated values for the transaction concept.
+        /// </param>
+        /// <param name="companyId">
+        /// Company (tenant) identifier provided by the Controller.
         /// </param>
         /// <param name="ct">
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse containing the updated transaction concept.
+        /// ApiResponse containing the updated transaction concept (read DTO).
         /// </returns>
-        Task<ApiResponse<Transactionconcepts>> UpdateAsync(
-            int companyId,
+        Task<ApiResponse<WMSTransactionconceptsReadDTO>> UpdateAsync(
             int id,
-            Transactionconcepts entity,
+            WMSTransactionconceptsUpdateDTO request,
+            int companyId,
             CancellationToken ct);
 
         /// <summary>
@@ -135,25 +133,46 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// This operation performs a soft state change and does not
         /// remove the record from the database.
         /// </summary>
+        /// <param name="request">
+        /// DTO containing the transaction concept identifier and target active state.
+        /// </param>
         /// <param name="companyId">
         /// Company (tenant) identifier provided by the Controller.
-        /// </param>
-        /// <param name="id">
-        /// Internal identifier of the transaction concept.
-        /// </param>
-        /// <param name="isActive">
-        /// Indicates whether the transaction concept should be active.
         /// </param>
         /// <param name="ct">
         /// Cancellation token to cancel the asynchronous operation.
         /// </param>
         /// <returns>
-        /// ApiResponse indicating success or failure of the operation.
+        /// ApiResponse containing the updated transaction concept (read DTO).
         /// </returns>
-        Task<ApiResponse<bool>> SetActiveAsync(
+        Task<ApiResponse<WMSTransactionconceptsReadDTO>> SetActiveAsync(
+            WMSTransactionconceptsSetActiveDTO request,
             int companyId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Deletes a transaction concept from the master catalog.
+        /// 
+        /// BUSINESS RULES:
+        /// - The record must exist and belong to the specified CompanyId.
+        /// - Physical deletion is blocked if dependencies exist
+        ///   (for example, mappings in client configuration tables).
+        /// </summary>
+        /// <param name="id">
+        /// Internal identifier of the transaction concept.
+        /// </param>
+        /// <param name="companyId">
+        /// Company (tenant) identifier provided by the Controller.
+        /// </param>
+        /// <param name="ct">
+        /// Cancellation token to cancel the asynchronous operation.
+        /// </param>
+        /// <returns>
+        /// ApiResponse indicating whether the deletion was completed successfully.
+        /// </returns>
+        Task<ApiResponse<bool>> DeleteAsync(
             int id,
-            bool isActive,
+            int companyId,
             CancellationToken ct);
     }
 }

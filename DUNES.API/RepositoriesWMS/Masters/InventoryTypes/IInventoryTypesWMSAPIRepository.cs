@@ -28,5 +28,11 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
 
         /// <summary>Activates/deactivates an inventory type for the given tenant.</summary>
         Task<bool> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct);
+
+        /// <summary>Delete an inventory type.</summary>
+        Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct);
+
+        /// <summary>Checks whether the inventory type has related records that prevent physical deletion.</summary>
+        Task<bool> HasDependenciesAsync(int companyId, int id, CancellationToken ct);
     }
 }

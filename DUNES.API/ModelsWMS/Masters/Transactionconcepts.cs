@@ -5,7 +5,7 @@ namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
 /// inventory transactions concept
 /// </summary>
-public partial class Transactionconcepts
+public class Transactionconcepts
 {
     /// <summary>
     /// internal database id

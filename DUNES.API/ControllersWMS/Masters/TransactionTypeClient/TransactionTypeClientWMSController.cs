@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.TransactionTypeClient;
 using DUNES.Shared.DTOs.WMS;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.TransactionTypeClient
@@ -9,6 +10,7 @@ namespace DUNES.API.ControllersWMS.Masters.TransactionTypeClient
     /// Manages Transaction Type assignments per Company Client.
     /// </summary>
     [ApiController]
+    [Authorize]
     [Route("api/wms/masters/transaction-type-client")]
     public class TransactionTypeClientWMSController : BaseController
     {

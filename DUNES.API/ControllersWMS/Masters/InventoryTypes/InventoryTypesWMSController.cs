@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.InventoryTypes;
 using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -95,6 +96,23 @@ namespace DUNES.API.ControllersWMS.Masters.InventoryTypes
         {
             return await HandleApi(
                 ct => _service.SetActiveAsync(CurrentCompanyId, id, isActive, ct),
+                ct);
+        }
+
+        /// <summary>
+        /// Delete inventory type master
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpDelete("Delete/{id:int}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status409Conflict)]
+        public Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            return HandleApi<bool>(
+                token => _service.DeleteAsync(CurrentCompanyId, id,  token),
                 ct);
         }
     }

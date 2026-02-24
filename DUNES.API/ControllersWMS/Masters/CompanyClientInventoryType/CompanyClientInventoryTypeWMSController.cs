@@ -10,104 +10,129 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryType
 {
 
     /// <summary>
-    /// API controller for managing inventory types enabled for the current client.
-    ///
-    /// Scoped by:
-    /// - CompanyId (from token)
-    /// - CompanyClientId (from token)
-    ///
-    /// This controller contains NO business logic.
+    /// Manages client-level InventoryType mappings (enable/disable per client)
+    /// using tenant scope from token (CompanyId / CompanyClientId).
     /// </summary>
-    [Authorize]
     [ApiController]
-    [Route("api/wms/masters/company-client/inventory-types")]
+    [Authorize]
+    [Route("api/wms/masters/company-client/type-inventory")]
     public class CompanyClientInventoryTypeWMSController : BaseController
     {
-        private readonly ICompanyClientInventoryTypeService _service;
+        private readonly ICompanyClientInventoryTypeWMSAPIService _service;
 
-        /// <summary>Constructor (DI).</summary>
-        public CompanyClientInventoryTypeWMSController(ICompanyClientInventoryTypeService service)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CompanyClientInventoryTypeWMSController"/> class.
+        /// </summary>
+        /// <param name="service">Service for CompanyClientInventoryType business logic.</param>
+        public CompanyClientInventoryTypeWMSController(ICompanyClientInventoryTypeWMSAPIService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Get enabled inventory types for this client.
-        /// Returns only:
-        /// - mapping IsActive=true AND
-        /// - master catalog IsActive=true
+        /// Gets all InventoryType mappings for the current tenant scope (company + client),
+        /// including active and inactive mappings.
         /// </summary>
-        [HttpGet("GetEnabled")]
-        public async Task<IActionResult> GetEnabled(CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
-                ct);
-        }
-
-        /// <summary>
-        /// Backwards compatibility: previous route "GetAll" returns enabled results.
-        /// </summary>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Standard API response with the list of mappings.</returns>
         [HttpGet("GetAll")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
-                ct);
+            return await HandleApi(ct =>
+                 _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+
+           
+
         }
 
         /// <summary>
-        /// Get a specific client-inventory type mapping by Id (scoped).
+        /// Gets a specific InventoryType mapping by mapping Id within the current tenant scope.
         /// </summary>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Standard API response with the mapping if found.</returns>
         [HttpGet("GetById/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.GetByIdAsync(CurrentCompanyId, CurrentCompanyClientId, id, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.GetByIdAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Create a new client-inventory type mapping.
-        /// Note: master catalog must be active to allow creation/enabling.
+        /// Creates a new InventoryType mapping for the current tenant scope.
+        /// CompanyId and CompanyClientId are always taken from token.
         /// </summary>
+        /// <param name="request">Create DTO (tenant values are not accepted in body).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Standard API response with the created mapping.</returns>
         [HttpPost("Create")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<IActionResult> Create(
-            [FromBody] WMSCompanyClientInventoryTypeCreateDTO dto,
+            [FromBody] WMSCompanyClientInventoryTypeCreateDTO request,
             CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.CreateAsync(CurrentCompanyId, CurrentCompanyClientId, dto, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.CreateAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
+        ///// <summary>
+        ///// Updates an existing InventoryType mapping within the current tenant scope.
+        ///// CompanyId and CompanyClientId are always taken from token.
+        ///// </summary>
+        ///// <param name="request">Update DTO.</param>
+        ///// <param name="ct">Cancellation token.</param>
+        ///// <returns>Standard API response with the updated mapping.</returns>
+        //[HttpPut("Update")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status409Conflict)]
+        //public async Task<IActionResult> Update(
+        //    [FromBody] WMSCompanyClientInventoryTypeUpdateDTO request,
+        //    CancellationToken ct)
+        //{
+        //    return await HandleApi(ct =>
+        //        _service.UpdateAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+        //}
+
         /// <summary>
-        /// Activate or deactivate a mapping by mapping Id.
-        /// Note: activation must be rejected if master inventory type is inactive.
+        /// Deletes an InventoryType mapping by mapping Id within the current tenant scope.
         /// </summary>
-        [HttpPatch("SetActive/{id:int}")]
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Standard API response indicating delete result.</returns>
+        [HttpDelete("Delete/{id:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            return await HandleApi(ct =>
+                 _service.DeleteAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+        }
+
+
+        /// <summary>
+        /// Activates or deactivates an InventoryType mapping within the current tenant scope.
+        /// CompanyId and CompanyClientId are always taken from token.
+        /// </summary>
+        /// <param name="request">Set-active request DTO.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Standard API response with the updated mapping.</returns>
+        [HttpPatch("SetActive")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> SetActive(
-            int id,
-            [FromQuery] bool isActive,
+            [FromBody] WMSCompanyClientInventoryTypeSetActiveDTO request,
             CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.SetActiveAsync(CurrentCompanyId, CurrentCompanyClientId, id, isActive, ct),
-                ct);
-        }
-
-        /// <summary>
-        /// Replace the enabled set for the current client (bulk, anti-error).
-        /// Body: list of master InventoryTypeIds that should be enabled.
-        /// </summary>
-        [HttpPut("SetEnabledSet")]
-        public async Task<IActionResult> SetEnabledSet(
-            [FromBody] List<int> inventoryTypeIds,
-            CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.SetEnabledSetAsync(CurrentCompanyId, CurrentCompanyClientId, inventoryTypeIds, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.SetActiveAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
     }
 }

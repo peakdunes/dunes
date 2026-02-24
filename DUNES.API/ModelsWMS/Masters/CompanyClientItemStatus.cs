@@ -37,11 +37,11 @@ namespace DUNES.API.ModelsWMS.Masters
         /// <summary>
         /// Navigation: Client entity (optional but useful for FK integrity and joins).
         /// </summary>
-        [ForeignKey(nameof(CompanyClientId))]
+      
         public virtual CompanyClient CompanyClientNavigation { get; set; } = null!;
 
         /// <summary>Navigation: Itemstatus master catalog.</summary>
-        [ForeignKey(nameof(ItemStatusId))]
+      
         public virtual Itemstatus ItemStatusNavigation { get; set; } = null!;
     }
 }

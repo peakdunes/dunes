@@ -1,4 +1,5 @@
 ﻿using DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory;
+using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
@@ -12,14 +13,18 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
     /// - No UpdateAsync (avoid changing category IDs accidentally).
     /// - Use GetEnabledAsync and SetEnabledSetAsync.
     /// </summary>
-    public class CompanyClientInventoryCategoryService : ICompanyClientInventoryCategoryService
+    public class CompanyClientInventoryCategoryWMSAPIService : ICompanyClientInventoryCategoryWMSAPIService
     {
         private readonly ICompanyClientInventoryCategoryWMSAPIRepository _repository;
+        private readonly IInventoryCategoriesWMSAPIRepository _categoryrepository;
 
         /// <summary>Constructor (Dependency Injection).</summary>
-        public CompanyClientInventoryCategoryService(ICompanyClientInventoryCategoryWMSAPIRepository repository)
+        public CompanyClientInventoryCategoryWMSAPIService(
+            ICompanyClientInventoryCategoryWMSAPIRepository repository,
+            IInventoryCategoriesWMSAPIRepository categoryrepository)
         {
             _repository = repository;
+            _categoryrepository = categoryrepository;
         }
 
         /// <inheritdoc/>
@@ -94,10 +99,20 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
             if (dto.InventoryCategoryId <= 0)
                 return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryCategoryReadDTO>("InventoryCategoryId is required.");
 
-            // Enforce: master must be active
-            var masterActive = await _repository.IsMasterActiveAsync(companyId, dto.InventoryCategoryId, ct);
-            if (!masterActive)
+
+            // verified if this category exist in category master
+            var existCategory = await _categoryrepository.GetByIdAsync(companyId, dto.InventoryCategoryId, ct);
+            if (existCategory == null)
             {
+                return ApiResponseFactory.Fail<WMSCompanyClientInventoryCategoryReadDTO>(
+                    "MASTER_NOT_FOUND",
+                    "Inventory category not found (master catalog).",
+                    (int)HttpStatusCode.BadRequest);
+            }
+
+            if (!existCategory.Active)
+            {
+
                 return ApiResponseFactory.Fail<WMSCompanyClientInventoryCategoryReadDTO>(
                     "MASTER_INACTIVE",
                     "The selected inventory category is inactive (master catalog).",

@@ -7,20 +7,28 @@ using System.Threading.Tasks;
 namespace DUNES.Shared.DTOs.WMS
 {
     /// <summary>
-    /// Read DTO for item status mappings assigned to a client.
+    /// Read DTO for ItemStatus mappings assigned to a client.
     /// </summary>
     public class WMSCompanyClientItemStatusReadDTO
     {
-        /// <summary>Mapping ID.</summary>
+        /// <summary>
+        /// Mapping identifier (surrogate key).
+        /// </summary>
         public int Id { get; set; }
 
-        /// <summary>Master ItemStatus ID.</summary>
+        /// <summary>
+        /// FK to master Itemstatus catalog.
+        /// </summary>
         public int ItemStatusId { get; set; }
 
-        /// <summary>Status name (from master catalog).</summary>
+        /// <summary>
+        /// Display name from master Itemstatus catalog.
+        /// </summary>
         public string ItemStatusName { get; set; } = string.Empty;
 
-        /// <summary>Mapping-level enable flag.</summary>
+        /// <summary>
+        /// Mapping-level active flag.
+        /// </summary>
         public bool IsActive { get; set; }
     }
 }

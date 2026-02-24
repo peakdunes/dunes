@@ -273,6 +273,12 @@ builder.Services.AddSwaggerGen(c =>
             "CompanyClientInventoryTypeWMS" => new[] { "WMS Inventory Types per client - CRUD" },
             "CompanyClientItemStatusWMS" => new[] { "WMS Item Status per client - CRUD" },
 
+            "TransactionConceptClientWMS" => new[] { "WMS Transaction Concepts per client - CRUD" },
+            "TransactionTypeClientWMS" => new[] { "WMS Transaction Types per client - CRUD" },
+            
+
+
+
             //#########
             //MASTERS
             //#########
@@ -405,11 +411,11 @@ builder.Services.AddScoped<IInventoryTypesWMSAPIService, InventoryTypesWMSAPISer
 builder.Services.AddScoped<IItemStatusWMSAPIRepository, ItemStatusWMSAPIRepository>();
 builder.Services.AddScoped<IItemStatusWMSAPIService, ItemStatusWMSAPIService>();
 builder.Services.AddScoped<ICompanyClientInventoryCategoryWMSAPIRepository, CompanyClientInventoryCategoryWMSAPIRepository>();
-builder.Services.AddScoped<ICompanyClientInventoryCategoryService, CompanyClientInventoryCategoryService>();
+builder.Services.AddScoped<ICompanyClientInventoryCategoryWMSAPIService, CompanyClientInventoryCategoryWMSAPIService>();
 builder.Services.AddScoped<ICompanyClientInventoryTypeWMSAPIRepository, CompanyClientInventoryTypeWMSAPIRepository>();
-builder.Services.AddScoped<ICompanyClientInventoryTypeService, CompanyClientInventoryTypeService>();
+builder.Services.AddScoped<ICompanyClientInventoryTypeWMSAPIService, CompanyClientInventoryTypeWMSAPIService>();
 builder.Services.AddScoped<ICompanyClientItemStatusWMSAPIRepository, CompanyClientItemStatusWMSAPIRepository>();
-builder.Services.AddScoped<ICompanyClientItemStatusService, CompanyClientItemStatusService>();
+builder.Services.AddScoped<ICompanyClientItemStatusWMSAPIService, CompanyClientItemStatusWMSAPIService>();
 builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository, TransactionTypeClientWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();
@@ -437,6 +443,8 @@ if (app.Environment.IsDevelopment())
         c.RoutePrefix = "docs"; // la doc estará en /docs
         c.DocumentTitle = "DUNES.API Docs";
         c.InjectStylesheet("/swagger-ui/custom.css");
+        c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);  //abre todo colapsado solo titulos
+        c.DefaultModelsExpandDepth(-1); // oculta Schemas
     });
 }
 

@@ -2,6 +2,7 @@
 using DUNES.API.Data;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.Shared.DTOs.WMS;
+using Humanizer;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
@@ -119,6 +120,65 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
             entity.Active = isActive;
             await _db.SaveChangesAsync(ct);
             return true;
+        }
+        /// <summary>
+        /// Deletes an inventory type master record physically.
+        /// </summary>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="id">Inventory type id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> when the record is deleted successfully.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown when the inventory type does not exist for the company.</exception>
+        public async Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            var entity = await _db.InventoryTypes
+          .FirstOrDefaultAsync(x => x.Id == id && x.Idcompany == companyId, ct);
+
+            if (entity is null)
+                throw new KeyNotFoundException("Inventory type not found.");
+
+            _db.InventoryTypes.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+
+            return true;
+
+        }
+        /// <summary>
+        /// Checks whether the inventory type has related records that prevent physical deletion.
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public async Task<bool> HasDependenciesAsync(int companyId, int id, CancellationToken ct)
+        {
+            var hasClientMappings = await _db.CompanyClientInventoryTypes
+        .AsNoTracking()
+        .AnyAsync(x => x.CompanyId == companyId && x.InventoryTypeId == id, ct);
+
+            if (hasClientMappings)
+                return true;
+
+            var hasInventoryDetailUsage = await _db.Inventorydetail
+                .AsNoTracking()
+                .AnyAsync(x => x.Idcompany == companyId && x.Idtype == id, ct);
+
+            if (hasInventoryDetailUsage)
+                return true;
+
+            var hasInventoryMovementUsage = await _db.Inventorymovement
+                .AsNoTracking()
+                .AnyAsync(x => x.Idcompany == companyId && x.Idtype == id, ct);
+
+            if (hasInventoryMovementUsage)
+                return true;
+
+            var hasInventoryTransactionDetailUsage = await _db.InventorytransactionDetail
+                .AsNoTracking()
+                .AnyAsync(x => x.Idcompany == companyId && x.Idtype == id, ct);
+
+            return hasInventoryTransactionDetailUsage;
         }
     }
 }

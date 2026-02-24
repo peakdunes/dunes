@@ -28,7 +28,18 @@ namespace DUNES.API.Controllers
         /// Regla: este valor nunca debe venir por body/query; solo del token.
         /// </para>
         /// </summary>
-        protected int CurrentCompanyId => int.Parse(User.FindFirst("companyId")!.Value);
+        protected int CurrentCompanyId
+        {
+            get
+            {
+                var claim = User?.FindFirst("companyId")?.Value;
+
+                if (string.IsNullOrWhiteSpace(claim) || !int.TryParse(claim, out var value))
+                    throw new UnauthorizedAccessException("Missing or invalid claim: companyId.");
+
+                return value;
+            }
+        }
 
         /// <summary>
         /// Obtiene el <c>CompanyClientId</c> desde el token JWT.
@@ -36,7 +47,18 @@ namespace DUNES.API.Controllers
         /// Regla: este valor nunca debe venir por body/query; solo del token.
         /// </para>
         /// </summary>
-        protected int CurrentCompanyClientId => int.Parse(User.FindFirst("companyClientId")!.Value);
+        protected int CurrentCompanyClientId
+        {
+            get
+            {
+                var claim = User?.FindFirst("companyClientId")?.Value;
+
+                if (string.IsNullOrWhiteSpace(claim) || !int.TryParse(claim, out var value))
+                    throw new UnauthorizedAccessException("Missing or invalid claim: companyClientId.");
+
+                return value;
+            }
+        }
 
         #endregion
 

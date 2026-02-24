@@ -8,17 +8,19 @@ using System.Threading.Tasks;
 namespace DUNES.Shared.DTOs.WMS
 {
     /// <summary>
-    /// Create DTO for enabling a master ItemStatus for the current client.
-    /// CompanyId and CompanyClientId are always resolved from the token.
+    /// Request DTO to create a new ItemStatus mapping for a client.
+    /// Tenant values (CompanyId, CompanyClientId) are always taken from token.
     /// </summary>
     public class WMSCompanyClientItemStatusCreateDTO
     {
-        /// <summary>Master ItemStatus ID to enable.</summary>
-        [Required]
-        [Range(1, int.MaxValue)]
+        /// <summary>
+        /// FK to master Itemstatus catalog.
+        /// </summary>
         public int ItemStatusId { get; set; }
 
-        /// <summary>Mapping-level enable flag (default true).</summary>
+        /// <summary>
+        /// Mapping-level active flag (default true).
+        /// </summary>
         public bool IsActive { get; set; } = true;
     }
 }

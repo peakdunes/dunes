@@ -3,74 +3,52 @@
 namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
 {
     /// <summary>
-    /// Repository contract for client-level item status enablement.
-    /// Anti-error principles:
-    /// - CompanyId and CompanyClientId are always taken from the token (never from body/query).
-    /// - No Update method is exposed to avoid changing ItemStatusId by mistake.
-    /// - Master catalog must be IsActive=true to allow enabling and to appear in enabled lists.
+    /// Repository contract for managing CompanyClientItemStatus mappings.
+    /// Handles persistence and tenant-scoped read operations for the relation
+    /// between a client and the master Itemstatus catalog.
     /// </summary>
     public interface ICompanyClientItemStatusWMSAPIRepository
     {
         /// <summary>
-        /// Returns only the item statuses enabled for the current client:
-        /// - Mapping IsActive=true AND
-        /// - Master ItemStatus IsActive=true
+        /// Gets all ItemStatus mappings for the specified tenant scope (company + client),
+        /// including both active and inactive mappings.
         /// </summary>
-        Task<List<WMSCompanyClientItemStatusReadDTO>> GetEnabledAsync(
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of ItemStatus mappings with master display name.</returns>
+        Task<List<WMSCompanyClientItemStatusReadDTO>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Gets a mapping by Id (scoped by CompanyId + CompanyClientId).
-        /// Recommended behavior: if master is inactive, treat as not-enabled (return null).
+        /// Gets a single ItemStatus mapping by mapping Id within the tenant scope.
         /// </summary>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The mapping DTO if found; otherwise <c>null</c>.</returns>
         Task<WMSCompanyClientItemStatusReadDTO?> GetByIdAsync(
-            int companyId,
-            int companyClientId,
             int id,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Creates a new mapping between the current client and a master item status.
-        /// Service must enforce:
-        /// - Master status exists and IsActive=true
-        /// - Uniqueness (CompanyId, CompanyClientId, ItemStatusId)
-        /// </summary>
-        Task<WMSCompanyClientItemStatusReadDTO> CreateAsync(
-            WMSCompanyClientItemStatusCreateDTO dto,
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Activates or deactivates a mapping by mapping Id.
-        /// CRITICAL: activation must be rejected if master item status IsActive=false.
+        /// Checks whether a mapping already exists for the same tenant scope and ItemStatusId.
+        /// Used to prevent duplicates in create/update operations.
         /// </summary>
-        Task<bool> SetActiveAsync(
-            int companyId,
-            int companyClientId,
-            int id,
-            bool isActive,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Replaces the enabled set for the client (bulk, anti-error).
-        /// Implementation should:
-        /// - Validate all IDs exist and are master-active
-        /// - Enable/create mappings for provided IDs
-        /// - Disable mappings not included in the provided list
-        /// </summary>
-        Task<bool> SetEnabledSetAsync(
-            int companyId,
-            int companyClientId,
-            List<int> itemStatusIds,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Checks if a mapping exists for a given client and master item status.
-        /// </summary>
-        Task<bool> ExistsAsync(
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="itemStatusId">Master Itemstatus identifier.</param>
+        /// <param name="excludeId">
+        /// Optional mapping Id to exclude from the duplicate check (used on update).
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if a duplicate mapping exists; otherwise <c>false</c>.</returns>
+        Task<bool> ExistsMappingAsync(
             int companyId,
             int companyClientId,
             int itemStatusId,
@@ -78,12 +56,87 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
             CancellationToken ct);
 
         /// <summary>
-        /// Validates that the master item status exists and is active.
-        /// Supports the business rule: master inactive => cannot be enabled for a client.
+        /// Checks whether the referenced master Itemstatus exists.
         /// </summary>
-        Task<bool> IsMasterActiveAsync(
-            int companyId,
+        /// <param name="itemStatusId">Master Itemstatus identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if exists; otherwise <c>false</c>.</returns>
+        Task<bool> MasterExistsAsync(
             int itemStatusId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Checks whether the referenced master Itemstatus exists and is active.
+        /// Used when enabling a mapping.
+        /// </summary>
+        /// <param name="itemStatusId">Master Itemstatus identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if master exists and is active; otherwise <c>false</c>.</returns>
+        Task<bool> MasterIsActiveAsync(
+            int itemStatusId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Gets the mapping entity by Id within the specified tenant scope.
+        /// Returns entity (not DTO) for update/delete operations.
+        /// </summary>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The entity if found; otherwise <c>null</c>.</returns>
+        Task<DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus?> GetEntityByIdAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Creates a new ItemStatus mapping.
+        /// </summary>
+        /// <param name="entity">Entity to create.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created entity including generated Id.</returns>
+        Task<DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus> CreateAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus entity,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Updates an existing ItemStatus mapping.
+        /// </summary>
+        /// <param name="entity">Entity with modified values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if at least one row was affected; otherwise <c>false</c>.</returns>
+        Task<bool> UpdateAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus entity,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Deletes an existing ItemStatus mapping (physical delete).
+        /// Intended for wrong assignments.
+        /// </summary>
+        /// <param name="entity">Entity to delete.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if at least one row was affected; otherwise <c>false</c>.</returns>
+        Task<bool> DeleteAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientItemStatus entity,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Sets the active status for an existing ItemStatus mapping within tenant scope.
+        /// Intended for temporary enable/disable without deleting the mapping.
+        /// </summary>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="isActive">New mapping active status.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if at least one row was affected; otherwise <c>false</c>.</returns>
+        Task<bool> SetActiveAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            bool isActive,
             CancellationToken ct);
     }
 }

@@ -21,10 +21,10 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
     [Route("api/wms/masters/company-client/inventory-categories")]
     public class CompanyClientInventoryCategoryWMSController : BaseController
     {
-        private readonly ICompanyClientInventoryCategoryService _service;
+        private readonly ICompanyClientInventoryCategoryWMSAPIService _service;
 
         /// <summary>Constructor (DI).</summary>
-        public CompanyClientInventoryCategoryWMSController(ICompanyClientInventoryCategoryService service)
+        public CompanyClientInventoryCategoryWMSController(ICompanyClientInventoryCategoryWMSAPIService service)
         {
             _service = service;
         }

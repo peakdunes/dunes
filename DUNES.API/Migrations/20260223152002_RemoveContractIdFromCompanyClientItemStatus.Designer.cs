@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260223152002_RemoveContractIdFromCompanyClientItemStatus")]
+    partial class RemoveContractIdFromCompanyClientItemStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -237,7 +240,8 @@ namespace DUNES.API.Migrations
 
                     b.HasIndex("CompanyClientId");
 
-                    b.HasIndex("CompanyId");
+                    b.HasIndex("CompanyId", "CompanyClientId")
+                        .IsUnique();
 
                     b.ToTable("CompaniesContract");
                 });
@@ -466,7 +470,7 @@ namespace DUNES.API.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("CompaniesContractId2")
+                    b.Property<int?>("CompaniesContractId")
                         .HasColumnType("int");
 
                     b.Property<int>("CompanyClientId")
@@ -483,16 +487,11 @@ namespace DUNES.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CompaniesContractId2");
+                    b.HasIndex("CompaniesContractId");
 
                     b.HasIndex("CompanyClientId");
 
                     b.HasIndex("ItemStatusId");
-
-                    b.HasIndex("CompanyId", "CompanyClientId");
-
-                    b.HasIndex("CompanyId", "CompanyClientId", "ItemStatusId")
-                        .IsUnique();
 
                     b.ToTable("CompanyClientItemStatuses", (string)null);
                 });
@@ -1553,13 +1552,13 @@ namespace DUNES.API.Migrations
                     b.HasOne("DUNES.API.ModelsWMS.Masters.CompanyClient", "CompanyClientNavegation")
                         .WithMany()
                         .HasForeignKey("CompanyClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Company", "CompanyNavegation")
                         .WithMany()
                         .HasForeignKey("CompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CompanyClientNavegation");
@@ -1673,12 +1672,12 @@ namespace DUNES.API.Migrations
                 {
                     b.HasOne("DUNES.API.ModelsWMS.Masters.CompaniesContract", null)
                         .WithMany("ItemStatusMappings")
-                        .HasForeignKey("CompaniesContractId2");
+                        .HasForeignKey("CompaniesContractId");
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.CompanyClient", "CompanyClientNavigation")
                         .WithMany()
                         .HasForeignKey("CompanyClientId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("DUNES.API.ModelsWMS.Masters.Itemstatus", "ItemStatusNavigation")

@@ -2,6 +2,7 @@
 using DUNES.API.ServicesWMS.Masters.TransactionsType;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,6 +21,7 @@ namespace DUNES.API.ControllersWMS.Masters.TransactionTypes
     /// - All business logic is delegated to the Service layer.
     /// </summary>
     [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
     public class TransactionTypesWMSController : BaseController
     {

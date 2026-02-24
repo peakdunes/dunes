@@ -6,65 +6,65 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
 {
 
     /// <summary>
-    /// Repository implementation for managing inventory type enablement per client.
-    /// Strictly scoped by CompanyId + CompanyClientId (from token).
+    /// Repository implementation for CompanyClientInventoryType mappings.
+    /// Provides tenant-scoped CRUD and validation helpers for the relation
+    /// between a client and the master InventoryTypes catalog.
     /// </summary>
     public class CompanyClientInventoryTypeWMSAPIRepository : ICompanyClientInventoryTypeWMSAPIRepository
     {
         private readonly appWmsDbContext _db;
 
-
         /// <summary>
-        /// Constructor (DI)
+        /// Initializes a new instance of the <see cref="CompanyClientInventoryTypeRepository"/> class.
         /// </summary>
-        /// <param name="db"></param>
+        /// <param name="db">Application database context.</param>
         public CompanyClientInventoryTypeWMSAPIRepository(appWmsDbContext db)
         {
             _db = db;
         }
 
-        /// <inheritdoc/>
-        public async Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetEnabledAsync(
+        /// <inheritdoc />
+        public async Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
         {
-            // Enabled means: mapping IsActive=true AND master IsActive=true
+            // NOTE:
+            // - Includes both active and inactive mappings from CompanyClientInventoryType.
+            // - Pulls display name from master InventoryTypes catalog.
             return await _db.CompanyClientInventoryTypes
                 .AsNoTracking()
                 .Where(m => m.CompanyId == companyId
-                         && m.CompanyClientId == companyClientId
-                         && m.IsActive)
+                         && m.CompanyClientId == companyClientId)
                 .Join(
-                    _db.InventoryTypes.AsNoTracking().Where(t => t.Active),
+                    _db.InventoryTypes.AsNoTracking(), // Adjust DbSet name if your context uses a different name
                     m => m.InventoryTypeId,
                     t => t.Id,
                     (m, t) => new WMSCompanyClientInventoryTypeReadDTO
                     {
                         Id = m.Id,
                         InventoryTypeId = t.Id,
-                        InventoryTypeName = t.Name,
+                        InventoryTypeName = t.Name, // Adjust property name if master uses Description/TypeName/etc.
                         IsActive = m.IsActive
                     })
                 .OrderBy(x => x.InventoryTypeName)
                 .ToListAsync(ct);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public async Task<WMSCompanyClientInventoryTypeReadDTO?> GetByIdAsync(
+            int id,
             int companyId,
             int companyClientId,
-            int id,
             CancellationToken ct)
         {
-            // Consistent with GetEnabledAsync: require master active.
             return await _db.CompanyClientInventoryTypes
                 .AsNoTracking()
                 .Where(m => m.Id == id
                          && m.CompanyId == companyId
                          && m.CompanyClientId == companyClientId)
                 .Join(
-                    _db.InventoryTypes.AsNoTracking().Where(t => t.Active),
+                    _db.InventoryTypes.AsNoTracking(),
                     m => m.InventoryTypeId,
                     t => t.Id,
                     (m, t) => new WMSCompanyClientInventoryTypeReadDTO
@@ -77,151 +77,8 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
                 .FirstOrDefaultAsync(ct);
         }
 
-        /// <inheritdoc/>
-        public async Task<WMSCompanyClientInventoryTypeReadDTO> CreateAsync(
-            WMSCompanyClientInventoryTypeCreateDTO dto,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct)
-        {
-            // Anti-error: master must be active
-            var master = await _db.InventoryTypes
-                .AsNoTracking()
-                .Where(t => t.Id == dto.InventoryTypeId && t.Active)
-                .Select(t => new { t.Id, t.Name })
-                .FirstOrDefaultAsync(ct);
-
-            if (master is null)
-                throw new InvalidOperationException("Cannot create mapping: master inventory type is invalid or inactive.");
-
-            // Anti-error: avoid duplicates (unique index should also exist)
-            var exists = await _db.CompanyClientInventoryTypes
-                .AsNoTracking()
-                .AnyAsync(m =>
-                    m.CompanyId == companyId &&
-                    m.CompanyClientId == companyClientId &&
-                    m.InventoryTypeId == dto.InventoryTypeId,
-                    ct);
-
-            if (exists)
-                throw new InvalidOperationException("Mapping already exists for this client and inventory type.");
-
-            var entity = new ModelsWMS.Masters.CompanyClientInventoryType
-            {
-                CompanyId = companyId,
-                CompanyClientId = companyClientId,
-                InventoryTypeId = dto.InventoryTypeId,
-                IsActive = dto.IsActive
-            };
-
-            _db.CompanyClientInventoryTypes.Add(entity);
-            await _db.SaveChangesAsync(ct);
-
-            return new WMSCompanyClientInventoryTypeReadDTO
-            {
-                Id = entity.Id,
-                InventoryTypeId = master.Id,
-                InventoryTypeName = master.Name,
-                IsActive = entity.IsActive
-            };
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> SetActiveAsync(
-            int companyId,
-            int companyClientId,
-            int id,
-            bool isActive,
-            CancellationToken ct)
-        {
-            var entity = await _db.CompanyClientInventoryTypes
-                .FirstOrDefaultAsync(m =>
-                    m.Id == id &&
-                    m.CompanyId == companyId &&
-                    m.CompanyClientId == companyClientId,
-                    ct);
-
-            if (entity is null)
-                return false;
-
-            // Anti-error: do not allow activation if master is inactive
-            if (isActive)
-            {
-                var masterActive = await IsMasterActiveAsync(companyId, entity.InventoryTypeId, ct);
-                if (!masterActive)
-                    throw new InvalidOperationException("Cannot activate mapping: master inventory type is inactive.");
-            }
-
-            entity.IsActive = isActive;
-            await _db.SaveChangesAsync(ct);
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> SetEnabledSetAsync(
-            int companyId,
-            int companyClientId,
-            List<int> inventoryTypeIds,
-            CancellationToken ct)
-        {
-            inventoryTypeIds ??= new List<int>();
-            inventoryTypeIds = inventoryTypeIds.Where(x => x > 0).Distinct().ToList();
-
-            // Validate all provided IDs are master-active
-            if (inventoryTypeIds.Count > 0)
-            {
-                var activeIds = await _db.InventoryTypes
-                    .AsNoTracking()
-                    .Where(t => t.Active && inventoryTypeIds.Contains(t.Id))
-                    .Select(t => t.Id)
-                    .ToListAsync(ct);
-
-                var missingOrInactive = inventoryTypeIds.Except(activeIds).ToList();
-                if (missingOrInactive.Count > 0)
-                    throw new InvalidOperationException($"Invalid/inactive master inventory types: {string.Join(",", missingOrInactive)}");
-            }
-
-            // Load current mappings for the client
-            var current = await _db.CompanyClientInventoryTypes
-                .Where(m => m.CompanyId == companyId && m.CompanyClientId == companyClientId)
-                .ToListAsync(ct);
-
-            var currentByTypeId = current.ToDictionary(x => x.InventoryTypeId, x => x);
-
-            // 1) Ensure all provided IDs exist and are active
-            foreach (var typeId in inventoryTypeIds)
-            {
-                if (currentByTypeId.TryGetValue(typeId, out var existing))
-                {
-                    if (!existing.IsActive)
-                        existing.IsActive = true;
-                }
-                else
-                {
-                    _db.CompanyClientInventoryTypes.Add(new ModelsWMS.Masters.CompanyClientInventoryType
-                    {
-                        CompanyId = companyId,
-                        CompanyClientId = companyClientId,
-                        InventoryTypeId = typeId,
-                        IsActive = true
-                    });
-                }
-            }
-
-            // 2) Deactivate anything not in final set
-            var finalSet = inventoryTypeIds.ToHashSet();
-            foreach (var m in current)
-            {
-                if (!finalSet.Contains(m.InventoryTypeId) && m.IsActive)
-                    m.IsActive = false;
-            }
-
-            await _db.SaveChangesAsync(ct);
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public async Task<bool> ExistsAsync(
+        /// <inheritdoc />
+        public async Task<bool> ExistsMappingAsync(
             int companyId,
             int companyClientId,
             int inventoryTypeId,
@@ -230,27 +87,104 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
         {
             var query = _db.CompanyClientInventoryTypes
                 .AsNoTracking()
-                .Where(m =>
-                    m.CompanyId == companyId &&
-                    m.CompanyClientId == companyClientId &&
-                    m.InventoryTypeId == inventoryTypeId);
+                .Where(x => x.CompanyId == companyId
+                         && x.CompanyClientId == companyClientId
+                         && x.InventoryTypeId == inventoryTypeId);
 
             if (excludeId.HasValue)
-                query = query.Where(m => m.Id != excludeId.Value);
+            {
+                query = query.Where(x => x.Id != excludeId.Value);
+            }
 
             return await query.AnyAsync(ct);
         }
 
-        /// <inheritdoc/>
-        public async Task<bool> IsMasterActiveAsync(
-            int companyId,
+        /// <inheritdoc />
+        public async Task<bool> MasterExistsAsync(
             int inventoryTypeId,
             CancellationToken ct)
         {
-            // If InventoryTypes is tenant-scoped, add: && t.CompanyId == companyId
             return await _db.InventoryTypes
                 .AsNoTracking()
-                .AnyAsync(t => t.Id == inventoryTypeId && t.Active, ct);
+                .AnyAsync(x => x.Id == inventoryTypeId, ct);
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> MasterIsActiveAsync(
+            int inventoryTypeId,
+            CancellationToken ct)
+        {
+            return await _db.InventoryTypes
+                .AsNoTracking()
+                .AnyAsync(x => x.Id == inventoryTypeId && x.Active, ct);
+            // If your master entity uses IsActive instead of Active, replace x.Active with x.IsActive
+        }
+
+
+
+
+        /// <inheritdoc />
+        public async Task<DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType?> GetEntityByIdAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            return await _db.CompanyClientInventoryTypes
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId, ct);
+        }
+
+        /// <inheritdoc />
+        public async Task<DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType> CreateAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType entity,
+            CancellationToken ct)
+        {
+            _db.CompanyClientInventoryTypes.Add(entity);
+            await _db.SaveChangesAsync(ct);
+            return entity;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> UpdateAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType entity,
+            CancellationToken ct)
+        {
+            _db.CompanyClientInventoryTypes.Update(entity);
+            return await _db.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> DeleteAsync(
+            DUNES.API.ModelsWMS.Masters.CompanyClientInventoryType entity,
+            CancellationToken ct)
+        {
+            _db.CompanyClientInventoryTypes.Remove(entity);
+            return await _db.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <inheritdoc />
+        public async Task<bool> SetActiveAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            bool isActive,
+            CancellationToken ct)
+        {
+            var entity = await _db.CompanyClientInventoryTypes
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId, ct);
+
+            if (entity is null)
+                return false;
+
+            entity.IsActive = isActive;
+
+            return await _db.SaveChangesAsync(ct) > 0;
         }
     }
 }

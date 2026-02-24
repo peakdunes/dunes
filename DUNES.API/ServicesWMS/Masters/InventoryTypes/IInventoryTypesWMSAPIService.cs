@@ -27,6 +27,9 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryTypes
 
         /// <summary>Activates/deactivates an inventory type for tenant.</summary>
         Task<ApiResponse<bool>> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct);
+
+        /// <summary>Activates/deactivates an inventory type for tenant.</summary>
+        Task<ApiResponse<bool>> DeleteAsync(int companyId, int id, CancellationToken ct);
     }
 }
 

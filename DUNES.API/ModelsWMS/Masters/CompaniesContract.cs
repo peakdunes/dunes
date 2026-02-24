@@ -94,11 +94,11 @@ namespace DUNES.API.ModelsWMS.Masters
         /// <summary>
         /// client inventory type navegation
         /// </summary>
-        public virtual ICollection<CompanyClientInventoryType> InventoryTypeMappings { get; set; } = new List<CompanyClientInventoryType>();
+      //  public virtual ICollection<CompanyClientInventoryType> InventoryTypeMappings { get; set; } = new List<CompanyClientInventoryType>();
         /// <summary>
         /// client item status navegation
         /// </summary>
-        public virtual ICollection<CompanyClientItemStatus> ItemStatusMappings { get; set; } = new List<CompanyClientItemStatus>();
+       // public virtual ICollection<CompanyClientItemStatus> ItemStatusMappings { get; set; } = new List<CompanyClientItemStatus>();
        /// <summary>
        /// client categories navegation
        /// </summary>
