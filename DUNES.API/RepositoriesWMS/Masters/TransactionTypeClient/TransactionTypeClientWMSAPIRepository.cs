@@ -1,169 +1,206 @@
 ﻿using DUNES.API.Data;
+using DUNES.Shared.DTOs.WMS;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.TransactionTypeClient
 {
     /// <summary>
-    /// Transaction Type Client repository implementation.
-    ///
-    /// This repository manages persistence and retrieval of
-    /// TransactionTypeClient mappings.
+    /// Repository implementation for TransactionTypeClient mappings.
     ///
     /// IMPORTANT (STANDARD COMPANYID):
-    /// - ALL queries are scoped by CompanyId.
-    /// - This is the last line of defense for multi-tenant isolation.
+    /// - All queries MUST be scoped by CompanyId.
+    /// - CompanyClientId is also enforced in mapping operations.
+    /// - Repository never infers tenant scope.
     /// </summary>
-    public class TransactionTypeClientWMSAPIRepository
-        : ITransactionTypeClientWMSAPIRepository
+    public class TransactionTypeClientWMSAPIRepository : ITransactionTypeClientWMSAPIRepository
     {
-        private readonly appWmsDbContext _context;
+        private readonly appWmsDbContext _db;
 
         /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="TransactionTypeClientWMSAPIRepository"/> class.
+        /// Initializes a new instance of the <see cref="TransactionTypeClientWMSAPIRepository"/> class.
         /// </summary>
-        /// <param name="context">WMS database context</param>
-        public TransactionTypeClientWMSAPIRepository(appWmsDbContext context)
+        /// <param name="db">Application WMS database context.</param>
+        public TransactionTypeClientWMSAPIRepository(appWmsDbContext db)
         {
-            _context = context;
+            _db = db;
         }
 
         /// <summary>
-        /// Retrieves all Transaction Type mappings
-        /// for a specific CompanyClient.
+        /// Gets all mappings for a specific company client.
+        /// Includes master transaction type info for display.
         /// </summary>
-        public async Task<List<DUNES.API.ModelsWMS.Masters.TransactionTypeClient>> GetAllByClientAsync(
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="companyClientId">Company client identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of mappings for the client.</returns>
+        public async Task<List<WMSTransactionTypeClientReadDTO>> GetByClientAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
         {
-            return await _context.TransactionTypeClients
+            return await _db.TransactionTypeClients
                 .AsNoTracking()
                 .Where(x =>
                     x.CompanyId == companyId &&
                     x.CompanyClientId == companyClientId)
+                .Join(
+                    _db.Transactiontypes.AsNoTracking(),
+                    map => map.TransactionTypeId,
+                    master => master.Id,
+                    (map, master) => new WMSTransactionTypeClientReadDTO
+                    {
+                        Id = map.Id,
+                        CompanyClientId = map.CompanyClientId,
+                        TransactionTypeId = map.TransactionTypeId,
+                        TransactionTypeName = master.Name,
+                        Active = map.Active
+                    })
+                .OrderBy(x => x.TransactionTypeName)
                 .ToListAsync(ct);
         }
 
         /// <summary>
-        /// Retrieves all active Transaction Type mappings
-        /// for a specific CompanyClient.
+        /// Gets one mapping entity by Id, scoped by Company and CompanyClient.
         /// </summary>
-        public async Task<List<DUNES.API.ModelsWMS.Masters.TransactionTypeClient>> GetActiveByClientAsync(
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="companyClientId">Company client identifier.</param>
+        /// <param name="id">Mapping identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The mapping entity if found; otherwise null.</returns>
+        public async Task<DUNES.API.ModelsWMS.Masters.TransactionTypeClient?> GetEntityByIdAsync(
             int companyId,
             int companyClientId,
-            CancellationToken ct)
-        {
-            return await _context.TransactionTypeClients
-                .AsNoTracking()
-                .Where(x =>
-                    x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId &&
-                    x.Active)
-                .ToListAsync(ct);
-        }
-
-        /// <summary>
-        /// Retrieves a Transaction Type mapping by its identifier,
-        /// validating Company ownership.
-        /// </summary>
-        public async Task<DUNES.API.ModelsWMS.Masters.TransactionTypeClient?> GetByIdAsync(
-            int companyId,
             int id,
             CancellationToken ct)
         {
-            return await _context.TransactionTypeClients
-                .AsNoTracking()
+            return await _db.TransactionTypeClients
                 .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
                     x.CompanyId == companyId &&
-                    x.Id == id,
-                    ct);
+                    x.CompanyClientId == companyClientId, ct);
         }
 
         /// <summary>
-        /// Retrieves a Transaction Type mapping by
-        /// CompanyClient and TransactionType identifiers.
+        /// Checks whether a mapping already exists for the combination
+        /// (CompanyId, CompanyClientId, TransactionTypeId).
         /// </summary>
-        public async Task<DUNES.API.ModelsWMS.Masters.TransactionTypeClient?> GetByClientAndTypeAsync(
-            int companyId,
-            int companyClientId,
-            int transactionTypeId,
-            CancellationToken ct)
-        {
-            return await _context.TransactionTypeClients
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x =>
-                    x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId &&
-                    x.TransactionTypeId == transactionTypeId,
-                    ct);
-        }
-
-        /// <summary>
-        /// Checks whether a Transaction Type is already
-        /// mapped to a specific CompanyClient.
-        /// </summary>
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="companyClientId">Company client identifier.</param>
+        /// <param name="transactionTypeId">Master transaction type identifier.</param>
+        /// <param name="excludeId">Optional mapping Id to exclude.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if a duplicate mapping exists; otherwise false.</returns>
         public async Task<bool> ExistsAsync(
             int companyId,
             int companyClientId,
             int transactionTypeId,
+            int? excludeId,
             CancellationToken ct)
         {
-            return await _context.TransactionTypeClients
+            var query = _db.TransactionTypeClients
                 .AsNoTracking()
-                .AnyAsync(x =>
+                .Where(x =>
                     x.CompanyId == companyId &&
                     x.CompanyClientId == companyClientId &&
-                    x.TransactionTypeId == transactionTypeId,
-                    ct);
+                    x.TransactionTypeId == transactionTypeId);
+
+            if (excludeId.HasValue)
+                query = query.Where(x => x.Id != excludeId.Value);
+
+            return await query.AnyAsync(ct);
         }
 
         /// <summary>
-        /// Creates a new Transaction Type mapping.
+        /// Validates that the master Transaction Type exists
+        /// and belongs to the same Company.
         /// </summary>
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="transactionTypeId">Master transaction type identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if the master exists for the company; otherwise false.</returns>
+        public async Task<bool> MasterExistsAsync(
+            int companyId,
+            int transactionTypeId,
+            CancellationToken ct)
+        {
+            return await _db.Transactiontypes
+                .AsNoTracking()
+                .AnyAsync(x =>
+                    x.Id == transactionTypeId &&
+                    x.companyId == companyId, ct);
+        }
+
+        /// <summary>
+        /// Creates a new mapping.
+        /// </summary>
+        /// <param name="entity">Mapping entity to create.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created mapping entity.</returns>
         public async Task<DUNES.API.ModelsWMS.Masters.TransactionTypeClient> CreateAsync(
             DUNES.API.ModelsWMS.Masters.TransactionTypeClient entity,
             CancellationToken ct)
         {
-            _context.TransactionTypeClients.Add(entity);
-            await _context.SaveChangesAsync(ct);
+            _db.TransactionTypeClients.Add(entity);
+            await _db.SaveChangesAsync(ct);
             return entity;
         }
 
         /// <summary>
-        /// Updates an existing Transaction Type mapping.
+        /// Updates the Active flag only (patch style).
         /// </summary>
-        public async Task<DUNES.API.ModelsWMS.Masters.TransactionTypeClient> UpdateAsync(
-            DUNES.API.ModelsWMS.Masters.TransactionTypeClient entity,
-            CancellationToken ct)
-        {
-            _context.TransactionTypeClients.Update(entity);
-            await _context.SaveChangesAsync(ct);
-            return entity;
-        }
-
-        /// <summary>
-        /// Activates or deactivates a Transaction Type
-        /// for a specific CompanyClient.
-        /// </summary>
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="companyClientId">Company client identifier.</param>
+        /// <param name="id">Mapping identifier.</param>
+        /// <param name="isActive">New active state.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if updated; otherwise false.</returns>
         public async Task<bool> SetActiveAsync(
             int companyId,
             int companyClientId,
-            int transactionTypeId,
+            int id,
             bool isActive,
             CancellationToken ct)
         {
-            var affected = await _context.TransactionTypeClients
-                .Where(x =>
+            var entity = await _db.TransactionTypeClients
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
                     x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId &&
-                    x.TransactionTypeId == transactionTypeId)
-                .ExecuteUpdateAsync(
-                    setters => setters
-                        .SetProperty(x => x.Active, isActive),
-                    ct);
+                    x.CompanyClientId == companyClientId, ct);
 
-            return affected > 0;
+            if (entity is null)
+                return false;
+
+            entity.Active = isActive;
+            await _db.SaveChangesAsync(ct);
+            return true;
+        }
+
+        /// <summary>
+        /// Deletes a mapping physically.
+        /// </summary>
+        /// <param name="companyId">Tenant company identifier.</param>
+        /// <param name="companyClientId">Company client identifier.</param>
+        /// <param name="id">Mapping identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if deleted; otherwise false.</returns>
+        public async Task<bool> DeleteAsync(
+            int companyId,
+            int companyClientId,
+            int id,
+            CancellationToken ct)
+        {
+            var entity = await _db.TransactionTypeClients
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId, ct);
+
+            if (entity is null)
+                return false;
+
+            _db.TransactionTypeClients.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+            return true;
         }
     }
 }

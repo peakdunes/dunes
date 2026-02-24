@@ -45,9 +45,10 @@ namespace DUNES.UI.Services.WMS.Masters.InventoryCategories
         
 
         public Task<ApiResponse<List<WMSInventorycategoriesReadDTO>>> GetAllAsync(string token, CancellationToken ct)
-        {
-            throw new NotImplementedException();
-        }
+        => GetApiAsync<List<WMSInventorycategoriesReadDTO>>(
+                $"/api/wms/masters/inventory-categories/GetAll",
+                token,
+                ct);
 
         public Task<ApiResponse<WMSInventorycategoriesReadDTO?>> GetByIdAsync(int id, string token, CancellationToken ct)
         {
