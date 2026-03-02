@@ -1,0 +1,44 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSInventorycategoriesReadDTO
+
+@{
+    ViewData["Title"] = "Delete Inventory Category";
+}
+
+
+<div class="alert alert-warning">
+    <strong>Warning:</strong> This action will permanently delete the record. This cannot be undone.
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+
+        <dl class="row">
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Id)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Id)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Name)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Observations)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Observations)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.CycleCountDays)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.CycleCountDays)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ErrorTolerance)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.ErrorTolerance)</dd>
+
+            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Active)</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(m => m.Active)</dd>
+        </dl>
+
+        <form asp-action="DeleteConfirmed" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+
+            <button type="submit" class="btn btn-outline-danger">Delete</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+        </form>
+
+    </div>
+</div>
