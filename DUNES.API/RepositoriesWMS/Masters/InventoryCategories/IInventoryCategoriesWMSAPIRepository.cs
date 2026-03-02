@@ -72,6 +72,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryCategories
             int id,
             bool isActive,
             CancellationToken ct);
+
+
+        /// <summary>
+        /// Delete an inventory category.
+        /// </summary>
+        Task<bool> DeleteAsync(
+            int companyId,
+            int id,
+            CancellationToken ct);
     }
 }
 

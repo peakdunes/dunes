@@ -36,6 +36,12 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         [Range(0, 100)]
         public decimal ErrorTolerance { get; set; }
+
+
+        /// <summary>
+        /// is active
+        /// </summary>
+        public bool Active { get; set; }
     }
 
 

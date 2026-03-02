@@ -28,5 +28,8 @@ namespace DUNES.API.RepositoriesWMS.Masters.ItemStatus
 
         /// <summary>Activates/deactivates an item status for the given tenant.</summary>
         Task<bool> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct);
+
+        /// <summary>delete master item status.</summary>
+        Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct);
     }
 }

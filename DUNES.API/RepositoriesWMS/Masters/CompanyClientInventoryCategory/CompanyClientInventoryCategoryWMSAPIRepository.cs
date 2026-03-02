@@ -283,5 +283,17 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
                 .AsNoTracking()
                 .AnyAsync(c => c.Id == inventoryCategoryId && c.Active, ct);
         }
+        /// <summary>
+        /// check if exist any categoryId and categoryclientId before delete master category Id
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="categoryId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public Task<bool> HasAnyClientMappingAsync(int companyId, int categoryId, CancellationToken ct)
+       
+             => _db.CompanyClientInventoryCategories
+        .AnyAsync(x => x.CompanyId == companyId && x.InventoryCategoryId == categoryId, ct);
+       
     }
 }

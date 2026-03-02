@@ -26,5 +26,8 @@ namespace DUNES.API.ServicesWMS.Masters.ItemStatus
 
         /// <summary>Activates/deactivates an item status for tenant.</summary>
         Task<ApiResponse<bool>> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct);
+
+        /// <summary>delete item status master record.</summary>
+        Task<ApiResponse<bool>> DeleteAsync(int companyId, int id, CancellationToken ct);
     }
 }

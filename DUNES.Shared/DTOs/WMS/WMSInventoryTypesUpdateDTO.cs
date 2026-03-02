@@ -42,6 +42,8 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         public int Zebrainvassociated { get; set; }
 
+        public bool Active { get; set; }
+
      
     }
 }

@@ -18,12 +18,19 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         [Required]
         [MaxLength(100)]
+        [Display(Name = "Name")]
+
         public string? Name { get; set; }
 
         /// <summary>
         /// Observations (max 1000 chars).
         /// </summary>
+        /// 
+        [Display(Name = "Observations")]
         [MaxLength(1000)]
         public string? Observations { get; set; }
+
+        [Display(Name ="Active")]
+        public bool Active { get; set; }
     }
 }

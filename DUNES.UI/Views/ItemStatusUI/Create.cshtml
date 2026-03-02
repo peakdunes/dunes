@@ -1,0 +1,54 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSItemStatusCreateDTO
+
+@{
+    ViewData["Title"] = "Create Item Status";
+}
+
+<h4>Create Item Status</h4>
+<hr />
+
+<form asp-action="Create" method="post">
+    <div class="row">
+        <div class="col-md-6">
+
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-check mb-3 mt-2">
+                <input class="form-check-input" asp-for="Active" />
+                <label class="form-check-label" asp-for="Active"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="mb-3">
+                <label asp-for="Observations" class="form-label"></label>
+                <input asp-for="Observations" class="form-control" />
+                <span asp-validation-for="Observations" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="d-flex gap-2 mt-2">
+                <button type="submit" class="btn btn-outline-primary">Create</button>
+                
+            </div>
+        </div>
+
+
+    </div>
+</form>
+<div class="mt-2">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

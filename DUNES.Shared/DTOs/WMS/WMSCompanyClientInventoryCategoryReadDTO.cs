@@ -15,6 +15,9 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>Mapping ID.</summary>
         public int Id { get; set; }
 
+
+     
+
         /// <summary>Master InventoryCategory ID.</summary>
         /// 
         [Display(Name ="Category ID")]

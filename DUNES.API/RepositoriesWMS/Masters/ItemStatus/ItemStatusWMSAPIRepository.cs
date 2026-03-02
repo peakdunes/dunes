@@ -29,35 +29,60 @@ namespace DUNES.API.RepositoriesWMS.Masters.ItemStatus
         /// <inheritdoc />
         public async Task<List<WMSItemStatusReadDTO>> GetAllAsync(int companyId, CancellationToken ct)
         {
-            var entities = await _db.Itemstatus
-                .AsNoTracking()
+
+           return await _db.Itemstatus
                 .Where(x => x.Idcompany == companyId)
-                .OrderBy(x => x.Name)
+                .Select(x => new WMSItemStatusReadDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Active = x.Active,
+                    Idcompany = x.Idcompany,
+                    Observations = x.Observations,
+                    CompanyName = x.IdcompanyNavigation.Name // navegación proyectada
+                })
                 .ToListAsync(ct);
 
-            return _mapper.Map<List<WMSItemStatusReadDTO>>(entities);
+           
         }
 
         /// <inheritdoc />
         public async Task<List<WMSItemStatusReadDTO>> GetActiveAsync(int companyId, CancellationToken ct)
         {
-            var entities = await _db.Itemstatus
-                .AsNoTracking()
-                .Where(x => x.Idcompany == companyId && x.Active)
-                .OrderBy(x => x.Name)
-                .ToListAsync(ct);
 
-            return _mapper.Map<List<WMSItemStatusReadDTO>>(entities);
+            return await _db.Itemstatus
+                 .Where(x => x.Idcompany == companyId && x.Active)
+                 .Select(x => new WMSItemStatusReadDTO
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Active = x.Active,
+                     Observations = x.Observations,
+                     Idcompany = x.Idcompany,
+                     CompanyName = x.IdcompanyNavigation.Name // navegación proyectada
+                 })
+                 .ToListAsync(ct);
         }
 
         /// <inheritdoc />
         public async Task<WMSItemStatusReadDTO?> GetByIdAsync(int companyId, int id, CancellationToken ct)
         {
-            var entity = await _db.Itemstatus
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id && x.Idcompany == companyId, ct);
 
-            return entity is null ? null : _mapper.Map<WMSItemStatusReadDTO>(entity);
+            return await _db.Itemstatus
+                 .AsNoTracking()
+               .Where(x => x.Idcompany == companyId && x.Id == id)
+               .Select(x => new WMSItemStatusReadDTO
+               {
+                   Id = x.Id,
+                   Name = x.Name,
+                   Active = x.Active,
+                   Observations = x.Observations,
+                   Idcompany = x.Idcompany,
+                   CompanyName = x.IdcompanyNavigation.Name,
+               })
+                       .FirstOrDefaultAsync(ct);
+
+           
         }
 
         /// <inheritdoc />
@@ -117,6 +142,22 @@ namespace DUNES.API.RepositoriesWMS.Masters.ItemStatus
                 return false;
 
             entity.Active = isActive;
+            await _db.SaveChangesAsync(ct);
+            return true;
+        }
+        /// <summary>
+        /// delete item status
+        /// </summary>
+      
+        public async Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            var entity = await _db.Itemstatus
+              .FirstOrDefaultAsync(x => x.Id == id && x.Idcompany == companyId, ct);
+
+            if (entity is null)
+                return false;
+
+            _db.Itemstatus.Remove(entity);  
             await _db.SaveChangesAsync(ct);
             return true;
         }

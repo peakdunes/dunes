@@ -183,5 +183,17 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus
 
             return await _db.SaveChangesAsync(ct) > 0;
         }
+
+        /// <summary>
+        /// check if exist any itemstatusid and categoryclientId before delete master category Id
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="statusId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public Task<bool> HasAnyClientMappingAsync(int companyId, int statusId, CancellationToken ct)
+
+             => _db.CompanyClientItemStatuses
+        .AnyAsync(x => x.CompanyId == companyId && x.ItemStatusId == statusId, ct);
     }
 }

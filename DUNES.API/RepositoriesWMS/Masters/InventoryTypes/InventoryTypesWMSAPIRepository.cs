@@ -30,35 +30,58 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
         /// <inheritdoc />
         public async Task<List<WMSInventoryTypesReadDTO>> GetAllAsync(int companyId, CancellationToken ct)
         {
-            var entities = await _db.InventoryTypes
-                .AsNoTracking()
+            return await _db.InventoryTypes
                 .Where(x => x.Idcompany == companyId)
-                .OrderBy(x => x.Name)
+                .Select(x => new WMSInventoryTypesReadDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Active = x.Active,
+                    Idcompany = x.Idcompany,
+                    Observations = x.Observations,
+                    CompanyName = x.IdcompanyNavigation.Name // navegación proyectada
+                })
                 .ToListAsync(ct);
 
-            return _mapper.Map<List<WMSInventoryTypesReadDTO>>(entities);
+
         }
 
         /// <inheritdoc />
         public async Task<List<WMSInventoryTypesReadDTO>> GetActiveAsync(int companyId, CancellationToken ct)
         {
-            var entities = await _db.InventoryTypes
-                .AsNoTracking()
-                .Where(x => x.Idcompany == companyId && x.Active)
-                .OrderBy(x => x.Name)
-                .ToListAsync(ct);
-
-            return _mapper.Map<List<WMSInventoryTypesReadDTO>>(entities);
+            return await _db.InventoryTypes
+                 .Where(x => x.Idcompany == companyId && x.Active)
+                 .Select(x => new WMSInventoryTypesReadDTO
+                 {
+                     Id = x.Id,
+                     Name = x.Name,
+                     Active = x.Active,
+                     Idcompany = x.Idcompany,
+                     Observations= x.Observations,
+                     CompanyName = x.IdcompanyNavigation.Name // navegación proyectada
+                 })
+                 .ToListAsync(ct);
         }
 
         /// <inheritdoc />
         public async Task<WMSInventoryTypesReadDTO?> GetByIdAsync(int companyId, int id, CancellationToken ct)
         {
-            var entity = await _db.InventoryTypes
-                .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == id && x.Idcompany == companyId, ct);
 
-            return entity is null ? null : _mapper.Map<WMSInventoryTypesReadDTO>(entity);
+            return await _db.InventoryTypes
+                  .AsNoTracking()
+                .Where(x => x.Idcompany == companyId && x.Id == id)
+                .Select(x => new WMSInventoryTypesReadDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    Active = x.Active,
+                    Observations = x.Observations,
+                    Idcompany = x.Idcompany,
+                    CompanyName = x.IdcompanyNavigation.Name,     
+                        })
+                        .FirstOrDefaultAsync(ct);
+
+         
         }
 
         /// <inheritdoc />

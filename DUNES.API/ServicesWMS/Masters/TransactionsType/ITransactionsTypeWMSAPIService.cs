@@ -61,5 +61,6 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
             int id,
             bool isActive,
             CancellationToken ct);
+
     }
 }

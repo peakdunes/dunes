@@ -83,5 +83,19 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
             int id,
             bool isActive,
             CancellationToken ct);
+
+
+        /// <summary>
+        /// Delete an existing inventory category.
+        /// </summary>
+        /// <param name="companyId">The company (tenant) identifier</param>
+        /// <param name="id">The ID of the category to update</param>
+        /// <param name="dto">Update DTO with new values</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>ApiResponse with success flag</returns>
+        Task<ApiResponse<bool>> DeleteAsync(
+            int companyId,
+            int id,
+            CancellationToken ct);
     }
 }

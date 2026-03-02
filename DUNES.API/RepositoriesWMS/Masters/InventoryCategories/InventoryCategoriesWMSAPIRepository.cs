@@ -123,5 +123,25 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryCategories
             await _db.SaveChangesAsync(ct);
             return true;
         }
+        /// <summary>
+        /// remove an inventory category
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            var entity = await _db.Inventorycategories
+               .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId, ct);
+
+            if (entity is null)
+                return false;
+
+            _db.Inventorycategories.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+                      
+            return true;
+        }
     }
 }

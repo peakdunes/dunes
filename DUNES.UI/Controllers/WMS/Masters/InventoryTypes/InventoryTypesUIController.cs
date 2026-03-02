@@ -3,26 +3,25 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
-using DUNES.UI.Services.WMS.Masters.InventoryCategories;
+using DUNES.UI.Services.WMS.Masters.InventoryTypes;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
-namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
+namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
 {
     /// <summary>
-    /// UI Controller for Inventory Categories (WMS / Masters).
-    /// Non-generic controller by design (one controller per model).
+    /// UI Controller for Inventory Types (WMS / Masters).
+    /// One controller per model (non-generic) by design.
     /// </summary>
-    public class InventoryCategoriesUIController : BaseController
+    public class InventoryTypesUIController : BaseController
     {
-        private readonly IInventoryCategoriesWMSUIService _service;
+        private readonly IInventoryTypesWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
-        private const string MENU_CODE_INDEX = "01020809";
-        private const string MENU_CODE_CRUD = "01020809ZZ";
+        private const string MENU_CODE_INDEX = "01020807";
+        private const string MENU_CODE_CRUD = "01020807ZZ";
 
-        public InventoryCategoriesUIController(
-            IInventoryCategoriesWMSUIService service,
+        public InventoryTypesUIController(
+            IInventoryTypesWMSUIService service,
             IMenuClientUIService menuClientService)
         {
             _service = service;
@@ -30,7 +29,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
         }
 
         /// <summary>
-        /// Inventory Categories list.
+        /// Inventory Types list.
         /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
@@ -46,12 +45,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
             return await HandleAsync(async ct =>
             {
-                var result = await _service.GetAllAsync(CurrentToken, ct);
+                var result = await _service.GetAllAsync(CurrentToken!, ct);
 
                 if (!result.Success || result.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading categories.", MessageDisplay.Inline);
-                    return View(new List<WMSInventorycategoriesReadDTO>());
+                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading inventory types.", MessageDisplay.Inline);
+                    return View(new List<WMSInventoryTypesReadDTO>());
                 }
 
                 return View(result.Data);
@@ -72,10 +71,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Inventory Categories", Url = Url.Action("Index", "InventoryCategoriesUI") },
-                new BreadcrumbItem { Text = "Create", Url = null });
+                //new BreadcrumbItem { Text = "Inventory Types", Url = Url.Action(nameof(Index), "InventoryTypesUI") },
+                new BreadcrumbItem { Text = "Add new Type", Url = null });
 
-            return View(new WMSInventorycategoriesCreateDTO());
+            return View(new WMSInventoryTypesCreateDTO());
         }
 
         /// <summary>
@@ -83,7 +82,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WMSInventorycategoriesCreateDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Create(WMSInventoryTypesCreateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
@@ -94,11 +93,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
                 if (!result.Success)
                 {
-                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error creating category.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error creating inventory type.", MessageDisplay.Inline);
                     return View(dto);
                 }
 
-                MessageHelper.SetMessage(this, "success", result.Message ?? "Category created.", MessageDisplay.Inline);
+                MessageHelper.SetMessage(this, "success", result.Message ?? "Inventory type created.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
@@ -117,7 +116,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Edit Catetory", Url = null });
+               
+                new BreadcrumbItem { Text = "Edit Category", Url = null });
 
             return await HandleAsync(async ct =>
             {
@@ -125,18 +125,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
                 if (!res.Success || res.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Category not found.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Inventory type not found.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
-                var model = new WMSInventorycategoriesUpdateDTO
+                var model = new WMSInventoryTypesUpdateDTO
                 {
                     Id = res.Data.Id,
                     Name = res.Data.Name,
                     Observations = res.Data.Observations,
-                    CycleCountDays = res.Data.CycleCountDays,
-                    ErrorTolerance  = res.Data.ErrorTolerance,
                     Active = res.Data.Active
                 };
 
@@ -149,7 +146,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, WMSInventorycategoriesUpdateDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, WMSInventoryTypesUpdateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
@@ -160,11 +157,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
                 if (!res.Success)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Error updating category.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Error updating inventory type.", MessageDisplay.Inline);
                     return View(dto);
                 }
 
-                MessageHelper.SetMessage(this, "success", res.Message ?? "Category updated.", MessageDisplay.Inline);
+                MessageHelper.SetMessage(this, "success", res.Message ?? "Inventory type updated.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
@@ -205,7 +202,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
             return await HandleAsync(async ct =>
             {
-                var res = await _service.DeleteByIdAsync(CurrentToken!, id, ct);
+                var res = await _service.DeleteByIdAsync(id, CurrentToken!, ct);
 
                 MessageHelper.SetMessage(
                     this,

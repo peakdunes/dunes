@@ -1,4 +1,5 @@
-﻿using DUNES.API.RepositoriesWMS.Masters.ItemStatus;
+﻿using DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus;
+using DUNES.API.RepositoriesWMS.Masters.ItemStatus;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
@@ -13,14 +14,17 @@ namespace DUNES.API.ServicesWMS.Masters.ItemStatus
     public class ItemStatusWMSAPIService : IItemStatusWMSAPIService
     {
         private readonly IItemStatusWMSAPIRepository _repository;
+        private readonly ICompanyClientItemStatusWMSAPIRepository _statusClientRepository;
 
         /// <summary>
         /// Initializes a new instance of <see cref="ItemStatusWMSAPIService"/>.
         /// </summary>
         /// <param name="repository">Item status repository (tenant-scoped).</param>
-        public ItemStatusWMSAPIService(IItemStatusWMSAPIRepository repository)
+        public ItemStatusWMSAPIService(IItemStatusWMSAPIRepository repository,
+            ICompanyClientItemStatusWMSAPIRepository statusClientRepository)
         {
             _repository = repository;
+            _statusClientRepository = statusClientRepository;
         }
 
         /// <inheritdoc />
@@ -139,6 +143,30 @@ namespace DUNES.API.ServicesWMS.Masters.ItemStatus
                 : "Item status deactivated successfully.";
 
             return ApiResponseFactory.Ok(true, message);
+        }
+        /// <summary>
+        /// delete item status master record
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<bool>> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            if (companyId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Company is required");
+
+            if (id <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Status Id is required");
+
+            if (await _statusClientRepository.HasAnyClientMappingAsync(companyId, id, ct))
+                return ApiResponseFactory.Conflict<bool>("Cannot delete: item status is assigned to at least one client.");
+
+            var ok = await _repository.DeleteAsync(companyId, id, ct);
+            if (!ok)
+                return ApiResponseFactory.NotFound<bool>("Item status not found.");
+
+            return ApiResponseFactory.Ok(true, "Item status deleted successfully.");
         }
     }
 }

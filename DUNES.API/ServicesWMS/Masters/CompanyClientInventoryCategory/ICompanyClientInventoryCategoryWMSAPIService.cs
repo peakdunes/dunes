@@ -101,5 +101,7 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
             int companyClientId,
             List<int> inventoryCategoryIds,
             CancellationToken ct);
+
+
     }
 }

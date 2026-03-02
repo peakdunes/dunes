@@ -31,5 +31,10 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         [MaxLength(1000)]
         public string? Observations { get; set; }
+
+        /// <summary>
+        /// is active
+        /// </summary>
+        public bool Active { get; set; }
     }
 }

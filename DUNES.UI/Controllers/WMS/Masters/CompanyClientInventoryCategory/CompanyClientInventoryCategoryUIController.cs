@@ -229,7 +229,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
         private async Task LoadCategoryDropdownAsync(string token, CancellationToken ct)
         {
             var master = await _inventoryCategoriesService.GetEnabledAsync(token, ct); // o GetAll / GetAllActive
-            var masterActive = await _masterCategoriesService.GetActiveAsync(token, ct);
+            var masterActive = await _masterCategoriesService.GetAllAsync(token, ct);
                 
 
             // 2) Existing enabled mappings (enough to prevent duplicates)
@@ -240,7 +240,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 
             // 3) Available to enable
             var available = masterActive.Data
-                .Where(x => !mappedIds.Contains(x.Id))
+                .Where(x => !mappedIds.Contains(x.Id) && x.Active)
                 .ToList();
 
             ViewBag.InventoryCategorySelectList = new SelectList(available, "Id", "Name");

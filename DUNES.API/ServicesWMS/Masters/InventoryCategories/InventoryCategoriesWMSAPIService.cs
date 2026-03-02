@@ -1,4 +1,6 @@
-﻿using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
+﻿using DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory;
+using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
+using DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
@@ -15,17 +17,21 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
     public class InventoryCategoriesWMSAPIService : IInventoryCategoriesWMSAPIService
     {
         private readonly IInventoryCategoriesWMSAPIRepository _repository;
-
+        private readonly ICompanyClientInventoryCategoryWMSAPIRepository _categoryClientrepository;
+                         
         /// <summary>
         /// Initializes a new instance of <see cref="InventoryCategoriesWMSAPIService"/>.
         /// </summary>
         /// <param name="repository">
+        ///  /// <param name="categoryClient">
         /// Repository for Inventory Categories.
         /// All repository calls must receive the <c>companyId</c> and enforce tenant scoping.
         /// </param>
-        public InventoryCategoriesWMSAPIService(IInventoryCategoriesWMSAPIRepository repository)
+        public InventoryCategoriesWMSAPIService(IInventoryCategoriesWMSAPIRepository repository,
+            ICompanyClientInventoryCategoryWMSAPIRepository categoryClientrepository)
         {
             _repository = repository;
+            _categoryClientrepository = categoryClientrepository;
         }
 
         /// <summary>
@@ -235,5 +241,34 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
                 return ApiResponseFactory.Ok(false, "Category name NOT FOUND in our system");
             }
         }
+        /// <summary>
+        /// delete an inventory category
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<bool>> DeleteAsync(int companyId, int id,  CancellationToken ct)
+        {
+            if (companyId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Company is required");
+
+            if (id <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Category Id is required");
+
+            var infoclient = _categoryClientrepository.HasAnyClientMappingAsync(companyId,id, ct);
+
+            if (await _categoryClientrepository.HasAnyClientMappingAsync(companyId, id, ct))
+                return ApiResponseFactory.Conflict<bool>("Cannot delete: category is assigned to at least one client.");
+
+
+            var ok = await _repository.DeleteAsync(companyId, id, ct);
+            if (!ok)
+                return ApiResponseFactory.NotFound<bool>("Inventory category not found.");
+
+            return ApiResponseFactory.Ok(true, "Inventory category deleted successfully.");
+        }
+
+    
     }
 }

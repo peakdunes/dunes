@@ -18,6 +18,8 @@ using DUNES.UI.Services.WMS.Masters.CompaniesContract;
 using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
+using DUNES.UI.Services.WMS.Masters.InventoryTypes;
+using DUNES.UI.Services.WMS.Masters.ItemStatus;
 using DUNES.UI.Services.WMS.Masters.Locations;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -75,6 +77,10 @@ builder.Services.AddScoped<IStatesCountriesWMSUIService, StatesCountriesWMSUISer
 builder.Services.AddScoped<ICitiesWMSUIService, CitiesWMSUIService>();
 
 builder.Services.AddScoped<ILocationsWMSUIService, LocationsWMSUIService>();
+
+builder.Services.AddScoped<IInventoryTypesWMSUIService, InventoryTypesWMSUIService>();
+
+builder.Services.AddScoped<IItemStatusWMSUIService, ItemStatusWMSUIService>();
 
 
 builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
