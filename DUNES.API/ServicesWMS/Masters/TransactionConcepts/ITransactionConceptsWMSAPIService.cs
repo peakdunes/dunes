@@ -93,7 +93,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// <returns>
         /// ApiResponse containing the newly created transaction concept (read DTO).
         /// </returns>
-        Task<ApiResponse<WMSTransactionconceptsReadDTO>> CreateAsync(
+        Task<ApiResponse<bool>> CreateAsync(
             WMSTransactionconceptsCreateDTO request,
             int companyId,
             CancellationToken ct);

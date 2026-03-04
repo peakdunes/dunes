@@ -1,7 +1,7 @@
-﻿@model DUNES.Shared.DTOs.WMS.WMSInventorycategoriesReadDTO
+﻿@model DUNES.Shared.DTOs.WMS.WMSInventoryTypesReadDTO
 
 @{
-    ViewData["Title"] = "Delete Inventory Category";
+    ViewData["Title"] = "Delete Inventory Type";
 }
 
 
@@ -18,15 +18,6 @@
             <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Name)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(m => m.Name)</dd>
 
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Observations)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.Observations)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.CycleCountDays)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.CycleCountDays)</dd>
-
-            <dt class="col-sm-3">@Html.DisplayNameFor(m => m.ErrorTolerance)</dt>
-            <dd class="col-sm-9">@Html.DisplayFor(m => m.ErrorTolerance)</dd>
-
             <dt class="col-sm-3">@Html.DisplayNameFor(m => m.Active)</dt>
             <dd class="col-sm-9">@Html.DisplayFor(m => m.Active)</dd>
         </dl>
@@ -36,7 +27,7 @@
             <input type="hidden" name="id" value="@Model.Id" />
 
             <button type="submit" class="btn btn-outline-danger">Delete</button>
-            
+           
         </form>
 
     </div>

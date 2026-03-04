@@ -256,7 +256,7 @@ namespace DUNES.API.ServicesWMS.Masters.InventoryCategories
             if (id <= 0)
                 return ApiResponseFactory.BadRequest<bool>("Category Id is required");
 
-            var infoclient = _categoryClientrepository.HasAnyClientMappingAsync(companyId,id, ct);
+            //var infoclient = _categoryClientrepository.HasAnyClientMappingAsync(companyId,id, ct);
 
             if (await _categoryClientrepository.HasAnyClientMappingAsync(companyId, id, ct))
                 return ApiResponseFactory.Conflict<bool>("Cannot delete: category is assigned to at least one client.");

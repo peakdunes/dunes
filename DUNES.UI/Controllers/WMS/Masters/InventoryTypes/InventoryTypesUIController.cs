@@ -190,12 +190,57 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
             }, ct);
         }
 
+
+        /// <summary>
+        /// Edit page.
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Delete Inventory Type", Url = null });
+
+            return await HandleAsync(async ct =>
+            {
+                var res = await _service.GetByIdAsync(id, CurrentToken!, ct);
+
+                if (!res.Success || res.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Category not found.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // ReadDTO -> UpdateDTO
+                var model = new WMSInventoryTypesReadDTO
+                {
+                    Id = res.Data.Id,
+                    Name = res.Data.Name,
+                    Observations = res.Data.Observations,
+                    IsOnHand = res.Data.IsOnHand,
+                    Zebrainvassociated = res.Data.Zebrainvassociated,
+                    Active = res.Data.Active,
+                    Idcompany = res.Data.Idcompany,
+                    CompanyName = res.Data.CompanyName,
+                };
+
+                return View(model);
+            }, ct);
+        }
+
+
         /// <summary>
         /// Hard delete (Option B): only if not used.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        public async Task<IActionResult> Delete(int id, WMSInventorycategoriesUpdateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();

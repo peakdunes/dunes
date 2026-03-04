@@ -1,0 +1,83 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSTransactionTypesUpdateDTO
+
+@{
+    ViewData["Title"] = "Edit";
+}
+<form asp-action="Edit">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row">
+        <div class="col-md-4">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" id="chkinput" asp-for="Isinput" /> @Html.DisplayNameFor(model => model.Isinput)
+                </label>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" id="chkoutput" asp-for="Isoutput" /> @Html.DisplayNameFor(model => model.Isoutput)
+                </label>
+            </div>
+        </div>
+
+
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="Match" class="control-label"></label>
+                <input asp-for="Match" class="form-control" />
+                <span asp-validation-for="Match" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-md-2 mt-4">
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Active" /> @Html.DisplayNameFor(model => model.Active)
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="row mt-2">
+        <div class="col-md-2">
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+        <script>
+
+
+            document.getElementById("chkinput").addEventListener("change", function () {
+              if (this.checked) document.getElementById("chkoutput").checked = false;
+            });
+
+            document.getElementById("chkoutput").addEventListener("change", function () {
+              if (this.checked) document.getElementById("chkinput").checked = false;
+            });
+
+
+        </script>
+
+    }
+}

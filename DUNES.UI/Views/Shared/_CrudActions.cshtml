@@ -1,0 +1,22 @@
+﻿@model DUNES.UI.Models.CrudActionsModel
+
+<style>
+    .btn-outline-danger:hover i,
+    .btn-outline-primary:hover i {
+        color: #fff !important;
+    }
+</style>
+@{
+    var controller = string.IsNullOrWhiteSpace(Model.Controller) ? null : Model.Controller;
+   
+}
+
+@if (Model.ShowEdit)
+{
+    <a asp-controller="@controller" asp-action="@Model.EditAction" asp-route-id="@Model.Id" class="text-primary btn btn-outline-primary" title="Edit"><i class="fas fa-pencil-alt"></i></a>
+}
+
+@if (Model.ShowDelete)
+{
+    <a asp-controller="@controller" asp-action="@Model.DeleteAction" asp-route-id="@Model.Id" class="text-danger btn btn-outline-danger" title="Delete"> <i class="fas fa-trash-alt"></i></a>
+}

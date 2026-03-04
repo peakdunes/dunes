@@ -85,7 +85,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
         /// <summary>
         /// Creates a new transaction type.
         /// </summary>
-        public async Task<ApiResponse<WMSTransactiontypesCreateDTO>> CreateAsync(
+        public async Task<ApiResponse<bool>> CreateAsync(
             int companyId,
             WMSTransactiontypesCreateDTO dto,
             CancellationToken ct)
@@ -98,7 +98,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
                 ct);
 
             if (exists)
-                return ApiResponseFactory.Fail<WMSTransactiontypesCreateDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "DUPLICATE_NAME",
                     message: "A transaction type with the same name already exists.",
                     statusCode: StatusCodes.Status409Conflict);
@@ -118,7 +118,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
             await _repository.CreateAsync(entity, ct);
 
             return ApiResponseFactory.Success(
-                dto,
+                true,
                 "Transaction type created successfully.");
         }
 
@@ -204,9 +204,42 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
                 Name = entity.Name,
                 Isinput = entity.Isinput,
                 Isoutput = entity.Isoutput,
+                companyId = entity.companyId,
+                
                 Active = entity.Active,
                 Match = entity.Match
             };
+        }
+
+        /// Deletes a transaction concept from the master catalog.
+        /// </summary>
+        public async Task<ApiResponse<bool>> DeleteAsync(
+            int id,
+            int companyId,
+            CancellationToken ct)
+        {
+            // opcional: validar existencia primero para responder 404 limpio
+            var existing = await _repository.GetByIdAsync(companyId, id, ct);
+            if (existing is null)
+            {
+                return ApiResponseFactory.NotFound<bool>(
+                    "Transaction concept not found.");
+            }
+
+            // Si agregaste HasDependenciesAsync en repo (recomendado), úsalo aquí.
+            // Si aún no lo has agregado, comenta este bloque hasta implementarlo.
+            var hasDependencies = await _repository.HasDependenciesAsync(companyId, id, ct);
+            if (hasDependencies)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "HAS_DEPENDENCIES",
+                    message: "The transaction type cannot be deleted because it has related records.",
+                    statusCode: StatusCodes.Status409Conflict);
+            }
+
+            var deleted = await _repository.DeleteAsync(companyId, id, ct);
+
+            return ApiResponseFactory.Success(deleted, "Type delete successfull");
         }
     }
 }

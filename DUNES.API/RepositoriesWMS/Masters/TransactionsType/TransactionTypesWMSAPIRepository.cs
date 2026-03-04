@@ -145,5 +145,45 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
             await _db.SaveChangesAsync(ct);
             return true;
         }
+
+        /// <summary>
+        /// Checks whether the transaction type has related records that prevent physical deletion.
+        /// </summary>
+        /// <param name="companyId">Company (tenant) identifier used for context/ownership validation.</param>
+        /// <param name="id">Transaction concept identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if dependencies exist; otherwise, false.</returns>
+        public async Task<bool> HasDependenciesAsync(int companyId, int id, CancellationToken ct)
+        {
+            // IMPORTANT:
+            // This validation is intentionally transversal.
+            // If any CompanyClient mapping exists for this TransactionConceptId,
+            // master deletion must be blocked.
+            return await _db.TransactionTypeClients
+                .AsNoTracking()
+                .AnyAsync(x => x.TransactionTypeId == id, ct);
+        }
+
+        /// <summary>
+        /// Deletes a transaction type permanently.
+        /// </summary>
+        /// <param name="companyId">Company (tenant) identifier used to validate ownership.</param>
+        /// <param name="id">Transaction concept identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if the record was found and deleted; otherwise, false.</returns>
+        /// <exception cref="KeyNotFoundException">Thrown when the record does not exist in the tenant scope.</exception>
+        public async Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct)
+        {
+            var entity = await _db.Transactiontypes
+                .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId, ct);
+
+            if (entity is null)
+                throw new KeyNotFoundException("Transaction concept not found.");
+
+            _db.Transactiontypes.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+
+            return true;
+        }
     }
 }

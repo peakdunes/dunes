@@ -16,10 +16,7 @@ namespace DUNES.Shared.DTOs.WMS
         [MaxLength(200)]
         public string? Name { get; set; }
 
-        /// <summary>
-        /// company id
-        /// </summary>
-        public int companyId { get; set; }
+       
 
         /// <summary>
         /// this type is input

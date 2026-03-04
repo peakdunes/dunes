@@ -102,6 +102,40 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
             int id,
             bool isActive,
             CancellationToken ct);
+
+
+        /// <summary>
+        /// Checks whether the transaction concept has related records
+        /// that prevent physical deletion.
+        /// </summary>
+        /// <param name="companyId">Company (tenant) identifier used to scope validation.</param>
+        /// <param name="id">Transaction concept identifier.</param>
+        /// <param name="ct">Cancellation token to cancel the asynchronous operation.</param>
+        /// <returns>
+        /// True if dependencies exist; otherwise, false.
+        /// </returns>
+        Task<bool> HasDependenciesAsync(
+            int companyId,
+            int id,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Deletes a transaction concept record permanently.
+        /// 
+        /// IMPORTANT:
+        /// - Must be called only after validating there are no dependencies.
+        /// - Ownership must be validated by CompanyId.
+        /// </summary>
+        /// <param name="companyId">Company (tenant) identifier used to validate ownership.</param>
+        /// <param name="id">Transaction concept identifier.</param>
+        /// <param name="ct">Cancellation token to cancel the asynchronous operation.</param>
+        /// <returns>
+        /// True if the record was found and deleted; otherwise, false.
+        /// </returns>
+        Task<bool> DeleteAsync(
+            int companyId,
+            int id,
+            CancellationToken ct);
     }
 
 }

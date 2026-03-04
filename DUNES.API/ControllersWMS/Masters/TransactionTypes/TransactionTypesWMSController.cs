@@ -20,7 +20,8 @@ namespace DUNES.API.ControllersWMS.Masters.TransactionTypes
     /// - CompanyId is NEVER received from route, query, or body.
     /// - All business logic is delegated to the Service layer.
     /// </summary>
-    [Route("api/[controller]")]
+    /// 
+    [Route("api/wms/masters/transaction-types")]
     [Authorize]
     [ApiController]
     public class TransactionTypesWMSController : BaseController
@@ -114,5 +115,17 @@ namespace DUNES.API.ControllersWMS.Masters.TransactionTypes
             [FromQuery] bool isActive,
             CancellationToken ct)
             => HandleApi(ct =>  _service.SetActiveAsync(CurrentCompanyId, id, isActive, ct), ct);
+
+        /// <summary>
+        /// Deletes a transaction concept from the master catalog.
+        /// </summary>
+        /// <param name="id">Transaction concept identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>ApiResponse indicating whether the record was deleted.</returns>
+        [HttpDelete("Delete/{id:int}")]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            return await HandleApi(x => _service.DeleteAsync(id, CurrentCompanyId, x), ct);
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
         /// <summary>
         /// Create a new transaction type.
         /// </summary>
-        Task<ApiResponse<WMSTransactiontypesCreateDTO>> CreateAsync(
+        Task<ApiResponse<bool>> CreateAsync(
             int companyId,
             WMSTransactiontypesCreateDTO dto,
             CancellationToken ct);
@@ -62,5 +62,29 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
             bool isActive,
             CancellationToken ct);
 
+        /// <summary>
+        /// Deletes a transaction type from the master catalog.
+        /// 
+        /// BUSINESS RULES:
+        /// - The record must exist and belong to the specified CompanyId.
+        /// - Physical deletion is blocked if dependencies exist
+        ///   (for example, mappings in client configuration tables).
+        /// </summary>
+        /// <param name="id">
+        /// Internal identifier of the transaction concept.
+        /// </param>
+        /// <param name="companyId">
+        /// Company (tenant) identifier provided by the Controller.
+        /// </param>
+        /// <param name="ct">
+        /// Cancellation token to cancel the asynchronous operation.
+        /// </param>
+        /// <returns>
+        /// ApiResponse indicating whether the deletion was completed successfully.
+        /// </returns>
+        Task<ApiResponse<bool>> DeleteAsync(
+            int id,
+            int companyId,
+            CancellationToken ct);
     }
 }

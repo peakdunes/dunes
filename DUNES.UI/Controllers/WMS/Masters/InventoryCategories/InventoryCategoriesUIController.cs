@@ -195,7 +195,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
 
 
         /// <summary>
-        /// Edit page.
+        /// Delete page.
         /// </summary>
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)

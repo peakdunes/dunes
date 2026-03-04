@@ -3,25 +3,23 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
-using DUNES.UI.Services.WMS.Masters.ItemStatus;
+using DUNES.UI.Services.WMS.Masters.InventoryCategories;
+using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
+using DUNES.UI.Services.WMS.Masters.TransactionTypes;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
+namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
 {
-    /// <summary>
-    /// UI Controller for Item Status (WMS / Masters).
-    /// One controller per model (non-generic) by design.
-    /// </summary>
-    public class ItemStatusUIController : BaseController
+    public class TransactionConceptsUIController : BaseController
     {
-        private readonly IItemStatusWMSUIService _service;
+        private readonly TransactionConceptsWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
-        private const string MENU_CODE_INDEX = "01020810";
-        private const string MENU_CODE_CRUD = "01020810ZZ";
+        private const string MENU_CODE_INDEX = "01020808";
+        private const string MENU_CODE_CRUD = "01020808ZZ";
 
-        public ItemStatusUIController(
-            IItemStatusWMSUIService service,
+        public TransactionConceptsUIController(
+            TransactionConceptsWMSUIService service,
             IMenuClientUIService menuClientService)
         {
             _service = service;
@@ -29,7 +27,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         }
 
         /// <summary>
-        /// Item Status list.
+        /// Transaction Concepts list.
         /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
@@ -45,12 +43,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
             return await HandleAsync(async ct =>
             {
-                var result = await _service.GetAllAsync(CurrentToken!, ct);
+                var result = await _service.GetAllAsync(CurrentToken, ct);
 
                 if (!result.Success || result.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading item status.", MessageDisplay.Inline);
-                    return View(new List<WMSItemStatusReadDTO>());
+                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading transaction Concepts.", MessageDisplay.Inline);
+                    return View(new List<WMSInventorycategoriesReadDTO>());
                 }
 
                 return View(result.Data);
@@ -71,9 +69,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Add New Status", Url = null });
+                
+                new BreadcrumbItem { Text = "Create", Url = null });
 
-            return View(new WMSItemStatusCreateDTO());
+            return View(new WMSInventorycategoriesCreateDTO());
         }
 
         /// <summary>
@@ -81,7 +80,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WMSItemStatusCreateDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Create(WMSTransactionconceptsCreateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
@@ -92,11 +91,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
                 if (!result.Success)
                 {
-                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error creating item status.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error creating transaction concept.", MessageDisplay.Inline);
                     return View(dto);
                 }
 
-                MessageHelper.SetMessage(this, "success", result.Message ?? "Item status created.", MessageDisplay.Inline);
+                MessageHelper.SetMessage(this, "success", result.Message ?? "Transaction Concept created.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
@@ -115,8 +114,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
                 _menuClientService,
                 ct,
                 CurrentToken,
-               
-                new BreadcrumbItem { Text = "Edit Item Status", Url = null });
+                new BreadcrumbItem { Text = "Edit Transaction Concept", Url = null });
 
             return await HandleAsync(async ct =>
             {
@@ -124,11 +122,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
                 if (!res.Success || res.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Item status not found.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Transaction Concept not found.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
                 }
 
-                var model = new WMSItemStatusUpdateDTO
+                // ReadDTO -> UpdateDTO
+                var model = new WMSTransactionconceptsUpdateDTO
                 {
                     Id = res.Data.Id,
                     Name = res.Data.Name,
@@ -145,7 +144,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, WMSItemStatusUpdateDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Edit(int id, WMSTransactionconceptsUpdateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
@@ -156,11 +155,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
                 if (!res.Success)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Error updating item status.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Error updating transaction concept.", MessageDisplay.Inline);
                     return View(dto);
                 }
 
-                MessageHelper.SetMessage(this, "success", res.Message ?? "Item status updated.", MessageDisplay.Inline);
+                MessageHelper.SetMessage(this, "success", res.Message ?? "Transaction Concept updated.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
@@ -190,6 +189,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         }
 
 
+        /// <summary>
+        /// Delete page.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
@@ -201,7 +203,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Delete Inventory Type", Url = null });
+                new BreadcrumbItem { Text = "Delete Transaction Concept", Url = null });
 
             return await HandleAsync(async ct =>
             {
@@ -209,19 +211,17 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
                 if (!res.Success || res.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Category not found.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Transaction Concept not found.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
                 }
 
                 // ReadDTO -> UpdateDTO
-                var model = new WMSItemStatusReadDTO
+                var model = new WMSTransactionconceptsReadDTO
                 {
                     Id = res.Data.Id,
                     Name = res.Data.Name,
                     Observations = res.Data.Observations,
-                    Active = res.Data.Active,
-                    Idcompany = res.Data.Idcompany,
-                    CompanyName = res.Data.CompanyName,
+                    Active = res.Data.Active
                 };
 
                 return View(model);
@@ -231,18 +231,17 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
         /// <summary>
         /// Hard delete (Option B): only if not used.
-        /// Requires API/UI support for Delete. If not implemented yet, API will return 404.
         /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, WMSItemStatusReadDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Delete(int id, WMSTransactionconceptsUpdateDTO dto, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
 
             return await HandleAsync(async ct =>
             {
-                var res = await _service.DeleteByIdAsync(id, CurrentToken!, ct);
+                var res = await _service.DeleteByIdAsync(CurrentToken!, id, ct);
 
                 MessageHelper.SetMessage(
                     this,

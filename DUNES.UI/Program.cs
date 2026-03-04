@@ -22,6 +22,8 @@ using DUNES.UI.Services.WMS.Masters.InventoryTypes;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
 using DUNES.UI.Services.WMS.Masters.Locations;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
+using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
+using DUNES.UI.Services.WMS.Masters.TransactionTypes;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,10 +54,12 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddScoped<IAuthUIService, AuthUIService>();
 
 builder.Services.AddScoped<IMenuClientUIService, MenuClientUIService>();
-builder.Services.AddScoped<IASNUIService, ASNUIService>();
-builder.Services.AddScoped<IPickProcessUIService, PickProcessUIService>();
-builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 
+builder.Services.AddScoped<IASNUIService, ASNUIService>();
+
+builder.Services.AddScoped<IPickProcessUIService, PickProcessUIService>();
+
+builder.Services.AddScoped<ICommonINVUIService, CommonINVUIService>();
 
 builder.Services.AddScoped<ICompaniesWMSUIService, CompaniesWMSUIService>();
 
@@ -64,7 +68,6 @@ builder.Services.AddScoped<IClientCompaniesWMSUIService, ClientCompaniesWMSUISer
 builder.Services.AddScoped<ICompaniesClientDivisionWMSUIService, CompaniesClientDivisionWMSUIService>();
 
 builder.Services.AddScoped<ICompaniesClientContractWMSUIService, CompaniesClientContractWMSUIService>();
-
 
 builder.Services.AddScoped<IInventoryCategoriesWMSUIService, InventoryCategoriesWMSUIService>();
 
@@ -82,8 +85,12 @@ builder.Services.AddScoped<IInventoryTypesWMSUIService, InventoryTypesWMSUIServi
 
 builder.Services.AddScoped<IItemStatusWMSUIService, ItemStatusWMSUIService>();
 
+builder.Services.AddScoped<ITransactionConceptsWMSUIService, TransactionConceptsWMSUIService>();
+
+builder.Services.AddScoped<ITransactionTypesWMSUIService, TransactionTypesWMSUIService>();
 
 builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
+
 builder.Services.AddScoped<IPdfService, PdfService>();
 
 // Necesario para el fallback de TempData si no hay Controller

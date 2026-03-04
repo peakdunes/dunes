@@ -87,14 +87,14 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// <summary>
         /// Creates a new transaction concept.
         /// </summary>
-        public async Task<ApiResponse<WMSTransactionconceptsReadDTO>> CreateAsync(
+        public async Task<ApiResponse<bool>> CreateAsync(
             WMSTransactionconceptsCreateDTO request,
             int companyId,
             CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(request.Name))
             {
-                return ApiResponseFactory.Fail<WMSTransactionconceptsReadDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "VALIDATION_ERROR",
                     message: "Name is required.",
                     statusCode: StatusCodes.Status400BadRequest);
@@ -110,7 +110,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
 
             if (exists)
             {
-                return ApiResponseFactory.Fail<WMSTransactionconceptsReadDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "DUPLICATE_NAME",
                     message: "A transaction concept with the same name already exists.",
                     statusCode: StatusCodes.Status409Conflict);
@@ -128,7 +128,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
 
             var created = await _repository.CreateAsync(entity, ct);
 
-            return ApiResponseFactory.Success(MapToReadDto(created), "Transaction concept created");
+            return ApiResponseFactory.Success(true, "Transaction concept created");
         }
 
         /// <summary>

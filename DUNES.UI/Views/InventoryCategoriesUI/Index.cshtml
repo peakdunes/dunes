@@ -29,8 +29,8 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-pencil-alt"></i></a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash-alt"></i></a>
+                        <partial name="_CrudActions"
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "InventoryCategoriesUI" })" />
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.Id)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>
