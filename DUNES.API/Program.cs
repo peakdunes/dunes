@@ -1,25 +1,18 @@
-﻿using AutoMapper;
-using DUNES.API.Auth.Authorization;
-using DUNES.API.ControllersWMS.Masters.CompaniesContract;
-using DUNES.API.ControllersWMS.Masters.CompanyClientDivision;
+﻿
 using DUNES.API.Data;
 using DUNES.API.Data.Interceptors;
-using DUNES.API.Models.Configuration;
-using DUNES.API.Models.Masters;
-using DUNES.API.Profiles;
+
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Transactions;
 using DUNES.API.Repositories.Inventory.Common.Queries;
 using DUNES.API.Repositories.Inventory.Common.Transactions;
 using DUNES.API.Repositories.Inventory.PickProcess.Queries;
-using DUNES.API.Repositories.Inventory.PickProcess.Transactions;
+
 using DUNES.API.Repositories.Masters;
-using DUNES.API.Repositories.WebService.Queries;
-using DUNES.API.Repositories.WebService.Transactions;
+
 using DUNES.API.RepositoriesWMS.Auth;
-using DUNES.API.RepositoriesWMS.Inventory.Common.Queries;
-using DUNES.API.RepositoriesWMS.Inventory.Transactions;
+
 using DUNES.API.RepositoriesWMS.Masters;
 using DUNES.API.RepositoriesWMS.Masters.Bins;
 using DUNES.API.RepositoriesWMS.Masters.Cities;
@@ -45,17 +38,15 @@ using DUNES.API.RepositoriesWMS.Masters.TransactionTypeClient;
 using DUNES.API.Services.Auth;
 using DUNES.API.Services.B2B.Common.Queries;
 using DUNES.API.Services.Inventory.ASN.Queries;
-using DUNES.API.Services.Inventory.ASN.Transactions;
+
 using DUNES.API.Services.Inventory.Common.Queries;
 using DUNES.API.Services.Inventory.PickProcess.Queries;
-using DUNES.API.Services.Inventory.PickProcess.Transactions;
+
 using DUNES.API.Services.Masters;
-using DUNES.API.Services.WebService.Queries;
-using DUNES.API.Services.WebService.Transactions;
+
 using DUNES.API.ServicesWMS.Admin;
 using DUNES.API.ServicesWMS.Auth;
-using DUNES.API.ServicesWMS.Inventory.Common.Queries;
-using DUNES.API.ServicesWMS.Inventory.Transactions;
+
 using DUNES.API.ServicesWMS.Masters;
 using DUNES.API.ServicesWMS.Masters.Bins;
 using DUNES.API.ServicesWMS.Masters.Cities;
@@ -82,7 +73,7 @@ using DUNES.API.Utils.Logging;
 using DUNES.API.Utils.Middlewares;
 using DUNES.API.Utils.TraceProvider;
 using DUNES.Shared.DTOs.Auth;
-using DUNES.Shared.DTOs.Masters;
+
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Interfaces.AuditContext;
 using DUNES.Shared.Interfaces.RequestInfo;
@@ -90,10 +81,9 @@ using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebSockets;
+
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -101,7 +91,15 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
+Console.WriteLine("STEP 1 - Entering Program");
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+
+Console.WriteLine("STEP 2 - Builder created");
+
+
 
 // ***** (1) Apaga providers por defecto del host (console/debug), para que solo Serilog loguee
 builder.Logging.ClearProviders();
@@ -275,7 +273,7 @@ builder.Services.AddSwaggerGen(c =>
 
             "TransactionConceptClientWMS" => new[] { "WMS Transaction Concepts per client - CRUD" },
             "TransactionTypeClientWMS" => new[] { "WMS Transaction Types per client - CRUD" },
-            
+
 
 
 
@@ -427,26 +425,43 @@ builder.Services.AddScoped<IItemsWMSAPIService, ItemsWMSAPIService>();
 //#######################
 
 
+Console.WriteLine("STEP 3 - Services registered");
 
 builder.Services.AddOpenApi();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+
+
 var app = builder.Build();
+
+Console.WriteLine("STEP 4 - App built");
 
 // Swagger solo en Development (evita duplicados y exposición en Prod)
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
+
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "DUNES.API v1");
-        c.RoutePrefix = "docs"; // la doc estará en /docs
+        c.RoutePrefix = "swagger";
         c.DocumentTitle = "DUNES.API Docs";
         c.InjectStylesheet("/swagger-ui/custom.css");
-        c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);  //abre todo colapsado solo titulos
-        c.DefaultModelsExpandDepth(-1); // oculta Schemas
+        c.DefaultModelsExpandDepth(-1);
     });
+
+    //app.UseSwaggerUI(c =>
+    //{
+    //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "DUNES.API v1");
+    //    c.RoutePrefix = "docs"; // la doc estará en /docs
+    //    c.DocumentTitle = "DUNES.API Docs";
+    //    c.InjectStylesheet("/swagger-ui/custom.css");
+    //    c.DocExpansion(Swashbuckle.AspNetCore.SwaggerUI.DocExpansion.None);  //abre todo colapsado solo titulos
+    //    c.DefaultModelsExpandDepth(-1); // oculta Schemas
+    //});
 }
+
+Console.WriteLine(app.Environment.EnvironmentName);
 
 // ***** (4) Orden del pipeline recomendado
 
@@ -505,4 +520,9 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+Console.WriteLine("STEP 5 - Middleware configured");
+
+Console.WriteLine("STEP 6 - Before app.Run()");
+
+app.MapGet("/ping", () => "DUNES API OK");
 app.Run();

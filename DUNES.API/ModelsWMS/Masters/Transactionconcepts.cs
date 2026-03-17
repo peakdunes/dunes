@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.ModelsWMS.Masters;
 /// <summary>
@@ -25,6 +26,8 @@ public class Transactionconcepts
     /// <summary>
     /// boservations
     /// </summary>
+    /// 
+    [MaxLength(1000)]
     public string? Observations { get; set; }
 
     /// <summary>

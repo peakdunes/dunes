@@ -132,18 +132,40 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
         }
 
         /// <inheritdoc />
-        public async Task<bool> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct)
+        public async Task<bool> SetActiveAsync(
+           int companyId,
+           int id,
+           bool isActive,
+           CancellationToken ct)
         {
             var entity = await _db.InventoryTypes
-                .FirstOrDefaultAsync(x => x.Id == id && x.Idcompany == companyId, ct);
+                .FirstOrDefaultAsync(m =>
+                    m.Id == id &&
+                    m.Idcompany == companyId,
+                    ct);
 
             if (entity is null)
                 return false;
+
+           
 
             entity.Active = isActive;
             await _db.SaveChangesAsync(ct);
             return true;
         }
+
+        /// <inheritdoc />
+        public async Task<bool> IsMasterActiveAsync(
+            int companyId,
+            int inventoryTypeId,
+            CancellationToken ct)
+        {
+            // If your master catalog is tenant-scoped, add: && c.CompanyId == companyId
+            return await _db.InventoryTypes
+                .AsNoTracking()
+                .AnyAsync(c => c.Id == inventoryTypeId && c.Active, ct);
+        }
+
         /// <summary>
         /// Deletes an inventory type master record physically.
         /// </summary>
@@ -203,5 +225,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
 
             return hasInventoryTransactionDetailUsage;
         }
+
+     
     }
 }

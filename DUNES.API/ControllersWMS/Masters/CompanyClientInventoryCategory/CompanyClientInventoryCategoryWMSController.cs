@@ -112,5 +112,27 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryCategory
                 ct => _service.SetEnabledSetAsync(CurrentCompanyId, CurrentCompanyClientId, inventoryCategoryIds, ct),
                 ct);
         }
+
+
+        /// <summary>
+        /// Deletes a client inventory category mapping by Id.
+        /// Only deletes the relation row; it does not affect the master category.
+        /// </summary>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        [HttpDelete("Delete/{id:int}")]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            return await HandleApi(async ct =>
+            {
+                var result = await _service.DeleteAsync(
+                    CurrentCompanyId,
+                    CurrentCompanyClientId,
+                    id,
+                    ct);
+
+                return result;
+            }, ct);
+        }
     }
 }

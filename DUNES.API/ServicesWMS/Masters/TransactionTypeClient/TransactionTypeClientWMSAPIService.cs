@@ -1,24 +1,14 @@
-﻿using DUNES.API.RepositoriesWMS.Masters.ClientCompanies;
-using DUNES.API.RepositoriesWMS.Masters.Companies;
-using DUNES.API.RepositoriesWMS.Masters.TransactionsType;
-using DUNES.API.RepositoriesWMS.Masters.TransactionTypeClient;
+﻿using DUNES.API.RepositoriesWMS.Masters.TransactionTypeClient;
 using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
-using Microsoft.AspNetCore.Http;
 
 namespace DUNES.API.ServicesWMS.Masters.TransactionTypeClient
 {
     /// <summary>
-    /// Transaction Type Client service implementation.
-    ///
-    /// Enforces business rules for mappings between
-    /// Transaction Types (master) and Company Clients.
-    ///
-    /// IMPORTANT (STANDARD COMPANYID):
-    /// - CompanyId is always provided by the Controller (from token).
-    /// - The service NEVER reads claims directly.
-    /// - The service validates master existence and duplicate mappings.
+    /// Service implementation for managing TransactionTypeClient mappings.
+    /// Applies business rules on top of the repository layer for the mapping
+    /// between a client and the master TransactionType catalog.
     /// </summary>
     public class TransactionTypeClientWMSAPIService : ITransactionTypeClientWMSAPIService
     {
@@ -27,164 +17,278 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionTypeClient
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionTypeClientWMSAPIService"/> class.
         /// </summary>
-        /// <param name="repository">Transaction Type Client repository.</param>
-        public TransactionTypeClientWMSAPIService(ITransactionTypeClientWMSAPIRepository repository)
+        /// <param name="repository">Repository for TransactionTypeClient mappings.</param>
+        public TransactionTypeClientWMSAPIService(
+            ITransactionTypeClientWMSAPIRepository repository)
         {
             _repository = repository;
         }
 
         /// <summary>
-        /// Retrieves all Transaction Type mappings for a specific CompanyClient.
+        /// Gets all transaction type mappings for the current tenant scope.
+        /// Includes both active and inactive mappings.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the list of mappings.</returns>
-        public async Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetByClientAsync(
+        public async Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
         {
-            var data = await _repository.GetByClientAsync(companyId, companyClientId, ct);
-            return ApiResponseFactory.Success(data);
+            var data = await _repository.GetAllAsync(companyId, companyClientId, ct);
+
+            return ApiResponseFactory.Success(
+                data,
+                "Transaction type mappings retrieved successfully.");
         }
 
         /// <summary>
-        /// Creates a new Transaction Type mapping for a CompanyClient.
+        /// Gets a transaction type mapping by Id for the current tenant scope.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="dto">Create DTO for the mapping.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the created mapping.</returns>
-        public async Task<ApiResponse<WMSTransactionTypeClientReadDTO>> CreateAsync(
+        public async Task<ApiResponse<WMSTransactionTypeClientReadDTO>> GetByIdAsync(
+            int id,
             int companyId,
-            WMSTransactionTypeClientCreateDTO dto,
+            int companyClientId,
             CancellationToken ct)
         {
-            // Validate master belongs to same tenant
-            var masterExists = await _repository.MasterExistsAsync(companyId, dto.TransactionTypeId, ct);
+            var data = await _repository.GetByIdAsync(id, companyId, companyClientId, ct);
+
+            if (data is null)
+            {
+                return ApiResponseFactory.NotFound<WMSTransactionTypeClientReadDTO>(
+                    "Transaction type client mapping was not found.");
+            }
+
+            return ApiResponseFactory.Success(
+                data,
+                "Transaction type client mapping retrieved successfully.");
+        }
+
+        /// <summary>
+        /// Creates a new TransactionTypeClient mapping.
+        /// </summary>
+        public async Task<ApiResponse<WMSTransactionTypeClientReadDTO>> CreateAsync(
+            WMSTransactionTypeClientCreateDTO dto,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            var masterExists = await _repository.MasterExistsAsync(dto.TransactionTypeId, ct);
             if (!masterExists)
             {
                 return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
-                    error: "MASTER_NOT_FOUND",
-                    message: "Transaction type not found for this company.",
-                    statusCode: StatusCodes.Status404NotFound);
+                    error: "TYPE_NOT_EXIST",
+                    message: "The selected Transaction Type does not exist.",
+                    statusCode: 400);
             }
 
-            // Validate duplicate mapping
-            var exists = await _repository.ExistsAsync(
+            var existsMapping = await _repository.ExistsMappingAsync(
                 companyId,
-                dto.CompanyClientId,
+                companyClientId,
                 dto.TransactionTypeId,
                 excludeId: null,
                 ct);
 
-            if (exists)
+            if (existsMapping)
             {
                 return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
                     error: "DUPLICATE_MAPPING",
-                    message: "This transaction type is already assigned to the client.",
-                    statusCode: StatusCodes.Status409Conflict);
+                    message: "A mapping for this Transaction Type already exists for the selected client.",
+                    statusCode: 400);
             }
 
-            var entity = new ModelsWMS.Masters.TransactionTypeClient
+            if (dto.Active)
+            {
+                var masterIsActive = await _repository.MasterIsActiveAsync(dto.TransactionTypeId, ct);
+                if (!masterIsActive)
+                {
+                    return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
+                        error: "MASTER_INACTIVE",
+                        message: "The mapping cannot be created as active because the master Transaction Type is inactive.",
+                        statusCode: 400);
+                }
+            }
+
+            var entity = new DUNES.API.ModelsWMS.Masters.TransactionTypeClient
             {
                 CompanyId = companyId,
-                CompanyClientId = dto.CompanyClientId,
+                CompanyClientId = companyClientId,
                 TransactionTypeId = dto.TransactionTypeId,
                 Active = dto.Active
             };
 
             var created = await _repository.CreateAsync(entity, ct);
+            var createdDto = await _repository.GetByIdAsync(created.Id, companyId, companyClientId, ct);
 
-            // Return consistent ReadDTO using repository projection
-            var list = await _repository.GetByClientAsync(companyId, created.CompanyClientId, ct);
-            var createdDto = list.FirstOrDefault(x => x.Id == created.Id);
-
-            if (createdDto is null)
-            {
-                // Fallback (should not happen, but don't crash)
-                createdDto = new WMSTransactionTypeClientReadDTO
-                {
-                    Id = created.Id,
-                    CompanyClientId = created.CompanyClientId,
-                    TransactionTypeId = created.TransactionTypeId,
-                    Active = created.Active
-                };
-            }
-
-            return ApiResponseFactory.Success(createdDto);
+            return ApiResponseFactory.Success(
+                createdDto!,
+                "Transaction type client mapping created successfully.");
         }
 
         /// <summary>
-        /// Activates or deactivates an existing mapping.
+        /// Updates an existing TransactionTypeClient mapping.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="id">Mapping identifier.</param>
-        /// <param name="isActive">New active state.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the updated mapping.</returns>
-        public async Task<ApiResponse<WMSTransactionTypeClientReadDTO>> SetActiveAsync(
+        public async Task<ApiResponse<WMSTransactionTypeClientReadDTO>> UpdateAsync(
+            int id,
+            WMSTransactionTypeClientUpdateDTO dto,
             int companyId,
             int companyClientId,
-            int id,
-            bool isActive,
             CancellationToken ct)
         {
-            var entity = await _repository.GetEntityByIdAsync(companyId, companyClientId, id, ct);
+            var entity = await _repository.GetEntityByIdAsync(id, companyId, companyClientId, ct);
             if (entity is null)
             {
                 return ApiResponseFactory.NotFound<WMSTransactionTypeClientReadDTO>(
-                    "Transaction type mapping not found.");
+                    "Transaction type client mapping was not found.");
             }
 
-            var updated = await _repository.SetActiveAsync(companyId, companyClientId, id, isActive, ct);
+            var masterExists = await _repository.MasterExistsAsync(dto.TransactionTypeId, ct);
+            if (!masterExists)
+            {
+                return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
+                    error: "TYPE_NOT_FOUND",
+                    message: "The selected Transaction Type does not exist.",
+                    statusCode: 400);
+            }
+
+            var existsMapping = await _repository.ExistsMappingAsync(
+                companyId,
+                companyClientId,
+                dto.TransactionTypeId,
+                excludeId: id,
+                ct);
+
+            if (existsMapping)
+            {
+                return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
+                    error: "MAPPING_EXIST",
+                    message: "A mapping for this Transaction Type already exists for the selected client.",
+                    statusCode: 400);
+            }
+
+            if (dto.Active)
+            {
+                var masterIsActive = await _repository.MasterIsActiveAsync(dto.TransactionTypeId, ct);
+                if (!masterIsActive)
+                {
+                    return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
+                        error: "MASTER_INACTIVE",
+                        message: "The mapping cannot be updated as active because the master Transaction Type is inactive.",
+                        statusCode: 400);
+                }
+            }
+
+            entity.TransactionTypeId = dto.TransactionTypeId;
+            entity.Active = dto.Active;
+
+            var updated = await _repository.UpdateAsync(entity, ct);
+
             if (!updated)
             {
-                return ApiResponseFactory.NotFound<WMSTransactionTypeClientReadDTO>(
-                    "Transaction type mapping not found.");
+                return ApiResponseFactory.Fail<WMSTransactionTypeClientReadDTO>(
+                    error: "NOT_UPDATE",
+                    message: "The transaction type client mapping could not be updated.",
+                    statusCode: 500);
             }
 
-            var list = await _repository.GetByClientAsync(companyId, companyClientId, ct);
-            var dto = list.FirstOrDefault(x => x.Id == id);
+            var updatedDto = await _repository.GetByIdAsync(id, companyId, companyClientId, ct);
 
-            if (dto is null)
-            {
-                return ApiResponseFactory.NotFound<WMSTransactionTypeClientReadDTO>(
-                    "Transaction type mapping not found after update.");
-            }
-
-            return ApiResponseFactory.Success(dto);
+            return ApiResponseFactory.Success(
+                updatedDto!,
+                "Transaction type client mapping updated successfully.");
         }
 
         /// <summary>
-        /// Deletes a mapping physically.
+        /// Deletes a TransactionTypeClient mapping by Id.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="id">Mapping identifier.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse indicating whether the mapping was deleted.</returns>
         public async Task<ApiResponse<bool>> DeleteAsync(
+            int id,
             int companyId,
             int companyClientId,
-            int id,
             CancellationToken ct)
         {
-            var entity = await _repository.GetEntityByIdAsync(companyId, companyClientId, id, ct);
+            var entity = await _repository.GetEntityByIdAsync(id, companyId, companyClientId, ct);
             if (entity is null)
             {
-                return ApiResponseFactory.NotFound<bool>("Transaction type mapping not found.");
+                return ApiResponseFactory.NotFound<bool>(
+                    "Transaction type client mapping was not found.");
             }
 
-            var deleted = await _repository.DeleteAsync(companyId, companyClientId, id, ct);
+            var deleted = await _repository.DeleteAsync(entity, ct);
+
             if (!deleted)
             {
-                return ApiResponseFactory.NotFound<bool>("Transaction type mapping not found.");
+                return ApiResponseFactory.Fail<bool>(
+                    error: "NOT_DELETE",
+                    message: "The transaction type client mapping could not be deleted.",
+                    statusCode: 500);
             }
 
-            return ApiResponseFactory.Success(true);
+            return ApiResponseFactory.Success(
+                true,
+                "Transaction type client mapping deleted successfully.");
+        }
+
+        /// <summary>
+        /// Updates the active status of a TransactionTypeClient mapping.
+        /// </summary>
+        public async Task<ApiResponse<bool>> SetActiveAsync(
+            int id,
+            bool isActive,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            var entity = await _repository.GetEntityByIdAsync(id, companyId, companyClientId, ct);
+            if (entity is null)
+            {
+                return ApiResponseFactory.NotFound<bool>(
+                    "Transaction type client mapping was not found.");
+            }
+
+            if (isActive)
+            {
+                var masterIsActive = await _repository.MasterIsActiveAsync(entity.TransactionTypeId, ct);
+                if (!masterIsActive)
+                {
+                    return ApiResponseFactory.Fail<bool>(
+                        error: "MASTER_INACTIVE",
+                        message: "The mapping cannot be activated because the master Transaction Type is inactive.",
+                        statusCode: 400);
+                }
+            }
+
+            var updated = await _repository.SetActiveAsync(
+                companyId,
+                companyClientId,
+                id,
+                isActive,
+                ct);
+
+            if (!updated)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "NOT_UPDATE",
+                    message: "The active status could not be updated.",
+                    statusCode: 500);
+            }
+
+            return ApiResponseFactory.Success(
+                true,
+                "Transaction type client mapping status updated successfully.");
+        }
+
+        /// <summary>
+        /// Gets the enabled transaction types for the current tenant scope.
+        /// </summary>
+        public async Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetEnabledAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            var data = await _repository.GetEnabledAsync(companyId, companyClientId, ct);
+
+            return ApiResponseFactory.Success(
+                data,
+                "Enabled transaction types retrieved successfully.");
         }
     }
 }

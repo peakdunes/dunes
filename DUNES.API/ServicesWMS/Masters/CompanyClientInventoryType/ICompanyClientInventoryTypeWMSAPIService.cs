@@ -98,17 +98,34 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
             CancellationToken ct);
 
 
+
         /// <summary>
         /// Changes the active status of an existing InventoryType mapping within the current tenant scope.
         /// If activating the mapping, the referenced master InventoryType must be active.
         /// </summary>
-        /// <param name="request">Set-active request DTO.</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="isActive"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<bool>> SetActiveAsync(
+            int companyId,
+            int companyClientId,
+            int id,
+            bool isActive,
+            CancellationToken ct);
+
+
+        /// <summary>
+        /// Returns only the inventory types enabled for the current client:
+        /// - Mapping IsActive=true AND
+        /// - Master InventoryCategory IsActive=true
+        /// </summary>
+        /// <param name="companyId">Company scope (from token).</param>
+        /// <param name="companyClientId">Client scope (from token).</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        Task<ApiResponse<WMSCompanyClientInventoryTypeReadDTO>> SetActiveAsync(
-            WMSCompanyClientInventoryTypeSetActiveDTO request,
+        Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetEnabledAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);

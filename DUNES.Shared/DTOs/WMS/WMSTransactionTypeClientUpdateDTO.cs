@@ -17,6 +17,17 @@ namespace DUNES.Shared.DTOs.WMS
         /// </summary>
         public int Id { get; set; }
 
+
+        /// <summary>
+        /// master Id
+        /// </summary>
+        public int TransactionTypeId { get; set; }
+
+        /// <summary>
+        /// transaction type name
+        /// </summary>
+        public string TransactionTypeName { get; set; }
+
         /// <summary>
         /// Indicates whether this Transaction Type
         /// is active for the CompanyClient.

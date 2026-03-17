@@ -5,142 +5,231 @@ using Microsoft.EntityFrameworkCore;
 namespace DUNES.API.RepositoriesWMS.Masters.TransactionConceptClient
 {
     /// <summary>
-    /// Repository for TransactionConceptClient mappings.
-    ///
-    /// IMPORTANT (STANDARD COMPANYID):
-    /// - All queries MUST be scoped by CompanyId.
-    /// - CompanyClientId must also be validated in every mapping operation.
-    /// - Repository never infers tenant scope.
+    /// Repository implementation for managing TransactionConceptClient mappings.
+    /// Handles persistence and read operations for the mapping between a client
+    /// and the master TransactionConcept catalog, scoped by CompanyId and CompanyClientId.
     /// </summary>
     public class TransactionConceptClientWMSAPIRepository : ITransactionConceptClientWMSAPIRepository
     {
-        private readonly appWmsDbContext _db;
+        private readonly appWmsDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TransactionConceptClientWMSAPIRepository"/> class.
         /// </summary>
-        /// <param name="db">WMS DbContext.</param>
-        public TransactionConceptClientWMSAPIRepository(appWmsDbContext db)
+        /// <param name="context">Application database context.</param>
+        public TransactionConceptClientWMSAPIRepository(appWmsDbContext context)
         {
-            _db = db;
+            _context = context;
         }
 
         /// <summary>
-        /// Gets all mappings for a specific company client.
-        /// Includes master concept info for display.
+        /// Gets all mapping records for the specified tenant scope (company + client),
+        /// including both active and inactive mappings.
         /// </summary>
-        public async Task<List<WMSTransactionConceptClientReadDTO>> GetByClientAsync(
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// A list of mapped transaction concepts (active and inactive) with master display name.
+        /// </returns>
+        public async Task<List<WMSTransactionConceptClientReadDTO>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct)
         {
-            return await _db.TransactionConceptClients
-                .AsNoTracking()
-                .Where(m => m.CompanyId == companyId && m.CompanyClientId == companyClientId)
-                .Join(
-                    _db.Transactionconcepts.AsNoTracking(),
-                    m => m.TransactionConceptId,
-                    tc => tc.Id,
-                    (m, tc) => new { m, tc })
-                .Where(x => x.tc.companyId == companyId) // defensa extra multi-tenant
-                .OrderBy(x => x.tc.Name)
+            return await _context.TransactionConceptClients
+                .Where(x =>
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId)
                 .Select(x => new WMSTransactionConceptClientReadDTO
                 {
-                    Id = x.m.Id,
-                    CompanyId = x.m.CompanyId,
-                    CompanyClientId = x.m.CompanyClientId,
-                    TransactionConceptId = x.m.TransactionConceptId,
-                    TransactionConceptName = x.tc.Name,
-                    Active = x.m.Active
+                    Id = x.Id,
+                   
+                    TransactionConceptId = x.TransactionConceptId,
+                    TransactionConceptName = x.TransactionConcept.Name,
+                    Active = x.Active
                 })
                 .ToListAsync(ct);
         }
 
         /// <summary>
-        /// Gets one mapping entity by Id, scoped by Company and CompanyClient.
+        /// Gets a single mapping record by mapping Id within the specified tenant scope.
         /// </summary>
-        public async Task<ModelsWMS.Masters.TransactionConceptClient?> GetEntityByIdAsync(
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// The mapped transaction concept DTO if found; otherwise <c>null</c>.
+        /// </returns>
+        public async Task<WMSTransactionConceptClientReadDTO?> GetByIdAsync(
+            int id,
             int companyId,
             int companyClientId,
-            int id,
             CancellationToken ct)
         {
-            return await _db.TransactionConceptClients
-                .FirstOrDefaultAsync(x =>
+            return await _context.TransactionConceptClients
+                .Where(x =>
                     x.Id == id &&
                     x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId, ct);
+                    x.CompanyClientId == companyClientId)
+                .Select(x => new WMSTransactionConceptClientReadDTO
+                {
+                    Id = x.Id,
+                   
+                    TransactionConceptId = x.TransactionConceptId,
+                    TransactionConceptName = x.TransactionConcept.Name,
+                    Active = x.Active
+                })
+                .FirstOrDefaultAsync(ct);
         }
 
         /// <summary>
-        /// Validates that the CompanyClient exists and belongs to the same Company.
+        /// Checks whether a mapping already exists for the same tenant scope and TransactionConceptId.
+        /// Useful to prevent duplicates on create/update.
         /// </summary>
-        public async Task<bool> CompanyClientExistsAsync(
-            int companyId,
-            int companyClientId,
-            CancellationToken ct)
-        {
-            return await _db.CompanyClient
-                .AsNoTracking()
-                .AnyAsync(x => x.Id == companyClientId && x.CompanyId == companyId.ToString(), ct);
-            // OJO:
-            // Si tu tabla companyClient maneja CompanyId como int (no string), cambia a:
-            // AnyAsync(x => x.Id == companyClientId && x.CompanyId == companyId, ct);
-        }
-
-        /// <summary>
-        /// Checks if the mapping already exists for the combination
-        /// (CompanyId, CompanyClientId, TransactionConceptId).
-        /// </summary>
-        public async Task<bool> ExistsAsync(
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="transactionConceptId">Master TransactionConcept identifier.</param>
+        /// <param name="excludeId">
+        /// Optional mapping Id to exclude from the duplicate check (used in updates).
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if a duplicate mapping exists; otherwise <c>false</c>.</returns>
+        public async Task<bool> ExistsMappingAsync(
             int companyId,
             int companyClientId,
             int transactionConceptId,
             int? excludeId,
             CancellationToken ct)
         {
-            var query = _db.TransactionConceptClients
-                .AsNoTracking()
-                .Where(x =>
+            return await _context.TransactionConceptClients
+                .AnyAsync(x =>
                     x.CompanyId == companyId &&
                     x.CompanyClientId == companyClientId &&
-                    x.TransactionConceptId == transactionConceptId);
-
-            if (excludeId.HasValue)
-                query = query.Where(x => x.Id != excludeId.Value);
-
-            return await query.AnyAsync(ct);
+                    x.TransactionConceptId == transactionConceptId &&
+                    (!excludeId.HasValue || x.Id != excludeId.Value),
+                    ct);
         }
 
         /// <summary>
-        /// Validates that the master Transaction Concept exists
-        /// and belongs to the same Company.
+        /// Checks whether the referenced TransactionConcept exists in the master catalog.
         /// </summary>
+        /// <param name="transactionConceptId">Master TransactionConcept identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns><c>true</c> if the master record exists; otherwise <c>false</c>.</returns>
         public async Task<bool> MasterExistsAsync(
-            int companyId,
             int transactionConceptId,
             CancellationToken ct)
         {
-            return await _db.Transactionconcepts
-                .AsNoTracking()
-                .AnyAsync(x => x.Id == transactionConceptId && x.companyId == companyId, ct);
+            return await _context.Transactionconcepts
+                .AnyAsync(x => x.Id == transactionConceptId, ct);
         }
 
         /// <summary>
-        /// Creates a new mapping.
+        /// Checks whether the referenced TransactionConcept exists and is active in the master catalog.
+        /// This is used when enabling a mapping (<c>Active = true</c>).
         /// </summary>
-        public async Task<ModelsWMS.Masters.TransactionConceptClient> CreateAsync(
-            ModelsWMS.Masters.TransactionConceptClient entity,
+        /// <param name="transactionConceptId">Master TransactionConcept identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <c>true</c> if the master record exists and is active; otherwise <c>false</c>.
+        /// </returns>
+        public async Task<bool> MasterIsActiveAsync(
+            int transactionConceptId,
             CancellationToken ct)
         {
-            _db.TransactionConceptClients.Add(entity);
-            await _db.SaveChangesAsync(ct);
+            return await _context.Transactionconcepts
+                .AnyAsync(x =>
+                    x.Id == transactionConceptId &&
+                    x.Active,
+                    ct);
+        }
+
+        /// <summary>
+        /// Gets the mapping entity by Id within the specified tenant scope.
+        /// This method returns the entity (not DTO) for update/delete operations.
+        /// </summary>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// The entity if found within the tenant scope; otherwise <c>null</c>.
+        /// </returns>
+        public async Task<DUNES.API.ModelsWMS.Masters.TransactionConceptClient?> GetEntityByIdAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            return await _context.TransactionConceptClients
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId,
+                    ct);
+        }
+
+        /// <summary>
+        /// Creates a new TransactionConceptClient mapping.
+        /// </summary>
+        /// <param name="entity">Entity to create.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created entity including generated Id.</returns>
+        public async Task<DUNES.API.ModelsWMS.Masters.TransactionConceptClient> CreateAsync(
+            DUNES.API.ModelsWMS.Masters.TransactionConceptClient entity,
+            CancellationToken ct)
+        {
+            _context.TransactionConceptClients.Add(entity);
+            await _context.SaveChangesAsync(ct);
             return entity;
         }
 
         /// <summary>
-        /// Updates Active flag only (patch style).
+        /// Updates an existing TransactionConceptClient mapping.
         /// </summary>
+        /// <param name="entity">Entity with modified values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <c>true</c> if at least one database row was affected; otherwise <c>false</c>.
+        /// </returns>
+        public async Task<bool> UpdateAsync(
+            DUNES.API.ModelsWMS.Masters.TransactionConceptClient entity,
+            CancellationToken ct)
+        {
+            _context.TransactionConceptClients.Update(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <summary>
+        /// Deletes an existing TransactionConceptClient mapping.
+        /// </summary>
+        /// <param name="entity">Entity to delete.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <c>true</c> if at least one database row was affected; otherwise <c>false</c>.
+        /// </returns>
+        public async Task<bool> DeleteAsync(
+            DUNES.API.ModelsWMS.Masters.TransactionConceptClient entity,
+            CancellationToken ct)
+        {
+            _context.TransactionConceptClients.Remove(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <summary>
+        /// Sets the active status for an existing TransactionConceptClient mapping
+        /// within the tenant scope.
+        /// </summary>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="isActive">New mapping active status.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <c>true</c> if at least one database row was affected; otherwise <c>false</c>.
+        /// </returns>
         public async Task<bool> SetActiveAsync(
             int companyId,
             int companyClientId,
@@ -148,41 +237,81 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionConceptClient
             bool isActive,
             CancellationToken ct)
         {
-            var entity = await _db.TransactionConceptClients
+            var entity = await _context.TransactionConceptClients
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
                     x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId, ct);
+                    x.CompanyClientId == companyClientId,
+                    ct);
 
-            if (entity is null)
+            if (entity == null)
                 return false;
 
             entity.Active = isActive;
-            await _db.SaveChangesAsync(ct);
-            return true;
+
+            return await _context.SaveChangesAsync(ct) > 0;
         }
 
         /// <summary>
-        /// Deletes a mapping physically (optional, if business allows).
+        /// Returns the enabled transaction concepts for the current client.
+        /// Only returns rows where:
+        /// - Mapping Active = true AND
+        /// - Master TransactionConcept IsActive = true
         /// </summary>
+        /// <param name="companyId">Company scope (from token).</param>
+        /// <param name="companyClientId">Client scope (from token).</param>
+        /// <param name="ct">Cancellation token.</param>
+        public async Task<List<WMSTransactionConceptClientReadDTO>> GetEnabledAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            return await _context.TransactionConceptClients
+                .Where(x =>
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId &&
+                    x.Active &&
+                    x.TransactionConcept.Active)
+                .Select(x => new WMSTransactionConceptClientReadDTO
+                {
+                    Id = x.Id,
+                   
+                    TransactionConceptId = x.TransactionConceptId,
+                    TransactionConceptName = x.TransactionConcept.Name,
+                    Active = x.Active
+                })
+                .ToListAsync(ct);
+        }
+
+        /// <summary>
+        /// Deletes the transaction concept relation by mapping Id
+        /// (does not delete the master transaction concept).
+        /// </summary>
+        /// <param name="companyId">Tenant company identifier from token.</param>
+        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>
+        /// <c>true</c> if at least one database row was affected; otherwise <c>false</c>.
+        /// </returns>
         public async Task<bool> DeleteAsync(
             int companyId,
             int companyClientId,
             int id,
             CancellationToken ct)
         {
-            var entity = await _db.TransactionConceptClients
+            var entity = await _context.TransactionConceptClients
                 .FirstOrDefaultAsync(x =>
                     x.Id == id &&
                     x.CompanyId == companyId &&
-                    x.CompanyClientId == companyClientId, ct);
+                    x.CompanyClientId == companyClientId,
+                    ct);
 
-            if (entity is null)
+            if (entity == null)
                 return false;
 
-            _db.TransactionConceptClients.Remove(entity);
-            await _db.SaveChangesAsync(ct);
-            return true;
+            _context.TransactionConceptClients.Remove(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
         }
     }
 }

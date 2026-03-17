@@ -41,9 +41,21 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryType
         {
             return await HandleApi(ct =>
                  _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+        }
 
-           
 
+        /// <summary>
+        /// Get enabled inventory types for this client.
+        /// Returns only:
+        /// - mapping IsActive=true AND
+        /// - master catalog IsActive=true
+        /// </summary>
+        [HttpGet("GetEnabled")]
+        public async Task<IActionResult> GetEnabled(CancellationToken ct)
+        {
+            return await HandleApi(
+                ct => _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct),
+                ct);
         }
 
         /// <summary>
@@ -100,39 +112,62 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientInventoryType
         //        _service.UpdateAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         //}
 
+    
         /// <summary>
-        /// Deletes an InventoryType mapping by mapping Id within the current tenant scope.
+        /// Deletes a client inventory category mapping by Id.
+        /// Only deletes the relation row; it does not affect the master category.
         /// </summary>
-        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="id">Mapping Id.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response indicating delete result.</returns>
         [HttpDelete("Delete/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            return await HandleApi(ct =>
-                 _service.DeleteAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+            return await HandleApi(async ct =>
+            {
+                var result = await _service.DeleteAsync(
+                    CurrentCompanyId,
+                    CurrentCompanyClientId,
+                    id,
+                    ct);
+
+                return result;
+            }, ct);
         }
+
 
 
         /// <summary>
-        /// Activates or deactivates an InventoryType mapping within the current tenant scope.
-        /// CompanyId and CompanyClientId are always taken from token.
+        /// 
         /// </summary>
-        /// <param name="request">Set-active request DTO.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        [HttpPatch("SetActive")]
+        /// <param name="id"></param>
+        /// <param name="isActive"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPatch("SetActive/{id:int}")]
         public async Task<IActionResult> SetActive(
-            [FromBody] WMSCompanyClientInventoryTypeSetActiveDTO request,
+            int id,
+            [FromQuery] bool isActive,
             CancellationToken ct)
         {
-            return await HandleApi(ct =>
-                _service.SetActiveAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+            return await HandleApi(
+                ct => _service.SetActiveAsync(CurrentCompanyId, CurrentCompanyClientId, id, isActive, ct),
+                ct);
         }
+
+
+
+        //public async Task<IActionResult> SetActive(
+        //    [FromBody] WMSCompanyClientInventoryTypeSetActiveDTO request,
+        //    CancellationToken ct)
+        //{
+        //    return await HandleApi(ct =>
+        //        _service.SetActiveAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+        //}
     }
 }

@@ -165,24 +165,17 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
             CancellationToken ct)
         {
             var entity = await _db.CompanyClientInventoryCategories
-                .FirstOrDefaultAsync(m =>
-                    m.Id == id &&
-                    m.CompanyId == companyId &&
-                    m.CompanyClientId == companyClientId,
-                    ct);
+        .FirstOrDefaultAsync(m =>
+            m.Id == id &&
+            m.CompanyId == companyId &&
+            m.CompanyClientId == companyClientId,
+            ct);
 
             if (entity is null)
                 return false;
 
-            // Anti-error: do not allow activation if master is inactive.
-            if (isActive)
-            {
-                var masterActive = await IsMasterActiveAsync(companyId, entity.InventoryCategoryId, ct);
-                if (!masterActive)
-                    throw new InvalidOperationException("Cannot activate mapping: master category is inactive.");
-            }
-
             entity.IsActive = isActive;
+
             await _db.SaveChangesAsync(ct);
             return true;
         }
@@ -294,6 +287,33 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
        
              => _db.CompanyClientInventoryCategories
         .AnyAsync(x => x.CompanyId == companyId && x.InventoryCategoryId == categoryId, ct);
-       
+
+
+        /// <summary>
+        /// delete inventory category relation (don't delete category master)
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteAsync(int companyId,int companyClientId, int id,  CancellationToken ct)
+        {
+            var entity = await _db.CompanyClientInventoryCategories
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId,
+                    ct);
+
+            if (entity is null)
+                return false;
+
+            _db.CompanyClientInventoryCategories.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+
+            return true;
+        }
+
     }
 }

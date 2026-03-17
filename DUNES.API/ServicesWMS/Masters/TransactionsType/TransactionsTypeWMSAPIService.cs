@@ -125,7 +125,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
         /// <summary>
         /// Updates an existing transaction type.
         /// </summary>
-        public async Task<ApiResponse<WMSTransactionTypesUpdateDTO>> UpdateAsync(
+        public async Task<ApiResponse<bool>> UpdateAsync(
             int companyId,
             int id,
             WMSTransactionTypesUpdateDTO dto,
@@ -134,12 +134,12 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
             var existing = await _repository.GetByIdAsync(companyId, id, ct);
 
             if (existing is null)
-                return ApiResponseFactory.NotFound<WMSTransactionTypesUpdateDTO>(
+                return ApiResponseFactory.NotFound<bool>(
                     "Transaction type not found.");
 
             // Ownership invariant (extra safety)
             if (existing.companyId != companyId)
-                return ApiResponseFactory.Forbidden<WMSTransactionTypesUpdateDTO>(
+                return ApiResponseFactory.Forbidden<bool>(
                     "You are not allowed to modify this record.");
 
             // Validate uniqueness (exclude current)
@@ -150,7 +150,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
                 ct);
 
             if (exists)
-                return ApiResponseFactory.Fail<WMSTransactionTypesUpdateDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "DUPLICATE_NAME",
                     message: "A transaction type with the same name already exists.",
                     statusCode: StatusCodes.Status409Conflict);
@@ -165,7 +165,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
             await _repository.UpdateAsync(existing, ct);
 
             return ApiResponseFactory.Success(
-                dto,
+                true,
                 "Transaction type updated successfully.");
         }
 
@@ -205,7 +205,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
                 Isinput = entity.Isinput,
                 Isoutput = entity.Isoutput,
                 companyId = entity.companyId,
-                
+                companyname = entity.IdcompanyNavigation.Name,
                 Active = entity.Active,
                 Match = entity.Match
             };

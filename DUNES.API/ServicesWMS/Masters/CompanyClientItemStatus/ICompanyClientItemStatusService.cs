@@ -1,103 +1,122 @@
-﻿using DUNES.Shared.DTOs.WMS;
+﻿
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Masters.CompanyClientItemStatus
 {
     /// <summary>
-    /// Service contract for managing CompanyClientItemStatus mappings.
-    /// Applies business rules and tenant validation using CompanyId and CompanyClientId from token.
+    /// Service contract for client-level item status enablement.
+    /// Business rules:
+    /// - CompanyId and CompanyClientId always come from the authenticated token.
+    /// - Master ItemStatus must exist and be active before it can be enabled for a client.
+    /// - Mapping uniqueness is enforced by (CompanyId, CompanyClientId, ItemStatusId).
+    /// - Delete only removes the client mapping, never the master item status.
     /// </summary>
     public interface ICompanyClientItemStatusWMSAPIService
     {
         /// <summary>
-        /// Gets all ItemStatus mappings for the current tenant scope (company + client),
-        /// including active and inactive mappings.
+        /// Returns all enabled item status mappings for the current client.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the list of mappings.</returns>
+        /// <returns>ApiResponse containing the list of enabled item statuses for the client.</returns>
         Task<ApiResponse<List<WMSCompanyClientItemStatusReadDTO>>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Gets an ItemStatus mapping by mapping Id within the current tenant scope.
+        /// Returns enabled item status mappings for the current client.
+        /// This method exists to preserve the explicit enabled-only use case.
         /// </summary>
-        /// <param name="id">Mapping identifier (surrogate key).</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the mapping if found.</returns>
+        /// <returns>ApiResponse containing the list of enabled item statuses for the client.</returns>
+        Task<ApiResponse<List<WMSCompanyClientItemStatusReadDTO>>> GetEnabledAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Returns a specific client mapping by its Id.
+        /// </summary>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>ApiResponse containing the requested mapping if found.</returns>
         Task<ApiResponse<WMSCompanyClientItemStatusReadDTO>> GetByIdAsync(
+            int companyId,
+            int companyClientId,
             int id,
-            int companyId,
-            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Creates a new ItemStatus mapping for the current tenant scope.
-        /// Business rules:
-        /// - Master ItemStatus must exist.
-        /// - No duplicate mappings allowed.
-        /// - If mapping is active, master ItemStatus must be active.
+        /// Creates a new client mapping for a master item status.
+        /// The service must validate:
+        /// - the master item status exists and is active
+        /// - the mapping does not already exist for the client
         /// </summary>
-        /// <param name="request">Create DTO (tenant values are not accepted in body).</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="dto">Create DTO.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the created mapping.</returns>
+        /// <returns>ApiResponse containing the created mapping.</returns>
         Task<ApiResponse<WMSCompanyClientItemStatusReadDTO>> CreateAsync(
-            WMSCompanyClientItemStatusCreateDTO request,
+            WMSCompanyClientItemStatusCreateDTO dto,
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Updates an existing ItemStatus mapping for the current tenant scope.
-        /// Business rules:
-        /// - Mapping must exist within tenant scope.
-        /// - Master ItemStatus must exist.
-        /// - No duplicate mappings allowed.
-        /// - If mapping is active, master ItemStatus must be active.
+        /// Enables or disables an existing mapping.
+        /// If activating a mapping, the master item status must still be active.
         /// </summary>
-        /// <param name="request">Update DTO.</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="isActive">New mapping status.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        Task<ApiResponse<WMSCompanyClientItemStatusReadDTO>> UpdateAsync(
-            WMSCompanyClientItemStatusUpdateDTO request,
+        /// <returns>ApiResponse indicating whether the update succeeded.</returns>
+        Task<ApiResponse<bool>> SetActiveAsync(
+            int id,
+            bool isActive,
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Activates or deactivates an existing ItemStatus mapping within the current tenant scope.
-        /// If activating the mapping, the master ItemStatus must be active.
+        /// Replaces the enabled set for the client.
+        /// Typical UI behavior: the user selects all desired item statuses and saves.
+        /// The service must validate:
+        /// - all provided master ids exist
+        /// - all provided master ids are active
+        /// - missing mappings are created when necessary
+        /// - existing mappings not included are disabled
         /// </summary>
-        /// <param name="request">Set-active request DTO.</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="itemStatusIds">Final list of enabled master item status ids.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        Task<ApiResponse<WMSCompanyClientItemStatusReadDTO>> SetActiveAsync(
-            WMSCompanyClientItemStatusSetActiveDTO request,
+        /// <returns>ApiResponse indicating whether the operation succeeded.</returns>
+        Task<ApiResponse<bool>> SetEnabledSetAsync(
+            List<int> itemStatusIds,
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Deletes an ItemStatus mapping by mapping Id within the current tenant scope.
-        /// Intended for wrong assignments (physical delete of mapping only).
+        /// Deletes a client mapping by Id.
+        /// Important: this deletes only the relationship, not the master item status.
         /// </summary>
-        /// <param name="id">Mapping identifier (surrogate key).</param>
-        /// <param name="companyId">Tenant company identifier from token.</param>
-        /// <param name="companyClientId">Tenant client identifier from token.</param>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="companyId">Company scope from token.</param>
+        /// <param name="companyClientId">Company client scope from token.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response indicating delete result.</returns>
-        Task<ApiResponse<bool>> DeleteAsync(
+        /// <returns>ApiResponse indicating whether the delete succeeded.</returns>
+        Task<ApiResponse<object>> DeleteAsync(
             int id,
             int companyId,
             int companyClientId,

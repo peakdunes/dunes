@@ -19,7 +19,17 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             string token,
             CancellationToken ct)
             => GetApiAsync<List<WMSCompanyClientInventoryTypeReadDTO>>(
-                "/api/wms/masters/company-client/inventory-types/GetAll",
+                "/api/wms/masters/company-client/type-inventory/GetAll",
+                token,
+                ct);
+
+       
+        /// <inheritdoc/>
+        public Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetEnabledAsync(
+            string token,
+            CancellationToken ct)
+            => GetApiAsync<List<WMSCompanyClientInventoryTypeReadDTO>>(
+                "/api/wms/masters/company-client/type-inventory/GetEnabled",
                 token,
                 ct);
 
@@ -28,7 +38,7 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             string token,
             CancellationToken ct)
             => GetApiAsync<WMSCompanyClientInventoryTypeReadDTO>(
-                $"/api/wms/masters/company-client/inventory-types/GetById/{id}",
+                $"/api/wms/masters/company-client/type-inventory/GetById/{id}",
                 token,
                 ct);
 
@@ -37,7 +47,7 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             string token,
             CancellationToken ct)
             => PostApiAsync<WMSCompanyClientInventoryTypeReadDTO, WMSCompanyClientInventoryTypeCreateDTO>(
-                "/api/wms/masters/company-client/inventory-types/Create",
+                "/api/wms/masters/company-client/type-inventory/Create",
                 dto,
                 token,
                 ct);
@@ -47,7 +57,7 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             string token,
             CancellationToken ct)
             => PutApiAsync<bool, WMSCompanyClientInventoryTypeUpdateDTO>(
-                "/api/wms/masters/company-client/inventory-types/Update",
+                "/api/wms/masters/company-client/type-inventory/Update",
                 dto,
                 token,
                 ct);
@@ -57,10 +67,20 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             bool isActive,
             string token,
             CancellationToken ct)
-            => PutApiAsync<bool, object>(
-                $"/api/wms/masters/company-client/inventory-types/SetActive/{id}?isActive={isActive.ToString().ToLower()}",
-                new { },
+            => PatchApiAsync<bool>(
+                $"/api/wms/masters/company-client/type-inventory/SetActive/{id}?isActive={isActive.ToString().ToLower()}",
                 token,
                 ct);
+
+
+        public Task<ApiResponse<bool>> DeleteAsync(
+         int id,
+         string token,
+         CancellationToken ct)
+             => DeleteApiAsync<bool>(
+
+                      $"/api/wms/masters/company-client/type-inventory/Delete/{id}",
+                     token,
+                     ct);
     }
 }

@@ -1,0 +1,58 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSCompanyClientItemStatusReadDTO
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<form asp-action="Edit">
+    <div class="row" style="display:none">
+        <div class="col-md-4">
+
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Id" class="control-label"></label>
+                <input asp-for="Id" class="form-control" />
+                <span asp-validation-for="Id" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-2">
+            <div class="form-group">
+                <label asp-for="ItemStatusId" class="control-label"></label>
+                <input asp-for="ItemStatusId" readonly="readonly" class="form-control" />
+                <span asp-validation-for="ItemStatusId" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label asp-for="ItemStatusName" class="control-label"></label>
+                <input asp-for="ItemStatusName" readonly="readonly" class="form-control" />
+                <span asp-validation-for="ItemStatusName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
+                </label>
+            </div>
+        </div>
+        <div class="col-md-2 mt-4">
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+
+        </div>
+    </div>
+</form>
+<div class="mt-2">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

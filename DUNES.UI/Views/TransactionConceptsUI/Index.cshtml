@@ -19,16 +19,19 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Name)
                 </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.CompanyId)
-                </th>
+              
                 <th>
                     @Html.DisplayNameFor(model => model.Observations)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Active)
                 </th>
-               
+                <th>
+                    @Html.DisplayNameFor(model => model.CompanyId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.companyname)
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -37,7 +40,7 @@
                 <tr>
                     <td>
                         <partial name="_CrudActions"
-                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "InventoryCategoriesUI" })" />
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "TransactionConceptsUI" })" />
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Id)
@@ -45,16 +48,19 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.Name)
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CompanyId)
-                    </td>
+                  
                     <td>
                         @Html.DisplayFor(modelItem => item.Observations)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Active)
                     </td>
-                   
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompanyId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.companyname)
+                    </td>
                 </tr>
             }
         </tbody>

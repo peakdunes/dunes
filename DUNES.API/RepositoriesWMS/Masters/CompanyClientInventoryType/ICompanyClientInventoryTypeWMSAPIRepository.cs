@@ -147,10 +147,37 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
         /// <c>true</c> if at least one database row was affected; otherwise <c>false</c>.
         /// </returns>
         Task<bool> SetActiveAsync(
-            int id,
             int companyId,
             int companyClientId,
+            int id,
             bool isActive,
             CancellationToken ct);
+
+
+
+
+        /// <summary>
+        /// Returns the enabled inventory types for the current client.
+        /// Only returns rows where:
+        /// - Mapping IsActive=true AND
+        /// - Master InventoryCategory IsActive=true
+        /// </summary>
+        /// <param name="companyId">Company scope (from token).</param>
+        /// <param name="companyClientId">Client scope (from token).</param>
+        /// <param name="ct">Cancellation token.</param>
+        Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetEnabledAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Delete inventory type id relacion (don't delete inventory type master)
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<bool> DeleteAsync(int companyId, int companyClientId, int id, CancellationToken ct);
     }
 }

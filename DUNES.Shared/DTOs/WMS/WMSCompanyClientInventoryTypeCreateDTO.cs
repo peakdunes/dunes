@@ -15,11 +15,15 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// FK to master InventoryTypes catalog.
         /// </summary>
+        /// 
+        [Display(Name ="Inventory Type")]
         public int InventoryTypeId { get; set; }
 
         /// <summary>
         /// Mapping-level active flag (default true).
         /// </summary>
+        /// 
+        [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
     }
 }

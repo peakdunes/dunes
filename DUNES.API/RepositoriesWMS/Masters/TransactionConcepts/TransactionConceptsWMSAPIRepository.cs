@@ -38,6 +38,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionConcepts
         {
             return await _db.Transactionconcepts
                 .AsNoTracking()
+                .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
@@ -53,6 +54,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionConcepts
         {
             return await _db.Transactionconcepts
                 .AsNoTracking()
+                 .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId && x.Active)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
@@ -68,6 +70,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionConcepts
         public async Task<Transactionconcepts?> GetByIdAsync(int companyId, int id, CancellationToken ct)
         {
             return await _db.Transactionconcepts
+                  .Include(x => x.IdcompanyNavigation)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == id && x.companyId == companyId, ct);
         }

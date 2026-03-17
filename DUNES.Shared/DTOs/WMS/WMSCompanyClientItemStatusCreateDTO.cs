@@ -16,11 +16,15 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// FK to master Itemstatus catalog.
         /// </summary>
+        /// 
+        [Display(Name = "Item Status Name")]
         public int ItemStatusId { get; set; }
 
         /// <summary>
         /// Mapping-level active flag (default true).
         /// </summary>
+        /// 
+        [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
     }
 }

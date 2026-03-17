@@ -13,6 +13,8 @@ namespace DUNES.Shared.DTOs.WMS
     public class WMSCompanyClientInventoryCategoryReadDTO
     {
         /// <summary>Mapping ID.</summary>
+        /// 
+        [Display(Name ="Mapping ID")]
         public int Id { get; set; }
 
 

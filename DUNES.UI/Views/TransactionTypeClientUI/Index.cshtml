@@ -1,0 +1,66 @@
+﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSTransactionTypeClientReadDTO>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+</p>
+
+<div class="row">
+    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100"
+           style="white-space: nowrap; font-size: medium">
+        <thead>
+            <tr>
+                <th>Actions</th>
+                @* <th>
+                    @Html.DisplayNameFor(model => model.Id)
+                </th> *@
+
+                <th style="text-align:left">
+                    @Html.DisplayNameFor(model => model.TransactionTypeId)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TransactionTypeName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Active)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <partial name="_CrudActions"
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "TransactionTypeClientUI" })" />
+                    </td>
+                    @* <td>
+                        @Html.DisplayFor(modelItem => item.Id)
+                    </td> *@
+                    <td style="text-align:left">
+                        @Html.DisplayFor(modelItem => item.TransactionTypeId)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TransactionTypeName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Active)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablelist').DataTable({
+                scrollX: true
+            });
+        });
+    </script>
+}

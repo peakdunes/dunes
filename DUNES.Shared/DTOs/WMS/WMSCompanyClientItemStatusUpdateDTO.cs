@@ -15,12 +15,24 @@ namespace DUNES.Shared.DTOs.WMS
         /// <summary>
         /// Mapping identifier (surrogate key).
         /// </summary>
+        /// 
+        [Display(Name = "ID")]
         public int Id { get; set; }
 
         /// <summary>
         /// FK to master Itemstatus catalog.
         /// </summary>
+        /// 
+        [Display(Name = "Item Status ID")]
         public int ItemStatusId { get; set; }
+
+
+        /// <summary>
+        /// Display name from master Itemstatus catalog.
+        /// </summary>
+        /// 
+        [Display(Name = "Item Status Name")]
+        public string ItemStatusName { get; set; } = string.Empty;
 
         /// <summary>
         /// Mapping-level active flag.

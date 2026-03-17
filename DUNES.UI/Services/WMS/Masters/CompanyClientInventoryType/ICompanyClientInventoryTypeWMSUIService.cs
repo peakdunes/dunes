@@ -40,6 +40,17 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             CancellationToken ct);
 
         /// <summary>
+        /// Get enabled inventory types for the current client.
+        /// Returns only:
+        /// - mapping IsActive=true AND
+        /// - master catalog IsActive=true
+        /// </summary>
+        Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetEnabledAsync(
+            string token,
+            CancellationToken ct);
+
+
+        /// <summary>
         /// Activates or deactivates a client inventory type mapping.
         /// </summary>
         Task<ApiResponse<bool>> SetActiveAsync(
@@ -47,5 +58,18 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType
             bool isActive,
             string token,
             CancellationToken ct);
+
+
+        /// <summary>
+        /// delete inventory category relation don't delete category  master
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="token"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<bool>> DeleteAsync(
+           int id,
+           string token,
+           CancellationToken ct);
     }
 }

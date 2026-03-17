@@ -4,70 +4,92 @@ using DUNES.Shared.Models;
 namespace DUNES.API.ServicesWMS.Masters.TransactionTypeClient
 {
     /// <summary>
-    /// Transaction Type Client service interface.
-    ///
-    /// Manages the association between Transaction Types
-    /// and Company Clients.
-    ///
-    /// IMPORTANT (STANDARD COMPANYID):
-    /// - CompanyId is always provided by the Controller.
-    /// - CompanyId comes from the authenticated token.
-    /// - The service enforces business rules before repository calls.
+    /// Service contract for managing TransactionTypeClient mappings.
+    /// Applies business rules on top of the repository layer for the mapping
+    /// between a client and the master TransactionType catalog.
     /// </summary>
     public interface ITransactionTypeClientWMSAPIService
     {
         /// <summary>
-        /// Retrieves all Transaction Type mappings for a specific CompanyClient.
+        /// Gets all transaction type mappings for the current tenant scope.
+        /// Includes both active and inactive mappings.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the list of mappings.</returns>
-        Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetByClientAsync(
+        Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetAllAsync(
             int companyId,
             int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Creates a new Transaction Type mapping for a CompanyClient.
+        /// Gets a transaction type mapping by Id for the current tenant scope.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="dto">Create DTO for the mapping.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the created mapping.</returns>
+        Task<ApiResponse<WMSTransactionTypeClientReadDTO>> GetByIdAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Creates a new TransactionTypeClient mapping.
+        /// Business rules:
+        /// - The master TransactionType must exist.
+        /// - The mapping must not already exist for the same CompanyId + CompanyClientId + TransactionTypeId.
+        /// - If the mapping is created as active, the master TransactionType must also be active.
+        /// </summary>
         Task<ApiResponse<WMSTransactionTypeClientReadDTO>> CreateAsync(
-            int companyId,
             WMSTransactionTypeClientCreateDTO dto,
+            int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Activates or deactivates an existing mapping.
+        /// Updates an existing TransactionTypeClient mapping.
+        /// Business rules:
+        /// - The mapping must belong to the current tenant scope.
+        /// - The referenced master TransactionType must exist.
+        /// - The mapping must remain unique by CompanyId + CompanyClientId + TransactionTypeId.
+        /// - If the mapping is updated as active, the master TransactionType must also be active.
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="id">Mapping identifier.</param>
-        /// <param name="isActive">New active state.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse with the updated mapping.</returns>
-        Task<ApiResponse<WMSTransactionTypeClientReadDTO>> SetActiveAsync(
+        Task<ApiResponse<WMSTransactionTypeClientReadDTO>> UpdateAsync(
+            int id,
+            WMSTransactionTypeClientUpdateDTO dto,
             int companyId,
             int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Deletes a TransactionTypeClient mapping by Id.
+        /// Important:
+        /// - This deletes only the client mapping.
+        /// - It does not delete the master TransactionType.
+        /// </summary>
+        Task<ApiResponse<bool>> DeleteAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Updates the active status of a TransactionTypeClient mapping.
+        /// Business rules:
+        /// - The mapping must belong to the current tenant scope.
+        /// - If the new state is active, the master TransactionType must also be active.
+        /// </summary>
+        Task<ApiResponse<bool>> SetActiveAsync(
             int id,
             bool isActive,
+            int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Deletes a mapping physically.
+        /// Gets the enabled transaction types for the current tenant scope.
+        /// Only returns mappings where:
+        /// - Mapping Active = true
+        /// - Master TransactionType Active = true
         /// </summary>
-        /// <param name="companyId">Tenant company identifier (from token).</param>
-        /// <param name="companyClientId">Company client identifier.</param>
-        /// <param name="id">Mapping identifier.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>ApiResponse indicating whether the mapping was deleted.</returns>
-        Task<ApiResponse<bool>> DeleteAsync(
+        Task<ApiResponse<List<WMSTransactionTypeClientReadDTO>>> GetEnabledAsync(
             int companyId,
             int companyClientId,
-            int id,
             CancellationToken ct);
     }
 }

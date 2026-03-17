@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
+using DUNES.Shared.Utils.Reponse;
 using DUNES.UI.Services.Common;
 
 namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
@@ -75,5 +76,16 @@ namespace DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory
                 inventoryCategoryIds ?? new List<int>(),
                 token,
                 ct);
+
+
+        public Task<ApiResponse<bool>> DeleteAsync(
+            int id,
+            string token,
+            CancellationToken ct)
+                => DeleteApiAsync<bool>(
+
+                         $"/api/wms/masters/company-client/inventory-categories/Delete/{id}",
+                        token,
+                        ct);
     }
 }

@@ -36,6 +36,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         {
             return await _db.Transactiontypes
                 .AsNoTracking()
+                 .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
@@ -50,6 +51,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         {
             return await _db.Transactiontypes
                 .AsNoTracking()
+                 .Include(x => x.IdcompanyNavigation)
                 .Where(x => x.companyId == companyId && x.Active)
                 .OrderBy(x => x.Name)
                 .ToListAsync(ct);
@@ -65,6 +67,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.TransactionsType
         {
             return await _db.Transactiontypes
                 .AsNoTracking()
+                 .Include(x => x.IdcompanyNavigation)
                 .FirstOrDefaultAsync(
                     x => x.Id == id && x.companyId == companyId,
                     ct);

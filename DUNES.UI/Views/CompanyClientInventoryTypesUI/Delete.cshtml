@@ -1,0 +1,48 @@
+﻿@model DUNES.Shared.DTOs.WMS.WMSCompanyClientInventoryTypeReadDTO
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h6 class="text-danger mt-4">This action will permanently delete the record. This cannot be undone.</h6>
+
+<div class="row">
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.InventoryTypeId)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.InventoryTypeId)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.InventoryTypeName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.InventoryTypeName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.IsActive)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.IsActive)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="submit" value="Delete" class="btn btn-danger" /> |
+
+    </form>
+</div>
+
+<div class="row">
+
+    <div class="mt-2">
+        <a asp-action="Index">Back to List</a>
+    </div>
+</div>

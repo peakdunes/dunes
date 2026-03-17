@@ -14,9 +14,9 @@
         <thead>
             <tr>
                 <th>Actions</th>
-                <th>
+               @*  <th style="display:none">
                     @Html.DisplayNameFor(model => model.Id)
-                </th>
+                </th> *@
                 <th>
                     @Html.DisplayNameFor(model => model.InventoryCategoryId)
                 </th>
@@ -34,12 +34,12 @@
             {
                 <tr>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id"><i class="fas fa-pencil-alt"></i></a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id"><i class="fas fa-trash-alt"></i></a>
+                        <partial name="_CrudActions"
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "CompanyClientInventoryCategoryUI" })" />
                     </td>
-                    <td>
+                  @*   <td style="display:none">
                         @Html.DisplayFor(modelItem => item.Id)
-                    </td>
+                    </td> *@
                     <td>
                         @Html.DisplayFor(modelItem => item.InventoryCategoryId)
                     </td>
@@ -49,11 +49,7 @@
                     <td>
                         @Html.DisplayFor(modelItem => item.IsActive)
                     </td>
-                    @*  <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td> *@
+            
                 </tr>
             }
         </tbody>

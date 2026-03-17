@@ -27,7 +27,7 @@ namespace DUNES.API.RepositoriesWMS.Masters.InventoryTypes
         Task<WMSInventoryTypesReadDTO> UpdateAsync(WMSInventoryTypesUpdateDTO dto, int companyId, CancellationToken ct);
 
         /// <summary>Activates/deactivates an inventory type for the given tenant.</summary>
-        Task<bool> SetActiveAsync(int companyId, int id, bool isActive, CancellationToken ct);
+        Task<bool> SetActiveAsync(int id,int companyId, bool isActive,  CancellationToken ct);
 
         /// <summary>Delete an inventory type.</summary>
         Task<bool> DeleteAsync(int companyId, int id, CancellationToken ct);

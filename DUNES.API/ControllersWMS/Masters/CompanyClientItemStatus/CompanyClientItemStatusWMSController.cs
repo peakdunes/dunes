@@ -15,7 +15,7 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientItemStatus
     /// </summary>
     [ApiController]
     [Authorize]
-    [Route("api/wms/masters/company-client/item-statuses")]
+    [Route("api/wms/masters/company-client/item-status")]
     public class CompanyClientItemStatusWMSController : BaseController
     {
         private readonly ICompanyClientItemStatusWMSAPIService _service;
@@ -30,107 +30,133 @@ namespace DUNES.API.ControllersWMS.Masters.CompanyClientItemStatus
         }
 
         /// <summary>
-        /// Gets all ItemStatus mappings for the current tenant scope (company + client),
-        /// including active and inactive mappings.
+        /// Returns all enabled item status mappings for the current client.
         /// </summary>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the list of mappings.</returns>
+        /// <returns>List of enabled item status mappings for the current client.</returns>
         [HttpGet("GetAll")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<List<WMSCompanyClientItemStatusReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
             return await HandleApi(ct =>
-                _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+                _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+                       
         }
 
         /// <summary>
-        /// Gets a specific ItemStatus mapping by mapping Id within the current tenant scope.
+        /// Returns enabled item status mappings for the current client.
+        /// This endpoint is explicit for enabled-only scenarios.
         /// </summary>
-        /// <param name="id">Mapping identifier (surrogate key).</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the mapping if found.</returns>
+        /// <returns>List of enabled item status mappings for the current client.</returns>
+        [HttpGet("GetEnabled")]
+        [ProducesResponseType(typeof(ApiResponse<List<WMSCompanyClientItemStatusReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetEnabled(CancellationToken ct)
+        {
+            return await HandleApi(ct =>
+                _service.GetEnabledAsync(CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+        }
+
+        /// <summary>
+        /// Returns a specific client item status mapping by its Id.
+        /// </summary>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The requested mapping if found.</returns>
         [HttpGet("GetById/{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<WMSCompanyClientItemStatusReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
             return await HandleApi(ct =>
-                _service.GetByIdAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+                _service.GetByIdAsync(CurrentCompanyId, CurrentCompanyClientId, id, ct), ct);
         }
 
         /// <summary>
-        /// Creates a new ItemStatus mapping for the current tenant scope.
-        /// CompanyId and CompanyClientId are always taken from token.
+        /// Creates a new client mapping for a master item status.
         /// </summary>
-        /// <param name="request">Create DTO (tenant values are not accepted in body).</param>
+        /// <param name="dto">Create DTO containing the master ItemStatusId and IsActive flag.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the created mapping.</returns>
+        /// <returns>The created client item status mapping.</returns>
         [HttpPost("Create")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(typeof(ApiResponse<WMSCompanyClientItemStatusReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create(
-            [FromBody] WMSCompanyClientItemStatusCreateDTO request,
+            [FromBody] WMSCompanyClientItemStatusCreateDTO dto,
             CancellationToken ct)
         {
             return await HandleApi(ct =>
-                _service.CreateAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+                _service.CreateAsync(dto, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Updates an existing ItemStatus mapping within the current tenant scope.
-        /// CompanyId and CompanyClientId are always taken from token.
+        /// Enables or disables an existing client mapping.
         /// </summary>
-        /// <param name="request">Update DTO.</param>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="dto">DTO containing the new IsActive value.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        [HttpPut("Update")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        public async Task<IActionResult> Update(
-            [FromBody] WMSCompanyClientItemStatusUpdateDTO request,
-            CancellationToken ct)
-        {
-            return await HandleApi(ct =>
-                _service.UpdateAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
-        }
-
-        /// <summary>
-        /// Activates or deactivates an ItemStatus mapping within the current tenant scope.
-        /// CompanyId and CompanyClientId are always taken from token.
-        /// </summary>
-        /// <param name="request">Set-active request DTO.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response with the updated mapping.</returns>
-        [HttpPatch("SetActive")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        /// <returns>Result of the activation update.</returns>
+        [HttpPut("SetActive/{id:int}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SetActive(
-            [FromBody] WMSCompanyClientItemStatusSetActiveDTO request,
+            int id,
+            [FromBody] WMSCompanyClientItemStatusSetActiveDTO dto,
             CancellationToken ct)
         {
             return await HandleApi(ct =>
-                _service.SetActiveAsync(request, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+                _service.SetActiveAsync(id, dto.IsActive, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Deletes an ItemStatus mapping by mapping Id within the current tenant scope.
-        /// Intended for wrong assignments only (physical delete of mapping).
+        /// Replaces the enabled set for the current client.
+        /// Typical UI behavior: user selects the final list of allowed item statuses and clicks Save.
         /// </summary>
-        /// <param name="id">Mapping identifier (surrogate key).</param>
+        /// <param name="dto">DTO containing the final list of enabled master item status ids.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Standard API response indicating delete result.</returns>
+        /// <returns>Result of the bulk enablement update.</returns>
+        [HttpPut("SetEnabledSet")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SetEnabledSet(
+            [FromBody] WMSCompanyClientItemStatusSetEnabledDTO dto,
+            CancellationToken ct)
+        {
+            return await HandleApi(ct =>
+                _service.SetEnabledSetAsync(dto.ItemStatusIds, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
+        }
+
+        /// <summary>
+        /// Deletes a client mapping by Id.
+        /// Important:
+        /// - This deletes only the relationship.
+        /// - It does not delete the master ItemStatus.
+        /// </summary>
+        /// <param name="id">Mapping Id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Result of the delete operation.</returns>
         [HttpDelete("Delete/{id:int}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
             return await HandleApi(ct =>
-                _service.DeleteAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct),ct);
+                 _service.DeleteAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
     }
 }

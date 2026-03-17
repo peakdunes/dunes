@@ -49,13 +49,13 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
             {
                 var result = await _inventoryCategoriesService.GetAllAsync(CurrentToken, ct);
 
-                if (result.Data is null)
+                if (!result.Success)
                 {
                     MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
                     return View(new List<WMSCompanyClientInventoryCategoryReadDTO>());
                 }
 
-                return View(result.Data);
+                return View(result.Data ?? new List<WMSCompanyClientInventoryCategoryReadDTO>());
             }, ct);
         }
 
@@ -78,6 +78,43 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
             await LoadCategoryDropdownAsync(CurrentToken, ct);
 
             return View(new WMSCompanyClientInventoryCategoryCreateDTO());
+        }
+
+
+        /// <summary>
+        /// Creates a new mapping (scoped by token).
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(WMSCompanyClientInventoryCategoryCreateDTO dto, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            // ✅ If ModelState fails, reload combo and return view
+            if (!ModelState.IsValid)
+            {
+                await LoadCategoryDropdownAsync(CurrentToken, ct);
+
+                return View(dto);
+            }
+
+            return await HandleAsync(async ct =>
+            {
+                var created = await _inventoryCategoriesService.CreateAsync(dto, CurrentToken, ct);
+
+                if (created.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", created.Message, MessageDisplay.Inline);
+
+                    // ✅ reload combo again because we’re returning the View
+                    await LoadCategoryDropdownAsync(CurrentToken!, ct);
+                    return View(dto);
+                }
+
+                MessageHelper.SetMessage(this, "success", "Mapping created successfully.", MessageDisplay.Inline);
+                return RedirectToAction(nameof(Index));
+            }, ct);
         }
 
 
@@ -156,42 +193,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
 
 
 
-        /// <summary>
-        /// Creates a new mapping (scoped by token).
-        /// </summary>
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(WMSCompanyClientInventoryCategoryCreateDTO dto, CancellationToken ct)
-        {
-            if (CurrentToken is null)
-                return RedirectToLogin();
-
-            // ✅ If ModelState fails, reload combo and return view
-            if (!ModelState.IsValid)
-            {
-                await LoadCategoryDropdownAsync(CurrentToken, ct);
-
-                return View(dto);
-            }
-
-            return await HandleAsync(async ct =>
-            {
-                var created = await _inventoryCategoriesService.CreateAsync(dto, CurrentToken, ct);
-
-                if (created.Data is null)
-                {
-                    MessageHelper.SetMessage(this, "danger", created.Message, MessageDisplay.Inline);
-
-                    // ✅ reload combo again because we’re returning the View
-                    await LoadCategoryDropdownAsync(CurrentToken!, ct);
-                    return View(dto);
-                }
-
-                MessageHelper.SetMessage(this, "success", "Mapping created successfully.", MessageDisplay.Inline);
-                return RedirectToAction(nameof(Index));
-            }, ct);
-        }
-
+      
         /// <summary>
         /// Enables or disables a mapping by mapping Id (scoped by token).
         /// </summary>
@@ -244,6 +246,61 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
                 .ToList();
 
             ViewBag.InventoryCategorySelectList = new SelectList(available, "Id", "Name");
+        }
+
+
+
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Delete Inventory Category Mapping", Url = null });
+
+
+
+            return await HandleAsync(async ct =>
+            {
+                var result = await _inventoryCategoriesService.GetByIdAsync(id, CurrentToken, ct);
+
+                if (result.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
+                    return View(new WMSCompanyClientInventoryCategoryReadDTO());
+                }
+
+                return View(result.Data);
+            }, ct);
+        }
+
+
+        /// <summary>
+        /// Hard delete (Option B): only if not used.
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id, WMSCompanyClientInventoryCategoryReadDTO dto, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            return await HandleAsync(async ct =>
+            {
+                var res = await _inventoryCategoriesService.DeleteAsync(id,CurrentToken!, ct);
+
+                MessageHelper.SetMessage(
+                    this,
+                    res.Success ? "success" : "danger",
+                    res.Message ?? (res.Success ? "Deleted." : "Error deleting."),
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index));
+            }, ct);
         }
     }
 }

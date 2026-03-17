@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DUNES.Shared.DTOs.WMS
+namespace DUNES.Shared.DTOs
 {
     public class WMSTransactionConceptClientSetActiveDTO
     {
-        public int Id { get; set; }
-
-       
-        public bool Active { get; set; } = true;
+        /// <summary>
+        /// New active value for the mapping.
+        /// </summary>
+        public bool Active { get; set; }
     }
 }

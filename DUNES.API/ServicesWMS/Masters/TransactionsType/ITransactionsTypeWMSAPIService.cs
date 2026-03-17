@@ -47,7 +47,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionsType
         /// <summary>
         /// Update an existing transaction type.
         /// </summary>
-        Task<ApiResponse<WMSTransactionTypesUpdateDTO>> UpdateAsync(
+        Task<ApiResponse<bool>> UpdateAsync(
             int companyId,
             int id,
             WMSTransactionTypesUpdateDTO dto,

@@ -219,9 +219,9 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
 
         /// <inheritdoc />
         public async Task<ApiResponse<bool>> DeleteAsync(
-            int id,
             int companyId,
             int companyClientId,
+            int id,
             CancellationToken ct)
         {
             if (id <= 0)
@@ -246,70 +246,68 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryType
             return ApiResponseFactory.Success(true, "Inventory type mapping deleted successfully.");
         }
         /// <inheritdoc />
-        public async Task<ApiResponse<WMSCompanyClientInventoryTypeReadDTO>> SetActiveAsync(
-            WMSCompanyClientInventoryTypeSetActiveDTO request,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct)
+        public async Task<ApiResponse<bool>> SetActiveAsync(
+              int companyId,
+             int companyClientId,
+             int id,
+             bool isActive,
+             CancellationToken ct)
         {
-            if (request is null)
-            {
-                return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("Request body is required.");
-            }
+            if (companyId <= 0 || companyClientId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Company or Client is required.");
 
-            if (request.Id <= 0)
-            {
-                return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>("Mapping Id is required.");
-            }
+            if (id <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Mapping Id is required.");
 
             // Mapping must exist in tenant scope
-            var entity = await _repository.GetEntityByIdAsync(request.Id, companyId, companyClientId, ct);
+            var entity = await _repository.GetEntityByIdAsync(id, companyId, companyClientId, ct);
             if (entity is null)
             {
-                return ApiResponseFactory.NotFound<WMSCompanyClientInventoryTypeReadDTO>(
+                return ApiResponseFactory.NotFound<bool>(
                     "Inventory type mapping not found for the current client.");
             }
 
             // If activating mapping, master must be active
-            if (request.IsActive)
+            if (isActive)
             {
                 var masterIsActive = await _repository.MasterIsActiveAsync(entity.InventoryTypeId, ct);
                 if (!masterIsActive)
                 {
-                    return ApiResponseFactory.BadRequest<WMSCompanyClientInventoryTypeReadDTO>(
+                    return ApiResponseFactory.BadRequest<bool>(
                         "Cannot activate mapping because the master InventoryType is inactive.");
                 }
             }
 
-            var changed = await _repository.SetActiveAsync(
-                request.Id,
-                companyId,
-                companyClientId,
-                request.IsActive,
-                ct);
+            var changed = await _repository.SetActiveAsync(companyId,companyClientId,id, isActive, ct);
+            
 
             if (!changed)
             {
-                return ApiResponseFactory.Error<WMSCompanyClientInventoryTypeReadDTO>(
+                return ApiResponseFactory.Error<bool>(
                     "The mapping status could not be updated.");
             }
 
-            var dto = await _repository.GetByIdAsync(request.Id, companyId, companyClientId, ct);
 
-            if (dto is null)
-            {
-                return ApiResponseFactory.Error<WMSCompanyClientInventoryTypeReadDTO>(
-                    "Status updated, but the updated mapping could not be loaded.");
-            }
 
-            return ApiResponseFactory.Success(
-                dto,
-                request.IsActive
-                    ? "Inventory type mapping activated successfully."
-                    : "Inventory type mapping deactivated successfully.");
+            return ApiResponseFactory.Ok(true, isActive ? "Mapping activated." : "Mapping deactivated.");
         }
 
+        /// <inheritdoc/>
+        public async Task<ApiResponse<List<WMSCompanyClientInventoryTypeReadDTO>>> GetEnabledAsync(
+            int companyId,
+            int companyClientId,
+            CancellationToken ct)
+        {
+            if (companyId <= 0 || companyClientId <= 0)
+                return ApiResponseFactory.BadRequest<List<WMSCompanyClientInventoryTypeReadDTO>>("Company or Client is required.");
 
+            var result = await _repository.GetEnabledAsync(companyId, companyClientId, ct);
+
+            //if (result.Count == 0)
+            //    return ApiResponseFactory.NotFound<List<WMSCompanyClientInventoryCategoryReadDTO>>("No enabled categories found.");
+
+            return ApiResponseFactory.Ok(result);
+        }
     }
 }
 

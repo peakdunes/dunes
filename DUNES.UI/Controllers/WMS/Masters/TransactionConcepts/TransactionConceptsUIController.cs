@@ -10,16 +10,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
 {
+     
     public class TransactionConceptsUIController : BaseController
     {
-        private readonly TransactionConceptsWMSUIService _service;
+        
+        private readonly ITransactionConceptsWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
         private const string MENU_CODE_INDEX = "01020808";
         private const string MENU_CODE_CRUD = "01020808ZZ";
 
         public TransactionConceptsUIController(
-            TransactionConceptsWMSUIService service,
+            ITransactionConceptsWMSUIService service,
             IMenuClientUIService menuClientService)
         {
             _service = service;
@@ -70,9 +72,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
                 ct,
                 CurrentToken,
                 
-                new BreadcrumbItem { Text = "Create", Url = null });
+                new BreadcrumbItem { Text = "New Transaction Concept", Url = null });
 
-            return View(new WMSInventorycategoriesCreateDTO());
+            return View(new WMSTransactionconceptsCreateDTO());
         }
 
         /// <summary>

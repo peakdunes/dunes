@@ -134,7 +134,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// <summary>
         /// Updates an existing transaction concept.
         /// </summary>
-        public async Task<ApiResponse<WMSTransactionconceptsReadDTO>> UpdateAsync(
+        public async Task<ApiResponse<bool>> UpdateAsync(
             int id,
             WMSTransactionconceptsUpdateDTO request,
             int companyId,
@@ -144,13 +144,13 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
 
             if (existing is null)
             {
-                return ApiResponseFactory.NotFound<WMSTransactionconceptsReadDTO>(
+                return ApiResponseFactory.NotFound<bool>(
                     "Transaction concept not found.");
             }
 
             if (string.IsNullOrWhiteSpace(request.Name))
             {
-                return ApiResponseFactory.Fail<WMSTransactionconceptsReadDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "VALIDATION_ERROR",
                     message: "Name is required.",
                     statusCode: StatusCodes.Status400BadRequest);
@@ -166,7 +166,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
 
             if (exists)
             {
-                return ApiResponseFactory.Fail<WMSTransactionconceptsReadDTO>(
+                return ApiResponseFactory.Fail<bool>(
                     error: "DUPLICATE_NAME",
                     message: "A transaction concept with the same name already exists.",
                     statusCode: StatusCodes.Status409Conflict);
@@ -184,7 +184,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
 
             var updated = await _repository.UpdateAsync(existing, ct);
 
-            return ApiResponseFactory.Success(MapToReadDto(updated),"Transaction concept updated");
+            return ApiResponseFactory.Success(true,"Transaction concept updated");
         }
 
         /// <summary>
@@ -270,6 +270,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
                 Name = entity.Name,
                 CompanyId = entity.companyId,
                 Observations = entity.Observations,
+                companyname = entity.IdcompanyNavigation.Name,
                 Active = entity.Active
             };
         }

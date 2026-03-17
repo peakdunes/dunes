@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,20 +13,20 @@ namespace DUNES.Shared.DTOs.WMS
     /// </summary>
     public class WMSTransactionConceptClientCreateDTO
     {
-        /// <summary>
-        /// Company client identifier.
-        /// </summary>
-        public int CompanyClientId { get; set; }
 
         /// <summary>
         /// Transaction concept identifier.
         /// </summary>
+        /// 
+        [Display(Name ="Transaction Concept Name")]
         public int TransactionConceptId { get; set; }
 
         /// <summary>
         /// Indicates whether the association
         /// should be created as active.
         /// </summary>
+        /// 
+        [Display(Name = "Active")]
         public bool Active { get; set; } = true;
     }
 }

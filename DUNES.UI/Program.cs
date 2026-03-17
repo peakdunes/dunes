@@ -16,13 +16,17 @@ using DUNES.UI.Services.WMS.Masters.Companies;
 using DUNES.UI.Services.WMS.Masters.CompaniesClientDivision;
 using DUNES.UI.Services.WMS.Masters.CompaniesContract;
 using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory;
+using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType;
+using DUNES.UI.Services.WMS.Masters.CompanyClientItemStatus;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using DUNES.UI.Services.WMS.Masters.InventoryTypes;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
 using DUNES.UI.Services.WMS.Masters.Locations;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
+using DUNES.UI.Services.WMS.Masters.TransactionConceptClient;
 using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
+using DUNES.UI.Services.WMS.Masters.TransactionTypeClient;
 using DUNES.UI.Services.WMS.Masters.TransactionTypes;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
@@ -88,6 +92,16 @@ builder.Services.AddScoped<IItemStatusWMSUIService, ItemStatusWMSUIService>();
 builder.Services.AddScoped<ITransactionConceptsWMSUIService, TransactionConceptsWMSUIService>();
 
 builder.Services.AddScoped<ITransactionTypesWMSUIService, TransactionTypesWMSUIService>();
+
+builder.Services.AddScoped<ICompanyClientInventoryTypeWMSUIService, CompanyClientInventoryTypeWMSUIService>();
+
+builder.Services.AddScoped<ICompanyClientItemStatusWMSUIService, CompanyClientItemStatusWMSUIService>();
+
+builder.Services.AddScoped<ITransactionConceptClientWMSUIService, TransactionConceptClientWMSUIService>();
+
+builder.Services.AddScoped<ITransactionTypeClientWMSUIService, TransactionTypeClientWMSUIService>();
+
+ 
 
 builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
 

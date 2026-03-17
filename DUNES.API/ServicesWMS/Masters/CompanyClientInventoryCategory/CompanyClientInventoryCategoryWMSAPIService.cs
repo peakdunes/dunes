@@ -146,11 +146,11 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
 
         /// <inheritdoc/>
         public async Task<ApiResponse<bool>> SetActiveAsync(
-            int companyId,
-            int companyClientId,
-            int id,
-            bool isActive,
-            CancellationToken ct)
+     int companyId,
+     int companyClientId,
+     int id,
+     bool isActive,
+     CancellationToken ct)
         {
             if (companyId <= 0 || companyClientId <= 0)
                 return ApiResponseFactory.BadRequest<bool>("Company or Client is required.");
@@ -158,23 +158,33 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
             if (id <= 0)
                 return ApiResponseFactory.BadRequest<bool>("Mapping Id is required.");
 
-            try
-            {
-                var updated = await _repository.SetActiveAsync(companyId, companyClientId, id, isActive, ct);
+            var entity = await _repository.GetByIdAsync(companyId, companyClientId, id, ct);
 
-                if (!updated)
-                    return ApiResponseFactory.NotFound<bool>("Mapping not found.");
+            if (entity is null)
+                return ApiResponseFactory.NotFound<bool>("Mapping not found.");
 
-                return ApiResponseFactory.Ok(true, isActive ? "Mapping activated." : "Mapping deactivated.");
-            }
-            catch (InvalidOperationException ex)
+            if (isActive)
             {
-                // Most likely: trying to activate while master is inactive
-                return ApiResponseFactory.Fail<bool>(
-                    "MASTER_INACTIVE",
-                    ex.Message,
-                    (int)HttpStatusCode.BadRequest);
+                var masterActive = await _repository.IsMasterActiveAsync(
+                    companyId,
+                    entity.InventoryCategoryId,
+                    ct);
+
+                if (!masterActive)
+                {
+                    return ApiResponseFactory.Fail<bool>(
+                        "MASTER_INACTIVE",
+                        "Cannot activate mapping: master category is inactive.",
+                        (int)HttpStatusCode.BadRequest);
+                }
             }
+
+            var updated = await _repository.SetActiveAsync(companyId, companyClientId, id, isActive, ct);
+
+            if (!updated)
+                return ApiResponseFactory.NotFound<bool>("Mapping not found.");
+
+            return ApiResponseFactory.Ok(true, isActive ? "Mapping activated." : "Mapping deactivated.");
         }
 
         /// <inheritdoc/>
@@ -213,5 +223,41 @@ namespace DUNES.API.ServicesWMS.Masters.CompanyClientInventoryCategory
                     (int)HttpStatusCode.BadRequest);
             }
         }
+
+
+        /// <summary>
+        /// delete inventory category relation don't delete category master
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<bool>> DeleteAsync(
+           int companyId,
+           int companyClientId,
+           int id,
+           CancellationToken ct)
+        {
+            if (companyId <= 0 || companyClientId <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Company or Client is required.");
+
+            if (id <= 0)
+                return ApiResponseFactory.BadRequest<bool>("Mapping Id is required.");
+
+            var entity = await _repository.GetByIdAsync(companyId, companyClientId, id, ct);
+
+            if (entity is null)
+                return ApiResponseFactory.NotFound<bool>("Mapping not found.");
+
+         
+            var deleted = await _repository.DeleteAsync(companyId, companyClientId, id, ct);
+
+            if (!deleted)
+                return ApiResponseFactory.NotFound<bool>("Mapping not found.");
+
+            return ApiResponseFactory.Ok(true, "Mapping deleted successfully.");
+        }
+
     }
 }

@@ -121,7 +121,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConcepts
         /// <returns>
         /// ApiResponse containing the updated transaction concept (read DTO).
         /// </returns>
-        Task<ApiResponse<WMSTransactionconceptsReadDTO>> UpdateAsync(
+        Task<ApiResponse<bool>> UpdateAsync(
             int id,
             WMSTransactionconceptsUpdateDTO request,
             int companyId,

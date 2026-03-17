@@ -146,5 +146,15 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryCategory
         /// <param name="ct"></param>
         /// <returns></returns>
         Task<bool> HasAnyClientMappingAsync(int companyId, int categoryId, CancellationToken ct);
+
+        /// <summary>
+        /// Delete category id relacion (don't delete category master)
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<bool> DeleteAsync(int companyId,int companyClientId,int id,    CancellationToken ct);
     }
 }

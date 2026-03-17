@@ -167,9 +167,9 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
 
         /// <inheritdoc />
         public async Task<bool> SetActiveAsync(
-            int id,
             int companyId,
             int companyClientId,
+            int id,
             bool isActive,
             CancellationToken ct)
         {
@@ -184,7 +184,71 @@ namespace DUNES.API.RepositoriesWMS.Masters.CompanyClientInventoryType
 
             entity.IsActive = isActive;
 
-            return await _db.SaveChangesAsync(ct) > 0;
+            await _db.SaveChangesAsync(ct);
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the enabled inventory types for the current client.
+        /// Only returns rows where:
+        /// - Mapping IsActive=true AND
+        /// - Master InventoryCategory IsActive=true
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<List<WMSCompanyClientInventoryTypeReadDTO>> GetEnabledAsync(
+           int companyId,
+           int companyClientId,
+           CancellationToken ct)
+        {
+            // Enabled means: mapping IsActive=true AND master IsActive=true
+            return await _db.CompanyClientInventoryTypes
+                .AsNoTracking()
+                .Where(m => m.CompanyId == companyId
+                         && m.CompanyClientId == companyClientId
+                         && m.IsActive)
+                .Join(
+                    _db.InventoryTypes.AsNoTracking()
+                        .Where(c => c.Active),
+                    m => m.InventoryTypeId,
+                    c => c.Id,
+                    (m, c) => new WMSCompanyClientInventoryTypeReadDTO
+                    {
+                        Id = m.Id,
+                        InventoryTypeId = c.Id,
+                        InventoryTypeName = c.Name,
+                        IsActive = m.IsActive
+                    })
+                .OrderBy(x => x.InventoryTypeName)
+                .ToListAsync(ct);
+        }
+
+        /// <summary>
+        /// delete inventory category relation (don't delete category master)
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="companyClientId"></param>
+        /// <param name="id"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<bool> DeleteAsync(int companyId, int companyClientId, int id, CancellationToken ct)
+        {
+            var entity = await _db.CompanyClientInventoryTypes
+                .FirstOrDefaultAsync(x =>
+                    x.Id == id &&
+                    x.CompanyId == companyId &&
+                    x.CompanyClientId == companyClientId,
+                    ct);
+
+            if (entity is null)
+                return false;
+
+            _db.CompanyClientInventoryTypes.Remove(entity);
+            await _db.SaveChangesAsync(ct);
+
+            return true;
         }
     }
 }
