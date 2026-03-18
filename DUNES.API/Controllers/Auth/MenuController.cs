@@ -1,4 +1,5 @@
 ﻿using Azure;
+using DUNES.API.ModelsWMS.Auth;
 using DUNES.API.Services.Auth;
 
 using DUNES.Shared.DTOs.Auth;
@@ -23,7 +24,7 @@ namespace DUNES.API.Controllers.Auth
     {
         private readonly IAuthService _authService;
         private readonly IMenuService _menuService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
 
         /// <summary>
@@ -32,7 +33,7 @@ namespace DUNES.API.Controllers.Auth
         /// <param name="menuService"></param>
         /// <param name="userManager"></param>
         /// <param name="authService"></param>
-        public MenuController(IMenuService menuService, UserManager<IdentityUser> userManager, IAuthService authService )
+        public MenuController(IMenuService menuService, UserManager<ApplicationUser> userManager, IAuthService authService )
         {
             _menuService = menuService;
             _userManager = userManager;

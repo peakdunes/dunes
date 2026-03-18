@@ -1,5 +1,5 @@
 ﻿using DUNES.API.Data;
-using DUNES.API.Models.Configuration;
+using DUNES.API.ModelsWMS.Configuration;
 using DUNES.Shared.DTOs.Auth;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DUNES.API.ModelsWMS.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.Models.Configuration;

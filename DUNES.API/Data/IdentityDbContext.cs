@@ -1,5 +1,5 @@
-﻿using DUNES.API.Models.Configuration;
-using DUNES.API.ModelsWMS.Auth;
+﻿using DUNES.API.ModelsWMS.Auth;
+using DUNES.API.ModelsWMS.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -9,8 +9,12 @@ namespace DUNES.API.Data
     /// <summary>
     /// Identity DB Context
     /// </summary>
-    public class IdentityDbContext : IdentityDbContext<IdentityUser>
+    public class IdentityDbContext : IdentityDbContext<ApplicationUser>
     {
+        /// <summary>
+        /// DI
+        /// </summary>
+        /// <param name="options"></param>
         public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
         {
         }
@@ -23,8 +27,7 @@ namespace DUNES.API.Data
         /// <summary>
         /// Menu access options
         /// </summary>
-        public virtual DbSet<Menu> Menu { get; set; }
-
+        public virtual DbSet<Menu> Menu { get; set; } = null!;
 
         /// <summary>
         /// Permissions catalog (stable keys like: WMS.LOCATIONS.ACCESS, ADMIN.USERS.EDIT).
@@ -49,7 +52,6 @@ namespace DUNES.API.Data
         /// </summary>
         public virtual DbSet<MenuPermission> MenuPermissions { get; set; } = null!;
 
-
         /// <summary>
         /// Fluent API mappings for this DbContext.
         /// Here we configure table names, column types/lengths, keys (including composite keys),
@@ -57,13 +59,43 @@ namespace DUNES.API.Data
         /// entities without relying only on data annotations.
         /// </summary>
         /// <param name="modelBuilder">EF Core model builder used to configure the entity model.</param>
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            //////
+            // =========================
+            // AspNetUsers extra fields
+            // =========================
+            modelBuilder.Entity<ApplicationUser>(entity =>
+            {
+                entity.ToTable("AspNetUsers");
 
+                entity.Property(x => x.FullName)
+                    .HasMaxLength(150)
+                    .IsRequired();
+
+                entity.Property(x => x.IsActive)
+                    .HasDefaultValue(true)
+                    .IsRequired();
+
+                entity.Property(x => x.MustChangePassword)
+                    .HasDefaultValue(true)
+                    .IsRequired();
+
+                entity.Property(x => x.CreatedAt)
+                    .HasColumnType("datetime2")
+                    .HasDefaultValueSql("sysutcdatetime()")
+                    .IsRequired();
+
+                entity.Property(x => x.CreatedBy)
+                    .HasMaxLength(450);
+
+                entity.Property(x => x.UpdatedAt)
+                    .HasColumnType("datetime2");
+
+                entity.Property(x => x.UpdatedBy)
+                    .HasMaxLength(450);
+            });
 
             // =========================
             // AuthPermissions
@@ -88,7 +120,6 @@ namespace DUNES.API.Data
                 entity.Property(x => x.IsActive)
                     .HasDefaultValue(true);
 
-                // CreatedAt default in SQL
                 entity.Property(x => x.CreatedAt)
                     .HasColumnType("datetime2")
                     .HasDefaultValueSql("sysutcdatetime()");
@@ -129,7 +160,7 @@ namespace DUNES.API.Data
             });
 
             // =========================
-            // AuthUserPermissions (UserId, PermissionId) - grants only
+            // AuthUserPermissions (UserId, PermissionId)
             // =========================
             modelBuilder.Entity<AuthUserPermission>(entity =>
             {
@@ -145,7 +176,7 @@ namespace DUNES.API.Data
                     .IsRequired();
 
                 // FK -> AspNetUsers
-                entity.HasOne<IdentityUser>()
+                entity.HasOne<ApplicationUser>()
                     .WithMany()
                     .HasForeignKey(x => x.UserId)
                     .HasConstraintName("FK_AuthUserPermissions_AspNetUsers_UserId")
@@ -175,7 +206,7 @@ namespace DUNES.API.Data
                 entity.Property(x => x.PermissionId).IsRequired();
 
                 // FK -> Menu
-                entity.HasOne<Menu>() // tu entity del menú
+                entity.HasOne<Menu>()
                     .WithMany()
                     .HasForeignKey(x => x.MenuId)
                     .HasConstraintName("FK_MenuPermissions_Menu_MenuId")
@@ -192,12 +223,10 @@ namespace DUNES.API.Data
                     .HasDatabaseName("IX_MenuPermissions_PermissionId");
             });
 
-       
-
-
-        /////////////
-
-        modelBuilder.Entity<Menu>(entity =>
+            // =========================
+            // Menu
+            // =========================
+            modelBuilder.Entity<Menu>(entity =>
             {
                 entity.ToTable("Menu");
 
@@ -229,14 +258,12 @@ namespace DUNES.API.Data
                     .HasMaxLength(100)
                     .HasColumnName("level5");
 
-              
-
                 entity.Property(e => e.Active)
                     .HasColumnName("active");
 
                 entity.Property(e => e.Utility)
                     .HasMaxLength(500)
-                    .HasColumnName("Utility"); 
+                    .HasColumnName("Utility");
 
                 entity.Property(e => e.Action)
                     .HasMaxLength(100)
@@ -247,26 +274,25 @@ namespace DUNES.API.Data
                     .HasColumnName("controller");
 
                 entity.Property(e => e.Order)
-                    .HasColumnName("order"); // reserved word ok via mapping
+                    .HasColumnName("order");
 
                 entity.Property(e => e.Title)
                     .HasColumnType("varchar(200)")
                     .HasColumnName("title");
             });
 
-
+            // =========================
+            // UserConfiguration
+            // =========================
             modelBuilder.Entity<UserConfiguration>(entity =>
             {
                 entity.ToTable("userConfiguration");
 
-                // PK
                 entity.HasKey(e => e.Id);
 
-                // Existing indexes from scaffold (keep them)
                 entity.HasIndex(e => e.Companyclientdefault, "IX_userConfiguration_companyclientdefault");
                 entity.HasIndex(e => e.Companydefault, "IX_userConfiguration_companydefault");
 
-                // Column mappings (keep your DB column names)
                 entity.Property(e => e.AllowChangeSettings).HasColumnName("allowChangeSettings");
                 entity.Property(e => e.Bindcr1default).HasColumnName("bindcr1default");
 
@@ -299,50 +325,36 @@ namespace DUNES.API.Data
 
                 entity.Property(e => e.Transactiontransferdefault).HasColumnName("transactiontransferdefault");
 
-                // IMPORTANT: must match AspNetUsers.Id (nvarchar(450))
                 entity.Property(e => e.Userid)
                     .HasMaxLength(450)
                     .HasColumnName("userid");
 
                 entity.Property(e => e.Wmsbin).HasColumnName("wmsbin");
 
-                // ----------------------------
-                // UNIQUE RULES
-                // ----------------------------
-
                 // Only one active config per user
                 entity.HasIndex(e => e.Userid)
-                      .IsUnique()
-                      .HasFilter("[isactive] = 1")
-                      .HasDatabaseName("UX_userConfiguration_OneActivePerUser");
+                    .IsUnique()
+                    .HasFilter("[isactive] = 1")
+                    .HasDatabaseName("UX_userConfiguration_OneActivePerUser");
 
-                // (Recommended) EnvironmentName unique per user
+                // Recommended: EnvironmentName unique per user
                 entity.HasIndex(e => new { e.Userid, e.Enviromentname })
-                      .IsUnique()
-                      .HasDatabaseName("UX_userConfiguration_User_EnvName");
-
-                // ----------------------------
-                // FOREIGN KEYS (Identity only here)
-                // ----------------------------
+                    .IsUnique()
+                    .HasDatabaseName("UX_userConfiguration_User_EnvName");
 
                 // FK -> AspNetUsers
-                entity.HasOne<IdentityUser>()
-                      .WithMany()
-                      .HasForeignKey(e => e.Userid)
-                      .OnDelete(DeleteBehavior.Restrict)
-                      .HasConstraintName("FK_userConfiguration_AspNetUsers_userid");
+                entity.HasOne<ApplicationUser>()
+                    .WithMany()
+                    .HasForeignKey(e => e.Userid)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("FK_userConfiguration_AspNetUsers_userid");
 
                 // FK -> AspNetRoles
                 entity.HasOne<IdentityRole>()
-                      .WithMany()
-                      .HasForeignKey(e => e.Roleid)
-                      .OnDelete(DeleteBehavior.Restrict)
-                      .HasConstraintName("FK_userConfiguration_AspNetRoles_roleid");
-
-                // NOTE:
-                // FKs to Company and companyClient will be created in the migration
-                // using migrationBuilder.AddForeignKey(principalTable: "Company"/"companyClient")
-                // because those entities are not part of this DbContext.
+                    .WithMany()
+                    .HasForeignKey(e => e.Roleid)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("FK_userConfiguration_AspNetRoles_roleid");
             });
         }
     }

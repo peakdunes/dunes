@@ -1,6 +1,7 @@
 ﻿using DUNES.API.DTOs.B2B;
 using DUNES.API.Models.Auth;
-
+using DUNES.API.ModelsWMS.Auth;
+using DUNES.API.ModelsWMS.Masters;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
@@ -8,27 +9,30 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text;
 
 namespace DUNES.API.Services.Auth
 {
     /// <summary>
-    /// Authentication services
+    /// Authentication services for login validation and role retrieval.
+    /// Uses ApplicationUser as the Identity user entity for DUNES.
     /// </summary>
     public class AuthService : IAuthService
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IUserConfigurationService _userConfigurationService;
         private readonly IConfiguration _configuration;
 
         /// <summary>
-        /// dependency injection
+        /// Initializes a new instance of the <see cref="AuthService"/> class.
         /// </summary>
-        /// <param name="userManager"></param>
-        /// <param name="configuration"></param>
-        /// <param name="userConfigurationService"></param>
-        public AuthService(UserManager<IdentityUser> userManager, IConfiguration configuration, IUserConfigurationService userConfigurationService)
+        /// <param name="userManager">Identity user manager for ApplicationUser.</param>
+        /// <param name="configuration">Application configuration.</param>
+        /// <param name="userConfigurationService">Service used to obtain the active user configuration.</param>
+        public AuthService(
+            UserManager<ApplicationUser> userManager,
+            IConfiguration configuration,
+            IUserConfigurationService userConfigurationService)
         {
             _userManager = userManager;
             _configuration = configuration;
@@ -36,60 +40,50 @@ namespace DUNES.API.Services.Auth
         }
 
         /// <summary>
-        /// Obtains all roles for the currently authenticated user using the claims in the JWT token.
+        /// Obtains all roles assigned to the currently authenticated user.
         /// </summary>
-        /// <param name="userPrincipal">The ClaimsPrincipal object injected by ASP.NET (User)</param>
-        /// <returns>List of role names (or empty list if no roles)</returns>
+        /// <param name="userPrincipal">Authenticated user principal.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of role names assigned to the user.</returns>
         public async Task<ApiResponse<List<string>>> GetRolesFromClaims(ClaimsPrincipal userPrincipal, CancellationToken ct)
         {
-
-            // Check for cancellation at the start
             ct.ThrowIfCancellationRequested();
 
-            var roleslist = new List<string>();
+            var rolesList = new List<string>();
 
-            // 1. Verifica que hay un usuario autenticado
             if (userPrincipal?.Identity == null || !userPrincipal.Identity.IsAuthenticated)
                 return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
 
-            // 2. Obtiene el username (normalmente el email) desde el claim `name`
-            var username = userPrincipal.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
+            var username = userPrincipal.Identity.Name;
+            if (string.IsNullOrWhiteSpace(username))
                 return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
 
             ct.ThrowIfCancellationRequested();
 
-            // 3. Busca el usuario en la base de datos de Identity
             var user = await _userManager.FindByNameAsync(username);
             if (user == null)
                 return ApiResponseFactory.NotFound<List<string>>("This user is not authenticated.");
 
-            // 4. Obtiene los roles desde Identity
             var roles = await _userManager.GetRolesAsync(user);
             if (roles == null || !roles.Any())
                 return ApiResponseFactory.NotFound<List<string>>("Roles list for this user not found.");
 
-            roleslist = roles.ToList();
+            rolesList = roles.ToList();
 
             ct.ThrowIfCancellationRequested();
 
-            // 5. Devuelve la lista de roles como List<string>
-            return ApiResponseFactory.Ok(roleslist, "Roles available for this user");
+            return ApiResponseFactory.Ok(rolesList, "Roles available for this user");
         }
 
         /// <summary>
-        /// login validation access
+        /// Validates user credentials and generates a JWT token for the authenticated user.
+        /// Also validates whether the user is active and returns the MustChangePassword flag.
         /// </summary>
-        /// <param name="model"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
-        /// <exception cref="UnauthorizedAccessException"></exception>
-
-
-
+        /// <param name="model">Login request model containing username and password.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Login response with JWT token, expiration, user context, and password-change requirement flag.</returns>
         public async Task<ApiResponse<LoginResponseDto>> LoginAsync(LoginModel model, CancellationToken ct)
         {
-
             if (string.IsNullOrEmpty(_configuration["JwtSettings:SecretKey"]))
                 return ApiResponseFactory.Error<LoginResponseDto>("JWT Info not found");
 
@@ -105,101 +99,89 @@ namespace DUNES.API.Services.Auth
             if (!int.TryParse(_configuration["JwtSettings:ExpirationMinutes"], out var expiration) || expiration <= 0)
                 return ApiResponseFactory.Error<LoginResponseDto>("Session Expiration time not valid");
 
-            // Validate input
-            if (string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
+            if (string.IsNullOrWhiteSpace(model.Username) || string.IsNullOrWhiteSpace(model.Password))
                 return ApiResponseFactory.Unauthorized<LoginResponseDto>("Username and password are required");
-
 
             var user = await _userManager.FindByNameAsync(model.Username);
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
                 return ApiResponseFactory.Unauthorized<LoginResponseDto>("Invalid credentials");
 
-            //we search user environment
+            if (!user.IsActive)
+                return ApiResponseFactory.Unauthorized<LoginResponseDto>("This user is inactive.");
+
             var userConfig = await _userConfigurationService.GetActiveAsync(user.Id, ct);
 
-            if (userConfig.Data == null)
-            {
-                return ApiResponseFactory.Unauthorized<LoginResponseDto>(
-                    "User has no active company configuration.");
-            }
-
+            var hasConfiguration = userConfig.Success && userConfig.Data != null;
 
             var userRoles = await _userManager.GetRolesAsync(user);
 
+
             var authClaims = new List<Claim>
-                {
-                    // UserId (GUID) -> clave para permisos / configuraciones por usuario
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
 
-                    // Opcional pero recomendado (estándar JWT)
-                    new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+            if (hasConfiguration)
+            {
+                authClaims.Add(new Claim("companyId", userConfig.Data.Companydefault.ToString()));
+                authClaims.Add(new Claim("companyClientId", userConfig.Data.Companyclientdefault.ToString()));
+                authClaims.Add(new Claim("locationId", userConfig.Data.Locationdefault.ToString()));
+                authClaims.Add(new Claim("companiesContractId", userConfig.Data.companiesContractId.ToString()));
+            }
 
-                    // Username/email
-                    new Claim(ClaimTypes.Name, user.UserName!),
-
-                    // Token id
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-
-
-                     // Company Default
-                    new Claim("companyId", userConfig.Data!.Companydefault.ToString()),
-
-                    // Company Client Default
-                    new Claim("companyClientId", userConfig.Data!.Companyclientdefault.ToString()),
-
-                    // Location ID
-                    new Claim("locationId", userConfig.Data!.Locationdefault.ToString()),
-
-                        // Contract ID
-                    new Claim("companiesContractId", userConfig.Data!.companiesContractId.ToString())
-
-                };
-
-            //var authClaims = new List<Claim>
-            //{
-            //    new Claim(JwtRegisteredClaimNames.Sub, user.Id),                 
-            //    new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName!),   
-            //    new Claim("email", user.Email ?? string.Empty),
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            //};
-
+          
 
             foreach (var role in userRoles)
+            {
                 authClaims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
-
-
-
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
+            var authSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"]!));
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JwtSettings:Issuer"],
                 audience: _configuration["JwtSettings:Audience"],
-                expires: DateTime.Now.AddMinutes(int.Parse(_configuration["JwtSettings:ExpirationMinutes"]!)),
+                expires: DateTime.UtcNow.AddMinutes(expiration),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
             );
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            string tokenString = tokenHandler.WriteToken(token);
+            var tokenString = tokenHandler.WriteToken(token);
 
-            return ApiResponseFactory.Ok(new LoginResponseDto
+            var response = new LoginResponseDto
             {
                 Token = tokenString,
                 Expiration = token.ValidTo,
-                UserName = user.UserName!,
-                CompanyId = userConfig.Data!.Companydefault,
-                CompanyClientId = userConfig.Data!.Companyclientdefault,
-                LocationId = userConfig.Data!.Locationdefault,
-                companyName = userConfig.Data!.CompanyName,
-                companyClientName = userConfig.Data!.CompanyClientName,
-                LocationName = userConfig.Data!.LocationName,
-                Enviromentname = userConfig.Data!.Enviromentname,
-                RoleName = userConfig.Data.RoleName,
-                companiesContractId = userConfig.Data.companiesContractId
+                UserName = user.UserName ?? string.Empty,
+
+                MustChangePassword = user.MustChangePassword,
+                HasConfiguration = hasConfiguration
+            };
+
+            if (hasConfiguration)
+            {
+                response.CompanyId = userConfig.Data.Companydefault;
+                response.CompanyClientId = userConfig.Data.Companyclientdefault;
+                response.LocationId = userConfig.Data.Locationdefault;
+
+                response.companyName = userConfig.Data.CompanyName;
+                response.companyClientName = userConfig.Data.CompanyClientName;
+                response.LocationName = userConfig.Data.LocationName;
+                response.Enviromentname = userConfig.Data.Enviromentname;
+
+                response.RoleName = userConfig.Data.RoleName;
+                response.companiesContractId = userConfig.Data.companiesContractId;
 
 
-            });
+            }
+            return ApiResponseFactory.Ok(response);
+
+          
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using DUNES.API.Models.Configuration;
+﻿using DUNES.API.ModelsWMS.Configuration;
 using DUNES.Shared.DTOs.Auth;
 
 namespace DUNES.API.RepositoriesWMS.Auth

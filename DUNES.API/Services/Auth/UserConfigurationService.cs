@@ -1,5 +1,6 @@
 ﻿using DUNES.API.Data;
 using DUNES.API.Models.Configuration;
+using DUNES.API.ModelsWMS.Configuration;
 using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.API.ServicesWMS.Masters.ClientCompanies;
 using DUNES.API.ServicesWMS.Masters.Companies;

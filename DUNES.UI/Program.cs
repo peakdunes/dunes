@@ -101,7 +101,7 @@ builder.Services.AddScoped<ITransactionConceptClientWMSUIService, TransactionCon
 
 builder.Services.AddScoped<ITransactionTypeClientWMSUIService, TransactionTypeClientWMSUIService>();
 
- 
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
 

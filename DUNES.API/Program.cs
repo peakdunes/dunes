@@ -1,7 +1,7 @@
 ﻿
 using DUNES.API.Data;
 using DUNES.API.Data.Interceptors;
-
+using DUNES.API.ModelsWMS.Auth;
 using DUNES.API.Repositories.B2B.Common.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Queries;
 using DUNES.API.Repositories.Inventory.ASN.Transactions;
@@ -144,7 +144,7 @@ builder.Services.AddDbContext<IdentityDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultWMSConnection")));
 
 // Authentication services
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<IdentityDbContext>()
     .AddDefaultTokenProviders();
 
@@ -234,6 +234,8 @@ builder.Services.AddSwaggerGen(c =>
             //#########
             "UserConfiguration" => new[] { "AUTH User Configuration" },
             "Auth" => new[] { "AUTH User Authentication" },
+            "User" => new[] { "AUTH CRUD Users" },
+           
 
             //#########
             //INV
@@ -326,6 +328,7 @@ builder.Services.AddScoped<ITraceProvider, TraceProvider>();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
 builder.Services.AddScoped<IMenuService, MenuService>();
 builder.Services.AddScoped<LogHelper>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 //#######################
 //END AUTHENTICATION SERVICES

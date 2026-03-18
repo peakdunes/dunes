@@ -1,4 +1,5 @@
 ﻿using DUNES.API.Models.Auth;
+using DUNES.API.ModelsWMS.Auth;
 using DUNES.API.Services.Auth;
 using DUNES.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Authorization;
@@ -17,14 +18,14 @@ namespace DUNES.API.Controllers.Auth
     public class AuthController : BaseController
     {
         private readonly IAuthService _authService;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         /// <summary>
         /// dependency injection
         /// </summary>
         /// <param name="authService"></param>
         /// <param name="userManager"></param>
-        public AuthController(IAuthService authService, UserManager<IdentityUser> userManager)
+        public AuthController(IAuthService authService, UserManager<ApplicationUser> userManager)
         {
             _authService = authService;
             _userManager = userManager;
