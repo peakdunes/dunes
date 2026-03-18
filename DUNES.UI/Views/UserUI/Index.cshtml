@@ -1,0 +1,41 @@
+﻿@model List<DUNES.Shared.DTOs.Auth.UserReadDTO>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container-fluid mt-3">
+    <h2>Users</h2>
+
+    <table class="table table-bordered table-hover mt-3">
+        <thead class="table-light">
+            <tr>
+                <th>UserName</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Active</th>
+                <th>Must Change Password</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.UserName</td>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@user.RoleName</td>
+                    <td>@(user.IsActive ? "Yes" : "No")</td>
+                    <td>@(user.MustChangePassword ? "Yes" : "No")</td>
+                    <td>
+                        <a class="btn btn-sm btn-primary">Edit</a>
+                        <a class="btn btn-sm btn-warning">Reset</a>
+                        <a class="btn btn-sm btn-danger">Deactivate</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
