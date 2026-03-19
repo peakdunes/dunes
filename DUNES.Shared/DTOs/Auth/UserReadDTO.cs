@@ -20,6 +20,8 @@ namespace DUNES.Shared.DTOs.Auth
 
         public bool MustChangePassword { get; set; }
 
+        public string? RoleId { get; set; }
+
         public string? RoleName { get; set; }
 
         public DateTime CreatedAt { get; set; }

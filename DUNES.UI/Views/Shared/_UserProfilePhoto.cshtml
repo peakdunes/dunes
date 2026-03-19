@@ -1,0 +1,19 @@
+﻿@model DUNES.UI.Models.UserPhotoViewModel
+@inject DUNES.UI.Services.Common.IUserPhotoService UserPhotoService
+
+@{
+    var photoUrl = UserPhotoService.GetPhotoUrl(Model.UserId);
+    var defaultPhotoUrl = UserPhotoService.GetDefaultPhotoUrl();
+
+    var cssClass = Model.Variant switch
+    {
+        "navbar" => "user-photo-navbar rounded-circle border shadow-sm",
+        "card" => "user-photo-card rounded-3 border shadow-sm",
+        _ => "user-photo-thumb rounded-circle border shadow-sm"
+    };
+}
+
+<img src="@photoUrl"
+     alt="@Model.AltText"
+     class="@cssClass @Model.AdditionalCssClass"
+     onerror="this.onerror=null; this.src='@defaultPhotoUrl';" />

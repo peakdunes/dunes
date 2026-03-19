@@ -49,6 +49,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
              MENU_CODE_INDEX,
              _menuClientService,
@@ -82,6 +83,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
                 return RedirectToLogin();
 
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
@@ -111,6 +113,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
 
             await SetMenuBreadcrumbAsync(
@@ -150,6 +153,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             var result = await _service.GetByIdAsync(id, CurrentToken, ct);
 
@@ -196,6 +200,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             if (!ModelState.IsValid)
             {
                 await LoadTransactionConceptsAsync(ct);
@@ -235,6 +240,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
            MENU_CODE_CRUD,
            _menuClientService,
@@ -265,6 +271,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             var result = await _service.DeleteAsync(id, CurrentToken, ct);
 

@@ -66,20 +66,20 @@ namespace DUNES.API.Auth.Authorization
             }
             else
             {
-                var resp = await _permissionService.GetMyPermissionsAsync(userId, ct);
+                //var resp = await _permissionService.GetMyPermissionsAsync(userId, ct);
 
-                // Si falla, tratamos como forbidden (autenticado pero sin permisos efectivos)
-                if (!resp.Success || resp.Data == null)
-                {
-                    context.Result = new ObjectResult(ApiResponseFactory.Forbidden<object>("Forbidden"))
-                    {
-                        StatusCode = StatusCodes.Status403Forbidden
-                    };
-                    return;
-                }
+                //// Si falla, tratamos como forbidden (autenticado pero sin permisos efectivos)
+                //if (!resp.Success || resp.Data == null)
+                //{
+                //    context.Result = new ObjectResult(ApiResponseFactory.Forbidden<object>("Forbidden"))
+                //    {
+                //        StatusCode = StatusCodes.Status403Forbidden
+                //    };
+                //    return;
+                //}
 
-                permissions = resp.Data;
-                context.HttpContext.Items[CacheKey] = permissions;
+                //permissions = resp.Data;
+                //context.HttpContext.Items[CacheKey] = permissions;
             }
 
             // 4) Check required permission

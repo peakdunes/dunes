@@ -17,6 +17,7 @@ namespace DUNES.API.ServicesWMS.Auth
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
@@ -93,16 +94,26 @@ namespace DUNES.API.ServicesWMS.Auth
             }
 
             var roles = await _userManager.GetRolesAsync(user);
+            var roleName = roles.FirstOrDefault();
+
+            string? roleId = null;
+
+            if (!string.IsNullOrWhiteSpace(roleName))
+            {
+                var role = await _roleManager.FindByNameAsync(roleName);
+                roleId = role?.Id;
+            }
 
             var dto = new UserReadDTO
             {
                 Id = user.Id,
                 UserName = user.UserName ?? string.Empty,
                 Email = user.Email ?? string.Empty,
-                FullName = user.FullName,
+                FullName = user.FullName ?? string.Empty,
                 IsActive = user.IsActive,
                 MustChangePassword = user.MustChangePassword,
-                RoleName = roles.FirstOrDefault(),
+                RoleId = roleId,
+                RoleName = roleName,
                 CreatedAt = user.CreatedAt
             };
 
@@ -584,6 +595,25 @@ namespace DUNES.API.ServicesWMS.Auth
             }
 
             return ApiResponseFactory.Ok(true, "Password changed successfully.");
+        }
+
+        /// <summary>
+        /// get role
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        public async Task<ApiResponse<List<RoleOptionDTO>>> GetRolesAsync(CancellationToken ct)
+        {
+            var roles = await _roleManager.Roles
+                .OrderBy(r => r.Name)
+                .Select(r => new RoleOptionDTO
+                {
+                    Id = r.Id,
+                    Name = r.Name!
+                })
+                .ToListAsync(ct);
+
+            return ApiResponseFactory.Success(roles, "Roles loaded successfully.");
         }
 
     }

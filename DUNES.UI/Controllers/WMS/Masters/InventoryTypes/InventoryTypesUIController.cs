@@ -36,6 +36,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
                 _menuClientService,
@@ -66,6 +67,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
@@ -86,6 +88,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             return await HandleAsync(async ct =>
             {
@@ -110,6 +113,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -151,6 +155,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             return await HandleAsync(async ct =>
             {
                 var res = await _service.UpdateAsync(id, dto, CurrentToken!, ct);
@@ -176,6 +181,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             return await HandleAsync(async ct =>
             {
                 var res = await _service.SetActiveAsync(id, isActive, CurrentToken!, ct);
@@ -199,6 +205,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -244,6 +251,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             return await HandleAsync(async ct =>
             {

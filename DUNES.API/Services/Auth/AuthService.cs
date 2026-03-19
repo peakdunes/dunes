@@ -155,6 +155,7 @@ namespace DUNES.API.Services.Auth
 
             var response = new LoginResponseDto
             {
+                UserId = user.Id,
                 Token = tokenString,
                 Expiration = token.ValidTo,
                 UserName = user.UserName ?? string.Empty,

@@ -1,0 +1,54 @@
+﻿@model DUNES.Shared.DTOs.Auth.AuthPermissionCreateDTO
+
+@{
+    ViewData["Title"] = "Create Permission";
+}
+
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-body p-4">
+        <form asp-action="Create" method="post" novalidate>
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="PermissionKey" class="form-label fw-semibold"></label>
+                    <input asp-for="PermissionKey" class="form-control" placeholder="Enter permission key" />
+                    <span asp-validation-for="PermissionKey" class="text-danger small"></span>
+                    <small class="text-muted">
+                        Example: MODELSWMS.MASTERS.LOCATIONS.ACCESS
+                    </small>
+                </div>
+
+                <div class="col-md-8">
+                    <label asp-for="Description" class="form-label fw-semibold"></label>
+                    <input asp-for="Description" class="form-control" placeholder="Enter description" />
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check mt-2">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label fw-semibold"></label>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4" />
+
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-1"></i> Back
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save me-1"></i> Save
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -44,6 +44,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                MENU_CODE_INDEX,
                _menuClientService,
@@ -69,6 +70,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -103,6 +105,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             {
                 if (CurrentToken is null)
                     return RedirectToLogin();
+
 
                 await SetMenuBreadcrumbAsync(
                     MENU_CODE_CRUD,
@@ -148,6 +151,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
@@ -167,6 +171,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             if (!ModelState.IsValid)
             {
@@ -199,6 +204,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
              MENU_CODE_CRUD,
@@ -234,6 +240,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             var res = await _service.DeleteAsync(CurrentToken, id, ct);
 

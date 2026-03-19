@@ -2,6 +2,7 @@
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
+using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.Common;
@@ -28,6 +29,7 @@ using DUNES.UI.Services.WMS.Masters.TransactionConceptClient;
 using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
 using DUNES.UI.Services.WMS.Masters.TransactionTypeClient;
 using DUNES.UI.Services.WMS.Masters.TransactionTypes;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,9 +53,21 @@ builder.Services.AddControllersWithViews(options =>
     options.Filters.Add<UiExceptionFilter>(); // ← registro global de exepciones
 });
 
+
+
 //#####################
 //FIN FILTROS
 //######################
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Auth/Login";
+    });
+
+builder.Services.AddAuthorization();
+
 
 builder.Services.AddScoped<IAuthUIService, AuthUIService>();
 
@@ -109,6 +123,14 @@ builder.Services.AddScoped<IPdfDocumentService, PdfDocumentService>();
 
 builder.Services.AddScoped<IPdfService, PdfService>();
 
+builder.Services.AddScoped<IAuthPermissionUIService, AuthPermissionUIService>();
+
+//toma la configuracion de la ruta de las fotos
+builder.Services.Configure<UserPhotoSettings>(
+    builder.Configuration.GetSection("UserPhotoSettings"));
+
+builder.Services.AddScoped<IUserPhotoService, UserPhotoService>();
+
 // Necesario para el fallback de TempData si no hay Controller
 builder.Services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
@@ -148,6 +170,7 @@ app.UseSession();
 // Middleware para validar el token (se ejecuta antes de Authorization)
 app.UseMiddleware<TokenValidationMiddleware>();
 
+app.UseAuthentication();
 // Autorización después del middleware personalizado
 app.UseAuthorization();
 

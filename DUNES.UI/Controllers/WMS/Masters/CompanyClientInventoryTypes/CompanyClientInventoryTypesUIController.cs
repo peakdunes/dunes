@@ -38,6 +38,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
                 _menuClientService,
@@ -69,6 +70,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
@@ -87,6 +89,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -121,6 +124,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             {
                 if (CurrentToken is null)
                     return RedirectToLogin();
+
+
 
                 await SetMenuBreadcrumbAsync(
                     MENU_CODE_CRUD,
@@ -168,6 +173,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             // ✅ If ModelState fails, reload combo and return view
             if (!ModelState.IsValid)
             {
@@ -203,6 +209,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             return await HandleAsync(async ct =>
             {
@@ -255,6 +262,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
@@ -288,6 +296,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             return await HandleAsync(async ct =>
             {

@@ -147,5 +147,18 @@ namespace DUNES.API.ControllersWMS.Auth
             var response = await _userService.ChangePasswordAsync(dto, currentUserId ?? string.Empty, ct);
             return StatusCode(response.StatusCode, response);
         }
+
+        /// <summary>
+        /// get role
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("GetRoles")]
+        public async Task<IActionResult> GetRoles(CancellationToken ct)
+        {
+            var response = await _userService.GetRolesAsync(ct);
+            return StatusCode(response.StatusCode, response);
+        }
+
     }
 }

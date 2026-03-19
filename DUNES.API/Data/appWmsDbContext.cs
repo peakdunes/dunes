@@ -1,4 +1,5 @@
 ﻿using DUNES.API.ModelsWMS.Admin;
+using DUNES.API.ModelsWMS.Auth;
 using DUNES.API.ModelsWMS.Masters;
 using DUNES.API.ModelsWMS.Transactions;
 using Microsoft.EntityFrameworkCore;
@@ -167,8 +168,13 @@ namespace DUNES.API.Data
         /// </summary>
         public DbSet<CompanyClientInventoryCategory> CompanyClientInventoryCategories { get; set; } = null!;
 
+        /// <summary>
+        /// user permissions 
+        /// </summary>
+        public DbSet<AuthPermission> AuthPermissions { get; set; } = null!;
 
-
+        
+            
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.

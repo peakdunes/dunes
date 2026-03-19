@@ -38,6 +38,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
                 _menuClientService,
@@ -54,6 +55,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await LoadInfoAsync(CurrentToken, ct, 0);
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
@@ -68,6 +70,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "New Contract", Url = null });

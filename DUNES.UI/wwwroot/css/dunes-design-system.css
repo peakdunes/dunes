@@ -427,3 +427,25 @@ textarea.form-control {
     }
 
 /*fin show enviroment for each user*/
+
+/*user pictures*/
+
+.user-photo-thumb { /*para la pagina de index*/
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+}
+
+.user-photo-card { /*formato tipo retrato*/
+    width: 180px;
+    height: 220px;
+    object-fit: cover;
+}
+
+.user-photo-navbar {/*para el top bar top rigth DUNES menu*/
+    width: 42px;
+    height: 42px;
+    object-fit: cover;
+}
+
+/*fin user pictures*/

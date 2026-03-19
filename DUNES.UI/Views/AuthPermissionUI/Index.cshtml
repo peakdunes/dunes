@@ -1,0 +1,55 @@
+﻿@model List<DUNES.Shared.DTOs.Auth.AuthPermissionReadDTO>
+
+@{
+    ViewData["Title"] = "Permissions";
+}
+
+<p>
+    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+</p>
+
+<div class="row">
+    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+        <thead class="table-light">
+            <tr>
+                <th>Group</th>
+                <th>Resource</th>
+                <th>Action</th>
+                <th>Description</th>
+                <th>Active</th>
+                <th>Permission Key</th>
+                <th>Created At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var permission in Model)
+            {
+                var parts = (permission.PermissionKey ?? string.Empty).Split('.', StringSplitOptions.RemoveEmptyEntries);
+
+                var group = parts.Length > 1 ? parts[1] : string.Empty;
+                var resource = parts.Length > 2 ? parts[2] : string.Empty;
+                var action = parts.Length > 3 ? parts[3] : string.Empty;
+
+                <tr>
+                    <td>@group</td>
+                    <td>@resource</td>
+                    <td>@action</td>
+                    <td>@permission.Description</td>
+                    <td>@(permission.IsActive ? "Yes" : "No")</td>
+                    <td class="text-muted small">@permission.PermissionKey</td>
+                    <td>@permission.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#tablelist').DataTable({
+                scrollX: true
+            });
+        });
+    </script>
+}

@@ -1,4 +1,6 @@
-﻿using DUNES.UI.Models;
+﻿using DUNES.Shared.Models;
+using DUNES.UI.Helpers;
+using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.Locations;
 using Microsoft.AspNetCore.Mvc;
@@ -31,6 +33,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Locations
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,

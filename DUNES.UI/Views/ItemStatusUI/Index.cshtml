@@ -31,7 +31,7 @@
                 <tr>
                     <td>
                         <partial name="_CrudActions"
-                                 model="@(new DUNES.UI.Models.CrudActionsModel { Id = item.Id, Controller = "ItemStatusUI" })" />
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { RouteId = item.Id.ToString(), Controller = "ItemStatusUI" })" />
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.Id)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>

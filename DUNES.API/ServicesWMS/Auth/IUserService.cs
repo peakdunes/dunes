@@ -70,5 +70,12 @@ namespace DUNES.API.ServicesWMS.Auth
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Operation result.</returns>
         Task<ApiResponse<bool>> ChangePasswordAsync(ChangePasswordDTO dto, string currentUserId, CancellationToken ct);
+
+        /// <summary>
+        /// get roles
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<List<RoleOptionDTO>>> GetRolesAsync(CancellationToken ct);
     }
 }

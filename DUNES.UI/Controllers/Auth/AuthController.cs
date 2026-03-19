@@ -12,6 +12,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+
 namespace DUNES.UI.Controllers.Auth
 {
     public class AuthController : Controller
@@ -32,8 +36,6 @@ namespace DUNES.UI.Controllers.Auth
 
         public async Task<IActionResult> Login(string username, string password, CancellationToken ct)
         {
-
-
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 MessageHelper.SetMessage(
@@ -63,19 +65,19 @@ namespace DUNES.UI.Controllers.Auth
             if (!login.HasConfiguration)
             {
                 MessageHelper.SetMessage(
-                       this,
-                       "warning",
-                       "Your account was successfully authenticated, but your work environment has not been configured yet. Please contact your administrator before using the system.",
-                       MessageDisplay.Inline
-                   );
+                    this,
+                    "warning",
+                    "Your account was successfully authenticated, but your work environment has not been configured yet. Please contact your administrator before using the system.",
+                    MessageDisplay.Inline
+                );
                 return View("Login");
             }
 
             var session = new SessionDTO
             {
+                
                 Token = login.Token,
                 UserName = login.UserName,
-
                 CompanyId = login.CompanyId,
                 companyName = login.companyName,
                 CompanyClientId = login.CompanyClientId,
@@ -105,27 +107,62 @@ namespace DUNES.UI.Controllers.Auth
                 }
             );
 
+            var claims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, login.UserName ?? string.Empty),
+                    new Claim(ClaimTypes.NameIdentifier, login.UserId ?? string.Empty)
+                };
+
+            if (!string.IsNullOrWhiteSpace(login.RoleName))
+                claims.Add(new Claim(ClaimTypes.Role, login.RoleName));
+
+            if (login.CompanyId > 0)
+                claims.Add(new Claim("CompanyId", login.CompanyId.ToString()));
+
+            if (login.CompanyClientId > 0)
+                claims.Add(new Claim("CompanyClientId", login.CompanyClientId.ToString()));
+
+            if (login.LocationId > 0)
+                claims.Add(new Claim("LocationId", login.LocationId.ToString()));
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme
+            );
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal,
+                new AuthenticationProperties
+                {
+                    IsPersistent = true,
+                    ExpiresUtc = login.Expiration
+                }
+            );
 
             if (login.MustChangePassword)
             {
-                // Aquí va tu redirección al flujo de cambio de contraseña
-                // Ejemplo:
-                 return RedirectToAction("ChangePassword", "Auth");
-
-
+                return RedirectToAction("ChangePassword", "Auth");
             }
-                   
 
             return RedirectToAction("Index", "Home");
         }
 
 
         [HttpPost]
-        public IActionResult Logout()
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
         {
             HttpContext.Session.Clear();
+
             Response.Cookies.Delete("api_token");
+
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             return RedirectToAction("Index", "Home");
+           // return RedirectToAction("Login", "Auth");
         }
 
 

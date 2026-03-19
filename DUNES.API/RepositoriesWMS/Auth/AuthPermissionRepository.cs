@@ -1,55 +1,75 @@
 ﻿using DUNES.API.Data;
+using DUNES.API.ModelsWMS.Auth;
 using DUNES.API.RepositoriesWMS.Auth;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace DUNES.API.RepositoriesWMS.Auth
 
 {
     /// <summary>
-    /// Auth permissions repository implementation.
+    /// Repository implementation for permission catalog operations.
     /// </summary>
     public class AuthPermissionRepository : IAuthPermissionRepository
     {
-        private readonly IdentityDbContext _db;
+        private readonly appWmsDbContext _context;
 
         /// <summary>
-        /// Constructor (DI).
+        /// Initializes a new instance of the <see cref="AuthPermissionRepository"/> class.
         /// </summary>
-        public AuthPermissionRepository(IdentityDbContext db)
+        /// <param name="context">Application database context.</param>
+        public AuthPermissionRepository(appWmsDbContext context)
         {
-            _db = db;
+            _context = context;
         }
 
         /// <summary>
-        /// Returns effective permission keys for user:
-        /// - Role permissions (AspNetUserRoles -> AuthRolePermissions -> AuthPermissions)
-        /// - User grants (AuthUserPermissions -> AuthPermissions)
+        /// Retrieves all permissions ordered by permission key.
         /// </summary>
-        public async Task<List<string>> GetEffectivePermissionKeysAsync(string userId, CancellationToken ct)
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of permissions.</returns>
+        public async Task<List<AuthPermission>> GetAllAsync(CancellationToken ct)
         {
-            // Role-based permissions
-            var rolePermsQuery =
-                from ur in _db.UserRoles
-                join rp in _db.AuthRolePermissions on ur.RoleId equals rp.RoleId
-                join p in _db.AuthPermissions on rp.PermissionId equals p.Id
-                where ur.UserId == userId && p.IsActive
-                select p.PermissionKey;
-
-            // User grants (only grants for now)
-            var userPermsQuery =
-                from up in _db.AuthUserPermissions
-                join p in _db.AuthPermissions on up.PermissionId equals p.Id
-                where up.UserId == userId && p.IsActive
-                select p.PermissionKey;
-
-            // Union + Distinct
-            var keys = await rolePermsQuery
-                .Union(userPermsQuery)
-                .Distinct()
-                .OrderBy(x => x)
+            return await _context.AuthPermissions
+                .OrderBy(x => x.PermissionKey)
                 .ToListAsync(ct);
+        }
 
-            return keys;
+        /// <summary>
+        /// Retrieves a permission by its database identifier.
+        /// </summary>
+        /// <param name="id">Permission identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The permission if found; otherwise null.</returns>
+        public async Task<AuthPermission?> GetByIdAsync(int id, CancellationToken ct)
+        {
+            return await _context.AuthPermissions
+                .FirstOrDefaultAsync(x => x.Id == id, ct);
+        }
+
+        /// <summary>
+        /// Retrieves a permission by its unique permission key.
+        /// </summary>
+        /// <param name="permissionKey">Permission key.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The permission if found; otherwise null.</returns>
+        public async Task<AuthPermission?> GetByKeyAsync(string permissionKey, CancellationToken ct)
+        {
+            return await _context.AuthPermissions
+                .FirstOrDefaultAsync(x => x.PermissionKey == permissionKey, ct);
+        }
+
+        /// <summary>
+        /// Creates a new permission record.
+        /// </summary>
+        /// <param name="entity">Permission entity to create.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created permission entity.</returns>
+        public async Task<AuthPermission> CreateAsync(AuthPermission entity, CancellationToken ct)
+        {
+            _context.AuthPermissions.Add(entity);
+            await _context.SaveChangesAsync(ct);
+            return entity;
         }
     }
 }

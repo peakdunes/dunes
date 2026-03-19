@@ -4,38 +4,73 @@
     ViewData["Title"] = "Users";
 }
 
-<div class="container-fluid mt-3">
-    <h2>Users</h2>
+<p>
+    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+</p>
 
-    <table class="table table-bordered table-hover mt-3">
+<div class="row">
+    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
+
         <thead class="table-light">
             <tr>
+                <th>Actions</th>
+                <th>Photo</th>
                 <th>UserName</th>
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Role</th>
                 <th>Active</th>
                 <th>Must Change Password</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var user in Model)
             {
                 <tr>
+                    <td>
+                        <partial name="_CrudActions"
+                                 model='new DUNES.UI.Models.CrudActionsModel
+                                 {
+                                     RouteId = user.Id,
+                                     Controller = "UserUI",
+                                     ShowEdit = true,
+                                     ShowDelete = false,
+                                     ShowReset = true,
+                                     ShowDeactivate = true,
+                                     IsActive = user.IsActive,
+                                     ResetAction = "ResetPassword",
+                                     DeactivateAction = user.IsActive ? "Deactivate" : "Activate"
+                                 }' />
+                </td>
+
+                    <td class="text-center">
+                        <partial name="_UserProfilePhoto"
+                                 model='new DUNES.UI.Models.UserPhotoViewModel
+                             {
+                                 UserId = user.Id,
+                                 Variant = "thumb",
+                                 AltText = user.FullName
+                             }' />
+                </td>
+
                     <td>@user.UserName</td>
                     <td>@user.FullName</td>
                     <td>@user.Email</td>
                     <td>@user.RoleName</td>
                     <td>@(user.IsActive ? "Yes" : "No")</td>
                     <td>@(user.MustChangePassword ? "Yes" : "No")</td>
-                    <td>
-                        <a class="btn btn-sm btn-primary">Edit</a>
-                        <a class="btn btn-sm btn-warning">Reset</a>
-                        <a class="btn btn-sm btn-danger">Deactivate</a>
-                    </td>
                 </tr>
-            }
+                        }
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $('#tablelist').DataTable({
+                scrollX: true,
+            });
+        })
+    </script>
+}

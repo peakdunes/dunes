@@ -35,6 +35,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
                 _menuClientService, ct, CurrentToken,
@@ -68,6 +69,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
             if (CurrentToken is null)
                 return RedirectToLogin();
 
+
             await LoadInfoAsync(CurrentToken, ct, 0);
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
@@ -82,6 +84,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
+
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "New Company Client Division", Url = null });

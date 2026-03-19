@@ -13,6 +13,10 @@ namespace DUNES.Shared.DTOs.Auth
     /// </summary>
     public class LoginResponseDto
     {
+
+
+        public string UserId { get; set; } = string.Empty;
+
         /// <summary>
         /// JWT token generated for the authenticated user.
         /// </summary>

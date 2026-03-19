@@ -51,7 +51,7 @@ namespace DUNES.UI.Controllers
         /// <returns>Redirección al Index/Home.</returns>
         protected IActionResult RedirectToLogin()
         {
-            MessageHelper.SetMessage(this, "danger", "Token Invalid. Please try again.", MessageDisplay.Inline);
+            MessageHelper.SetMessage(this, "danger", "Your session has expired. Please sign in again. Please try again.", MessageDisplay.Inline);
             //return RedirectToAction("Index", "Home");
             return RedirectToAction("Login", "Auth");
         }
