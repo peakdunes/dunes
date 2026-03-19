@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace DUNES.Shared.DTOs.Auth
 {
     /// <summary>
-    /// Basic role option DTO for dropdown lists.
+    /// Request DTO to save the full permission set for a role.
     /// </summary>
-    public class RoleOptionDTO
+    public class SaveRolePermissionsDTO
     {
         /// <summary>
         /// Role identifier.
         /// </summary>
-        public string Id { get; set; } = string.Empty;
+        public string RoleId { get; set; } = string.Empty;
 
         /// <summary>
-        /// Role name.
+        /// Selected permission identifiers for the role.
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public List<int> PermissionIds { get; set; } = new();
     }
 }

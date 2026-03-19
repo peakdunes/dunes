@@ -1,0 +1,92 @@
+﻿@model DUNES.UI.Models.RolePermissionsPageVM
+
+@{
+    ViewData["Title"] = "Role Permissions";
+    var groupedPermissions = Model.Permissions
+        .GroupBy(x => x.Group)
+        .OrderBy(g => g.Key);
+}
+
+<div class="card shadow-sm border-0 mt-4">
+    <div class="card-body p-4">
+        <form asp-action="Index" method="get" class="mb-4">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label asp-for="RoleId" class="form-label fw-semibold">Role</label>
+                    <select asp-for="RoleId" asp-items="Model.Roles" class="form-select">
+                        <option value="">-- Select role --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">
+                        Load
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        @if (!string.IsNullOrWhiteSpace(Model.RoleId))
+        {
+            <form asp-action="Save" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="RoleId" type="hidden" />
+
+                @for (int i = 0; i < Model.Permissions.Count; i++)
+                {
+                    <input asp-for="Permissions[@i].PermissionId" type="hidden" />
+                    <input asp-for="Permissions[@i].Group" type="hidden" />
+                    <input asp-for="Permissions[@i].Resource" type="hidden" />
+                    <input asp-for="Permissions[@i].Action" type="hidden" />
+                    <input asp-for="Permissions[@i].Description" type="hidden" />
+                }
+
+                @foreach (var group in groupedPermissions)
+                {
+                    <div class="card mb-4 border-0 shadow-sm">
+                        <div class="card-header bg-light fw-bold">
+                            @group.Key
+                        </div>
+                        <div class="card-body">
+                            @foreach (var resourceGroup in group.GroupBy(x => x.Resource).OrderBy(x => x.Key))
+                            {
+                                <div class="mb-3">
+                                    <div class="fw-semibold mb-2">@resourceGroup.Key</div>
+                                    <div class="row g-2">
+                                        @foreach (var item in resourceGroup.OrderBy(x => x.Action))
+                                        {
+                                            var index = Model.Permissions.FindIndex(p =>
+                                            p.PermissionId == item.PermissionId &&
+                                            p.Group == item.Group &&
+                                            p.Resource == item.Resource &&
+                                            p.Action == item.Action);
+
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input asp-for="Permissions[@index].Assigned" class="form-check-input" />
+                                                    <label asp-for="Permissions[@index].Assigned" class="form-check-label">
+                                                        @item.Action
+                                                    </label>
+                                                </div>
+                                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                                {
+                                                    <small class="text-muted">@item.Description</small>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <hr />
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-1"></i> Save Permissions
+                    </button>
+                </div>
+            </form>
+        }
+    </div>
+</div>

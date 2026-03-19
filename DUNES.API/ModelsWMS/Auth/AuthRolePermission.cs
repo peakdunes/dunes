@@ -1,12 +1,17 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.ModelsWMS.Auth
 {
     /// <summary>
     /// Role -> Permission (many-to-many)
     /// </summary>
+    /// 
+    [Keyless]
     public class AuthRolePermission
     {
+
+        
         /// <summary>
         /// Role Id
         /// </summary>

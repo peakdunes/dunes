@@ -125,6 +125,8 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 
 builder.Services.AddScoped<IAuthPermissionUIService, AuthPermissionUIService>();
 
+builder.Services.AddScoped<IAuthRolePermissionUIService, AuthRolePermissionUIService>();
+
 //toma la configuracion de la ruta de las fotos
 builder.Services.Configure<UserPhotoSettings>(
     builder.Configuration.GetSection("UserPhotoSettings"));

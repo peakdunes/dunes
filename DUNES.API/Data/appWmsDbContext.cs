@@ -169,12 +169,17 @@ namespace DUNES.API.Data
         public DbSet<CompanyClientInventoryCategory> CompanyClientInventoryCategories { get; set; } = null!;
 
         /// <summary>
-        /// user permissions 
+        /// permissions Catalog 
         /// </summary>
         public DbSet<AuthPermission> AuthPermissions { get; set; } = null!;
 
+        /// <summary>
+        /// Role permissions
+        /// </summary>
+        public DbSet<AuthRolePermission> AuthRolePermissions { get; set; } = null!;
         
-            
+
+
         /// <summary>
         /// Configures the entity mappings and relationships for the database schema.
         /// This method is called by the Entity Framework runtime when the model is being created.
