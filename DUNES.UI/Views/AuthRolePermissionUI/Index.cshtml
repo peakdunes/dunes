@@ -2,91 +2,489 @@
 
 @{
     ViewData["Title"] = "Role Permissions";
-    var groupedPermissions = Model.Permissions
+
+    var assignedGroups = Model.AssignedPermissions?
         .GroupBy(x => x.Group)
-        .OrderBy(g => g.Key);
+        .OrderBy(x => x.Key)
+        .ToList() ?? new List<IGrouping<string, DUNES.UI.Models.RolePermissionItemVM>>();
+
+    var availableGroups = Model.AvailablePermissions?
+        .GroupBy(x => x.Group)
+        .OrderBy(x => x.Key)
+        .ToList() ?? new List<IGrouping<string, DUNES.UI.Models.RolePermissionItemVM>>();
 }
 
-<div class="card shadow-sm border-0 mt-4">
-    <div class="card-body p-4">
-        <form asp-action="Index" method="get" class="mb-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-md-6">
-                    <label asp-for="RoleId" class="form-label fw-semibold">Role</label>
-                    <select asp-for="RoleId" asp-items="Model.Roles" class="form-select">
-                        <option value="">-- Select role --</option>
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-outline-primary w-100">
-                        Load
-                    </button>
-                </div>
-            </div>
-        </form>
+<div class="container py-4">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">Role Permissions</h2>
+        <div class="text-muted">Manage assigned and available permissions by role</div>
+    </div>
 
-        @if (!string.IsNullOrWhiteSpace(Model.RoleId))
-        {
-            <form asp-action="Save" method="post">
-                @Html.AntiForgeryToken()
-                <input asp-for="RoleId" type="hidden" />
-
-                @for (int i = 0; i < Model.Permissions.Count; i++)
-                {
-                    <input asp-for="Permissions[@i].PermissionId" type="hidden" />
-                    <input asp-for="Permissions[@i].Group" type="hidden" />
-                    <input asp-for="Permissions[@i].Resource" type="hidden" />
-                    <input asp-for="Permissions[@i].Action" type="hidden" />
-                    <input asp-for="Permissions[@i].Description" type="hidden" />
-                }
-
-                @foreach (var group in groupedPermissions)
-                {
-                    <div class="card mb-4 border-0 shadow-sm">
-                        <div class="card-header bg-light fw-bold">
-                            @group.Key
-                        </div>
-                        <div class="card-body">
-                            @foreach (var resourceGroup in group.GroupBy(x => x.Resource).OrderBy(x => x.Key))
-                            {
-                                <div class="mb-3">
-                                    <div class="fw-semibold mb-2">@resourceGroup.Key</div>
-                                    <div class="row g-2">
-                                        @foreach (var item in resourceGroup.OrderBy(x => x.Action))
-                                        {
-                                            var index = Model.Permissions.FindIndex(p =>
-                                            p.PermissionId == item.PermissionId &&
-                                            p.Group == item.Group &&
-                                            p.Resource == item.Resource &&
-                                            p.Action == item.Action);
-
-                                            <div class="col-md-3">
-                                                <div class="form-check">
-                                                    <input asp-for="Permissions[@index].Assigned" class="form-check-input" />
-                                                    <label asp-for="Permissions[@index].Assigned" class="form-check-label">
-                                                        @item.Action
-                                                    </label>
-                                                </div>
-                                                @if (!string.IsNullOrWhiteSpace(item.Description))
-                                                {
-                                                    <small class="text-muted">@item.Description</small>
-                                                }
-                                            </div>
-                                        }
-                                    </div>
-                                </div>
-                                <hr />
-                            }
-                        </div>
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-5 col-md-6">
+                        <label asp-for="RoleId" class="form-label fw-semibold">Role</label>
+                        <select asp-for="RoleId" asp-items="Model.Roles" class="form-select">
+                            <option value="">-- Select role --</option>
+                        </select>
                     </div>
-                }
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save me-1"></i> Save Permissions
-                    </button>
+                    <div class="col-lg-2 col-md-3">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search me-1"></i> Load
+                        </button>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(Model.RoleId))
+                    {
+                        <div class="col-lg-5 col-md-12">
+                            <div class="d-flex justify-content-lg-end align-items-end h-100">
+                                <div class="d-flex align-items-center gap-2 flex-wrap">
+                                    <span class="fw-semibold">Add Permissions</span>
+
+                                    <button type="button"
+                                            class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center"
+                                            style="width: 28px; height: 28px; padding: 0;"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="top"
+                                            title="Open the selector, filter the available permissions, select one or more, and click Add Selected.">
+                                        <i class="fas fa-question"></i>
+                                    </button>
+
+                                    <button type="button"
+                                            class="btn btn-outline-primary d-inline-flex align-items-center gap-2 text-nowrap"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#availablePermissionsModal">
+                                        <i class="fas fa-plus"></i>
+                                        <span>Open Selector</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
             </form>
-        }
+        </div>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.RoleId))
+    {
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="fw-bold">Assigned Permissions</span>
+                            <div class="small text-muted">Permissions currently assigned to the selected role</div>
+                        </div>
+                        <span class="badge bg-primary">
+                            @(Model.AssignedPermissions?.Count ?? 0)
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        @if (Model.AssignedPermissions != null && Model.AssignedPermissions.Any())
+                        {
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Search</label>
+                                    <input type="text" id="assignedPermissionSearch" class="form-control" placeholder="Search assigned permission..." />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Group</label>
+                                    <select id="assignedGroupFilter" class="form-select">
+                                        <option value="">All groups</option>
+                                        @foreach (var group in assignedGroups)
+                                        {
+                                            <option value="@group.Key">@group.Key</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Module</label>
+                                    <select id="assignedResourceFilter" class="form-select">
+                                        <option value="">All modules</option>
+                                        @foreach (var resource in Model.AssignedPermissions.Select(x => x.Resource).Distinct().OrderBy(x => x))
+                                        {
+                                            <option value="@resource">@resource</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearAssignedFiltersBtn">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <form asp-action="RemoveMultiple" method="post" id="removeMultipleForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="RoleId" value="@Model.RoleId" />
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="small text-muted">
+                                        Select one or multiple assigned permissions and click <strong>Remove Selected</strong>.
+                                    </div>
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="fw-semibold text-danger">
+                                            <span id="assignedSelectedCount">0</span> selected
+                                        </div>
+                                        <button type="submit" class="btn btn-outline-danger" id="removeSelectedBtn">
+                                            <i class="fas fa-trash-alt me-1"></i> Remove Selected
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover align-middle" id="assignedPermissionsTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th style="width:50px;" class="text-center">
+                                                    <input type="checkbox" id="selectAllAssignedPermissions" />
+                                                </th>
+                                                <th>Group</th>
+                                                <th>Module</th>
+                                                <th>Action</th>
+                                                <th style="width:90px;" class="text-center">Remove</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.AssignedPermissions
+                                                                                .OrderBy(x => x.Group)
+                                                                                .ThenBy(x => x.Resource)
+                                                                                .ThenBy(x => x.Action == "Access" ? 1 :
+                                                                                x.Action == "Create" ? 2 :
+                                                                                x.Action == "Update" ? 3 :
+                                                                                x.Action == "Delete" ? 4 : 99)
+                                                                                .ThenBy(x => x.Action))
+                                            {
+                                                <tr data-group="@item.Group" data-resource="@item.Resource">
+                                                    <td class="text-center">
+                                                        <input type="checkbox"
+                                                               name="PermissionIds"
+                                                               value="@item.PermissionId"
+                                                               class="assigned-permission-check" />
+                                                    </td>
+                                                    <td>@item.Group</td>
+                                                    <td>@item.Resource</td>
+                                                    <td>@item.Action</td>
+                                                    <td class="text-center">
+                                                        <form asp-action="Remove" method="post" class="d-inline remove-single-form">
+                                                            @Html.AntiForgeryToken()
+                                                            <input type="hidden" name="RoleId" value="@Model.RoleId" />
+                                                            <input type="hidden" name="PermissionId" value="@item.PermissionId" />
+                                                            <input type="hidden" name="PermissionLabel" value="@($"{item.Resource} - {item.Action}")" />
+
+                                                            <button type="submit"
+                                                                    class="btn btn-sm btn-outline-secondary remove-single-btn"
+                                                                    data-permission-label="@($"{item.Resource} - {item.Action}")"
+                                                                    title="Remove permission">
+                                                                <i class="fas fa-times text-danger"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </form>
+                        }
+                        else
+                        {
+                            <div class="text-muted">No permissions assigned to this role yet.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Available Permissions -->
+        <div class="modal fade" id="availablePermissionsModal" tabindex="-1" aria-labelledby="availablePermissionsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content border-0 shadow">
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title fw-bold mb-0" id="availablePermissionsModalLabel">Available Permissions</h5>
+                            <small class="text-muted">Only permissions not yet assigned to this role are shown</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <form asp-action="AddMultiple" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="RoleId" value="@Model.RoleId" />
+
+                        <div class="modal-body">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Search</label>
+                                    <input type="text" id="permissionSearch" class="form-control" placeholder="Search permission..." />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Group</label>
+                                    <select id="groupFilter" class="form-select">
+                                        <option value="">All groups</option>
+                                        @foreach (var group in availableGroups)
+                                        {
+                                            <option value="@group.Key">@group.Key</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Module</label>
+                                    <select id="resourceFilter" class="form-select">
+                                        <option value="">All modules</option>
+                                        @foreach (var resource in Model.AvailablePermissions.Select(x => x.Resource).Distinct().OrderBy(x => x))
+                                        {
+                                            <option value="@resource">@resource</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearFiltersBtn">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="small text-muted">
+                                    Select one or multiple permissions and click <strong>Add Selected</strong>.
+                                </div>
+                                <div class="fw-semibold text-primary">
+                                    <span id="selectedCount">0</span> selected
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-hover align-middle" id="availablePermissionsTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width:50px;" class="text-center">
+                                                <input type="checkbox" id="selectAllPermissions" />
+                                            </th>
+                                            <th>Group</th>
+                                            <th>Module</th>
+                                            <th>Action</th>
+                                            <th>Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.AvailablePermissions
+                                                                            .OrderBy(x => x.Group)
+                                                                            .ThenBy(x => x.Resource)
+                                                                            .ThenBy(x => x.Action == "Access" ? 1 :
+                                                                            x.Action == "Create" ? 2 :
+                                                                            x.Action == "Update" ? 3 :
+                                                                            x.Action == "Delete" ? 4 : 99)
+                                                                            .ThenBy(x => x.Action))
+                                        {
+                                            <tr data-group="@item.Group" data-resource="@item.Resource">
+                                                <td class="text-center">
+                                                    <input type="checkbox" name="PermissionIds" value="@item.PermissionId" class="permission-check" />
+                                                </td>
+                                                <td>@item.Group</td>
+                                                <td>@item.Resource</td>
+                                                <td>@item.Action</td>
+                                                <td>@item.Description</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Add Selected
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+                new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            // Assigned table filters
+            const assignedSearchInput = document.getElementById('assignedPermissionSearch');
+            const assignedGroupFilter = document.getElementById('assignedGroupFilter');
+            const assignedResourceFilter = document.getElementById('assignedResourceFilter');
+            const clearAssignedFiltersBtn = document.getElementById('clearAssignedFiltersBtn');
+            const selectAllAssigned = document.getElementById('selectAllAssignedPermissions');
+            const assignedSelectedCount = document.getElementById('assignedSelectedCount');
+            const removeMultipleForm = document.getElementById('removeMultipleForm');
+
+            function getVisibleAssignedRows() {
+                return Array.from(document.querySelectorAll('#assignedPermissionsTable tbody tr'))
+                    .filter(row => row.style.display !== 'none');
+            }
+
+            function updateAssignedSelectedCount() {
+                const checked = document.querySelectorAll('.assigned-permission-check:checked').length;
+                if (assignedSelectedCount) {
+                    assignedSelectedCount.textContent = checked;
+                }
+            }
+
+            function filterAssignedRows() {
+                const search = (assignedSearchInput?.value || '').toLowerCase();
+                const group = assignedGroupFilter?.value || '';
+                const resource = assignedResourceFilter?.value || '';
+
+                document.querySelectorAll('#assignedPermissionsTable tbody tr').forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    const rowGroup = row.getAttribute('data-group');
+                    const rowResource = row.getAttribute('data-resource');
+
+                    const matchSearch = !search || rowText.includes(search);
+                    const matchGroup = !group || rowGroup === group;
+                    const matchResource = !resource || rowResource === resource;
+
+                    row.style.display = (matchSearch && matchGroup && matchResource) ? '' : 'none';
+                });
+
+                if (selectAllAssigned) {
+                    selectAllAssigned.checked = false;
+                }
+            }
+
+            assignedSearchInput?.addEventListener('input', filterAssignedRows);
+            assignedGroupFilter?.addEventListener('change', filterAssignedRows);
+            assignedResourceFilter?.addEventListener('change', filterAssignedRows);
+
+            clearAssignedFiltersBtn?.addEventListener('click', function () {
+                if (assignedSearchInput) assignedSearchInput.value = '';
+                if (assignedGroupFilter) assignedGroupFilter.value = '';
+                if (assignedResourceFilter) assignedResourceFilter.value = '';
+                filterAssignedRows();
+            });
+
+            selectAllAssigned?.addEventListener('change', function () {
+                const visibleChecks = getVisibleAssignedRows()
+                    .flatMap(row => Array.from(row.querySelectorAll('.assigned-permission-check')));
+
+                visibleChecks.forEach(check => check.checked = selectAllAssigned.checked);
+                updateAssignedSelectedCount();
+            });
+
+            document.querySelectorAll('.assigned-permission-check').forEach(check => {
+                check.addEventListener('change', updateAssignedSelectedCount);
+            });
+
+            removeMultipleForm?.addEventListener('submit', function (e) {
+                const checked = document.querySelectorAll('.assigned-permission-check:checked').length;
+
+                if (checked === 0) {
+                    e.preventDefault();
+                    alert('Please select at least one assigned permission to remove.');
+                    return;
+                }
+
+                const confirmed = confirm(`Are you sure you want to remove ${checked} permission(s) from this role?`);
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+
+            document.querySelectorAll('.remove-single-form').forEach(form => {
+                form.addEventListener('submit', function (e) {
+                    const btn = form.querySelector('.remove-single-btn');
+                    const label = btn?.getAttribute('data-permission-label') || 'this permission';
+
+                    const confirmed = confirm(`Are you sure you want to remove ${label}?`);
+                    if (!confirmed) {
+                        e.preventDefault();
+                    }
+                });
+            });
+
+            updateAssignedSelectedCount();
+
+            // Available modal filters
+            const searchInput = document.getElementById('permissionSearch');
+            const groupFilter = document.getElementById('groupFilter');
+            const resourceFilter = document.getElementById('resourceFilter');
+            const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+            const selectAll = document.getElementById('selectAllPermissions');
+            const selectedCount = document.getElementById('selectedCount');
+
+            function getVisibleRows() {
+                return Array.from(document.querySelectorAll('#availablePermissionsTable tbody tr'))
+                    .filter(row => row.style.display !== 'none');
+            }
+
+            function updateSelectedCount() {
+                const checked = document.querySelectorAll('.permission-check:checked').length;
+                if (selectedCount) {
+                    selectedCount.textContent = checked;
+                }
+            }
+
+            function filterRows() {
+                const search = (searchInput?.value || '').toLowerCase();
+                const group = groupFilter?.value || '';
+                const resource = resourceFilter?.value || '';
+
+                document.querySelectorAll('#availablePermissionsTable tbody tr').forEach(row => {
+                    const rowText = row.innerText.toLowerCase();
+                    const rowGroup = row.getAttribute('data-group');
+                    const rowResource = row.getAttribute('data-resource');
+
+                    const matchSearch = !search || rowText.includes(search);
+                    const matchGroup = !group || rowGroup === group;
+                    const matchResource = !resource || rowResource === resource;
+
+                    row.style.display = (matchSearch && matchGroup && matchResource) ? '' : 'none';
+                });
+
+                if (selectAll) {
+                    selectAll.checked = false;
+                }
+            }
+
+            searchInput?.addEventListener('input', filterRows);
+            groupFilter?.addEventListener('change', filterRows);
+            resourceFilter?.addEventListener('change', filterRows);
+
+            clearFiltersBtn?.addEventListener('click', function () {
+                if (searchInput) searchInput.value = '';
+                if (groupFilter) groupFilter.value = '';
+                if (resourceFilter) resourceFilter.value = '';
+                filterRows();
+            });
+
+            selectAll?.addEventListener('change', function () {
+                const visibleChecks = getVisibleRows()
+                    .flatMap(row => Array.from(row.querySelectorAll('.permission-check')));
+
+                visibleChecks.forEach(check => check.checked = selectAll.checked);
+                updateSelectedCount();
+            });
+
+            document.querySelectorAll('.permission-check').forEach(check => {
+                check.addEventListener('change', updateSelectedCount);
+            });
+
+            updateSelectedCount();
+        });
+    </script>
+}

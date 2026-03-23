@@ -9,13 +9,13 @@ namespace DUNES.API.RepositoriesWMS.Auth
     /// </summary>
     public class AuthRolePermissionRepository : IAuthRolePermissionRepository
     {
-        private readonly appWmsDbContext _context;
+        private readonly IdentityDbContext _context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthRolePermissionRepository"/> class.
         /// </summary>
         /// <param name="context">Application database context.</param>
-        public AuthRolePermissionRepository(appWmsDbContext context)
+        public AuthRolePermissionRepository(IdentityDbContext context)
         {
             _context = context;
         }

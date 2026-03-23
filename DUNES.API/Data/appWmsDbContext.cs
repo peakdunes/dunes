@@ -173,10 +173,7 @@ namespace DUNES.API.Data
         /// </summary>
         public DbSet<AuthPermission> AuthPermissions { get; set; } = null!;
 
-        /// <summary>
-        /// Role permissions
-        /// </summary>
-        public DbSet<AuthRolePermission> AuthRolePermissions { get; set; } = null!;
+      
         
 
 

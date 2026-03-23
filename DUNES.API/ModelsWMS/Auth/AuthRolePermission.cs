@@ -7,7 +7,7 @@ namespace DUNES.API.ModelsWMS.Auth
     /// Role -> Permission (many-to-many)
     /// </summary>
     /// 
-    [Keyless]
+
     public class AuthRolePermission
     {
 

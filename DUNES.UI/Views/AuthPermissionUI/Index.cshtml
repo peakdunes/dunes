@@ -4,51 +4,77 @@
     ViewData["Title"] = "Permissions";
 }
 
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+       
 
-<div class="row">
-    <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
-        <thead class="table-light">
-            <tr>
-                <th>Group</th>
-                <th>Resource</th>
-                <th>Action</th>
-                <th>Description</th>
-                <th>Active</th>
-                <th>Permission Key</th>
-                <th>Created At</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var permission in Model)
-            {
-                var parts = (permission.PermissionKey ?? string.Empty).Split('.', StringSplitOptions.RemoveEmptyEntries);
+        <a class="btn btn-outline-primary" asp-action="Create">
+            <i class="bi bi-plus-circle me-1"></i> Create New
+        </a>
+    </div>
 
-                var group = parts.Length > 1 ? parts[1] : string.Empty;
-                var resource = parts.Length > 2 ? parts[2] : string.Empty;
-                var action = parts.Length > 3 ? parts[3] : string.Empty;
-
-                <tr>
-                    <td>@group</td>
-                    <td>@resource</td>
-                    <td>@action</td>
-                    <td>@permission.Description</td>
-                    <td>@(permission.IsActive ? "Yes" : "No")</td>
-                    <td class="text-muted small">@permission.PermissionKey</td>
-                    <td>@permission.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="tablelist" class="table table-bordered table-striped table-hover align-middle w-100">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Group</th>
+                            <th>Module</th>
+                            <th>Action</th>
+                            <th>Description</th>
+                            <th>Order</th>
+                            <th>Active</th>
+                            <th>Permission Key</th>
+                            <th>Created At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var permission in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="fw-semibold">@permission.GroupName</span>
+                                </td>
+                                <td>@permission.ModuleName</td>
+                                <td>@permission.ActionName</td>
+                                <td class="text-wrap" style="min-width: 250px; white-space: normal;">
+                                    @permission.Description
+                                </td>
+                                <td>@permission.DisplayOrder</td>
+                                <td>
+                                    @if (permission.IsActive)
+                                    {
+                                        <span class="badge bg-success">Yes</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">No</span>
+                                    }
+                                </td>
+                                <td class="text-muted small">@permission.PermissionKey</td>
+                                <td>@permission.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
         $(document).ready(function () {
             $('#tablelist').DataTable({
-                scrollX: true
+                scrollX: true,
+                pageLength: 25,
+                order: [[0, 'asc'], [1, 'asc'], [4, 'asc']],
+                columnDefs: [
+                    { targets: [6], searchable: true },
+                    { targets: [4], className: "text-center" },
+                    { targets: [5], className: "text-center" }
+                ]
             });
         });
     </script>

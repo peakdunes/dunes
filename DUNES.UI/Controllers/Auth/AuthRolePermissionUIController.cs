@@ -71,16 +71,22 @@ namespace DUNES.UI.Controllers.Auth
                         return View(vm);
                     }
 
-                    vm.Permissions = (result.Data ?? new List<RolePermissionItemDTO>())
-                        .Select(x => new RolePermissionSelectionItemVM
-                        {
-                            PermissionId = x.PermissionId,
-                            Group = x.Group,
-                            Resource = x.Resource,
-                            Action = x.Action,
-                            Description = x.Description,
-                            Assigned = x.Assigned
-                        })
+                    var allPermissions = result.Data ?? new List<RolePermissionItemDTO>();
+
+                    vm.AssignedPermissions = allPermissions
+                        .Where(x => x.Assigned)
+                        .Select(MapToVm)
+                        .OrderBy(x => x.Group)
+                        .ThenBy(x => x.Resource)
+                        .ThenBy(x => x.Action)
+                        .ToList();
+
+                    vm.AvailablePermissions = allPermissions
+                        .Where(x => !x.Assigned)
+                        .Select(MapToVm)
+                        .OrderBy(x => x.Group)
+                        .ThenBy(x => x.Resource)
+                        .ThenBy(x => x.Action)
                         .ToList();
                 }
 
@@ -89,14 +95,15 @@ namespace DUNES.UI.Controllers.Auth
         }
 
         /// <summary>
-        /// Saves the full permission set for the selected role.
+        /// Adds a single permission to the selected role.
         /// </summary>
-        /// <param name="model">Role permissions page model.</param>
+        /// <param name="roleId">Role identifier.</param>
+        /// <param name="permissionId">Permission identifier.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>Redirects back to the selected role view.</returns>
+        /// <returns>Redirects back to index.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(RolePermissionsPageVM model, CancellationToken ct)
+        public async Task<IActionResult> AddSelected(string roleId, int permissionId, CancellationToken ct)
         {
             if (CurrentToken is null)
                 return RedirectToLogin();
@@ -107,37 +114,182 @@ namespace DUNES.UI.Controllers.Auth
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "Role Permissions", Url = Url.Action(nameof(Index)) },
-                new BreadcrumbItem { Text = "Save", Url = null });
+                new BreadcrumbItem { Text = "Add Permission", Url = null });
 
             return await HandleAsync(async ct =>
             {
-                if (string.IsNullOrWhiteSpace(model.RoleId))
+                if (string.IsNullOrWhiteSpace(roleId) || permissionId <= 0)
                 {
-                    await LoadRolesAsync(model, ct);
-                    MessageHelper.SetMessage(this, "danger", "Please select a role.", MessageDisplay.Inline);
-                    return View("Index", model);
+                    MessageHelper.SetMessage(this, "danger", "Invalid role or permission.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
                 }
+
+                var currentResult = await _rolePermissionService.GetByRoleAsync(CurrentToken, roleId, ct);
+
+                if (!currentResult.Success)
+                {
+                    MessageHelper.SetMessage(this, "danger", currentResult.Message, MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var finalPermissionIds = (currentResult.Data ?? new List<RolePermissionItemDTO>())
+                    .Where(x => x.Assigned)
+                    .Select(x => x.PermissionId)
+                    .ToHashSet();
+
+                finalPermissionIds.Add(permissionId);
 
                 var dto = new SaveRolePermissionsDTO
                 {
-                    RoleId = model.RoleId,
-                    PermissionIds = model.Permissions
-                        .Where(x => x.Assigned)
-                        .Select(x => x.PermissionId)
-                        .ToList()
+                    RoleId = roleId,
+                    PermissionIds = finalPermissionIds.ToList()
                 };
 
                 var result = await _rolePermissionService.SaveByRoleAsync(CurrentToken, dto, ct);
 
-                if (!result.Success)
+                MessageHelper.SetMessage(
+                    this,
+                    result.Success ? "success" : "danger",
+                    result.Success ? "Permission assigned successfully." : result.Message,
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index), new { roleId });
+            }, ct);
+        }
+
+        /// <summary>
+        /// Adds multiple permissions to the selected role.
+        /// </summary>
+        /// <param name="roleId">Role identifier.</param>
+        /// <param name="permissionIds">Permission identifiers.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Redirects back to index.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddMultiple(string roleId, List<int>? permissionIds, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Role Permissions", Url = Url.Action(nameof(Index)) },
+                new BreadcrumbItem { Text = "Add Multiple Permissions", Url = null });
+
+            return await HandleAsync(async ct =>
+            {
+                if (string.IsNullOrWhiteSpace(roleId))
                 {
-                    await LoadRolesAsync(model, ct);
-                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
-                    return View("Index", model);
+                    MessageHelper.SetMessage(this, "danger", "Invalid role.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
                 }
 
-                MessageHelper.SetMessage(this, "success", "Role permissions saved successfully.", MessageDisplay.Inline);
-                return RedirectToAction(nameof(Index), new { roleId = model.RoleId });
+                permissionIds ??= new List<int>();
+
+                if (!permissionIds.Any())
+                {
+                    MessageHelper.SetMessage(this, "warning", "Please select at least one permission.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var currentResult = await _rolePermissionService.GetByRoleAsync(CurrentToken, roleId, ct);
+
+                if (!currentResult.Success)
+                {
+                    MessageHelper.SetMessage(this, "danger", currentResult.Message, MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var finalPermissionIds = (currentResult.Data ?? new List<RolePermissionItemDTO>())
+                    .Where(x => x.Assigned)
+                    .Select(x => x.PermissionId)
+                    .ToHashSet();
+
+                foreach (var permissionId in permissionIds.Where(x => x > 0))
+                {
+                    finalPermissionIds.Add(permissionId);
+                }
+
+                var dto = new SaveRolePermissionsDTO
+                {
+                    RoleId = roleId,
+                    PermissionIds = finalPermissionIds.ToList()
+                };
+
+                var result = await _rolePermissionService.SaveByRoleAsync(CurrentToken, dto, ct);
+
+                MessageHelper.SetMessage(
+                    this,
+                    result.Success ? "success" : "danger",
+                    result.Success ? "Permissions assigned successfully." : result.Message,
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index), new { roleId });
+            }, ct);
+        }
+
+        /// <summary>
+        /// Removes a permission from the selected role.
+        /// </summary>
+        /// <param name="roleId">Role identifier.</param>
+        /// <param name="permissionId">Permission identifier.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Redirects back to index.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Remove(string roleId, int permissionId, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Role Permissions", Url = Url.Action(nameof(Index)) },
+                new BreadcrumbItem { Text = "Remove Permission", Url = null });
+
+            return await HandleAsync(async ct =>
+            {
+                if (string.IsNullOrWhiteSpace(roleId) || permissionId <= 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "Invalid role or permission.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var currentResult = await _rolePermissionService.GetByRoleAsync(CurrentToken, roleId, ct);
+
+                if (!currentResult.Success)
+                {
+                    MessageHelper.SetMessage(this, "danger", currentResult.Message, MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var finalPermissionIds = (currentResult.Data ?? new List<RolePermissionItemDTO>())
+                    .Where(x => x.Assigned)
+                    .Select(x => x.PermissionId)
+                    .Where(x => x != permissionId)
+                    .ToList();
+
+                var dto = new SaveRolePermissionsDTO
+                {
+                    RoleId = roleId,
+                    PermissionIds = finalPermissionIds
+                };
+
+                var result = await _rolePermissionService.SaveByRoleAsync(CurrentToken, dto, ct);
+
+                MessageHelper.SetMessage(
+                    this,
+                    result.Success ? "success" : "danger",
+                    result.Success ? "Permission removed successfully." : result.Message,
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index), new { roleId });
             }, ct);
         }
 
@@ -160,6 +312,23 @@ namespace DUNES.UI.Controllers.Auth
                     })
                     .ToList()
                 : new List<SelectListItem>();
+        }
+
+        /// <summary>
+        /// Maps a role permission DTO item into the page VM item.
+        /// </summary>
+        /// <param name="dto">Source dto item.</param>
+        /// <returns>Mapped view model item.</returns>
+        private static RolePermissionItemVM MapToVm(RolePermissionItemDTO dto)
+        {
+            return new RolePermissionItemVM
+            {
+                PermissionId = dto.PermissionId,
+                Group = dto.Group,
+                Resource = dto.Resource,
+                Action = dto.Action,
+                Description = dto.Description
+            };
         }
     }
 }

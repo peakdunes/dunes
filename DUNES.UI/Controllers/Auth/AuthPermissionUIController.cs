@@ -80,12 +80,17 @@ namespace DUNES.UI.Controllers.Auth
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Permissions", Url = Url.Action(nameof(Index)) },
-                new BreadcrumbItem { Text = "Create", Url = null });
+                new BreadcrumbItem { Text = "Add New Permission", Url = null });
 
             return await HandleAsync(async ct =>
             {
-                return View(new AuthPermissionCreateDTO());
+                var model = new AuthPermissionCreateDTO
+                {
+                    IsActive = true,
+                    DisplayOrder = 1
+                };
+
+                return View(model);
             }, ct);
         }
 
@@ -112,6 +117,8 @@ namespace DUNES.UI.Controllers.Auth
 
             return await HandleAsync(async ct =>
             {
+                NormalizeCreateModel(model);
+
                 if (!ModelState.IsValid)
                 {
                     MessageHelper.SetMessage(this, "danger", "Please review the required fields.", MessageDisplay.Inline);
@@ -129,6 +136,24 @@ namespace DUNES.UI.Controllers.Auth
                 MessageHelper.SetMessage(this, "success", "Permission created successfully.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
+        }
+
+        /// <summary>
+        /// Normalizes text fields before sending the model to the API.
+        /// </summary>
+        /// <param name="model">Permission creation model.</param>
+        private static void NormalizeCreateModel(AuthPermissionCreateDTO model)
+        {
+            model.PermissionKey = model.PermissionKey?.Trim() ?? string.Empty;
+            model.GroupName = model.GroupName?.Trim() ?? string.Empty;
+            model.ModuleName = model.ModuleName?.Trim() ?? string.Empty;
+            model.ActionName = model.ActionName?.Trim() ?? string.Empty;
+            model.Description = string.IsNullOrWhiteSpace(model.Description)
+                ? null
+                : model.Description.Trim();
+
+            if (model.DisplayOrder < 1)
+                model.DisplayOrder = 1;
         }
     }
 }

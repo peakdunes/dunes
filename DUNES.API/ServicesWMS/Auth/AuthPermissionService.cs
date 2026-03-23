@@ -4,6 +4,7 @@ using DUNES.API.RepositoriesWMS.Auth;
 using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
+using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.API.ServicesWMS.Auth
 {
@@ -117,8 +118,14 @@ namespace DUNES.API.ServicesWMS.Auth
                 Id = entity.Id,
                 PermissionKey = entity.PermissionKey,
                 Description = entity.Description,
+                GroupName = entity.GroupName,
+                ModuleName = entity.ModuleName,
+                ActionName = entity.ActionName,
                 IsActive = entity.IsActive,
+                DisplayOrder = entity.DisplayOrder,
                 CreatedAt = entity.CreatedAt
+
+
             };
         }
     }

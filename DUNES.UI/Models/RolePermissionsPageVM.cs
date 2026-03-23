@@ -8,19 +8,9 @@ namespace DUNES.UI.Models
     /// </summary>
     public class RolePermissionsPageVM
     {
-        /// <summary>
-        /// Selected role identifier.
-        /// </summary>
-        public string RoleId { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Available roles for selection.
-        /// </summary>
+        public string? RoleId { get; set; }
         public List<SelectListItem> Roles { get; set; } = new();
-
-        /// <summary>
-        /// Permission checkbox items.
-        /// </summary>
-        public List<RolePermissionSelectionItemVM> Permissions { get; set; } = new();
+        public List<RolePermissionItemVM> AssignedPermissions { get; set; } = new();
+        public List<RolePermissionItemVM> AvailablePermissions { get; set; } = new();
     }
 }
