@@ -232,6 +232,79 @@ namespace DUNES.UI.Controllers.Auth
         }
 
         /// <summary>
+        /// Removes multiple permissions from the selected role.
+        /// </summary>
+        /// <param name="roleId">Role identifier.</param>
+        /// <param name="permissionIds">Permission identifiers to remove.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Redirects back to index.</returns>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveMultiple(string roleId, List<int>? permissionIds, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Role Permissions", Url = Url.Action(nameof(Index)) },
+                new BreadcrumbItem { Text = "Remove Multiple Permissions", Url = null });
+
+            return await HandleAsync(async ct =>
+            {
+                if (string.IsNullOrWhiteSpace(roleId))
+                {
+                    MessageHelper.SetMessage(this, "danger", "Invalid role.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                permissionIds ??= new List<int>();
+
+                if (!permissionIds.Any())
+                {
+                    MessageHelper.SetMessage(this, "warning", "Please select at least one permission to remove.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var currentResult = await _rolePermissionService.GetByRoleAsync(CurrentToken, roleId, ct);
+
+                if (!currentResult.Success)
+                {
+                    MessageHelper.SetMessage(this, "danger", currentResult.Message, MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index), new { roleId });
+                }
+
+                var idsToRemove = permissionIds.ToHashSet();
+
+                var finalPermissionIds = (currentResult.Data ?? new List<RolePermissionItemDTO>())
+                    .Where(x => x.Assigned)
+                    .Select(x => x.PermissionId)
+                    .Where(x => !idsToRemove.Contains(x))
+                    .ToList();
+
+                var dto = new SaveRolePermissionsDTO
+                {
+                    RoleId = roleId,
+                    PermissionIds = finalPermissionIds
+                };
+
+                var result = await _rolePermissionService.SaveByRoleAsync(CurrentToken, dto, ct);
+
+                MessageHelper.SetMessage(
+                    this,
+                    result.Success ? "success" : "danger",
+                    result.Success ? "Selected permissions removed successfully." : result.Message,
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index), new { roleId });
+            }, ct);
+        }
+
+
+        /// <summary>
         /// Removes a permission from the selected role.
         /// </summary>
         /// <param name="roleId">Role identifier.</param>
