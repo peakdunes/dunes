@@ -50,5 +50,11 @@ namespace DUNES.Shared.DTOs.Auth
         /// Indicates whether the permission is active.
         /// </summary>
         public bool IsActive { get; set; }
+
+
+        /// <summary>
+        /// Display Order
+        /// </summary>
+        public int DisplayOrder { get; set; }
     }
 }

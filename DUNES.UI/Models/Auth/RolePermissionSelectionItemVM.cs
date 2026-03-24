@@ -1,4 +1,4 @@
-﻿namespace DUNES.UI.Models
+﻿namespace DUNES.UI.Models.Auth
 {
     /// <summary>
     /// UI model for a permission checkbox item assigned to a role.

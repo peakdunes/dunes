@@ -1,4 +1,4 @@
-﻿namespace DUNES.UI.Models
+﻿namespace DUNES.UI.Models.Auth
 {
     /// <summary>
     /// fotos de cada usuario si no existe usa default.jpg

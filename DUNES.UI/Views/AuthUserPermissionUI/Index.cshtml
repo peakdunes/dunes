@@ -1,0 +1,490 @@
+﻿@model DUNES.UI.Models.Auth.UserPermissionsMatrixPageVM
+
+@{
+    ViewData["Title"] = "User Permissions";
+}
+
+<style>
+    .matrix-wrapper {
+        overflow-x: auto;
+        overflow-y: auto;
+        max-height: 62vh;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+
+    .matrix-table th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background: #f8f9fa;
+        white-space: nowrap;
+    }
+
+    .matrix-table td {
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
+    .matrix-sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 1;
+        background: #fff;
+    }
+
+    .matrix-sticky-col-2 {
+        position: sticky;
+        left: 160px;
+        z-index: 1;
+        background: #fff;
+    }
+
+    .matrix-table thead .matrix-sticky-col,
+    .matrix-table thead .matrix-sticky-col-2 {
+        z-index: 3;
+        background: #f8f9fa;
+    }
+
+    .matrix-group-col {
+        min-width: 160px;
+        width: 160px;
+    }
+
+    .matrix-module-col {
+        min-width: 240px;
+        width: 240px;
+    }
+
+    .matrix-action-col {
+        min-width: 110px;
+        text-align: center;
+    }
+
+    .permission-tab-pane {
+        padding-top: 1rem;
+    }
+
+    .legend-badge {
+        font-size: 0.8rem;
+    }
+
+    .matrix-filter-bar {
+        margin-bottom: 1rem;
+    }
+
+    .save-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+        .save-bar .text-muted {
+            margin: 0;
+        }
+</style>
+
+<div class="container py-4">
+    <div class="mb-4">
+        <h2 class="fw-bold mb-1">User Permissions</h2>
+        <div class="text-muted">Manage inherited, direct, and effective permissions by user</div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4">
+            <form asp-action="Index" method="get">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-6 col-md-7">
+                        <label asp-for="UserId" class="form-label fw-semibold">User</label>
+                        <select asp-for="UserId" asp-items="Model.Users" class="form-select">
+                            <option value="">-- Select user --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-2 col-md-3">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-search me-1"></i> Load
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.UserId))
+    {
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="fw-bold">Permission Matrix</span>
+                    <div class="small text-muted">Inherited permissions are read-only. Only direct permissions can be modified.</div>
+                </div>
+
+                <div class="d-flex gap-2 align-items-center flex-wrap">
+                    <span class="badge bg-secondary legend-badge">Inherited = read only</span>
+                    <span class="badge bg-primary legend-badge">Direct = editable</span>
+                    <span class="badge bg-success legend-badge">Effective = final result</span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <ul class="nav nav-tabs" id="userPermissionTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active"
+                                id="inherited-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#inherited-pane"
+                                type="button"
+                                role="tab"
+                                aria-controls="inherited-pane"
+                                aria-selected="true">
+                            Inherited
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="direct-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#direct-pane"
+                                type="button"
+                                role="tab"
+                                aria-controls="direct-pane"
+                                aria-selected="false">
+                            Direct Permissions
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link"
+                                id="effective-tab"
+                                data-bs-toggle="tab"
+                                data-bs-target="#effective-pane"
+                                type="button"
+                                role="tab"
+                                aria-controls="effective-pane"
+                                aria-selected="false">
+                            Effective
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="userPermissionTabsContent">
+                    <!-- INHERITED -->
+                    <div class="tab-pane fade show active permission-tab-pane" id="inherited-pane" role="tabpanel" aria-labelledby="inherited-tab">
+                        @if (Model.InheritedRows != null && Model.InheritedRows.Any())
+                        {
+                            <div class="mb-3 text-muted small">
+                                These permissions come from the user’s assigned role(s) and cannot be changed here.
+                            </div>
+
+                            <div class="row g-3 matrix-filter-bar">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Search module</label>
+                                    <input type="text" id="inheritedSearch" class="form-control" placeholder="Search module..." />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Group</label>
+                                    <select id="inheritedGroupFilter" class="form-select">
+                                        <option value="">All groups</option>
+                                        @foreach (var group in Model.InheritedRows.Select(x => x.Group).Distinct().OrderBy(x => x))
+                                        {
+                                            <option value="@group">@group</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearInheritedFiltersBtn">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="matrix-wrapper">
+                                <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="inheritedMatrixTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="matrix-sticky-col matrix-group-col">Group</th>
+                                            <th class="matrix-sticky-col-2 matrix-module-col">Module</th>
+
+                                            @foreach (var action in Model.Actions)
+                                            {
+                                                <th class="matrix-action-col text-center">@action</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var row in Model.InheritedRows)
+                                        {
+                                            <tr data-group="@row.Group" data-module="@row.Module">
+                                                <td class="matrix-sticky-col matrix-group-col">@row.Group</td>
+                                                <td class="matrix-sticky-col-2 matrix-module-col">@row.Module</td>
+
+                                                @foreach (var action in Model.Actions)
+                                                {
+                                                    var cell = row.Cells[action];
+
+                                                    <td class="text-center matrix-action-col">
+                                                        @if (!cell.Exists)
+                                                        {
+                                                            <span class="text-muted">—</span>
+                                                        }
+                                                        else if (cell.Assigned)
+                                                        {
+                                                            <input type="checkbox" checked disabled />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" disabled />
+                                                        }
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">No inherited permissions found for this user.</div>
+                        }
+                    </div>
+
+                    <!-- DIRECT -->
+                    <div class="tab-pane fade permission-tab-pane" id="direct-pane" role="tabpanel" aria-labelledby="direct-tab">
+                        <form asp-action="SaveDirect" method="post" id="directPermissionsForm">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="UserId" value="@Model.UserId" />
+
+                            <div class="save-bar">
+                                <p class="text-muted small">
+                                    Only direct permissions are editable here. Permissions inherited from roles are not affected.
+                                </p>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-1"></i> Save Direct Permissions
+                                </button>
+                            </div>
+
+                            @if (Model.DirectRows != null && Model.DirectRows.Any())
+                            {
+                                <div class="row g-3 matrix-filter-bar">
+                                    <div class="col-md-4">
+                                        <label class="form-label fw-semibold">Search module</label>
+                                        <input type="text" id="directSearch" class="form-control" placeholder="Search module..." />
+                                    </div>
+
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-semibold">Group</label>
+                                        <select id="directGroupFilter" class="form-select">
+                                            <option value="">All groups</option>
+                                            @foreach (var group in Model.DirectRows.Select(x => x.Group).Distinct().OrderBy(x => x))
+                                            {
+                                                <option value="@group">@group</option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-outline-secondary w-100" id="clearDirectFiltersBtn">
+                                            Clear
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="matrix-wrapper">
+                                    <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="directMatrixTable">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th class="matrix-sticky-col matrix-group-col">Group</th>
+                                                <th class="matrix-sticky-col-2 matrix-module-col">Module</th>
+
+                                                @foreach (var action in Model.Actions)
+                                                {
+                                                    <th class="matrix-action-col text-center">@action</th>
+                                                }
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var row in Model.DirectRows)
+                                            {
+                                                <tr data-group="@row.Group" data-module="@row.Module">
+                                                    <td class="matrix-sticky-col matrix-group-col">@row.Group</td>
+                                                    <td class="matrix-sticky-col-2 matrix-module-col">@row.Module</td>
+
+                                                    @foreach (var action in Model.Actions)
+                                                    {
+                                                        var cell = row.Cells[action];
+
+                                                        <td class="text-center matrix-action-col">
+                                                            @if (!cell.Exists)
+                                                            {
+                                                                <span class="text-muted">—</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="checkbox"
+                                                                       name="PermissionIds"
+                                                                       value="@cell.PermissionId"
+                                                                       @(cell.Assigned ? "checked" : null) />
+                                                            }
+                                                        </td>
+                                                    }
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-muted">No direct permission matrix available.</div>
+                            }
+                        </form>
+                    </div>
+
+                    <!-- EFFECTIVE -->
+                    <div class="tab-pane fade permission-tab-pane" id="effective-pane" role="tabpanel" aria-labelledby="effective-tab">
+                        @if (Model.EffectiveRows != null && Model.EffectiveRows.Any())
+                        {
+                            <div class="mb-3 text-muted small">
+                                These are the final permissions the user effectively has after combining inherited and direct permissions.
+                            </div>
+
+                            <div class="row g-3 matrix-filter-bar">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold">Search module</label>
+                                    <input type="text" id="effectiveSearch" class="form-control" placeholder="Search module..." />
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="form-label fw-semibold">Group</label>
+                                    <select id="effectiveGroupFilter" class="form-select">
+                                        <option value="">All groups</option>
+                                        @foreach (var group in Model.EffectiveRows.Select(x => x.Group).Distinct().OrderBy(x => x))
+                                        {
+                                            <option value="@group">@group</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-md-2 d-flex align-items-end">
+                                    <button type="button" class="btn btn-outline-secondary w-100" id="clearEffectiveFiltersBtn">
+                                        Clear
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="matrix-wrapper">
+                                <table class="table table-bordered table-hover align-middle mb-0 matrix-table" id="effectiveMatrixTable">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="matrix-sticky-col matrix-group-col">Group</th>
+                                            <th class="matrix-sticky-col-2 matrix-module-col">Module</th>
+
+                                            @foreach (var action in Model.Actions)
+                                            {
+                                                <th class="matrix-action-col text-center">@action</th>
+                                            }
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var row in Model.EffectiveRows)
+                                        {
+                                            <tr data-group="@row.Group" data-module="@row.Module">
+                                                <td class="matrix-sticky-col matrix-group-col">@row.Group</td>
+                                                <td class="matrix-sticky-col-2 matrix-module-col">@row.Module</td>
+
+                                                @foreach (var action in Model.Actions)
+                                                {
+                                                    var cell = row.Cells[action];
+
+                                                    <td class="text-center matrix-action-col">
+                                                        @if (!cell.Exists)
+                                                        {
+                                                            <span class="text-muted">—</span>
+                                                        }
+                                                        else if (cell.Assigned)
+                                                        {
+                                                            <input type="checkbox" checked disabled />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="checkbox" disabled />
+                                                        }
+                                                    </td>
+                                                }
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">No effective permissions found for this user.</div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const directForm = document.getElementById('directPermissionsForm');
+
+            directForm?.addEventListener('submit', function (e) {
+                const confirmed = confirm('Are you sure you want to save the direct permissions for this user?');
+                if (!confirmed) {
+                    e.preventDefault();
+                }
+            });
+
+            function wireMatrixFilters(searchId, groupId, clearId, tableId) {
+                const searchInput = document.getElementById(searchId);
+                const groupFilter = document.getElementById(groupId);
+                const clearBtn = document.getElementById(clearId);
+                const table = document.getElementById(tableId);
+
+                if (!table) return;
+
+                function filterRows() {
+                    const search = (searchInput?.value || '').toLowerCase();
+                    const group = (groupFilter?.value || '').toLowerCase();
+
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        const rowModule = (row.getAttribute('data-module') || '').toLowerCase();
+                        const rowGroup = (row.getAttribute('data-group') || '').toLowerCase();
+
+                        const matchSearch = !search || rowModule.includes(search);
+                        const matchGroup = !group || rowGroup === group;
+
+                        row.style.display = (matchSearch && matchGroup) ? '' : 'none';
+                    });
+                }
+
+                searchInput?.addEventListener('input', filterRows);
+                groupFilter?.addEventListener('change', filterRows);
+
+                clearBtn?.addEventListener('click', function () {
+                    if (searchInput) searchInput.value = '';
+                    if (groupFilter) groupFilter.value = '';
+                    filterRows();
+                });
+            }
+
+            wireMatrixFilters('inheritedSearch', 'inheritedGroupFilter', 'clearInheritedFiltersBtn', 'inheritedMatrixTable');
+            wireMatrixFilters('directSearch', 'directGroupFilter', 'clearDirectFiltersBtn', 'directMatrixTable');
+            wireMatrixFilters('effectiveSearch', 'effectiveGroupFilter', 'clearEffectiveFiltersBtn', 'effectiveMatrixTable');
+        });
+    </script>
+}

@@ -79,9 +79,11 @@ namespace DUNES.API.ServicesWMS.Auth
                     statusCode: 400);
             }
 
-            var normalizedKey = dto.PermissionKey.Trim().ToUpperInvariant();
+            //var normalizedKey = dto.PermissionKey.Trim().ToUpperInvariant();
 
-            var existing = await _repository.GetByKeyAsync(normalizedKey, ct);
+            //var existing = await _repository.GetByKeyAsync(normalizedKey, ct);
+
+            var existing = await _repository.GetByKeyAsync(dto.PermissionKey.Trim(), ct);
 
             if (existing is not null)
             {
@@ -93,9 +95,12 @@ namespace DUNES.API.ServicesWMS.Auth
 
             var entity = new AuthPermission
             {
-                PermissionKey = normalizedKey,
+                PermissionKey = dto.PermissionKey.Trim(),
                 Description = dto.Description?.Trim(),
                 IsActive = dto.IsActive,
+                GroupName  = dto.GroupName.Trim(),
+                ModuleName = dto.ModuleName.Trim(),
+                ActionName = dto.ActionName.Trim(),
                 CreatedAt = DateTime.UtcNow
             };
 

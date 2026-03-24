@@ -1,4 +1,4 @@
-﻿namespace DUNES.UI.Models
+﻿namespace DUNES.UI.Models.Auth
 {
     public class RolePermissionItemVM
     {

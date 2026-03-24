@@ -1,4 +1,4 @@
-﻿using DUNES.UI.Models;
+﻿using DUNES.UI.Models.Auth;
 using Microsoft.Extensions.Options;
 
 namespace DUNES.UI.Services.Common

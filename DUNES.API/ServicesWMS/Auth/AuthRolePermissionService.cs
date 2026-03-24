@@ -48,25 +48,22 @@ namespace DUNES.API.ServicesWMS.Auth
             var assignedIds = await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct);
 
             var data = allPermissions
-                .Select(p =>
+                .Select(p => new RolePermissionItemDTO
                 {
-                    var parts = (p.PermissionKey ?? string.Empty)
-                        .Split('.', StringSplitOptions.RemoveEmptyEntries);
-
-                    return new RolePermissionItemDTO
-                    {
-                        PermissionId = p.Id,
-                        PermissionKey = p.PermissionKey,
-                        Group = parts.Length > 1 ? parts[1] : string.Empty,
-                        Resource = parts.Length > 2 ? parts[2] : string.Empty,
-                        Action = parts.Length > 3 ? parts[3] : string.Empty,
-                        Description = p.Description,
-                        IsActive = p.IsActive,
-                        Assigned = assignedIds.Contains(p.Id)
-                    };
+                    PermissionId = p.Id,
+                    PermissionKey = p.PermissionKey,
+                    Group = p.GroupName,
+                    Resource = p.ModuleName,
+                    Action = p.ActionName,
+                    Description = p.Description,
+                    IsActive = p.IsActive,
+                    Assigned = assignedIds.Contains(p.Id),
+                    DisplayOrder = p.DisplayOrder
+                    
                 })
-                .OrderBy(x => x.Group)
+               .OrderBy(x => x.Group)
                 .ThenBy(x => x.Resource)
+                .ThenBy(x => x.DisplayOrder)
                 .ThenBy(x => x.Action)
                 .ToList();
 

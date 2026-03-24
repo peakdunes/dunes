@@ -3,6 +3,7 @@ using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
+using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;

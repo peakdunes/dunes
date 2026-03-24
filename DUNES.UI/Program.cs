@@ -2,7 +2,7 @@
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
-using DUNES.UI.Models;
+using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.Common;
@@ -126,6 +126,9 @@ builder.Services.AddScoped<IPdfService, PdfService>();
 builder.Services.AddScoped<IAuthPermissionUIService, AuthPermissionUIService>();
 
 builder.Services.AddScoped<IAuthRolePermissionUIService, AuthRolePermissionUIService>();
+
+builder.Services.AddScoped<IAuthUserPermissionUIService, AuthUserPermissionUIService>();
+
 
 //toma la configuracion de la ruta de las fotos
 builder.Services.Configure<UserPhotoSettings>(

@@ -1,7 +1,7 @@
 ﻿using DUNES.Shared.DTOs.Auth;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace DUNES.UI.Models
+namespace DUNES.UI.Models.Auth
 {
     /// <summary>
     /// UI model for the Role Permissions page.

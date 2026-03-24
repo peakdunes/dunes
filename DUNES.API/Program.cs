@@ -240,7 +240,9 @@ builder.Services.AddSwaggerGen(c =>
 
             "AuthRolePermission" => new[] { "Role Permission CRUD" },
 
-          
+            "AuthUserPermissions" => new[] { "User Permission CRUD" },
+            
+
             //#########
             //INV
             //#########
@@ -336,6 +338,9 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddScoped<IAuthRolePermissionRepository, AuthRolePermissionRepository>();
 builder.Services.AddScoped<IAuthRolePermissionService, AuthRolePermissionService>();
+
+builder.Services.AddScoped<IAuthUserPermissionRepository, AuthUserPermissionRepository>();
+builder.Services.AddScoped<IAuthUserPermissionService, AuthUserPermissionService>();
 
 //#######################
 //END AUTHENTICATION SERVICES

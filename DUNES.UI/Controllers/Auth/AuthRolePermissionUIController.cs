@@ -2,6 +2,7 @@
 using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
+using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,7 @@ namespace DUNES.UI.Controllers.Auth
         /// <param name="roleId">Selected role identifier.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Role permissions view.</returns>
+
         [HttpGet]
         public async Task<IActionResult> Index(string? roleId, CancellationToken ct)
         {
@@ -54,7 +56,7 @@ namespace DUNES.UI.Controllers.Auth
 
             return await HandleAsync(async ct =>
             {
-                var vm = new RolePermissionsPageVM
+                var vm = new RolePermissionsMatrixPageVM
                 {
                     RoleId = roleId ?? string.Empty
                 };
@@ -71,27 +73,122 @@ namespace DUNES.UI.Controllers.Auth
                         return View(vm);
                     }
 
-                    var allPermissions = result.Data ?? new List<RolePermissionItemDTO>();
-
-                    vm.AssignedPermissions = allPermissions
-                        .Where(x => x.Assigned)
-                        .Select(MapToVm)
-                        .OrderBy(x => x.Group)
-                        .ThenBy(x => x.Resource)
-                        .ThenBy(x => x.Action)
+                    var allPermissions = (result.Data ?? new List<RolePermissionItemDTO>())
+                        .Select(x => new RolePermissionItemDTO
+                        {
+                            PermissionId = x.PermissionId,
+                            PermissionKey = x.PermissionKey?.Trim() ?? string.Empty,
+                            Group = x.Group?.Trim() ?? string.Empty,
+                            Resource = x.Resource?.Trim() ?? string.Empty,
+                            Action = x.Action?.Trim() ?? string.Empty,
+                            Description = x.Description?.Trim(),
+                            Assigned = x.Assigned,
+                            IsActive = x.IsActive
+                        })
                         .ToList();
 
-                    vm.AvailablePermissions = allPermissions
-                        .Where(x => !x.Assigned)
-                        .Select(MapToVm)
+
+
+                    vm.Actions = allPermissions
+                         .Where(x => !string.IsNullOrWhiteSpace(x.Action))
+                         .GroupBy(x => x.Action, StringComparer.OrdinalIgnoreCase)
+                         .OrderBy(g => g.Min(x => x.DisplayOrder))
+                         .ThenBy(g => g.Key)
+                         .Select(g => g.Key)
+                         .ToList();
+
+                    vm.Rows = allPermissions
+                        .GroupBy(x => new
+                        {
+                            Group = x.Group,
+                            Resource = x.Resource
+                        })
+                        .Select(g => new RolePermissionsMatrixRowVM
+                        {
+                            Group = g.Key.Group,
+                            Module = g.Key.Resource,
+                            Cells = vm.Actions.ToDictionary(
+                                action => action,
+                                action =>
+                                {
+                                    var permission = g.FirstOrDefault(x =>
+                                        string.Equals(x.Action, action, StringComparison.OrdinalIgnoreCase));
+
+                                    return new RolePermissionsMatrixCellVM
+                                    {
+                                        PermissionId = permission?.PermissionId ?? 0,
+                                        Exists = permission != null,
+                                        Assigned = permission?.Assigned ?? false
+                                    };
+                                },
+                                StringComparer.OrdinalIgnoreCase)
+                        })
                         .OrderBy(x => x.Group)
-                        .ThenBy(x => x.Resource)
-                        .ThenBy(x => x.Action)
+                        .ThenBy(x => x.Module)
                         .ToList();
                 }
 
                 return View(vm);
             }, ct);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveMatrix(SaveRolePermissionsMatrixVM model, CancellationToken ct)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            await SetMenuBreadcrumbAsync(
+                MENU_CODE_CRUD,
+                _menuClientService,
+                ct,
+                CurrentToken,
+                new BreadcrumbItem { Text = "Role Permissions", Url = Url.Action(nameof(Index), new { roleId = model.RoleId }) },
+                new BreadcrumbItem { Text = "Save Matrix", Url = null });
+
+            return await HandleAsync(async ct =>
+            {
+                if (string.IsNullOrWhiteSpace(model.RoleId))
+                {
+                    MessageHelper.SetMessage(this, "danger", "Invalid role.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var dto = new SaveRolePermissionsDTO
+                {
+                    RoleId = model.RoleId,
+                    PermissionIds = model.PermissionIds?.Distinct().ToList() ?? new List<int>()
+                };
+
+                var result = await _rolePermissionService.SaveByRoleAsync(CurrentToken, dto, ct);
+
+                MessageHelper.SetMessage(
+                    this,
+                    result.Success ? "success" : "danger",
+                    result.Success ? "Role permissions updated successfully." : result.Message,
+                    MessageDisplay.Inline);
+
+                return RedirectToAction(nameof(Index), new { roleId = model.RoleId });
+            }, ct);
+        }
+
+
+        private async Task LoadRolesAsync(RolePermissionsMatrixPageVM model, CancellationToken ct)
+        {
+            var rolesResult = await _rolePermissionService.GetRolesAsync(CurrentToken!, ct);
+
+            model.Roles = rolesResult.Success && rolesResult.Data is not null
+                ? rolesResult.Data
+                    .OrderBy(x => x.Name)
+                    .Select(x => new SelectListItem
+                    {
+                        Value = x.Id,
+                        Text = x.Name
+                    })
+                    .ToList()
+                : new List<SelectListItem>();
         }
 
         /// <summary>
