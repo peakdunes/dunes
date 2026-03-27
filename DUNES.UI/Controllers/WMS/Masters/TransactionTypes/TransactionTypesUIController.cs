@@ -5,36 +5,43 @@ using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
 using DUNES.UI.Services.WMS.Masters.TransactionTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 
 namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
 {
+    [Authorize]
     public class TransactionTypesUIController : BaseController
     {
-
         private readonly ITransactionTypesWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
         private const string MENU_CODE_INDEX = "01020813";
         private const string MENU_CODE_CRUD = "01020813ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.TransactionTypes.Access";
+        private const string PERMISSION_CREATE = "Masters.TransactionTypes.Create";
+        private const string PERMISSION_UPDATE = "Masters.TransactionTypes.Update";
+        private const string PERMISSION_DELETE = "Masters.TransactionTypes.Delete";
+
         public TransactionTypesUIController(
             ITransactionTypesWMSUIService service,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
         }
 
-        /// <summary>
-        /// Transaction type list.
-        /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -57,37 +64,34 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
             }, ct);
         }
 
-        /// <summary>
-        /// Create page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
                 ct,
                 CurrentToken,
-
                 new BreadcrumbItem { Text = "Add New Type", Url = null });
 
             return View(new WMSTransactiontypesCreateDTO());
         }
 
-        /// <summary>
-        /// Create action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSTransactiontypesCreateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -104,15 +108,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
             }, ct);
         }
 
-        /// <summary>
-        /// Edit page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -131,7 +134,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
                 var model = new WMSTransactionTypesUpdateDTO
                 {
                     Id = res.Data.Id,
@@ -143,21 +145,19 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
                     companyId = res.Data.companyId
                 };
 
-
                 return View(model);
             }, ct);
         }
 
-        /// <summary>
-        /// Edit action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, WMSTransactionTypesUpdateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -174,16 +174,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
             }, ct);
         }
 
-        /// <summary>
-        /// Toggle active status.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetActive(int id, bool isActive, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -199,16 +198,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
             }, ct);
         }
 
-
-        /// <summary>
-        /// Delete page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -227,7 +224,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
                 var model = new WMSTransactiontypesReadDTO
                 {
                     Id = res.Data.Id,
@@ -243,17 +239,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionTypes
             }, ct);
         }
 
-
-        /// <summary>
-        /// Hard delete (Option B): only if not used.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id, WMSTransactionTypesUpdateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {

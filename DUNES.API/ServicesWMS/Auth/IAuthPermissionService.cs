@@ -30,5 +30,46 @@ namespace DUNES.API.ServicesWMS.Auth
         /// <param name="ct">Cancellation token.</param>
         /// <returns>The created permission record.</returns>
         Task<ApiResponse<AuthPermissionReadDTO>> CreateAsync(AuthPermissionCreateDTO dto, CancellationToken ct);
+
+        /// <summary>
+        /// Retrieves all permissions that belong to a specific functional group and module.
+        /// This method returns the complete permission catalog for the requested module.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of permissions for the requested module.</returns>
+        Task<ApiResponse<List<AuthPermissionReadDTO>>> GetByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Retrieves active permissions for a specific functional group and module
+        /// that are configured to be rendered as row-level actions in index tables.
+        /// Example: Edit, Delete, ResetPassword, Deactivate.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of row-action permissions for the requested module.</returns>
+        Task<ApiResponse<List<AuthPermissionReadDTO>>> GetRowActionsByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Retrieves active permissions for a specific functional group and module
+        /// that are configured to be rendered as toolbar or header actions in index views.
+        /// Example: Create, Export, Process.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of toolbar-action permissions for the requested module.</returns>
+        Task<ApiResponse<List<AuthPermissionReadDTO>>> GetToolbarActionsByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct);
     }
 }

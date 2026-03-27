@@ -126,12 +126,76 @@ namespace DUNES.API.ServicesWMS.Auth
                 GroupName = entity.GroupName,
                 ModuleName = entity.ModuleName,
                 ActionName = entity.ActionName,
+
+               
+                MvcActionName = entity.MvcActionName,
+                ButtonText = entity.ButtonText,
+                IconCss = entity.IconCss,
+                ButtonCss = entity.ButtonCss,
+                TextCss = entity.TextCss,
+                ButtonOrder = entity.ButtonOrder,
+                ShowAsRowAction = entity.ShowAsRowAction,
+                ShowAsToolbarAction = entity.ShowAsToolbarAction,
+                RequiresConfirmation = entity.RequiresConfirmation,
+                ConfirmationMessage = entity.ConfirmationMessage,
+
+                // EXISTENTES
                 IsActive = entity.IsActive,
                 DisplayOrder = entity.DisplayOrder,
                 CreatedAt = entity.CreatedAt
-
-
             };
+        }
+
+        /// <summary>
+        /// Retrieves all permissions that belong to a specific functional group and module.
+        /// This method returns the complete permission catalog for the requested module.
+        /// </summary>
+        public async Task<ApiResponse<List<AuthPermissionReadDTO>>> GetByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct)
+        {
+            var permissions = await _repository.GetByModuleAsync(groupName, moduleName, ct);
+
+            var data = permissions
+                .Select(MapToReadDTO)
+                .ToList();
+
+            return ApiResponseFactory.Success(data, "Permissions loaded successfully.");
+        }
+
+        /// <summary>
+        /// Retrieves active permissions configured as row-level actions for a module.
+        /// </summary>
+        public async Task<ApiResponse<List<AuthPermissionReadDTO>>> GetRowActionsByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct)
+        {
+            var permissions = await _repository.GetRowActionsByModuleAsync(groupName, moduleName, ct);
+
+            var data = permissions
+                .Select(MapToReadDTO)
+                .ToList();
+
+            return ApiResponseFactory.Success(data, "Row actions loaded successfully.");
+        }
+
+        /// <summary>
+        /// Retrieves active permissions configured as toolbar actions for a module.
+        /// </summary>
+        public async Task<ApiResponse<List<AuthPermissionReadDTO>>> GetToolbarActionsByModuleAsync(
+            string groupName,
+            string moduleName,
+            CancellationToken ct)
+        {
+            var permissions = await _repository.GetToolbarActionsByModuleAsync(groupName, moduleName, ct);
+
+            var data = permissions
+                .Select(MapToReadDTO)
+                .ToList();
+
+            return ApiResponseFactory.Success(data, "Toolbar actions loaded successfully.");
         }
     }
 }

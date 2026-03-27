@@ -2,25 +2,21 @@
 {
     public class CrudActionsModel
     {
-        //public int Id { get; set; }
-        public string RouteId { get; set; } = string.Empty;
-        // If null, it uses current controller
+        public string? RouteId { get; set; }
         public string? Controller { get; set; }
+        public List<CrudActionItemModel> Actions { get; set; } = new();
+    }
 
-        public string EditAction { get; set; } = "Edit";
-        public string DeleteAction { get; set; } = "Delete";
-        public string ResetAction { get; set; } = "ResetPassword";
-        public string DeactivateAction { get; set; } = "Deactivate";
-
-        // Para cambiar título o texto si mañana lo necesitas
-        public string ResetTitle { get; set; } = "Reset Password";
-        public string DeactivateTitle { get; set; } = "Deactivate";
-
-        public bool ShowEdit { get; set; } = true;
-        public bool ShowDelete { get; set; } = true;
-        public bool ShowReset { get; set; } = false;
-        public bool ShowDeactivate { get; set; } = false;
-        public bool IsActive { get; set; } = true;
-
+    public class CrudActionItemModel
+    {
+        public string PermissionKey { get; set; } = string.Empty;
+        public string MvcActionName { get; set; } = string.Empty;
+        public string? ButtonText { get; set; }
+        public string? IconCss { get; set; }
+        public string? ButtonCss { get; set; }
+        public string? TextCss { get; set; }
+        public int ButtonOrder { get; set; }
+        public bool RequiresConfirmation { get; set; }
+        public string? ConfirmationMessage { get; set; }
     }
 }

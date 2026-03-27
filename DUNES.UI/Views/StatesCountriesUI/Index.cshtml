@@ -1,12 +1,16 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSStatesCountriesReadDTO>
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSStatesCountriesReadDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
-
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
+@if (PermissionSession.HasPermission("Masters.StatesCountries.Create"))
+{
+    <p>
+        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+    </p>
+}
 
 <div class="row">
     @using (Html.BeginForm("Index", "StatesCountriesUI", FormMethod.Get))

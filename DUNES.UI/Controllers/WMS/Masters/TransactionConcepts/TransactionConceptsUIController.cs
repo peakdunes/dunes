@@ -3,39 +3,43 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
-using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
-using DUNES.UI.Services.WMS.Masters.TransactionTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
 {
-     
+    [Authorize]
     public class TransactionConceptsUIController : BaseController
     {
-        
         private readonly ITransactionConceptsWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
 
         private const string MENU_CODE_INDEX = "01020808";
         private const string MENU_CODE_CRUD = "01020808ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.TransactionConcepts.Access";
+        private const string PERMISSION_CREATE = "Masters.TransactionConcepts.Create";
+        private const string PERMISSION_UPDATE = "Masters.TransactionConcepts.Update";
+        private const string PERMISSION_DELETE = "Masters.TransactionConcepts.Delete";
+
         public TransactionConceptsUIController(
             ITransactionConceptsWMSUIService service,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
         }
 
-        /// <summary>
-        /// Transaction Concepts list.
-        /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -50,45 +54,42 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
 
                 if (!result.Success || result.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading transaction Concepts.", MessageDisplay.Inline);
-                    return View(new List<WMSInventorycategoriesReadDTO>());
+                    MessageHelper.SetMessage(this, "danger", result.Message ?? "Error loading transaction concepts.", MessageDisplay.Inline);
+                    return View(new List<WMSTransactionconceptsReadDTO>());
                 }
 
                 return View(result.Data);
             }, ct);
         }
 
-        /// <summary>
-        /// Create page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
                 ct,
                 CurrentToken,
-                
                 new BreadcrumbItem { Text = "New Transaction Concept", Url = null });
 
             return View(new WMSTransactionconceptsCreateDTO());
         }
 
-        /// <summary>
-        /// Create action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSTransactionconceptsCreateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -105,15 +106,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
             }, ct);
         }
 
-        /// <summary>
-        /// Edit page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -132,7 +132,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
                 var model = new WMSTransactionconceptsUpdateDTO
                 {
                     Id = res.Data.Id,
@@ -145,16 +144,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
             }, ct);
         }
 
-        /// <summary>
-        /// Edit action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, WMSTransactionconceptsUpdateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -171,16 +169,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
             }, ct);
         }
 
-        /// <summary>
-        /// Toggle active status.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetActive(int id, bool isActive, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -196,16 +193,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
             }, ct);
         }
 
-
-        /// <summary>
-        /// Delete page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -224,30 +219,19 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConcepts
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
-                var model = new WMSTransactionconceptsReadDTO
-                {
-                    Id = res.Data.Id,
-                    Name = res.Data.Name,
-                    Observations = res.Data.Observations,
-                    Active = res.Data.Active
-                };
-
-                return View(model);
+                return View(res.Data);
             }, ct);
         }
 
-
-        /// <summary>
-        /// Hard delete (Option B): only if not used.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id, WMSTransactionconceptsUpdateDTO dto, CancellationToken ct)
+        public async Task<IActionResult> Delete(int id, WMSTransactionconceptsReadDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {

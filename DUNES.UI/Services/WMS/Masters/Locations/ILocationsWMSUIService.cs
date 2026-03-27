@@ -14,7 +14,7 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
         /// </summary>
         /// <param name="ct"></param>
         /// <returns></returns>
-        Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllAsync(string token, CancellationToken ct);
+        Task<ApiResponse<List<WMSLocationsReadDTO>>> GetAllAsync(string token, CancellationToken ct);
         /// <summary>
         /// get all active locations
         /// </summary>

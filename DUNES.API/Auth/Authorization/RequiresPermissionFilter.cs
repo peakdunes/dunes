@@ -15,24 +15,24 @@ namespace DUNES.API.Auth.Authorization
         private const string CacheKey = "__DUNES_MY_PERMISSIONS__";
 
         private readonly string _requiredPermissionKey;
-
-      
-        private readonly IAuthPermissionService _permissionService;
+        private readonly IAuthUserPermissionService _authUserPermissionService;
 
         /// <summary>
         /// Constructor. The permissionKey is provided by the attribute and the service comes from DI.
         /// </summary>
-        public RequiresPermissionFilter(string permissionKey, IAuthPermissionService permissionService)
+        public RequiresPermissionFilter(
+            string permissionKey,
+            IAuthUserPermissionService authUserPermissionService)
         {
             _requiredPermissionKey = permissionKey ?? string.Empty;
-            _permissionService = permissionService;
+            _authUserPermissionService = authUserPermissionService;
         }
 
+        /// <inheritdoc />
         public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             var ct = context.HttpContext.RequestAborted;
 
-            // 1) Must be authenticated (JWT)
             if (context.HttpContext.User?.Identity == null || !context.HttpContext.User.Identity.IsAuthenticated)
             {
                 context.Result = new ObjectResult(ApiResponseFactory.Unauthorized<object>("Unauthorized"))
@@ -42,7 +42,6 @@ namespace DUNES.API.Auth.Authorization
                 return;
             }
 
-            // 2) Read userId from claims (AspNetUsers.Id)
             var userId =
                 context.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier)
                 ?? context.HttpContext.User.FindFirstValue("sub")
@@ -57,45 +56,41 @@ namespace DUNES.API.Auth.Authorization
                 return;
             }
 
-            // 3) Get cached permissions (avoid hitting DB multiple times if multiple attributes exist)
-            List<string>? permissions = null;
+            List<string> permissions;
 
-            if (context.HttpContext.Items.TryGetValue(CacheKey, out var cached) && cached is List<string> cachedList)
+            if (context.HttpContext.Items.TryGetValue(CacheKey, out var cached) &&
+                cached is List<string> cachedList)
             {
                 permissions = cachedList;
             }
             else
             {
-                //var resp = await _permissionService.GetMyPermissionsAsync(userId, ct);
+                var resp = await _authUserPermissionService.GetCurrentUserPermissionsAsync(userId, ct);
 
-                //// Si falla, tratamos como forbidden (autenticado pero sin permisos efectivos)
-                //if (!resp.Success || resp.Data == null)
-                //{
-                //    context.Result = new ObjectResult(ApiResponseFactory.Forbidden<object>("Forbidden"))
-                //    {
-                //        StatusCode = StatusCodes.Status403Forbidden
-                //    };
-                //    return;
-                //}
+                if (!resp.Success || resp.Data is null)
+                {
+                    context.Result = new ObjectResult(ApiResponseFactory.Forbidden<object>("Forbidden"))
+                    {
+                        StatusCode = StatusCodes.Status403Forbidden
+                    };
+                    return;
+                }
 
-                //permissions = resp.Data;
-                //context.HttpContext.Items[CacheKey] = permissions;
+                permissions = resp.Data.Permissions ?? new List<string>();
+                context.HttpContext.Items[CacheKey] = permissions;
             }
 
-            // 4) Check required permission
             var hasPermission = permissions.Any(p =>
                 string.Equals(p, _requiredPermissionKey, StringComparison.OrdinalIgnoreCase));
 
             if (!hasPermission)
             {
-                context.Result = new ObjectResult(ApiResponseFactory.Forbidden<object>($"Missing permission: {_requiredPermissionKey}"))
+                context.Result = new ObjectResult(
+                    ApiResponseFactory.Forbidden<object>($"Missing permission: {_requiredPermissionKey}"))
                 {
                     StatusCode = StatusCodes.Status403Forbidden
                 };
-                return;
             }
         }
     }
-
-    
 }

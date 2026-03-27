@@ -1,16 +1,22 @@
 ﻿using DUNES.Shared.DTOs.Auth;
+using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
 namespace DUNES.UI.Controllers.Admin
 {
+    [Authorize]
     public class HomeController : BaseController
     {
         private readonly IMenuClientUIService _menuClientService;
 
-        public HomeController(IMenuClientUIService menuClientService)
+        public HomeController(
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _menuClientService = menuClientService;
         }
@@ -19,8 +25,6 @@ namespace DUNES.UI.Controllers.Admin
         {
             return await HandleAsync(async ct =>
             {
-
-                // Token desde SessionDTO (no strings sueltos)
                 var token = CurrentToken;
 
                 if (string.IsNullOrWhiteSpace(token))
@@ -29,7 +33,6 @@ namespace DUNES.UI.Controllers.Admin
                 var menuItems = await _menuClientService.GetMenuAsync(token, ct);
 
                 return View(menuItems);
-
             }, ct);
         }
 
@@ -45,6 +48,12 @@ namespace DUNES.UI.Controllers.Admin
             {
                 RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             });
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

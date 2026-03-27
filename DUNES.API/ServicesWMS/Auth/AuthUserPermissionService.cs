@@ -39,7 +39,6 @@ namespace DUNES.API.ServicesWMS.Auth
         }
 
         /// <inheritdoc />
-        /// <inheritdoc />
         public async Task<ApiResponse<UserPermissionBundleDTO>> GetByUserAsync(string userId, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(userId))
@@ -62,27 +61,30 @@ namespace DUNES.API.ServicesWMS.Auth
                     statusCode: 404);
             }
 
-            var allPermissions = await _permissionRepository.GetAllAsync(ct);
-
-            var directPermissionIds = await _userPermissionRepository.GetPermissionIdsByUserAsync(userId, ct);
-
             var roleIds = await _identityContext.UserRoles
                 .AsNoTracking()
                 .Where(x => x.UserId == userId)
                 .Select(x => x.RoleId)
                 .ToListAsync(ct);
 
-            var inheritedPermissionIds = new HashSet<int>();
-
-            foreach (var roleId in roleIds)
+            if (roleIds.Count > 1)
             {
-                var rolePermissionIds = await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct);
-
-                foreach (var permissionId in rolePermissionIds)
-                {
-                    inheritedPermissionIds.Add(permissionId);
-                }
+                return ApiResponseFactory.Fail<UserPermissionBundleDTO>(
+                    error: "MULTIPLE_ROLES_NOT_ALLOWED",
+                    message: "The user has more than one role assigned. Only one role is allowed.",
+                    statusCode: 400);
             }
+
+            var roleId = roleIds.FirstOrDefault();
+
+            var allPermissions = await _permissionRepository.GetAllAsync(ct);
+
+            var directPermissionIds = await _userPermissionRepository
+                .GetPermissionIdsByUserAsync(userId, ct);
+
+            var inheritedPermissionIds = string.IsNullOrWhiteSpace(roleId)
+                ? new HashSet<int>()
+                : (await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct)).ToHashSet();
 
             var directPermissionSet = directPermissionIds.ToHashSet();
 
@@ -120,8 +122,6 @@ namespace DUNES.API.ServicesWMS.Auth
                 .ThenBy(x => x.Action)
                 .ToList();
 
-            // Catálogo editable para permisos directos:
-            // todos los permisos activos que NO vienen heredados por rol.
             var availableDirectPermissions = allPermissions
                 .Where(p => p.IsActive)
                 .Where(p => !inheritedPermissionIds.Contains(p.Id))
@@ -143,12 +143,8 @@ namespace DUNES.API.ServicesWMS.Auth
 
             return ApiResponseFactory.Success(response, "User permissions loaded successfully.");
         }
-        /// <summary>
-        /// save user permission
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="ct"></param>
-        /// <returns></returns>
+
+        /// <inheritdoc />
         public async Task<ApiResponse<bool>> SaveByUserAsync(SaveUserPermissionsDTO request, CancellationToken ct)
         {
             if (request is null || string.IsNullOrWhiteSpace(request.UserId))
@@ -170,6 +166,22 @@ namespace DUNES.API.ServicesWMS.Auth
                     message: "User not found.",
                     statusCode: 404);
             }
+
+            var roleIds = await _identityContext.UserRoles
+                .AsNoTracking()
+                .Where(x => x.UserId == request.UserId)
+                .Select(x => x.RoleId)
+                .ToListAsync(ct);
+
+            if (roleIds.Count > 1)
+            {
+                return ApiResponseFactory.Fail<bool>(
+                    error: "MULTIPLE_ROLES_NOT_ALLOWED",
+                    message: "The user has more than one role assigned. Only one role is allowed.",
+                    statusCode: 400);
+            }
+
+            var roleId = roleIds.FirstOrDefault();
 
             request.PermissionIds ??= new List<int>();
 
@@ -196,23 +208,9 @@ namespace DUNES.API.ServicesWMS.Auth
                     statusCode: 400);
             }
 
-            var roleIds = await _identityContext.UserRoles
-                .AsNoTracking()
-                .Where(x => x.UserId == request.UserId)
-                .Select(x => x.RoleId)
-                .ToListAsync(ct);
-
-            var inheritedPermissionIds = new HashSet<int>();
-
-            foreach (var roleId in roleIds)
-            {
-                var rolePermissionIds = await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct);
-
-                foreach (var permissionId in rolePermissionIds)
-                {
-                    inheritedPermissionIds.Add(permissionId);
-                }
-            }
+            var inheritedPermissionIds = string.IsNullOrWhiteSpace(roleId)
+                ? new HashSet<int>()
+                : (await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct)).ToHashSet();
 
             var directOnlyPermissionIds = requestedPermissionIds
                 .Where(x => !inheritedPermissionIds.Contains(x))
@@ -242,6 +240,81 @@ namespace DUNES.API.ServicesWMS.Auth
         }
 
         /// <summary>
+        /// Gets effective permissions for the authenticated user.
+        /// </summary>
+        /// <param name="userId">Authenticated user id.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Current user effective permissions.</returns>
+        public async Task<ApiResponse<CurrentUserPermissionsDTO>> GetCurrentUserPermissionsAsync(string userId, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                return ApiResponseFactory.Fail<CurrentUserPermissionsDTO>(
+                    error: "UNAUTHORIZED",
+                    message: "Authenticated user was not found.",
+                    statusCode: 401);
+            }
+
+            var userExists = await _identityContext.Users
+                .AsNoTracking()
+                .AnyAsync(x => x.Id == userId, ct);
+
+            if (!userExists)
+            {
+                return ApiResponseFactory.Fail<CurrentUserPermissionsDTO>(
+                    error: "USER_NOT_FOUND",
+                    message: "User not found.",
+                    statusCode: 404);
+            }
+
+            var roleIds = await _identityContext.UserRoles
+                .AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Select(x => x.RoleId)
+                .ToListAsync(ct);
+
+            if (roleIds.Count > 1)
+            {
+                return ApiResponseFactory.Fail<CurrentUserPermissionsDTO>(
+                    error: "MULTIPLE_ROLES_NOT_ALLOWED",
+                    message: "The user has more than one role assigned. Only one role is allowed.",
+                    statusCode: 400);
+            }
+
+            var roleId = roleIds.FirstOrDefault();
+
+            var rolePermissionIds = string.IsNullOrWhiteSpace(roleId)
+                ? new List<int>()
+                : await _rolePermissionRepository.GetPermissionIdsByRoleAsync(roleId, ct);
+
+            var directPermissionIds = await _userPermissionRepository
+                .GetPermissionIdsByUserAsync(userId, ct);
+
+            var permissionIds = rolePermissionIds
+                .Union(directPermissionIds)
+                .Distinct()
+                .ToList();
+
+            var permissions = await _permissionRepository.GetByIdsAsync(permissionIds, ct);
+
+            var keys = permissions
+                .Where(x => x.IsActive)
+                .Select(BuildPermissionKey)
+                .Where(x => !string.IsNullOrWhiteSpace(x))
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .OrderBy(x => x)
+                .ToList();
+
+            var dto = new CurrentUserPermissionsDTO
+            {
+                UserId = userId,
+                Permissions = keys
+            };
+
+            return ApiResponseFactory.Success(dto, "Permissions loaded successfully.");
+        }
+
+        /// <summary>
         /// Maps a permission entity to a role/user permission DTO item.
         /// </summary>
         /// <param name="permission">Permission entity.</param>
@@ -260,6 +333,28 @@ namespace DUNES.API.ServicesWMS.Auth
                 Assigned = true,
                 DisplayOrder = permission.DisplayOrder
             };
+        }
+
+        /// <summary>
+        /// Builds the permission key for UI usage.
+        /// Example: Masters.Locations.Create
+        /// </summary>
+        /// <param name="permission">Permission entity.</param>
+        /// <returns>Formatted permission key.</returns>
+        private static string BuildPermissionKey(AuthPermission permission)
+        {
+            var group = permission.GroupName?.Trim() ?? string.Empty;
+            var resource = permission.ModuleName?.Trim() ?? string.Empty;
+            var action = permission.ActionName?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(group) ||
+                string.IsNullOrWhiteSpace(resource) ||
+                string.IsNullOrWhiteSpace(action))
+            {
+                return string.Empty;
+            }
+
+            return $"{group}.{resource}.{action}";
         }
     }
 }

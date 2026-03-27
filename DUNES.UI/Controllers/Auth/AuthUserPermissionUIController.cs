@@ -5,35 +5,47 @@ using DUNES.UI.Models;
 using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-
 namespace DUNES.UI.Controllers.Auth
 {
+    [Authorize]
     public class AuthUserPermissionUIController : BaseController
     {
         private readonly IAuthUserPermissionUIService _userPermissionService;
         private readonly IUserUIService _userService;
         private readonly IMenuClientUIService _menuClientService;
 
+       
+
         private const string MENU_CODE_INDEX = "0304";
         private const string MENU_CODE_CRUD = "0304ZZ";
+
+        private const string PERMISSION_ACCESS = "Auth.UserPermission.Access";
+        private const string PERMISSION_UPDATE = "Auth.UserPermission.Update";
+
+        private const string SUPER_ADMIN_ROLE_NAME = "SuperAdmin";
 
         public AuthUserPermissionUIController(
             IAuthUserPermissionUIService userPermissionService,
             IUserUIService userService,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _userPermissionService = userPermissionService;
             _userService = userService;
             _menuClientService = menuClientService;
         }
 
-        
         [HttpGet]
         public async Task<IActionResult> Index(string? userId, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -172,6 +184,9 @@ namespace DUNES.UI.Controllers.Auth
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveDirect(SaveUserPermissionsMatrixVM model, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -185,16 +200,23 @@ namespace DUNES.UI.Controllers.Auth
 
             return await HandleAsync(async ct =>
             {
-                if (string.IsNullOrWhiteSpace(model.UserId))
+                if (model is null || string.IsNullOrWhiteSpace(model.UserId))
                 {
                     MessageHelper.SetMessage(this, "danger", "Please select a user.", MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var userResult = await _userService.GetByIdAsync(CurrentToken, model.UserId, ct);
+                if (!userResult.Success || userResult.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", userResult.Message ?? "User not found.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
                 }
 
                 var dto = new SaveUserPermissionsDTO
                 {
                     UserId = model.UserId,
-                    PermissionIds = model.PermissionIds?.Distinct().ToList() ?? new List<int>()
+                    PermissionIds = model.PermissionIds?.Where(x => x > 0).Distinct().ToList() ?? new List<int>()
                 };
 
                 var result = await _userPermissionService.SaveByUserAsync(CurrentToken, dto, ct);

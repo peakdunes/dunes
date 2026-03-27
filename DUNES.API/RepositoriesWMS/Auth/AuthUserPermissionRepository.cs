@@ -53,5 +53,24 @@ namespace DUNES.API.RepositoriesWMS.Auth
             _context.AuthUserPermissions.AddRange(entities);
             await _context.SaveChangesAsync(ct);
         }
+
+     
+
+        /// <inheritdoc />
+        public async Task<List<int>> GetValidIdsAsync(IEnumerable<int> ids, CancellationToken ct)
+        {
+            var idList = ids?
+                .Distinct()
+                .ToList() ?? new List<int>();
+
+            if (idList.Count == 0)
+                return new List<int>();
+
+            return await _context.AuthPermissions
+                .AsNoTracking()
+                .Where(x => idList.Contains(x.Id))
+                .Select(x => x.Id)
+                .ToListAsync(ct);
+        }
     }
 }

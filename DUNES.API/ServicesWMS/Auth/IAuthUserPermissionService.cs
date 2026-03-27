@@ -24,6 +24,18 @@ namespace DUNES.API.ServicesWMS.Auth
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Operation result.</returns>
         Task<ApiResponse<bool>> SaveByUserAsync(SaveUserPermissionsDTO request, CancellationToken ct);
+
+
+        /// <summary>
+        /// obtain all users permission
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        Task<ApiResponse<CurrentUserPermissionsDTO>> GetCurrentUserPermissionsAsync(string userId, CancellationToken ct);
+
+
+
     }
 
 }

@@ -4,7 +4,8 @@
     .btn-outline-danger:hover i,
     .btn-outline-primary:hover i,
     .btn-outline-warning:hover i,
-    .btn-outline-secondary:hover i {
+    .btn-outline-secondary:hover i,
+    .btn-primary:hover i {
         color: #fff !important;
     }
 </style>
@@ -13,46 +14,18 @@
     var controller = string.IsNullOrWhiteSpace(Model.Controller) ? null : Model.Controller;
 }
 
-@if (Model.ShowEdit)
+@if (Model.Actions != null && Model.Actions.Any())
 {
-    <a asp-controller="@controller"
-       asp-action="@Model.EditAction"
-       asp-route-id="@Model.RouteId"
-       class="text-primary btn btn-outline-primary"
-       title="Edit">
-        <i class="fas fa-pencil-alt"></i>
-    </a>
-}
-
-@if (Model.ShowDelete)
-{
-    <a asp-controller="@controller"
-       asp-action="@Model.DeleteAction"
-       asp-route-id="@Model.RouteId"
-       class="text-danger btn btn-outline-danger"
-       title="Delete">
-        <i class="fas fa-trash-alt"></i>
-    </a>
-}
-
-@if (Model.ShowReset)
-{
-    <a asp-controller="@controller"
-       asp-action="@Model.ResetAction"
-       asp-route-id="@Model.RouteId"
-       class="text-warning btn btn-outline-warning"
-       title="@Model.ResetTitle">
-        <i class="fas fa-key"></i>
-    </a>
-}
-
-@if (Model.ShowDeactivate)
-{
-    <a asp-controller="@controller"
-       asp-action="@Model.DeactivateAction"
-       asp-route-id="@Model.RouteId"
-       class="text-secondary btn btn-outline-secondary"
-       title="@(Model.IsActive ? Model.DeactivateTitle : "Activate")">
-        <i class="fas @(Model.IsActive ? "fa-user-slash" : "fa-user-check")"></i>
-    </a>
+    foreach (var action in Model.Actions.OrderBy(x => x.ButtonOrder))
+    {
+        <a asp-controller="@controller"
+           asp-action="@action.MvcActionName"
+           asp-route-id="@Model.RouteId"
+           class="@($"{action.TextCss} {action.ButtonCss}")"
+           title="@action.ButtonText"
+           data-requires-confirmation="@(action.RequiresConfirmation ? "true" : "false")"
+           data-confirmation-message="@action.ConfirmationMessage">
+            <i class="@action.IconCss"></i>
+        </a>
+    }
 }

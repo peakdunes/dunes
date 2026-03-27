@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.Models;
-using DUNES.UI.Helpers; // Asegúrate de tener este using si usas MessageHelper
+using DUNES.UI.Helpers;
+
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
-
 
 namespace DUNES.UI.Controllers
 {
@@ -20,6 +20,12 @@ namespace DUNES.UI.Controllers
     /// </summary>
     public class BaseController : Controller
     {
+        protected readonly IUserPermissionSessionHelper _permissionSessionHelper;
+
+        public BaseController(IUserPermissionSessionHelper permissionSessionHelper)
+        {
+            _permissionSessionHelper = permissionSessionHelper;
+        }
 
         /// <summary>
         /// Obtiene el token JWT almacenado en la sesión.
@@ -37,12 +43,51 @@ namespace DUNES.UI.Controllers
         /// </summary>
         protected int CurrentCompanyClientId => HttpContext.GetUserSession()?.CompanyClientId ?? 0;
 
-
         /// <summary>
         /// Gets the current CompanyClientId from the session.
         /// </summary>
         protected int CurrentcompaniesContractId => HttpContext.GetUserSession()?.companiesContractId ?? 0;
 
+        /// <summary>
+        /// Returns Forbid when the current user does not have the specified permission.
+        /// Returns null when access is allowed.
+        /// </summary>
+        /// <param name="permission">Permission key.</param>
+        /// <returns>Forbid result or null.</returns>
+        protected IActionResult? RequirePermission(string permission)
+        {
+            if (!_permissionSessionHelper.HasPermission(permission))
+                return Forbid();
+
+            return null;
+        }
+
+        /// <summary>
+        /// Returns RedirectToLogin when token is missing, Forbid when permission is missing,
+        /// or null when access is allowed.
+        /// </summary>
+        /// <param name="permission">Permission key.</param>
+        /// <returns>Redirect/Forbid result or null.</returns>
+        protected IActionResult? RequireTokenAndPermission(string permission)
+        {
+            if (CurrentToken is null)
+                return RedirectToLogin();
+
+            if (!_permissionSessionHelper.HasPermission(permission))
+                return Forbid();
+
+            return null;
+        }
+
+        /// <summary>
+        /// Determines whether the current user has the specified permission.
+        /// </summary>
+        /// <param name="permission">Permission key.</param>
+        /// <returns>True when the user has the permission.</returns>
+        protected bool HasPermission(string permission)
+        {
+            return _permissionSessionHelper.HasPermission(permission);
+        }
 
         /// <summary>
         /// Redirige al usuario a la pantalla de login en caso de token inválido.
@@ -81,7 +126,6 @@ namespace DUNES.UI.Controllers
             }
             catch
             {
-
                 throw;
             }
         }
@@ -99,14 +143,11 @@ namespace DUNES.UI.Controllers
             string menuCode,
             IMenuClientUIService menuClientService,
             CancellationToken ct,
-             string token,
+            string token,
             params BreadcrumbItem[] extraItems)
         {
-
             var isCrud = menuCode.Contains("ZZ");   // tu marca para Create/Edit/etc.
             var newCode = menuCode.Trim();
-
-
 
             if (isCrud)
             {
@@ -123,8 +164,6 @@ namespace DUNES.UI.Controllers
             if (breadcrumb.Count > 0)
                 breadcrumb[0].Url = Url.Action("Index", "Home");
 
-
-
             if (isCrud && breadcrumb.Count > 0)
             {
                 // quitamos el último del menú (normalmente el listado)
@@ -136,10 +175,7 @@ namespace DUNES.UI.Controllers
                 breadcrumb.AddRange(extraItems);
             }
 
-            
-
             SetBreadcrumb(breadcrumb.ToArray());
         }
-
     }
 }

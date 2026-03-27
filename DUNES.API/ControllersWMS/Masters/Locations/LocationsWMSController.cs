@@ -16,7 +16,7 @@ namespace DUNES.API.ControllersWMS.Masters.Locations
     [ApiController]
     [Route("api/[controller]")]
     [Authorize]
-    [RequiresPermission("MODELSWMS.MASTERS.LOCATIONS.ACCESS")]
+    [RequiresPermission("Masters.Locations.Access")]
     public class LocationsWMSController : BaseController
     {
         private readonly ILocationsWMSAPIService _service;

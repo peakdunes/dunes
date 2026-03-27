@@ -1,12 +1,17 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSTransactionconceptsReadDTO>
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSTransactionconceptsReadDTO>
 
 @{
     ViewData["Title"] = "Index";
 }
+@if (PermissionSession.HasPermission("Masters.TransactionConcepts.Create"))
+{
+    <p>
+        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+    </p>
+}
 
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
 <div class="row">
     <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100"
            style="white-space: nowrap; font-size: medium">

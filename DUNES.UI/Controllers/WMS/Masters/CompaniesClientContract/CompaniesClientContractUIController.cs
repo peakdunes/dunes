@@ -6,11 +6,13 @@ using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
 using DUNES.UI.Services.WMS.Masters.CompaniesContract;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
 {
+    [Authorize]
     public class CompaniesClientContractUIController : BaseController
     {
         private readonly ICompaniesClientContractWMSUIService _service;
@@ -21,11 +23,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
         private const string MENU_CODE_INDEX = "01020303";
         private const string MENU_CODE_CRUD = "01020303ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.CompaniesContract.Access";
+        private const string PERMISSION_CREATE = "Masters.CompaniesContract.Create";
+        private const string PERMISSION_UPDATE = "Masters.CompaniesContract.Update";
+        private const string PERMISSION_DELETE = "Masters.CompaniesContract.Delete";
+
         public CompaniesClientContractUIController(
             ICompaniesClientContractWMSUIService service,
             IMenuClientUIService menuClientService,
             IClientCompaniesWMSUIService companyClientService,
-            ICompaniesWMSUIService companyService)
+            ICompaniesWMSUIService companyService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -35,9 +44,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_ACCESS);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -52,9 +64,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_CREATE);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await LoadInfoAsync(CurrentToken, ct, 0);
 
@@ -68,9 +83,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCompaniesContractDTO dto, CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_CREATE);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "New Contract", Url = null });

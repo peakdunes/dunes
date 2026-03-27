@@ -6,11 +6,13 @@ using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using DUNES.UI.Services.WMS.Masters.InventoryTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
 {
+    [Authorize]
     public class CompanyClientInventoryTypesUIController : BaseController
     {
         private readonly ICompanyClientInventoryTypeWMSUIService _inventoryTypeService;
@@ -20,10 +22,17 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         private const string MENU_CODE_INDEX = "01020305";
         private const string MENU_CODE_CRUD = "01020305ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.CompanyClientInventoryCategory.Access";
+        private const string PERMISSION_CREATE = "Masters.CompanyClientInventoryCategory.Create";
+        private const string PERMISSION_UPDATE = "Masters.CompanyClientInventoryCategory.Update";
+        private const string PERMISSION_DELETE = "Masters.CompanyClientInventoryCategory.Delete";
+
         public CompanyClientInventoryTypesUIController(
             ICompanyClientInventoryTypeWMSUIService inventoryTypeService,
             IInventoryTypesWMSUIService masterInventoryTypeService,
-        IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _inventoryTypeService = inventoryTypeService;
             _menuClientService = menuClientService;
@@ -35,9 +44,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -49,7 +60,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             return await HandleAsync(async ct =>
             {
                 var result = await _inventoryTypeService.GetAllAsync(CurrentToken, ct);
-                
+
                 if (!result.Success)
                 {
                     MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
@@ -57,8 +68,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 }
 
                 return View(result.Data ?? new List<WMSCompanyClientInventoryTypeReadDTO>());
-
-
             }, ct);
         }
 
@@ -67,9 +76,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         /// </summary>
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -78,18 +89,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 CurrentToken,
                 new BreadcrumbItem { Text = "New Inventory Type Mapping", Url = null });
 
-            // ✅ Load combo data
             await LoadTypesDropdownAsync(CurrentToken, ct);
 
             return View(new WMSCompanyClientInventoryTypeCreateDTO());
         }
 
-
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -97,8 +108,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "Edit Inventory Type Mapping", Url = null });
-
-
 
             return await HandleAsync(async ct =>
             {
@@ -114,18 +123,17 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             }, ct);
         }
 
-        // POST: DepotController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //  public async Task <IActionResult> Edit(int id, IFormCollection collection, CancellationToken ct)
         public async Task<IActionResult> Edit(int id, WMSCompanyClientInventoryTypeReadDTO collection, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             try
             {
                 if (CurrentToken is null)
                     return RedirectToLogin();
-
-
 
                 await SetMenuBreadcrumbAsync(
                     MENU_CODE_CRUD,
@@ -151,17 +159,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
 
                     return RedirectToAction(nameof(Index));
                 }, ct);
-
-
             }
             catch
             {
                 return View();
             }
         }
-
-
-
 
         /// <summary>
         /// Creates a new mapping (scoped by token).
@@ -170,15 +173,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCompanyClientInventoryTypeCreateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-
-            // ✅ If ModelState fails, reload combo and return view
             if (!ModelState.IsValid)
             {
                 await LoadTypesDropdownAsync(CurrentToken, ct);
-
                 return View(dto);
             }
 
@@ -189,8 +192,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 if (created.Data is null)
                 {
                     MessageHelper.SetMessage(this, "danger", created.Message, MessageDisplay.Inline);
-
-                    // ✅ reload combo again because we’re returning the View
                     await LoadTypesDropdownAsync(CurrentToken!, ct);
                     return View(dto);
                 }
@@ -207,9 +208,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetActive(int id, bool isActive, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -237,17 +240,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         /// </summary>
         private async Task LoadTypesDropdownAsync(string token, CancellationToken ct)
         {
-            var master = await _inventoryTypeService.GetEnabledAsync(token, ct); // o GetAll / GetAllActive
+            var master = await _inventoryTypeService.GetEnabledAsync(token, ct);
             var masterActive = await _masterInventoryTypeService.GetAllAsync(token, ct);
 
-
-            // 2) Existing enabled mappings (enough to prevent duplicates)
             var mapped = await _inventoryTypeService.GetEnabledAsync(token, ct);
             var mappedIds = (mapped.Data ?? new List<WMSCompanyClientInventoryTypeReadDTO>())
                 .Select(x => x.InventoryTypeId)
                 .ToHashSet();
 
-            // 3) Available to enable
             var available = masterActive.Data
                 .Where(x => !mappedIds.Contains(x.Id) && x.Active)
                 .ToList();
@@ -255,13 +255,13 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             ViewBag.InventoryTypesSelectList = new SelectList(available, "Id", "Name");
         }
 
-
-
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -269,8 +269,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "Delete Inventory Type Mapping", Url = null });
-
-
 
             return await HandleAsync(async ct =>
             {
@@ -286,7 +284,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
             }, ct);
         }
 
-
         /// <summary>
         /// Hard delete (Option B): only if not used.
         /// </summary>
@@ -294,9 +291,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id, WMSCompanyClientInventoryTypeReadDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {

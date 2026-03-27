@@ -1,4 +1,5 @@
 ﻿//funcionando
+using DUNES.UI.Helpers;
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Interfaces.Print;
 using DUNES.UI.Middleware;
@@ -63,7 +64,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/Auth/Login";
-        options.AccessDeniedPath = "/Auth/Login";
+        options.AccessDeniedPath = "/Home/AccessDenied";
     });
 
 builder.Services.AddAuthorization();
@@ -129,6 +130,9 @@ builder.Services.AddScoped<IAuthRolePermissionUIService, AuthRolePermissionUISer
 
 builder.Services.AddScoped<IAuthUserPermissionUIService, AuthUserPermissionUIService>();
 
+builder.Services.AddScoped<ICurrentUserPermissionUIService, CurrentUserPermissionUIService>();
+
+builder.Services.AddScoped<IUserPermissionSessionHelper, UserPermissionSessionHelper>();
 
 //toma la configuracion de la ruta de las fotos
 builder.Services.Configure<UserPhotoSettings>(

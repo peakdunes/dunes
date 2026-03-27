@@ -1,8 +1,13 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSCitiesReadDTO>
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSCitiesReadDTO>
 
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
+@if (PermissionSession.HasPermission("Masters.Cities.Create"))
+{
+    <p>
+        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+    </p>
+}
 
 <div class="row">
     @using (Html.BeginForm("Index", "CitiesUI", FormMethod.Get))

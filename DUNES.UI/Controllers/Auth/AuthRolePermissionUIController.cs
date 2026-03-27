@@ -5,6 +5,7 @@ using DUNES.UI.Models;
 using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -13,6 +14,7 @@ namespace DUNES.UI.Controllers.Auth
     /// <summary>
     /// MVC controller for role-permission assignments.
     /// </summary>
+    [Authorize]
     public class AuthRolePermissionUIController : BaseController
     {
         private readonly IAuthRolePermissionUIService _rolePermissionService;
@@ -21,14 +23,21 @@ namespace DUNES.UI.Controllers.Auth
         private const string MENU_CODE_INDEX = "0303";
         private const string MENU_CODE_CRUD = "0303ZZ";
 
+        private const string PERMISSION_ACCESS = "Auth.RolePermission.Access";
+        private const string PERMISSION_UPDATE = "Auth.RolePermission.Update";
+        private const string SUPER_ADMIN_ROLE_NAME = "SuperAdmin";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AuthRolePermissionUIController"/> class.
         /// </summary>
         /// <param name="rolePermissionService">Role-permission UI service.</param>
         /// <param name="menuClientService">Menu client UI service.</param>
+        /// <param name="permissionSessionHelper">Permission session helper.</param>
         public AuthRolePermissionUIController(
             IAuthRolePermissionUIService rolePermissionService,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _rolePermissionService = rolePermissionService;
             _menuClientService = menuClientService;
@@ -40,10 +49,12 @@ namespace DUNES.UI.Controllers.Auth
         /// <param name="roleId">Selected role identifier.</param>
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Role permissions view.</returns>
-
         [HttpGet]
         public async Task<IActionResult> Index(string? roleId, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -83,19 +94,18 @@ namespace DUNES.UI.Controllers.Auth
                             Action = x.Action?.Trim() ?? string.Empty,
                             Description = x.Description?.Trim(),
                             Assigned = x.Assigned,
-                            IsActive = x.IsActive
+                            IsActive = x.IsActive,
+                            DisplayOrder = x.DisplayOrder
                         })
                         .ToList();
 
-
-
                     vm.Actions = allPermissions
-                         .Where(x => !string.IsNullOrWhiteSpace(x.Action))
-                         .GroupBy(x => x.Action, StringComparer.OrdinalIgnoreCase)
-                         .OrderBy(g => g.Min(x => x.DisplayOrder))
-                         .ThenBy(g => g.Key)
-                         .Select(g => g.Key)
-                         .ToList();
+                        .Where(x => !string.IsNullOrWhiteSpace(x.Action))
+                        .GroupBy(x => x.Action, StringComparer.OrdinalIgnoreCase)
+                        .OrderBy(g => g.Min(x => x.DisplayOrder))
+                        .ThenBy(g => g.Key)
+                        .Select(g => g.Key)
+                        .ToList();
 
                     vm.Rows = allPermissions
                         .GroupBy(x => new
@@ -132,11 +142,13 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveMatrix(SaveRolePermissionsMatrixVM model, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -174,23 +186,6 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-
-        private async Task LoadRolesAsync(RolePermissionsMatrixPageVM model, CancellationToken ct)
-        {
-            var rolesResult = await _rolePermissionService.GetRolesAsync(CurrentToken!, ct);
-
-            model.Roles = rolesResult.Success && rolesResult.Data is not null
-                ? rolesResult.Data
-                    .OrderBy(x => x.Name)
-                    .Select(x => new SelectListItem
-                    {
-                        Value = x.Id,
-                        Text = x.Name
-                    })
-                    .ToList()
-                : new List<SelectListItem>();
-        }
-
         /// <summary>
         /// Adds a single permission to the selected role.
         /// </summary>
@@ -202,6 +197,9 @@ namespace DUNES.UI.Controllers.Auth
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSelected(string roleId, int permissionId, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -265,6 +263,9 @@ namespace DUNES.UI.Controllers.Auth
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddMultiple(string roleId, List<int>? permissionIds, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -339,6 +340,9 @@ namespace DUNES.UI.Controllers.Auth
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RemoveMultiple(string roleId, List<int>? permissionIds, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -400,7 +404,6 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-
         /// <summary>
         /// Removes a permission from the selected role.
         /// </summary>
@@ -412,6 +415,9 @@ namespace DUNES.UI.Controllers.Auth
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Remove(string roleId, int permissionId, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -463,12 +469,7 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Loads available roles into the page model.
-        /// </summary>
-        /// <param name="model">Page model.</param>
-        /// <param name="ct">Cancellation token.</param>
-        private async Task LoadRolesAsync(RolePermissionsPageVM model, CancellationToken ct)
+        private async Task LoadRolesAsync(RolePermissionsMatrixPageVM model, CancellationToken ct)
         {
             var rolesResult = await _rolePermissionService.GetRolesAsync(CurrentToken!, ct);
 
@@ -484,11 +485,6 @@ namespace DUNES.UI.Controllers.Auth
                 : new List<SelectListItem>();
         }
 
-        /// <summary>
-        /// Maps a role permission DTO item into the page VM item.
-        /// </summary>
-        /// <param name="dto">Source dto item.</param>
-        /// <returns>Mapped view model item.</returns>
         private static RolePermissionItemVM MapToVm(RolePermissionItemDTO dto)
         {
             return new RolePermissionItemVM

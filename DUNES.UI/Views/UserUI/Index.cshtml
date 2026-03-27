@@ -1,12 +1,17 @@
-﻿@model List<DUNES.Shared.DTOs.Auth.UserReadDTO>
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model List<DUNES.Shared.DTOs.Auth.UserReadDTO>
 
 @{
     ViewData["Title"] = "Users";
 }
 
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
+@if (PermissionSession.HasPermission("Auth.User.Create"))
+{
+    <p>
+        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+    </p>
+}
 
 <div class="row">
     <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100" style="white-space: nowrap; font-size:medium">
@@ -28,19 +33,7 @@
             {
                 <tr>
                     <td>
-                        <partial name="_CrudActions"
-                                 model='new DUNES.UI.Models.CrudActionsModel
-                                 {
-                                     RouteId = user.Id,
-                                     Controller = "UserUI",
-                                     ShowEdit = true,
-                                     ShowDelete = false,
-                                     ShowReset = true,
-                                     ShowDeactivate = true,
-                                     IsActive = user.IsActive,
-                                     ResetAction = "ResetPassword",
-                                     DeactivateAction = user.IsActive ? "Deactivate" : "Activate"
-                                 }' />
+                       
                 </td>
 
                     <td class="text-center">

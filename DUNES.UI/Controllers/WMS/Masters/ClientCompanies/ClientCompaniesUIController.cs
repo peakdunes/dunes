@@ -9,11 +9,13 @@ using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 {
+    [Authorize]
     public class ClientCompaniesUIController : BaseController
     {
         private readonly ICompaniesWMSUIService _companyservice;
@@ -27,6 +29,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         private const string MENU_CODE_INDEX = "01020301";
         private const string MENU_CODE_CRUD = "01020301ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.ClientCompanies.Access";
+        private const string PERMISSION_CREATE = "Masters.ClientCompanies.Create";
+        private const string PERMISSION_UPDATE = "Masters.ClientCompanies.Update";
+        private const string PERMISSION_DELETE = "Masters.ClientCompanies.Delete";
+
         public ClientCompaniesUIController(
             IHttpClientFactory httpClientFactory,
             IClientCompaniesWMSUIService service,
@@ -34,7 +41,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
             IMenuClientUIService menuClientService,
             ICountriesWMSUIService countryService,
             IStatesCountriesWMSUIService statesservice,
-            ICitiesWMSUIService cityService)
+            ICitiesWMSUIService cityService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _httpClientFactory = httpClientFactory;
             _service = service;
@@ -47,6 +56,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_ACCESS);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken == null)
                 return RedirectToLogin();
 
@@ -62,6 +75,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_CREATE);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken == null)
                 return RedirectToLogin();
 
@@ -77,6 +94,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WmsCompanyclientDto dto, CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_CREATE);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken == null)
                 return RedirectToLogin();
 
@@ -117,6 +138,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         [HttpGet]
         public async Task<IActionResult> GetStatesByCountry(int countryId, CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_ACCESS);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken == null)
                 return Unauthorized();
 
@@ -133,6 +158,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
         [HttpGet]
         public async Task<IActionResult> GetCitiesByState(int stateId, int countryId, CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_ACCESS);
+            if (deny is not null)
+                return deny;
+
             if (CurrentToken == null)
                 return Unauthorized();
 

@@ -39,8 +39,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
         public PickProcessController(IHttpClientFactory httpClientFactory, IConfiguration config,
             IPickProcessUIService service, ICommonINVUIService CommonINVService
             ,
-            IPdfService pdfService
-            )
+            IPdfService pdfService, IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
+            
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

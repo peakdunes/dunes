@@ -55,5 +55,20 @@ namespace DUNES.API.ControllersWMS.Auth
                             _authUserPermissionService.SaveByUserAsync(request, ct), ct);
             
         }
+
+        /// <summary>
+        /// Obtain user permissions
+        /// </summary>
+        /// <param name="ct"></param>
+        /// <returns></returns>
+        [HttpGet("me")]
+        public async Task<IActionResult> GetMyPermissions(CancellationToken ct)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            return await HandleApi(
+                ct => _authUserPermissionService.GetCurrentUserPermissionsAsync(userId ?? string.Empty, ct),
+                ct);
+        }
     }
 }

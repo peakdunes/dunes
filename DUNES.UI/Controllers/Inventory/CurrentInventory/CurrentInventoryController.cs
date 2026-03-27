@@ -21,7 +21,8 @@ namespace DUNES.UI.Controllers.Inventory.CurrentInventory
 
 
         public CurrentInventoryController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNUIService ASNService,
-            ICommonINVUIService CommonINVService)
+            ICommonINVUIService CommonINVService, IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

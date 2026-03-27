@@ -1,16 +1,10 @@
-﻿using DUNES.API.Controllers;
-using DUNES.API.ServicesWMS.Auth;
+﻿using DUNES.API.ServicesWMS.Auth;
 using DUNES.Shared.DTOs.Auth;
-using DUNES.Shared.Utils.Reponse;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace DUNES.API.ControllersWMS.Auth
 {
-
     /// <summary>
     /// Provides endpoints to manage the permission catalog.
     /// </summary>
@@ -52,6 +46,53 @@ namespace DUNES.API.ControllersWMS.Auth
         public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
             var response = await _service.GetByIdAsync(id, ct);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Returns all permissions that belong to a specific functional group and module.
+        /// This endpoint returns the complete permission catalog for the requested module.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of permissions for the requested module.</returns>
+        [HttpGet("GetByModule/{groupName}/{moduleName}")]
+        public async Task<IActionResult> GetByModule(string groupName, string moduleName, CancellationToken ct)
+        {
+            var response = await _service.GetByModuleAsync(groupName, moduleName, ct);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Returns active permissions for a specific functional group and module
+        /// that are configured to be rendered as row-level actions in index tables.
+        /// Example: Edit, Delete, ResetPassword, Deactivate.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of row-action permissions for the requested module.</returns>
+        [HttpGet("GetRowActionsByModule/{groupName}/{moduleName}")]
+        public async Task<IActionResult> GetRowActionsByModule(string groupName, string moduleName, CancellationToken ct)
+        {
+            var response = await _service.GetRowActionsByModuleAsync(groupName, moduleName, ct);
+            return StatusCode(response.StatusCode, response);
+        }
+
+        /// <summary>
+        /// Returns active permissions for a specific functional group and module
+        /// that are configured to be rendered as toolbar or header actions in index views.
+        /// Example: Create, Export, Process.
+        /// </summary>
+        /// <param name="groupName">Functional group name. Example: Masters, Auth, Reports.</param>
+        /// <param name="moduleName">Module name. Example: Locations, Users, CompanyClientItemStatus.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of toolbar-action permissions for the requested module.</returns>
+        [HttpGet("GetToolbarActionsByModule/{groupName}/{moduleName}")]
+        public async Task<IActionResult> GetToolbarActionsByModule(string groupName, string moduleName, CancellationToken ct)
+        {
+            var response = await _service.GetToolbarActionsByModuleAsync(groupName, moduleName, ct);
             return StatusCode(response.StatusCode, response);
         }
 

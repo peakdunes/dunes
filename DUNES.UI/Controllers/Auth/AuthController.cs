@@ -1,39 +1,38 @@
-﻿//NUEVO
-
-using DUNES.Shared.DTOs.Auth;
+﻿using DUNES.Shared.DTOs.Auth;
 using DUNES.Shared.Models;
 using DUNES.Shared.Utils.Reponse;
 using DUNES.Shared.WiewModels.Auth;
 using DUNES.UI.Helpers;
+using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Auth;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
-
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace DUNES.UI.Controllers.Auth
 {
     public class AuthController : Controller
     {
-
         private readonly IAuthUIService _authService;
+        private readonly ICurrentUserPermissionUIService _currentUserPermissionUIService;
+        private readonly IUserPermissionSessionHelper _userPermissionSessionHelper;
 
-        public AuthController(IAuthUIService authService)
+        public AuthController(
+            IAuthUIService authService,
+            ICurrentUserPermissionUIService currentUserPermissionUIService,
+            IUserPermissionSessionHelper userPermissionSessionHelper)
         {
             _authService = authService;
+            _currentUserPermissionUIService = currentUserPermissionUIService;
+            _userPermissionSessionHelper = userPermissionSessionHelper;
         }
 
         [HttpGet]
         public IActionResult Login() => View();
 
-
         [HttpPost]
-
         public async Task<IActionResult> Login(string username, string password, CancellationToken ct)
         {
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
@@ -75,7 +74,6 @@ namespace DUNES.UI.Controllers.Auth
 
             var session = new SessionDTO
             {
-                
                 Token = login.Token,
                 UserName = login.UserName,
                 CompanyId = login.CompanyId,
@@ -108,10 +106,10 @@ namespace DUNES.UI.Controllers.Auth
             );
 
             var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, login.UserName ?? string.Empty),
-                    new Claim(ClaimTypes.NameIdentifier, login.UserId ?? string.Empty)
-                };
+            {
+                new Claim(ClaimTypes.Name, login.UserName ?? string.Empty),
+                new Claim(ClaimTypes.NameIdentifier, login.UserId ?? string.Empty)
+            };
 
             if (!string.IsNullOrWhiteSpace(login.RoleName))
                 claims.Add(new Claim(ClaimTypes.Role, login.RoleName));
@@ -142,6 +140,29 @@ namespace DUNES.UI.Controllers.Auth
                 }
             );
 
+            var permissionResponse = await _currentUserPermissionUIService
+                .GetMyPermissionsAsync(login.Token, ct);
+
+            if (permissionResponse.Success && permissionResponse.Data is not null)
+            {
+                var permissionSession = new UserPermissionSessionDTO
+                {
+                    UserId = permissionResponse.Data.UserId,
+                    Permissions = permissionResponse.Data.Permissions
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase)
+                };
+
+                _userPermissionSessionHelper.Save(permissionSession);
+
+                var savedPermissions = _userPermissionSessionHelper.Get();
+
+            }
+            else
+            {
+                _userPermissionSessionHelper.Clear();
+            }
+
             if (login.MustChangePassword)
             {
                 return RedirectToAction("ChangePassword", "Auth");
@@ -150,11 +171,12 @@ namespace DUNES.UI.Controllers.Auth
             return RedirectToAction("Index", "Home");
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            _userPermissionSessionHelper.Clear();
+
             HttpContext.Session.Clear();
 
             Response.Cookies.Delete("api_token");
@@ -162,9 +184,7 @@ namespace DUNES.UI.Controllers.Auth
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
             return RedirectToAction("Index", "Home");
-           // return RedirectToAction("Login", "Auth");
         }
-
 
         /// <summary>
         /// Displays the change password view.
@@ -174,8 +194,6 @@ namespace DUNES.UI.Controllers.Auth
         public IActionResult ChangePassword()
         {
             return View(new ChangePasswordVM());
-
-
         }
 
         /// <summary>
@@ -219,12 +237,11 @@ namespace DUNES.UI.Controllers.Auth
                 MessageDisplay.Inline
             );
 
+            _userPermissionSessionHelper.Clear();
             HttpContext.Session.Clear();
             Response.Cookies.Delete("api_token");
 
             return RedirectToAction("Login", "Auth");
-
-            
         }
     }
 }

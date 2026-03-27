@@ -1,4 +1,6 @@
-﻿@model DUNES.UI.Models.Auth.RolePermissionsMatrixPageVM
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model DUNES.UI.Models.Auth.RolePermissionsMatrixPageVM
 
 @{
     ViewData["Title"] = "Role Permissions Matrix";
@@ -93,10 +95,12 @@
                     <span class="fw-bold">Permissions Matrix</span>
                     <div class="small text-muted">Modules as rows, actions as dynamic columns</div>
                 </div>
-
-                <button type="button" class="btn btn-outline-primary" id="saveMatrixBtnTop">
-                    <i class="fas fa-save me-1"></i> Save Changes
+                @if (PermissionSession.HasPermission("Auth.RolePermission.Create"))
+                {
+                    <button type="button" class="btn btn-outline-primary" id="saveMatrixBtnTop">
+                        <i class="fas fa-save me-1"></i> Save Changes
                 </button>
+                }
             </div>
 
             <div class="card-body">

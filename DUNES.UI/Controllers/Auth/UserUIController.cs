@@ -6,13 +6,14 @@ using DUNES.UI.Models;
 using DUNES.UI.Models.Auth;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.Extensions.Options;
 
 namespace DUNES.UI.Controllers.Auth
 {
+    [Authorize]
     public class UserUIController : BaseController
     {
         private readonly IUserUIService _userService;
@@ -23,11 +24,20 @@ namespace DUNES.UI.Controllers.Auth
         private const string MENU_CODE_INDEX = "0301";
         private const string MENU_CODE_CRUD = "0301ZZ";
 
+        private const string PERMISSION_ACCESS = "Auth.User.Access";
+        private const string PERMISSION_CREATE = "Auth.User.Create";
+        private const string PERMISSION_UPDATE = "Auth.User.Update";
+        private const string PERMISSION_DELETE = "Auth.User.Delete";
+
+        private const string SUPER_ADMIN_ROLE_NAME = "SuperAdmin";
+
         public UserUIController(
               IUserUIService userService,
               IMenuClientUIService menuClientService,
               IOptions<UserPhotoSettings> userPhotoOptions,
-              IWebHostEnvironment environment)
+              IWebHostEnvironment environment,
+              IUserPermissionSessionHelper permissionSessionHelper)
+              : base(permissionSessionHelper)
         {
             _userService = userService;
             _menuClientService = menuClientService;
@@ -35,20 +45,15 @@ namespace DUNES.UI.Controllers.Auth
             _environment = environment;
         }
 
-        /// <summary>
-        /// Displays the users list.
-        /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_INDEX,
-                _menuClientService,
-                ct,
-                CurrentToken,
-                new BreadcrumbItem { Text = "", Url = null });
+            await SetMenuBreadcrumbAsync(MENU_CODE_INDEX, _menuClientService, ct, CurrentToken, new BreadcrumbItem { Text = "", Url = null });
 
             return await HandleAsync(async ct =>
             {
@@ -64,45 +69,34 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Displays the create user view.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "Add New User", Url = null });
 
             await LoadRolesDropdownAsync(CurrentToken, ct);
 
             return View(new UserCreateDTO());
-
-         
         }
 
-
-        /// <summary>
-        /// Creates a new user.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(UserCreateDTO model, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "Users", Url = Url.Action(nameof(Index)) },
                 new BreadcrumbItem { Text = "Create", Url = null });
 
@@ -113,6 +107,12 @@ namespace DUNES.UI.Controllers.Auth
                 if (!ModelState.IsValid)
                 {
                     MessageHelper.SetMessage(this, "danger", "Please review the required fields.", MessageDisplay.Inline);
+                    return View(model);
+                }
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, model.RoleId, ct))
+                {
+                    MessageHelper.SetMessage(this, "danger", "You are not allowed to assign the SuperAdmin role.", MessageDisplay.Inline);
                     return View(model);
                 }
 
@@ -129,40 +129,32 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Displays the edit view for a specific user.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Edit(string id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
-               
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "Edit User", Url = null });
 
             return await HandleAsync(async ct =>
             {
                 if (string.IsNullOrWhiteSpace(id))
-                {
-                    MessageHelper.SetMessage(this, "danger", "Invalid user id.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
-
-                await LoadRolesDropdownAsync(CurrentToken, ct);
 
                 var result = await _userService.GetByIdAsync(CurrentToken, id, ct);
 
                 if (!result.Success || result.Data is null)
-                {
-                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, result.Data.RoleId, ct))
+                    return Forbid();
+
+                await LoadRolesDropdownAsync(CurrentToken, ct);
 
                 var model = new UserUpdateDTO
                 {
@@ -178,22 +170,17 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Updates an existing user.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UserUpdateDTO model, IFormFile? photo, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
-                new BreadcrumbItem { Text = "Users", Url = Url.Action(nameof(Index)) },
+            await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "Edit", Url = null });
 
             return await HandleAsync(async ct =>
@@ -201,7 +188,23 @@ namespace DUNES.UI.Controllers.Auth
                 if (!ModelState.IsValid)
                 {
                     await LoadRolesDropdownAsync(CurrentToken, ct);
-                    MessageHelper.SetMessage(this, "danger", "Please review the required fields.", MessageDisplay.Inline);
+                    return View(model);
+                }
+
+                var currentTargetResult = await _userService.GetByIdAsync(CurrentToken, model.Id, ct);
+                if (!currentTargetResult.Success || currentTargetResult.Data is null)
+                {
+                    MessageHelper.SetMessage(this, "danger", currentTargetResult.Message, MessageDisplay.Inline);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, currentTargetResult.Data.RoleId, ct))
+                    return Forbid();
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, model.RoleId, ct))
+                {
+                    await LoadRolesDropdownAsync(CurrentToken, ct);
+                    MessageHelper.SetMessage(this, "danger", "You are not allowed to assign the SuperAdmin role.", MessageDisplay.Inline);
                     return View(model);
                 }
 
@@ -210,225 +213,179 @@ namespace DUNES.UI.Controllers.Auth
                 if (!result.Success)
                 {
                     await LoadRolesDropdownAsync(CurrentToken, ct);
-                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
                     return View(model);
-                }
-
-                if (photo is not null && photo.Length > 0)
-                {
-                    var allowedContentTypes = new[] { "image/jpeg" };
-                    var allowedExtensions = new[] { ".jpg", ".jpeg" };
-                    var maxSizeBytes = 2 * 1024 * 1024; // 2 MB
-
-                    var extension = Path.GetExtension(photo.FileName).ToLowerInvariant();
-
-                    if (!allowedContentTypes.Contains(photo.ContentType) || !allowedExtensions.Contains(extension))
-                    {
-                        await LoadRolesDropdownAsync(CurrentToken, ct);
-                        MessageHelper.SetMessage(this, "danger", "Invalid image format. Only JPG and JPEG files are allowed.", MessageDisplay.Inline);
-                        return View(model);
-                    }
-
-                    if (photo.Length > maxSizeBytes)
-                    {
-                        await LoadRolesDropdownAsync(CurrentToken, ct);
-                        MessageHelper.SetMessage(this, "danger", "The image file is too large. Maximum allowed size is 2 MB.", MessageDisplay.Inline);
-                        return View(model);
-                    }
-
-                    var configuredBaseUrl = _userPhotoSettings.BaseUrl?.TrimStart('/', '\\') ?? "uploads/users";
-                    var physicalFolder = Path.Combine(_environment.WebRootPath, configuredBaseUrl.Replace('/', Path.DirectorySeparatorChar));
-
-                    if (!Directory.Exists(physicalFolder))
-                        Directory.CreateDirectory(physicalFolder);
-
-                    var targetFilePath = Path.Combine(physicalFolder, $"{model.Id}.jpg");
-
-                    await using var stream = new FileStream(targetFilePath, FileMode.Create, FileAccess.Write, FileShare.None);
-                    await photo.CopyToAsync(stream, ct);
                 }
 
                 MessageHelper.SetMessage(this, "success", "User updated successfully.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
-        /// <summary>
-        /// Activates a user.
-        /// </summary>
+
         [HttpGet]
         public async Task<IActionResult> Activate(string id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
             return await HandleAsync(async ct =>
             {
                 if (string.IsNullOrWhiteSpace(id))
-                {
-                    MessageHelper.SetMessage(this, "danger", "Invalid user id.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
+
+                var userResult = await _userService.GetByIdAsync(CurrentToken, id, ct);
+                if (!userResult.Success || userResult.Data is null)
+                    return RedirectToAction(nameof(Index));
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, userResult.Data.RoleId, ct))
+                    return Forbid();
 
                 var result = await _userService.ActivateAsync(CurrentToken, id, ct);
 
                 if (!result.Success)
-                {
                     MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
-                }
                 else
-                {
                     MessageHelper.SetMessage(this, "success", "User activated successfully.", MessageDisplay.Inline);
-                }
 
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
 
-        /// <summary>
-        /// Deactivates a user.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Deactivate(string id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
             return await HandleAsync(async ct =>
             {
                 if (string.IsNullOrWhiteSpace(id))
-                {
-                    MessageHelper.SetMessage(this, "danger", "Invalid user id.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
+
+                var userResult = await _userService.GetByIdAsync(CurrentToken, id, ct);
+                if (!userResult.Success || userResult.Data is null)
+                    return RedirectToAction(nameof(Index));
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, userResult.Data.RoleId, ct))
+                    return Forbid();
 
                 var result = await _userService.DeactivateAsync(CurrentToken, id, ct);
 
                 if (!result.Success)
-                {
                     MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
-                }
                 else
-                {
                     MessageHelper.SetMessage(this, "success", "User deactivated successfully.", MessageDisplay.Inline);
-                }
 
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
 
-        /// <summary>
-        /// Displays the reset password view for a specific user.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> ResetPassword(string id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
-                new BreadcrumbItem { Text = "Users", Url = Url.Action(nameof(Index)) },
-                new BreadcrumbItem { Text = "Reset Password", Url = null });
 
             return await HandleAsync(async ct =>
             {
                 if (string.IsNullOrWhiteSpace(id))
-                {
-                    MessageHelper.SetMessage(this, "danger", "Invalid user id.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
 
                 var userResult = await _userService.GetByIdAsync(CurrentToken, id, ct);
-
                 if (!userResult.Success || userResult.Data is null)
-                {
-                    MessageHelper.SetMessage(this, "danger", userResult.Message, MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
-                }
 
-                var model = new ResetPasswordDTO
-                {
-                    UserId = userResult.Data.Id
-                };
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, userResult.Data.RoleId, ct))
+                    return Forbid();
 
-                ViewBag.UserName = userResult.Data.FullName;
-                ViewBag.UserEmail = userResult.Data.Email;
-
+                var model = new ResetPasswordDTO { UserId = id };
                 return View(model);
             }, ct);
         }
 
-        /// <summary>
-        /// Resets the password for a specific user.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ResetPassword(ResetPasswordDTO model, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
-            await SetMenuBreadcrumbAsync(
-                MENU_CODE_CRUD,
-                _menuClientService,
-                ct,
-                CurrentToken,
-                new BreadcrumbItem { Text = "Reset Password", Url = null });
-
             return await HandleAsync(async ct =>
             {
-                async Task LoadUserInfoAsync()
-                {
-                    if (!string.IsNullOrWhiteSpace(model.UserId))
-                    {
-                        var userResult = await _userService.GetByIdAsync(CurrentToken, model.UserId, ct);
+                if (model is null || string.IsNullOrWhiteSpace(model.UserId))
+                    return RedirectToAction(nameof(Index));
 
-                        if (userResult.Success && userResult.Data is not null)
-                        {
-                            ViewBag.UserName = userResult.Data.FullName;
-                            ViewBag.UserEmail = userResult.Data.Email;
-                        }
-                    }
-                }
+                var userResult = await _userService.GetByIdAsync(CurrentToken, model.UserId, ct);
+                if (!userResult.Success || userResult.Data is null)
+                    return RedirectToAction(nameof(Index));
+
+                if (!IsCurrentUserSuperAdmin() && await IsSuperAdminRoleAsync(CurrentToken, userResult.Data.RoleId, ct))
+                    return Forbid();
 
                 if (!ModelState.IsValid)
-                {
-                    await LoadUserInfoAsync();
-                    MessageHelper.SetMessage(this, "danger", "Please review the password information.", MessageDisplay.Inline);
                     return View(model);
-                }
 
                 var result = await _userService.ResetPasswordAsync(CurrentToken, model, ct);
 
                 if (!result.Success)
-                {
-                    await LoadUserInfoAsync();
-                    MessageHelper.SetMessage(this, "danger", result.Message, MessageDisplay.Inline);
                     return View(model);
-                }
 
                 MessageHelper.SetMessage(this, "success", "Password reset successfully.", MessageDisplay.Inline);
                 return RedirectToAction(nameof(Index));
             }, ct);
         }
 
-
         private async Task LoadRolesDropdownAsync(string token, CancellationToken ct)
         {
-            var master = await _userService.GetRolesAsync(token, ct); // o GetAll / GetAllActive
+            var master = await _userService.GetRolesAsync(token, ct);
 
-            ViewBag.Roles = master.Success && master.Data is not null
-                     ? master.Data.Select(r => new Microsoft.AspNetCore.Mvc.Rendering.SelectListItem
-                     {
-                         Value = r.Id,
-                         Text = r.Name
-                     }).ToList()
-                     : new List<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>();
+            var roles = master.Success && master.Data is not null
+                ? master.Data.ToList()
+                : new List<RoleOptionDTO>();
 
-          
+            if (!IsCurrentUserSuperAdmin())
+            {
+                roles = roles
+                    .Where(r => !string.Equals(r.Name, SUPER_ADMIN_ROLE_NAME, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            ViewBag.Roles = roles.Select(r => new SelectListItem
+            {
+                Value = r.Id,
+                Text = r.Name
+            }).ToList();
+        }
+
+        private bool IsCurrentUserSuperAdmin()
+        {
+            return User.IsInRole(SUPER_ADMIN_ROLE_NAME);
+        }
+
+        private async Task<bool> IsSuperAdminRoleAsync(string token, string? roleId, CancellationToken ct)
+        {
+            if (string.IsNullOrWhiteSpace(roleId))
+                return false;
+
+            var rolesResult = await _userService.GetRolesAsync(token, ct);
+
+            if (!rolesResult.Success || rolesResult.Data is null)
+                return false;
+
+            return rolesResult.Data.Any(r =>
+                string.Equals(r.Id, roleId, StringComparison.OrdinalIgnoreCase) &&
+                string.Equals(r.Name, SUPER_ADMIN_ROLE_NAME, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

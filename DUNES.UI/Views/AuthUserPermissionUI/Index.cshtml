@@ -1,4 +1,6 @@
-﻿@model DUNES.UI.Models.Auth.UserPermissionsMatrixPageVM
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model DUNES.UI.Models.Auth.UserPermissionsMatrixPageVM
 
 @{
     ViewData["Title"] = "User Permissions";
@@ -267,9 +269,14 @@
                                     Only direct permissions are editable here. Permissions inherited from roles are not affected.
                                 </p>
 
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-1"></i> Save Direct Permissions
-                                </button>
+                                @if (PermissionSession.HasPermission("Auth.UserPermission.Update"))
+                                {
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-1"></i> Save Direct Permissions
+                                    </button>
+
+                                }
+
                             </div>
 
                             @if (Model.DirectRows != null && Model.DirectRows.Any())

@@ -40,10 +40,10 @@ namespace DUNES.UI.Services.WMS.Masters.Locations
                 token,
                 ct);
 
-        public Task<ApiResponse<List<WMSLocationsUpdateDTO>>> GetAllAsync(
+        public Task<ApiResponse<List<WMSLocationsReadDTO>>> GetAllAsync(
             string token,
             CancellationToken ct)
-            => GetApiAsync<List<WMSLocationsUpdateDTO>>(
+            => GetApiAsync<List<WMSLocationsReadDTO>>(
                 "/api/LocationsWMS/wms-all-locations",
                 token,
                 ct);

@@ -4,10 +4,12 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.Countries;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Controllers.WMS.Masters.Countries
 {
+    [Authorize]
     public class CountriesController : BaseController
     {
         private readonly ICountriesWMSUIService _service;
@@ -16,9 +18,16 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
         private const string MENU_CODE_INDEX = "01020801";
         private const string MENU_CODE_CRUD = "01020801ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.Countries.Access";
+        private const string PERMISSION_CREATE = "Masters.Countries.Create";
+        private const string PERMISSION_UPDATE = "Masters.Countries.Update";
+        private const string PERMISSION_DELETE = "Masters.Countries.Delete";
+
         public CountriesController(
             ICountriesWMSUIService service,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -26,9 +35,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
 
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -37,7 +48,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
                 CurrentToken,
                 new BreadcrumbItem
                 {
-                    Text = "", // actual
+                    Text = "",
                     Url = null
                 });
 
@@ -50,9 +61,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -72,9 +85,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCountriesDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,

@@ -1,12 +1,17 @@
-﻿@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSItemStatusReadDTO>
+﻿@using DUNES.UI.Helpers
+@inject IUserPermissionSessionHelper PermissionSession
+@model IEnumerable<DUNES.Shared.DTOs.WMS.WMSItemStatusReadDTO>
 
 @{
     ViewData["Title"] = "Item Status List";
 }
 
-<p>
-    <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-</p>
+@if (PermissionSession.HasPermission("Masters.ItemStatus.Create"))
+{
+    <p>
+        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
+    </p>
+}
 
 <div class="row">
     <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100"

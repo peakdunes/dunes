@@ -35,7 +35,8 @@ namespace DUNES.UI.Controllers.Inventory.ASN
 
 
         public ASNController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNUIService ASNService,
-            ICommonINVUIService CommonINVService)
+            ICommonINVUIService CommonINVService, IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

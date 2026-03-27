@@ -30,5 +30,11 @@ namespace DUNES.API.RepositoriesWMS.Auth
         /// <param name="ct">Cancellation token.</param>
         /// <returns>Task.</returns>
         Task AddRangeAsync(List<AuthUserPermission> entities, CancellationToken ct);
+
+
+       
+
+
+       
     }
 }

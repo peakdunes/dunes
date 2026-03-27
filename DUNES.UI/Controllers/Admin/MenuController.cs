@@ -11,7 +11,8 @@ namespace DUNES.UI.Controllers.Admin
     {
         private readonly IMenuClientUIService _menuClientService;
 
-        public MenuController(IMenuClientUIService menuClientService)
+        public MenuController(IMenuClientUIService menuClientService, IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _menuClientService = menuClientService;
         }

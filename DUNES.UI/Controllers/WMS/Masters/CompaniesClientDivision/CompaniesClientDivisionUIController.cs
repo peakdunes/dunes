@@ -6,11 +6,13 @@ using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.CompaniesClientDivision;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
 {
+    [Authorize]
     public class CompaniesClientDivisionUIController : BaseController
     {
         private readonly IClientCompaniesWMSUIService _companyClientService;
@@ -20,10 +22,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         private const string MENU_CODE_INDEX = "01020302";
         private const string MENU_CODE_CRUD = "01020302ZZ";
 
+        private const string PERMISSION_ACCESS = "WMS.CompanyClientDivision.Access";
+        private const string PERMISSION_CREATE = "WMS.CompanyClientDivision.Create";
+
         public CompaniesClientDivisionUIController(
             ICompaniesClientDivisionWMSUIService service,
             IMenuClientUIService menuClientService,
-            IClientCompaniesWMSUIService companyClientService)
+            IClientCompaniesWMSUIService companyClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -32,9 +39,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
 
         public async Task<IActionResult> Index(int? companyclientid, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,
@@ -47,12 +56,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
             {
                 await LoadInfoAsync(CurrentToken, ct, companyclientid.Value);
 
+                if (companyclientid < 0)
+                {
+                    MessageHelper.SetMessage(this, "danger", "Invalid company client id.", MessageDisplay.Inline);
+                    return View(new List<WMSCompanyClientDivisionReadDTO>());
+                }
+
                 var listsdivision = await _service.GetAllCompaniesClientDivisionInformationByCompanyClient(
                     companyclientid.Value, CurrentToken, ct);
 
                 if (!listsdivision.Success)
                 {
-                    MessageHelper.SetMessage(this, "danger", listsdivision.Error?.ToString(), MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", listsdivision.Message, MessageDisplay.Inline);
                 }
 
                 if (companyclientid != 0 && listsdivision.Data == null)
@@ -66,31 +81,42 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
 
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await LoadInfoAsync(CurrentToken, ct, 0);
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "New Company Client Division", Url = null });
 
-            return View();
+            return View(new WMSCompanyClientDivisionDTO());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCompanyClientDivisionDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(MENU_CODE_CRUD, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "New Company Client Division", Url = null });
 
             return await HandleAsync(async ct =>
             {
+                if (dto == null || dto.Idcompanyclient <= 0 || string.IsNullOrWhiteSpace(dto.DivisionName))
+                {
+                    MessageHelper.SetMessage(this, "danger", "Invalid data.", MessageDisplay.Inline);
+                    await LoadInfoAsync(CurrentToken, ct, dto?.Idcompanyclient ?? 0);
+                    return View(dto);
+                }
+
                 var infocompany = await _companyClientService.GetClientCompanyInformationByIdAsync(
                     dto.Idcompanyclient, CurrentToken, ct);
 
@@ -102,7 +128,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
                 }
 
                 var infodivisoname = await _service.GetCompanyClientDivisionByNameAsync(
-                    dto.Idcompanyclient, dto.DivisionName!, CurrentToken, ct);
+                    dto.Idcompanyclient, dto.DivisionName.Trim(), CurrentToken, ct);
 
                 if (infodivisoname.Data != null)
                 {
@@ -115,12 +141,16 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
 
                 if (!createrecord.Data)
                 {
-                    MessageHelper.SetMessage(this, "danger", $"Error creating this Company Client Division. Error: {createrecord.Message}", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger",
+                        $"Error creating this Company Client Division. Error: {createrecord.Message}",
+                        MessageDisplay.Inline);
+
+                    await LoadInfoAsync(CurrentToken, ct, dto.Idcompanyclient);
                     return View(dto);
                 }
 
                 MessageHelper.SetMessage(this, "success", "Company Client Division created", MessageDisplay.Inline);
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { companyclientid = dto.Idcompanyclient });
             }, ct);
         }
 
@@ -130,8 +160,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
             var listcompaniesactives = listcompanies.Data?.Where(x => x.Active).ToList() ?? new();
 
             ViewData["companiesclient"] = idselected != 0
-                ? new SelectList(listcompaniesactives, "Id", "Name")
-                : new SelectList(listcompaniesactives, "Id", "Name", idselected);
+                ? new SelectList(listcompaniesactives, "Id", "Name", idselected)
+                : new SelectList(listcompaniesactives, "Id", "Name");
         }
     }
 }

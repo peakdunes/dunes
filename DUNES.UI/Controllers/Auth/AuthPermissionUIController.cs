@@ -4,13 +4,13 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DUNES.UI.Controllers.Auth
 {
-    /// <summary>
-    /// MVC controller for permission catalog management.
-    /// </summary>
+    [Authorize]
     public class AuthPermissionUIController : BaseController
     {
         private readonly IAuthPermissionUIService _authPermissionService;
@@ -19,27 +19,31 @@ namespace DUNES.UI.Controllers.Auth
         private const string MENU_CODE_INDEX = "0302";
         private const string MENU_CODE_CRUD = "0302ZZ";
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AuthPermissionUIController"/> class.
-        /// </summary>
-        /// <param name="authPermissionService">Permission UI service.</param>
-        /// <param name="menuClientService">Menu client UI service.</param>
+        private const string PERMISSION_ACCESS = "Auth.Permission.Access";
+        private const string PERMISSION_CREATE = "Auth.Permission.Create";
+        private const string PERMISSION_UPDATE = "Auth.Permission.Update";
+        private const string PERMISSION_DELETE = "Auth.Permission.Delete";
+
+        private const string SUPER_ADMIN_ROLE_NAME = "SuperAdmin";
+
         public AuthPermissionUIController(
             IAuthPermissionUIService authPermissionService,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _authPermissionService = authPermissionService;
             _menuClientService = menuClientService;
         }
 
-        /// <summary>
-        /// Displays the permission catalog list.
-        /// </summary>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Permissions index view.</returns>
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+           
+
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -64,14 +68,12 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Displays the create permission view.
-        /// </summary>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Create permission view.</returns>
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -94,16 +96,13 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Creates a new permission in the catalog.
-        /// </summary>
-        /// <param name="model">Permission creation model.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Redirects to index on success, otherwise returns the create view.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(AuthPermissionCreateDTO model, CancellationToken ct)
         {
+            if (!User.IsInRole(SUPER_ADMIN_ROLE_NAME) || !_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -138,10 +137,6 @@ namespace DUNES.UI.Controllers.Auth
             }, ct);
         }
 
-        /// <summary>
-        /// Normalizes text fields before sending the model to the API.
-        /// </summary>
-        /// <param name="model">Permission creation model.</param>
         private static void NormalizeCreateModel(AuthPermissionCreateDTO model)
         {
             model.PermissionKey = model.PermissionKey?.Trim() ?? string.Empty;

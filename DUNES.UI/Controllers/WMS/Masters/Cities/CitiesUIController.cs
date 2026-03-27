@@ -1,14 +1,16 @@
 ﻿using DUNES.Shared.DTOs.WMS;
+using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.Countries;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.Cities
 {
+    [Authorize]
     public class CitiesUIController : BaseController
     {
         private readonly IHttpClientFactory _httpClientFactory;
@@ -19,11 +21,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.Cities
         private const string MENU_CODE_INDEX = "01020803";
         private const string MENU_CODE_CRUD = "01020803ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.Cities.Access";
+        private const string PERMISSION_CREATE = "Masters.Cities.Create";
+        private const string PERMISSION_UPDATE = "Masters.Cities.Update";
+        private const string PERMISSION_DELETE = "Masters.Cities.Delete";
+
         public CitiesUIController(
             IHttpClientFactory httpClientFactory,
             ICitiesWMSUIService service,
             IMenuClientUIService menuClientService,
-            ICountriesWMSUIService countryService)
+            ICountriesWMSUIService countryService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _httpClientFactory = httpClientFactory;
             _service = service;
@@ -33,6 +42,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.Cities
 
         public async Task<IActionResult> Index(int? countryId, CancellationToken ct)
         {
+            var deny = RequireTokenAndPermission(PERMISSION_ACCESS);
+            if (deny is not null)
+                return deny;
+
             var token = CurrentToken;
             if (token == null)
                 return RedirectToLogin();
@@ -60,7 +73,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Cities
             return await HandleAsync(async ct =>
             {
                 await LoadInfoAsync(token, ct, 0);
-                var listcities = await _service.GetAllCitiesInformation(countryId.Value,token,ct);
+                var listcities = await _service.GetAllCitiesInformation(countryId.Value, token, ct);
 
                 return View(listcities.Data ?? new List<WMSCitiesReadDTO>());
             }, ct);

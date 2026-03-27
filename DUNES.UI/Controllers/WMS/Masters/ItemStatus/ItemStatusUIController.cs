@@ -4,14 +4,12 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 {
-    /// <summary>
-    /// UI Controller for Item Status (WMS / Masters).
-    /// One controller per model (non-generic) by design.
-    /// </summary>
+    [Authorize]
     public class ItemStatusUIController : BaseController
     {
         private readonly IItemStatusWMSUIService _service;
@@ -20,19 +18,26 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         private const string MENU_CODE_INDEX = "01020810";
         private const string MENU_CODE_CRUD = "01020810ZZ";
 
+        private const string PERMISSION_ACCESS = "Masters.ItemStatus.Access";
+        private const string PERMISSION_CREATE = "Masters.ItemStatus.Create";
+        private const string PERMISSION_UPDATE = "Masters.ItemStatus.Update";
+        private const string PERMISSION_DELETE = "Masters.ItemStatus.Delete";
+
         public ItemStatusUIController(
             IItemStatusWMSUIService service,
-            IMenuClientUIService menuClientService)
+            IMenuClientUIService menuClientService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
         }
 
-        /// <summary>
-        /// Item Status list.
-        /// </summary>
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
 
@@ -57,15 +62,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-        /// <summary>
-        /// Create page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -77,16 +81,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             return View(new WMSItemStatusCreateDTO());
         }
 
-        /// <summary>
-        /// Create action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSItemStatusCreateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -103,22 +106,20 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-        /// <summary>
-        /// Edit page.
-        /// </summary>
         [HttpGet]
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
                 ct,
                 CurrentToken,
-               
                 new BreadcrumbItem { Text = "Edit Item Status", Url = null });
 
             return await HandleAsync(async ct =>
@@ -143,16 +144,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-        /// <summary>
-        /// Edit action.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, WMSItemStatusUpdateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -169,16 +169,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-        /// <summary>
-        /// Toggle active status.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SetActive(int id, bool isActive, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {
@@ -194,20 +193,21 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
                 _menuClientService,
                 ct,
                 CurrentToken,
-                new BreadcrumbItem { Text = "Delete Inventory Type", Url = null });
+                new BreadcrumbItem { Text = "Delete Item Status", Url = null });
 
             return await HandleAsync(async ct =>
             {
@@ -215,11 +215,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
 
                 if (!res.Success || res.Data is null)
                 {
-                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Category not found.", MessageDisplay.Inline);
+                    MessageHelper.SetMessage(this, "danger", res.Message ?? "Item status not found.", MessageDisplay.Inline);
                     return RedirectToAction(nameof(Index));
                 }
 
-                // ReadDTO -> UpdateDTO
                 var model = new WMSItemStatusReadDTO
                 {
                     Id = res.Data.Id,
@@ -234,18 +233,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
             }, ct);
         }
 
-
-        /// <summary>
-        /// Hard delete (Option B): only if not used.
-        /// Requires API/UI support for Delete. If not implemented yet, API will return 404.
-        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id, WMSItemStatusReadDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             return await HandleAsync(async ct =>
             {

@@ -5,11 +5,13 @@ using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
 using DUNES.UI.Services.WMS.Masters.CompanyClientItemStatus;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
 {
+    [Authorize]
     public class CompanyClientItemStatusUIController : BaseController
     {
         private readonly ICompanyClientItemStatusWMSUIService _service;
@@ -19,31 +21,31 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         private const string MENU_CODE_INDEX = "01020306";
         private const string MENU_CODE_CRUD = "01020306ZZ";
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CompanyClientItemStatusWMSUIController"/> class.
-        /// </summary>
-        /// <param name="service">UI service for client Item Status mappings.</param>
+        private const string PERMISSION_ACCESS = "Masters.CompanyClientItemStatus.Access";
+        private const string PERMISSION_CREATE = "Masters.CompanyClientItemStatus.Create";
+        private const string PERMISSION_UPDATE = "Masters.CompanyClientItemStatus.Update";
+        private const string PERMISSION_DELETE = "Masters.CompanyClientItemStatus.Delete";
+
         public CompanyClientItemStatusUIController(
             ICompanyClientItemStatusWMSUIService service,
             IMenuClientUIService menuClientService,
-            IItemStatusWMSUIService itemStatusService)
+            IItemStatusWMSUIService itemStatusService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper)
         {
             _service = service;
             _menuClientService = menuClientService;
             _itemStatusService = itemStatusService;
         }
 
-        /// <summary>
-        /// Displays the list of enabled Item Status mappings for the current client.
-        /// </summary>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Index view with the client Item Status mappings.</returns>
         [HttpGet]
         public async Task<IActionResult> Index(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_ACCESS))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                MENU_CODE_INDEX,
@@ -68,9 +70,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
 
         public async Task<IActionResult> Edit(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -78,8 +82,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "Edit Item Status Mapping", Url = null });
-
-
 
             return await HandleAsync(async ct =>
             {
@@ -95,17 +97,17 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             }, ct);
         }
 
-        // POST: DepotController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //  public async Task <IActionResult> Edit(int id, IFormCollection collection, CancellationToken ct)
         public async Task<IActionResult> Edit(int id, WMSCompanyClientItemStatusSetActiveDTO collection, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_UPDATE))
+                return Forbid();
+
             try
             {
                 if (CurrentToken is null)
                     return RedirectToLogin();
-
 
                 await SetMenuBreadcrumbAsync(
                     MENU_CODE_CRUD,
@@ -131,8 +133,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
 
                     return RedirectToAction(nameof(Index));
                 }, ct);
-
-
             }
             catch
             {
@@ -140,17 +140,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             }
         }
 
-
-        /// <summary>
-        /// Form for creating a new mapping (enabling a category for this client).
-        /// </summary>
-        /// 
         [HttpGet]
         public async Task<IActionResult> Create(CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_CRUD,
@@ -159,7 +156,6 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
                 CurrentToken,
                 new BreadcrumbItem { Text = "New Item Status Mapping", Url = null });
 
-            // ✅ Load combo data
             await LoadTypesDropdownAsync(CurrentToken, ct);
 
             return View(new WMSCompanyClientItemStatusCreateDTO());
@@ -169,9 +165,11 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(WMSCompanyClientItemStatusCreateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_CREATE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             if (!ModelState.IsValid)
             {
@@ -192,19 +190,14 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             return RedirectToAction(nameof(Index));
         }
 
-
-        /// <summary>
-        /// Displays the delete confirmation view for a specific client Item Status mapping.
-        /// </summary>
-        /// <param name="id">Mapping Id.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Delete confirmation view.</returns>
         [HttpGet]
         public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             await SetMenuBreadcrumbAsync(
              MENU_CODE_CRUD,
@@ -227,20 +220,15 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             }, ct);
         }
 
-        /// <summary>
-        /// Confirms and executes the deletion of a client Item Status mapping.
-        /// This deletes only the client relation, not the master Item Status.
-        /// </summary>
-        /// <param name="id">Mapping Id.</param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>Redirects to Index after delete attempt.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id, WMSCompanyClientItemStatusUpdateDTO dto, CancellationToken ct)
         {
+            if (!_permissionSessionHelper.HasPermission(PERMISSION_DELETE))
+                return Forbid();
+
             if (CurrentToken is null)
                 return RedirectToLogin();
-
 
             var res = await _service.DeleteAsync(CurrentToken, id, ct);
 
@@ -253,30 +241,20 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             return RedirectToAction(nameof(Index));
         }
 
-        /// <summary>
-        /// Loads the dropdown list of master categories available to enable:
-        /// - only master Active=true
-        /// - excludes categories already enabled for this client
-        /// </summary>
         private async Task LoadTypesDropdownAsync(string token, CancellationToken ct)
         {
-            var master = await _itemStatusService.GetActiveAsync(token, ct); // o GetAll / GetAllActive
-           
+            var master = await _itemStatusService.GetActiveAsync(token, ct);
 
-            // 2) Existing enabled mappings (enough to prevent duplicates)
             var mapped = await _service.GetEnabledAsync(token, ct);
             var mappedIds = (mapped.Data ?? new List<WMSCompanyClientItemStatusReadDTO>())
                 .Select(x => x.ItemStatusId)
                 .ToHashSet();
 
-            // 3) Available to enable
             var available = master.Data
                 .Where(x => !mappedIds.Contains(x.Id) && x.Active)
                 .ToList();
 
             ViewBag.ItemStatuses = new SelectList(available, "Id", "Name");
         }
-
     }
 }
-
