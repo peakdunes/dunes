@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +27,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
         public CountriesController(
             ICountriesWMSUIService service,
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -51,6 +53,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.Countries
                     Text = "",
                     Url = null
                 });
+
+            await LoadCrudActionsAsync("Masters", "Countries", ct);
 
             return await HandleAsync(async ct =>
             {

@@ -1,5 +1,6 @@
 ﻿using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using Microsoft.AspNetCore.Http;
@@ -21,8 +22,10 @@ namespace DUNES.UI.Controllers.Inventory.CurrentInventory
 
 
         public CurrentInventoryController(IHttpClientFactory httpClientFactory, IConfiguration config, IASNUIService ASNService,
-            ICommonINVUIService CommonINVService, IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            ICommonINVUIService CommonINVService,
+             IAuthPermissionUIService authPermissionUIService,
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper,authPermissionUIService)
         {
             _httpClientFactory = httpClientFactory;
             _config = config;

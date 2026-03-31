@@ -32,7 +32,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.Locations
             ILocationsWMSUIService service,
             IMenuClientUIService menuClientService,
             IAuthPermissionUIService authPermissionUIService,
-             IUserPermissionSessionHelper permissionSessionHelper) : base(permissionSessionHelper) 
+           
+             IUserPermissionSessionHelper permissionSessionHelper) : base(permissionSessionHelper,authPermissionUIService) 
         {
             _service = service;
             _authPermissionUIService = authPermissionUIService;
@@ -66,17 +67,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.Locations
                     Url = null
                 });
 
-            ViewBag.RowActions = await _authPermissionUIService.BuildRowActionsAsync(
-                    CurrentToken!,
-                    "Masters",
-                    "Locations",
-                    ct);
-
-            ViewBag.ToolbarActions = await _authPermissionUIService.BuildToolbarActionsAsync(
-                CurrentToken!,
-                "Masters",
-                "Locations",
-                ct);
+            await LoadCrudActionsAsync("Masters", "Locations", ct);
 
 
             var locationList = await _service.GetAllAsync(CurrentToken, ct);

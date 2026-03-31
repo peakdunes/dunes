@@ -2,6 +2,7 @@
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
@@ -15,8 +16,9 @@ namespace DUNES.UI.Controllers.Admin
 
         public HomeController(
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _menuClientService = menuClientService;
         }

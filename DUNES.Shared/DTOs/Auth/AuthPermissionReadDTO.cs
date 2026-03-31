@@ -124,6 +124,18 @@ namespace DUNES.Shared.DTOs.Auth
         [MaxLength(250)]
         public string? ConfirmationMessage { get; set; }
 
+
+        /// <summary>
+        /// Template used to build route values dynamically in the UI.
+        /// Examples:
+        /// id={Id}
+        /// companyId={CompanyId}
+        /// companyId={CompanyId}&companyClientId={CompanyClientId}
+        /// code={Code}
+        /// </summary>
+        [MaxLength(500)]
+        public string? RouteParamsTemplate { get; set; }
+
         /// <summary>
         /// Date created.
         /// </summary>

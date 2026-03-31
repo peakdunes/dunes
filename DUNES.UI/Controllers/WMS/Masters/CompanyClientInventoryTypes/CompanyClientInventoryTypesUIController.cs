@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryType;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using DUNES.UI.Services.WMS.Masters.InventoryTypes;
@@ -22,17 +23,18 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
         private const string MENU_CODE_INDEX = "01020305";
         private const string MENU_CODE_CRUD = "01020305ZZ";
 
-        private const string PERMISSION_ACCESS = "Masters.CompanyClientInventoryCategory.Access";
-        private const string PERMISSION_CREATE = "Masters.CompanyClientInventoryCategory.Create";
-        private const string PERMISSION_UPDATE = "Masters.CompanyClientInventoryCategory.Update";
-        private const string PERMISSION_DELETE = "Masters.CompanyClientInventoryCategory.Delete";
+        private const string PERMISSION_ACCESS = "Masters.CompanyClientInventoryType.Access";
+        private const string PERMISSION_CREATE = "Masters.CompanyClientInventoryType.Create";
+        private const string PERMISSION_UPDATE = "Masters.CompanyClientInventoryType.Update";
+        private const string PERMISSION_DELETE = "Masters.CompanyClientInventoryType.Delete";
 
         public CompanyClientInventoryTypesUIController(
             ICompanyClientInventoryTypeWMSUIService inventoryTypeService,
             IInventoryTypesWMSUIService masterInventoryTypeService,
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _inventoryTypeService = inventoryTypeService;
             _menuClientService = menuClientService;
@@ -56,6 +58,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryTypes
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "CompanyClientInventoryType", ct);
 
             return await HandleAsync(async ct =>
             {

@@ -131,7 +131,9 @@ namespace DUNES.UI.Services.Auth
                 TextCss = dto.TextCss,
                 ButtonOrder = dto.ButtonOrder,
                 RequiresConfirmation = dto.RequiresConfirmation,
-                ConfirmationMessage = dto.ConfirmationMessage
+                ConfirmationMessage = dto.ConfirmationMessage,
+                RouteParamsTemplate = dto.RouteParamsTemplate
+               
             };
         }
     }

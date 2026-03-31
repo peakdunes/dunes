@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.CompanyClientInventoryCategory;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using Microsoft.AspNetCore.Authorization;
@@ -30,8 +31,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
             ICompanyClientInventoryCategoryWMSUIService inventoryCategoriesService,
             IInventoryCategoriesWMSUIService masterCategoriesService,
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _inventoryCategoriesService = inventoryCategoriesService;
             _menuClientService = menuClientService;
@@ -53,6 +55,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientInventoryCategory
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "CompanyClientInventoryCategory", ct);
 
             return await HandleAsync(async ct =>
             {

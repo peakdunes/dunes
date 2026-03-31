@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
     {
         private readonly IItemStatusWMSUIService _service;
         private readonly IMenuClientUIService _menuClientService;
+        
 
         private const string MENU_CODE_INDEX = "01020810";
         private const string MENU_CODE_CRUD = "01020810ZZ";
@@ -26,11 +28,12 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
         public ItemStatusUIController(
             IItemStatusWMSUIService service,
             IMenuClientUIService menuClientService,
-            IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            IAuthPermissionUIService authPermissionUIService,
+             IUserPermissionSessionHelper permissionSessionHelper) : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
+          
         }
 
         public async Task<IActionResult> Index(CancellationToken ct)
@@ -47,6 +50,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.ItemStatus
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "ItemStatus", ct);
+
 
             return await HandleAsync(async ct =>
             {

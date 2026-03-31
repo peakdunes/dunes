@@ -5,13 +5,33 @@
 @{
     ViewData["Title"] = "Index";
 }
-@if (PermissionSession.HasPermission("Masters.TransactionConcepts.Create"))
-{
-    <p>
-        <a type="button" class="btn btn-outline-primary" asp-action="Create">Create New</a>
-    </p>
+@{
+    var rowActions = ViewBag.RowActions as List<CrudActionItemModel> ?? new List<CrudActionItemModel>();
+    var toolbarActions = ViewBag.ToolbarActions as List<CrudActionItemModel> ?? new List<CrudActionItemModel>();
 }
 
+@if (toolbarActions.Any())
+{
+    <div class="row g-2 mb-3">
+        @foreach (var action in toolbarActions.OrderBy(x => x.ButtonOrder).Take(6))
+        {
+            <div class="col-12 col-sm-6 col-md-2">
+                <a asp-action="@action.MvcActionName"
+                   class="@($"{action.ButtonCss} {action.TextCss} w-100 d-inline-flex align-items-center justify-content-center")"
+                   title="@action.ButtonText">
+                    @if (!string.IsNullOrWhiteSpace(action.IconCss))
+                    {
+                        <i class="@action.IconCss"></i>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(action.ButtonText))
+                    {
+                        <span class="ms-1">@action.ButtonText</span>
+                    }
+                </a>
+            </div>
+        }
+    </div>
+}
 <div class="row">
     <table id="tablelist" class="table table-bordered table-striped table-hover table-sm align-middle w-100"
            style="white-space: nowrap; font-size: medium">
@@ -44,8 +64,9 @@
             {
                 <tr>
                     <td>
-                        <partial name="_CrudActions"
-                                 model="@(new DUNES.UI.Models.CrudActionsModel { RouteId = item.Id.ToString(), Controller = "TransactionConceptsUI" })" />
+                       <partial name="_CrudActions"
+         model="@(new DUNES.UI.Models.CrudActionsModel 
+                                 { RouteId = item.Id.ToString(), Controller = "TransactionConceptsUI", Actions = rowActions })" />
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Id)

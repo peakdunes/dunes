@@ -4,6 +4,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
@@ -42,8 +43,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
             ICountriesWMSUIService countryService,
             IStatesCountriesWMSUIService statesservice,
             ICitiesWMSUIService cityService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _httpClientFactory = httpClientFactory;
             _service = service;
@@ -65,6 +67,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.ClientCompanies
 
             await SetMenuBreadcrumbAsync(MENU_CODE_INDEX, _menuClientService, ct, CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+
+            await LoadCrudActionsAsync("Masters", "ClientCompanies", ct);
 
             return await HandleAsync(async ct =>
             {

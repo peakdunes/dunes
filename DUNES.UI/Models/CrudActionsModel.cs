@@ -1,4 +1,6 @@
-﻿namespace DUNES.UI.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace DUNES.UI.Models
 {
     public class CrudActionsModel
     {
@@ -18,5 +20,6 @@
         public int ButtonOrder { get; set; }
         public bool RequiresConfirmation { get; set; }
         public string? ConfirmationMessage { get; set; }
+        public string? RouteParamsTemplate { get; set; }
     }
 }

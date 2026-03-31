@@ -4,6 +4,7 @@ using DUNES.UI.Helpers;
 using DUNES.UI.Infrastructure;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
@@ -21,10 +22,13 @@ namespace DUNES.UI.Controllers
     public class BaseController : Controller
     {
         protected readonly IUserPermissionSessionHelper _permissionSessionHelper;
+       
+        protected readonly IAuthPermissionUIService _authPermissionUIService;
 
-        public BaseController(IUserPermissionSessionHelper permissionSessionHelper)
+        public BaseController(IUserPermissionSessionHelper permissionSessionHelper, IAuthPermissionUIService authPermissionUIService)
         {
             _permissionSessionHelper = permissionSessionHelper;
+            _authPermissionUIService = authPermissionUIService;
         }
 
         /// <summary>
@@ -177,5 +181,26 @@ namespace DUNES.UI.Controllers
 
             SetBreadcrumb(breadcrumb.ToArray());
         }
+
+        /// <summary>
+
+        protected async Task LoadCrudActionsAsync(
+      string groupName,
+      string moduleName,
+      CancellationToken ct = default)
+        {
+            ViewBag.RowActions = await _authPermissionUIService.BuildRowActionsAsync(
+                CurrentToken!,
+                groupName,
+                moduleName,
+                ct);
+
+            ViewBag.ToolbarActions = await _authPermissionUIService.BuildToolbarActionsAsync(
+                CurrentToken!,
+                groupName,
+                moduleName,
+                ct);
+        }
+
     }
 }

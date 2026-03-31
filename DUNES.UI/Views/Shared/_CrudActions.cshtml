@@ -1,4 +1,5 @@
 ﻿@model DUNES.UI.Models.CrudActionsModel
+@using Microsoft.AspNetCore.Routing
 
 <style>
     .btn-outline-danger:hover i,
@@ -10,6 +11,54 @@
     }
 </style>
 
+@functions {
+    private RouteValueDictionary BuildRouteValues(string? template, object? routeId)
+    {
+        var values = new RouteValueDictionary();
+
+        if (string.IsNullOrWhiteSpace(template))
+        {
+            if (routeId != null)
+            {
+                values["id"] = routeId;
+            }
+
+            return values;
+        }
+
+        var pairs = template.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        foreach (var pair in pairs)
+        {
+            var parts = pair.Split('=', 2, StringSplitOptions.TrimEntries);
+
+            if (parts.Length != 2)
+                continue;
+
+            var key = parts[0];
+            var rawValue = parts[1];
+
+            if (string.IsNullOrWhiteSpace(key))
+                continue;
+
+            object? resolvedValue = rawValue;
+
+            // Soporte inicial/transitorio para {Id}
+            if (rawValue.Equals("{Id}", StringComparison.OrdinalIgnoreCase))
+            {
+                resolvedValue = routeId;
+            }
+
+            if (resolvedValue != null)
+            {
+                values[key] = resolvedValue;
+            }
+        }
+
+        return values;
+    }
+}
+
 @{
     var controller = string.IsNullOrWhiteSpace(Model.Controller) ? null : Model.Controller;
 }
@@ -18,9 +67,15 @@
 {
     foreach (var action in Model.Actions.OrderBy(x => x.ButtonOrder))
     {
-        <a asp-controller="@controller"
-           asp-action="@action.MvcActionName"
-           asp-route-id="@Model.RouteId"
+        var routeValues = BuildRouteValues(action.RouteParamsTemplate, Model.RouteId);
+
+        var url = Url.Action(
+            action.MvcActionName,
+            controller,
+            routeValues
+        );
+
+        <a href="@url"
            class="@($"{action.TextCss} {action.ButtonCss}")"
            title="@action.ButtonText"
            data-requires-confirmation="@(action.RequiresConfirmation ? "true" : "false")"

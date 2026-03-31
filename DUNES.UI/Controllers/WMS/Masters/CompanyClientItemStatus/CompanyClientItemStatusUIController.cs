@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.CompanyClientItemStatus;
 using DUNES.UI.Services.WMS.Masters.ItemStatus;
 using Microsoft.AspNetCore.Authorization;
@@ -30,8 +31,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
             ICompanyClientItemStatusWMSUIService service,
             IMenuClientUIService menuClientService,
             IItemStatusWMSUIService itemStatusService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -53,6 +55,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompanyClientItemStatus
                ct,
                CurrentToken,
                new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "CompanyClientItemStatus", ct);
 
             return await HandleAsync(async ct =>
             {

@@ -4,6 +4,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.CompaniesClientDivision;
 using Microsoft.AspNetCore.Authorization;
@@ -22,15 +23,16 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
         private const string MENU_CODE_INDEX = "01020302";
         private const string MENU_CODE_CRUD = "01020302ZZ";
 
-        private const string PERMISSION_ACCESS = "WMS.CompanyClientDivision.Access";
-        private const string PERMISSION_CREATE = "WMS.CompanyClientDivision.Create";
+        private const string PERMISSION_ACCESS = "Masters.CompanyClientDivision.Access";
+        private const string PERMISSION_CREATE = "Masters.CompanyClientDivision.Create";
 
         public CompaniesClientDivisionUIController(
             ICompaniesClientDivisionWMSUIService service,
             IMenuClientUIService menuClientService,
             IClientCompaniesWMSUIService companyClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -51,6 +53,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesClientDivision
                 new BreadcrumbItem { Text = "", Url = null });
 
             companyclientid ??= 0;
+
+
+            await LoadCrudActionsAsync("Masters", "CompanyClientDivision", ct);
 
             return await HandleAsync(async ct =>
             {

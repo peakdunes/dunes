@@ -36,8 +36,9 @@ namespace DUNES.UI.Controllers.Auth
               IMenuClientUIService menuClientService,
               IOptions<UserPhotoSettings> userPhotoOptions,
               IWebHostEnvironment environment,
+               IAuthPermissionUIService authPermissionUIService,
               IUserPermissionSessionHelper permissionSessionHelper)
-              : base(permissionSessionHelper)
+              : base(permissionSessionHelper, authPermissionUIService)
         {
             _userService = userService;
             _menuClientService = menuClientService;

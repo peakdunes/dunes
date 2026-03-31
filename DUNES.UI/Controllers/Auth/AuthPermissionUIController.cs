@@ -29,8 +29,9 @@ namespace DUNES.UI.Controllers.Auth
         public AuthPermissionUIController(
             IAuthPermissionUIService authPermissionService,
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _authPermissionService = authPermissionService;
             _menuClientService = menuClientService;

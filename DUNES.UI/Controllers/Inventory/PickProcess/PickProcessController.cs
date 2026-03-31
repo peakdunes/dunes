@@ -5,6 +5,7 @@ using DUNES.Shared.Models;
 using DUNES.Shared.TemporalModels;
 using DUNES.Shared.WiewModels.Inventory;
 using DUNES.UI.Helpers;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.Inventory.ASN;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
@@ -38,9 +39,9 @@ namespace DUNES.UI.Controllers.Inventory.PickProcess
 
         public PickProcessController(IHttpClientFactory httpClientFactory, IConfiguration config,
             IPickProcessUIService service, ICommonINVUIService CommonINVService
-            ,
+            , IAuthPermissionUIService authPermissionUIService,
             IPdfService pdfService, IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
             
         {
             _httpClientFactory = httpClientFactory;

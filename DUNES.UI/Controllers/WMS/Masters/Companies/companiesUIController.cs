@@ -1,6 +1,7 @@
 ﻿using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.Inventory.Common;
 using DUNES.UI.Services.Inventory.PickProcess;
 using DUNES.UI.Services.Print;
@@ -32,8 +33,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.Companies
             IHttpClientFactory httpClientFactory,
             ICompaniesWMSUIService service,
             IMenuClientUIService menuClientService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _httpClientFactory = httpClientFactory;
             _service = service;

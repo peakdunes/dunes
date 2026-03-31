@@ -2,6 +2,7 @@
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.Cities;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using Microsoft.AspNetCore.Authorization;
@@ -31,8 +32,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.Cities
             ICitiesWMSUIService service,
             IMenuClientUIService menuClientService,
             ICountriesWMSUIService countryService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper,authPermissionUIService)
         {
             _httpClientFactory = httpClientFactory;
             _service = service;
@@ -53,6 +55,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.Cities
             var session = CurrentToken;
             if (session == null)
                 return RedirectToLogin();
+
+            await LoadCrudActionsAsync("Masters", "Cities", ct);
+
 
             await SetMenuBreadcrumbAsync(
                 MENU_CODE_INDEX,

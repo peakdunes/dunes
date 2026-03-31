@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.TransactionConceptClient;
 using DUNES.UI.Services.WMS.Masters.TransactionConcepts;
 using Microsoft.AspNetCore.Authorization;
@@ -30,8 +31,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
             ITransactionConceptClientWMSUIService service,
             IMenuClientUIService menuClientService,
             ITransactionConceptsWMSUIService transactionConceptService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _transactionConceptService = transactionConceptService;
@@ -53,6 +55,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.TransactionConceptClient
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+
+            await LoadCrudActionsAsync("Masters", "TransactionConceptClient", ct);
 
             return await HandleAsync(async ct =>
             {

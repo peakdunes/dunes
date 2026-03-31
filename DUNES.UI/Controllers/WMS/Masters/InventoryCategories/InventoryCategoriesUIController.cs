@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.InventoryCategories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,8 +28,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
         public InventoryCategoriesUIController(
             IInventoryCategoriesWMSUIService service,
             IMenuClientUIService menuClientService,
+
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -48,6 +51,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.InventoryCategories
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "InventoryCategories", ct);
 
             return await HandleAsync(async ct =>
             {

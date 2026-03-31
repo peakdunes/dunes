@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.UI.Controllers.Admin
@@ -11,8 +12,10 @@ namespace DUNES.UI.Controllers.Admin
     {
         private readonly IMenuClientUIService _menuClientService;
 
-        public MenuController(IMenuClientUIService menuClientService, IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+        public MenuController(IMenuClientUIService menuClientService, 
+            IAuthPermissionUIService authPermissionUIService, 
+            IUserPermissionSessionHelper permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _menuClientService = menuClientService;
         }

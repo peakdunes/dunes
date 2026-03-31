@@ -138,6 +138,7 @@ namespace DUNES.API.ServicesWMS.Auth
                 ShowAsToolbarAction = entity.ShowAsToolbarAction,
                 RequiresConfirmation = entity.RequiresConfirmation,
                 ConfirmationMessage = entity.ConfirmationMessage,
+                RouteParamsTemplate = entity.RouteParamsTemplate,
 
                 // EXISTENTES
                 IsActive = entity.IsActive,

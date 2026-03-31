@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.Countries;
 using DUNES.UI.Services.WMS.Masters.StatesCountries;
 using Microsoft.AspNetCore.Authorization;
@@ -30,8 +31,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
             IStatesCountriesWMSUIService service,
             IMenuClientUIService menuClientService,
             ICountriesWMSUIService countryService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -55,6 +57,8 @@ namespace DUNES.UI.Controllers.WMS.Masters.StatesCountries
                 new BreadcrumbItem { Text = "", Url = null });
 
             countryId ??= 0;
+
+            await LoadCrudActionsAsync("Masters", "StatesCountries", ct);
 
             return await HandleAsync(async ct =>
             {

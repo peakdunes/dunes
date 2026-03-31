@@ -5,8 +5,6 @@
 }
 
 <div class="container py-4">
-
-
     <div class="card shadow-sm border-0">
         <div class="card-body p-4">
             <form asp-action="Create" method="post" novalidate>
@@ -40,9 +38,7 @@
                         <label asp-for="PermissionKey" class="form-label fw-semibold"></label>
                         <input asp-for="PermissionKey" class="form-control" placeholder="Enter permission key" />
                         <span asp-validation-for="PermissionKey" class="text-danger small"></span>
-                        <small class="text-muted">
-                            Example: Masters.Locations.Access
-                        </small>
+                        <small class="text-muted">Example: Masters.Locations.Access</small>
                     </div>
 
                     <div class="col-md-4">
@@ -63,6 +59,89 @@
                             <input asp-for="IsActive" class="form-check-input" />
                             <label asp-for="IsActive" class="form-check-label fw-semibold"></label>
                         </div>
+                    </div>
+                </div>
+
+                <hr class="my-4" />
+
+                <h5 class="fw-bold mb-3">UI Metadata</h5>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label asp-for="MvcActionName" class="form-label fw-semibold"></label>
+                        <input asp-for="MvcActionName" class="form-control" placeholder="Enter MVC action name" />
+                        <span asp-validation-for="MvcActionName" class="text-danger small"></span>
+                        <small class="text-muted">Example: Index, Create, Edit, Delete</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="RouteParamsTemplate" class="form-label fw-semibold"></label>
+                        <input asp-for="RouteParamsTemplate" class="form-control" placeholder="id={Id}" />
+                        <span asp-validation-for="RouteParamsTemplate" class="text-danger small"></span>
+                        <small class="text-muted">Examples: id={Id}, code={Code}, companyId={CompanyId}&companyClientId={CompanyClientId}</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ButtonOrder" class="form-label fw-semibold"></label>
+                        <input asp-for="ButtonOrder" class="form-control" type="number" min="0" placeholder="Enter button order" />
+                        <span asp-validation-for="ButtonOrder" class="text-danger small"></span>
+                        <small class="text-muted">Order used for rendering buttons</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ButtonText" class="form-label fw-semibold"></label>
+                        <input asp-for="ButtonText" class="form-control" placeholder="Enter button text" />
+                        <span asp-validation-for="ButtonText" class="text-danger small"></span>
+                        <small class="text-muted">Example: Create New, Edit, Delete</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="IconCss" class="form-label fw-semibold"></label>
+                        <input asp-for="IconCss" class="form-control" placeholder="Enter icon css class" />
+                        <span asp-validation-for="IconCss" class="text-danger small"></span>
+                        <small class="text-muted">Example: fas fa-plus, fas fa-pencil-alt, fas fa-trash-alt</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="ButtonCss" class="form-label fw-semibold"></label>
+                        <input asp-for="ButtonCss" class="form-control" placeholder="Enter button css classes" />
+                        <span asp-validation-for="ButtonCss" class="text-danger small"></span>
+                        <small class="text-muted">Example: btn btn-outline-primary</small>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label asp-for="TextCss" class="form-label fw-semibold"></label>
+                        <input asp-for="TextCss" class="form-control" placeholder="Enter text css classes" />
+                        <span asp-validation-for="TextCss" class="text-danger small"></span>
+                        <small class="text-muted">Example: text-primary, text-danger</small>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mt-2">
+                            <input asp-for="ShowAsRowAction" class="form-check-input" />
+                            <label asp-for="ShowAsRowAction" class="form-check-label fw-semibold"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mt-2">
+                            <input asp-for="ShowAsToolbarAction" class="form-check-input" />
+                            <label asp-for="ShowAsToolbarAction" class="form-check-label fw-semibold"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 d-flex align-items-end">
+                        <div class="form-check mt-2">
+                            <input asp-for="RequiresConfirmation" class="form-check-input" />
+                            <label asp-for="RequiresConfirmation" class="form-check-label fw-semibold"></label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12">
+                        <label asp-for="ConfirmationMessage" class="form-label fw-semibold"></label>
+                        <input asp-for="ConfirmationMessage" class="form-control" placeholder="Enter confirmation message" />
+                        <span asp-validation-for="ConfirmationMessage" class="text-danger small"></span>
+                        <small class="text-muted">Example: Are you sure you want to delete this record?</small>
                     </div>
                 </div>
 

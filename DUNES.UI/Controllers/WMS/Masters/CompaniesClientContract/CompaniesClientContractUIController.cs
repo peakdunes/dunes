@@ -3,6 +3,7 @@ using DUNES.Shared.Models;
 using DUNES.UI.Helpers;
 using DUNES.UI.Models;
 using DUNES.UI.Services.Admin;
+using DUNES.UI.Services.Auth;
 using DUNES.UI.Services.WMS.Masters.ClientCompanies;
 using DUNES.UI.Services.WMS.Masters.Companies;
 using DUNES.UI.Services.WMS.Masters.CompaniesContract;
@@ -33,8 +34,9 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
             IMenuClientUIService menuClientService,
             IClientCompaniesWMSUIService companyClientService,
             ICompaniesWMSUIService companyService,
+             IAuthPermissionUIService authPermissionUIService,
             IUserPermissionSessionHelper permissionSessionHelper)
-            : base(permissionSessionHelper)
+            : base(permissionSessionHelper, authPermissionUIService)
         {
             _service = service;
             _menuClientService = menuClientService;
@@ -57,6 +59,10 @@ namespace DUNES.UI.Controllers.WMS.Masters.CompaniesContract
                 ct,
                 CurrentToken,
                 new BreadcrumbItem { Text = "", Url = null });
+
+            await LoadCrudActionsAsync("Masters", "CompaniesContract", ct);
+
+            await LoadInfoAsync(CurrentToken, ct, 0);
 
             var contractList = await _service.GetAllClientCompaniesContractInformationAsync(CurrentToken, ct);
             return View(contractList.Data);
