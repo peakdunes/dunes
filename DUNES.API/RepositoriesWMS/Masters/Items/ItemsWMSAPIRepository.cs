@@ -1,152 +1,184 @@
 ﻿using DUNES.API.Data;
+using DUNES.API.ModelsWMS.Masters;
+using DUNES.Shared.DTOs;
+using DUNES.Shared.DTOs.WMS;
 using Microsoft.EntityFrameworkCore;
 
 namespace DUNES.API.RepositoriesWMS.Masters.Items
 {
     /// <summary>
-    /// Items Repository
-    /// Data access implementation for inventory items.
-    /// Scoped strictly by Company (STANDARD COMPANYID).
+    /// Repository implementation for managing Items within WMS.
+    /// Supports retrieval of company/master items, client-owned items, or both,
+    /// depending on the ownership mode resolved by the service layer.
     /// </summary>
     public class ItemsWMSAPIRepository : IItemsWMSAPIRepository
     {
         private readonly appWmsDbContext _context;
 
         /// <summary>
-        /// Constructor (Dependency Injection)
+        /// Initializes a new instance of the <see cref="ItemsWMSAPIRepository"/> class.
         /// </summary>
-        /// <param name="context">WMS database context</param>
+        /// <param name="context">Application database context.</param>
         public ItemsWMSAPIRepository(appWmsDbContext context)
         {
             _context = context;
         }
 
         /// <summary>
-        /// Get all items for a company (CompanyClientId = null)
+        /// Returns all items available for the given company and client context,
+        /// according to the ownership filters provided.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of items</returns>
-        public async Task<List<DUNES.API.ModelsWMS.Masters.Items>> GetAllAsync(
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of items available under the resolved ownership scope.</returns>
+        public async Task<List<WMSItemsReadDTO>> GetAllAsync(
             int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
             CancellationToken ct)
         {
-            return await _context.items
+            var query = _context.items
                 .AsNoTracking()
-                .Include(x => x.InventoryCategory)
-                .Where(x =>
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null)
-                .OrderBy(x => x.sku)
+                .Where(x => x.CompanyId == companyId);
+
+            query = ApplyOwnershipFilter(query, companyClientId, includeMasterItems, includeClientItems);
+
+            return await query
+                .Select(x => new WMSItemsReadDTO
+                {
+                    Id = x.Id,
+                    CompanyId = x.CompanyId,
+                    CompanyClientId = x.CompanyClientId,
+                    InventoryCategoryId = x.InventoryCategoryId,
+                    InventoryCategoryName = x.InventoryCategory.Name,
+                    PartNumber = x.PartNumber,
+                    Sku = x.Sku,
+                    ItemDescription = x.ItemDescription,
+                    Barcode = x.Barcode,
+                    IsRepairable = x.IsRepairable,
+                    IsSerialized = x.IsSerialized,
+                    Active = x.Active
+                })
                 .ToListAsync(ct);
         }
 
         /// <summary>
-        /// Get all active items for a company (CompanyClientId = null)
+        /// Returns a single item by Id within the given company and client context,
+        /// according to the ownership filters provided.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of active items</returns>
-        public async Task<List<DUNES.API.ModelsWMS.Masters.Items>> GetActiveAsync(
-            int companyId,
-            CancellationToken ct)
-        {
-            return await _context.items
-                .AsNoTracking()
-                .Include(x => x.InventoryCategory)
-                .Where(x =>
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null &&
-                    x.active)
-                .OrderBy(x => x.sku)
-                .ToListAsync(ct);
-        }
-
-        /// <summary>
-        /// Get item by id (scoped by company)
-        /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Item entity or null</returns>
-        public async Task<DUNES.API.ModelsWMS.Masters.Items?> GetByIdAsync(
-            int companyId,
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The requested item if found within the allowed scope; otherwise null.</returns>
+        public async Task<WMSItemsReadDTO?> GetByIdAsync(
             int id,
+            int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
+            CancellationToken ct)
+        {
+            var query = _context.items
+                .AsNoTracking()
+                .Where(x => x.Id == id && x.CompanyId == companyId);
+
+            query = ApplyOwnershipFilter(query, companyClientId, includeMasterItems, includeClientItems);
+
+            return await query
+                .Select(x => new WMSItemsReadDTO
+                {
+                    Id = x.Id,
+                    CompanyId = x.CompanyId,
+                    CompanyClientId = x.CompanyClientId,
+                    InventoryCategoryId = x.InventoryCategoryId,
+                    InventoryCategoryName = x.InventoryCategory.Name,
+                    PartNumber = x.PartNumber,
+                    Sku = x.Sku,
+                    ItemDescription = x.ItemDescription,
+                    Barcode = x.Barcode,
+                    IsRepairable = x.IsRepairable,
+                    IsSerialized = x.IsSerialized,
+                    Active = x.Active
+                })
+                .FirstOrDefaultAsync(ct);
+        }
+
+        /// <summary>
+        /// Returns the entity instance for a specific item by Id within the given company and client context,
+        /// according to the ownership filters provided.
+        /// This method is intended for update/delete operations.
+        /// </summary>
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The entity if found within the allowed scope; otherwise null.</returns>
+        public async Task<DUNES.API.ModelsWMS.Masters.Items?> GetEntityByIdAsync(
+            int id,
+            int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
+            CancellationToken ct)
+        {
+            var query = _context.items
+                .Where(x => x.Id == id && x.CompanyId == companyId);
+
+            query = ApplyOwnershipFilter(query, companyClientId, includeMasterItems, includeClientItems);
+
+            return await query.FirstOrDefaultAsync(ct);
+        }
+
+        /// <summary>
+        /// Checks whether a Part Number already exists in the Items catalog.
+        /// Business rule: Part Number must be unique globally.
+        /// </summary>
+        /// <param name="partNumber">Part Number to validate.</param>
+        /// <param name="excludeId">
+        /// Optional item Id to exclude from the validation.
+        /// Used during update scenarios.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if the Part Number already exists; otherwise false.</returns>
+        public async Task<bool> ExistsPartNumberAsync(
+            string partNumber,
+            int? excludeId,
             CancellationToken ct)
         {
             return await _context.items
-                .Include(x => x.InventoryCategory)
-                .FirstOrDefaultAsync(x =>
-                    x.Id == id &&
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null,
+                .AnyAsync(x =>
+                    x.PartNumber == partNumber &&
+                    (!excludeId.HasValue || x.Id != excludeId.Value),
                     ct);
         }
 
         /// <summary>
-        /// Check if an item exists by SKU (scoped by company)
+        /// Creates a new item record.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="sku">SKU value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if SKU exists</returns>
-        public async Task<bool> ExistsBySkuAsync(
-            int companyId,
-            string sku,
-            int? excludeId,
-            CancellationToken ct)
-        {
-            var query = _context.items
-                .AsNoTracking()
-                .Where(x =>
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null &&
-                    x.sku == sku);
-
-            if (excludeId.HasValue)
-            {
-                query = query.Where(x => x.Id != excludeId.Value);
-            }
-
-            return await query.AnyAsync(ct);
-        }
-
-        /// <summary>
-        /// Check if an item exists by Barcode (scoped by company)
-        /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="barcode">Barcode value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if barcode exists</returns>
-        public async Task<bool> ExistsByBarcodeAsync(
-            int companyId,
-            string barcode,
-            int? excludeId,
-            CancellationToken ct)
-        {
-            var query = _context.items
-                .AsNoTracking()
-                .Where(x =>
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null &&
-                    x.Barcode == barcode);
-
-            if (excludeId.HasValue)
-            {
-                query = query.Where(x => x.Id != excludeId.Value);
-            }
-
-            return await query.AnyAsync(ct);
-        }
-
-        /// <summary>
-        /// Create a new item
-        /// </summary>
-        /// <param name="entity">Item entity</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Created item</returns>
+        /// <param name="entity">Entity to persist.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created entity including generated Id.</returns>
         public async Task<DUNES.API.ModelsWMS.Masters.Items> CreateAsync(
             DUNES.API.ModelsWMS.Masters.Items entity,
             CancellationToken ct)
@@ -157,47 +189,109 @@ namespace DUNES.API.RepositoriesWMS.Masters.Items
         }
 
         /// <summary>
-        /// Update an existing item
+        /// Updates an existing item record.
         /// </summary>
-        /// <param name="entity">Item entity</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Updated item</returns>
-        public async Task<DUNES.API.ModelsWMS.Masters.Items> UpdateAsync(
+        /// <param name="entity">Entity with modified values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
+        public async Task<bool> UpdateAsync(
             DUNES.API.ModelsWMS.Masters.Items entity,
             CancellationToken ct)
         {
             _context.items.Update(entity);
-            await _context.SaveChangesAsync(ct);
-            return entity;
+            return await _context.SaveChangesAsync(ct) > 0;
         }
 
         /// <summary>
-        /// Activate or deactivate an item
+        /// Deletes an existing item record.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="isActive">Activation flag</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if operation succeeded</returns>
+        /// <param name="entity">Entity to delete.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
+        public async Task<bool> DeleteAsync(
+            DUNES.API.ModelsWMS.Masters.Items entity,
+            CancellationToken ct)
+        {
+            _context.items.Remove(entity);
+            return await _context.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <summary>
+        /// Updates the active status of an item within the allowed ownership scope.
+        /// </summary>
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="isActive">New active status.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
         public async Task<bool> SetActiveAsync(
-            int companyId,
             int id,
+            int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
             bool isActive,
             CancellationToken ct)
         {
-            var entity = await _context.items
-                .FirstOrDefaultAsync(x =>
-                    x.Id == id &&
-                    x.companyId == companyId &&
-                    x.CompanyClientId == null,
-                    ct);
+            var query = _context.items
+                .Where(x => x.Id == id && x.CompanyId == companyId);
+
+            query = ApplyOwnershipFilter(query, companyClientId, includeMasterItems, includeClientItems);
+
+            var entity = await query.FirstOrDefaultAsync(ct);
 
             if (entity is null)
                 return false;
 
-            entity.active = isActive;
-            await _context.SaveChangesAsync(ct);
-            return true;
+            entity.Active = isActive;
+
+            return await _context.SaveChangesAsync(ct) > 0;
+        }
+
+        /// <summary>
+        /// Applies ownership filtering to the provided query according to the current client scope
+        /// and ownership mode requested by the service layer.
+        /// </summary>
+        /// <param name="query">Base query.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <returns>Filtered query according to the ownership mode.</returns>
+        private static IQueryable<DUNES.API.ModelsWMS.Masters.Items> ApplyOwnershipFilter(
+            IQueryable<DUNES.API.ModelsWMS.Masters.Items> query,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems)
+        {
+            if (includeMasterItems && includeClientItems)
+            {
+                return query.Where(x =>
+                    x.CompanyClientId == null ||
+                    x.CompanyClientId == companyClientId);
+            }
+
+            if (includeMasterItems)
+            {
+                return query.Where(x => x.CompanyClientId == null);
+            }
+
+            if (includeClientItems)
+            {
+                return query.Where(x => x.CompanyClientId == companyClientId);
+            }
+
+            return query.Where(x => false);
         }
     }
 }

@@ -8,100 +8,95 @@ namespace DUNES.API.ModelsWMS.Masters
     public class Items
     {
         /// <summary>
-        /// internal id
+        /// Internal identifier.
         /// </summary>
         public int Id { get; set; }
 
-
         /// <summary>
-        /// Company 
+        /// Company owner scope.
         /// </summary>
         [Required]
         [Display(Name = "Company")]
-        public required int companyId { get; set; }
-
+        public int CompanyId { get; set; }
 
         /// <summary>
-        /// client company when this item belong a client
+        /// Client company when this item belongs to a specific client.
+        /// Null means this is a company/master item.
         /// </summary>
         [Display(Name = "Company Client")]
         public int? CompanyClientId { get; set; }
 
         /// <summary>
-        /// Company category
+        /// Inventory category.
         /// </summary>
+        [Required]
         [Display(Name = "Inventory Category")]
-        public int InventorycategoriesId { get; set; }
-
-
+        public int InventoryCategoryId { get; set; }
 
         /// <summary>
-        ///  SKU (Stock Keeping Unit)
+        /// Part Number.
+        /// Business rule: required and unique.
+        /// </summary>
+        [Required]
+        [MaxLength(50)]
+        [Display(Name = "Part Number")]
+        public string PartNumber { get; set; } = string.Empty;
+
+        /// <summary>
+        /// SKU (Stock Keeping Unit).
+        /// Optional internal/commercial code.
         /// </summary>
         [MaxLength(50)]
         [Display(Name = "SKU")]
-        public required string sku { get; set; }
+        public string? Sku { get; set; }
 
         /// <summary>
-        /// item description
+        /// Item description.
         /// </summary>
+        [Required]
         [MaxLength(500)]
         [Display(Name = "Item Description")]
-        public required string itemDescription { get; set; }
+        public string ItemDescription { get; set; } = string.Empty;
 
         /// <summary>
-        /// Bar code
+        /// Barcode.
+        /// Optional. Not used as the duplicate validation key.
         /// </summary>
         [MaxLength(50)]
         [Display(Name = "Barcode")]
         public string? Barcode { get; set; }
 
-
         /// <summary>
-        /// Serial Number
+        /// Indicates whether the item is repairable.
         /// </summary>
-        [MaxLength(500)]
-        [Display(Name = "Serial Number")]
-        public string? serialnumber { get; set; }
-
-
-        /// <summary>
-        /// is Repairable
-        /// </summary>
-        /// 
         [Display(Name = "Is Repairable")]
-        public bool isRepairable { get; set; }
+        public bool IsRepairable { get; set; }
 
         /// <summary>
-        /// is serialized
+        /// Indicates whether the item is serialized.
         /// </summary>
-        /// 
-        [Display(Name = "Is serialized")]
-        public bool isSerialized { get; set; }
+        [Display(Name = "Is Serialized")]
+        public bool IsSerialized { get; set; }
 
         /// <summary>
-        /// Is active
+        /// Indicates whether the item is active.
         /// </summary>
-        /// 
         [Display(Name = "Is Active")]
-        public bool active { get; set; }
-
+        public bool Active { get; set; }
 
         /// <summary>
-        /// company navegation property
+        /// Navigation to company.
         /// </summary>
-        public virtual Company IdcompanyNavigation { get; set; } = null!;
-
+        public virtual Company Company { get; set; } = null!;
 
         /// <summary>
-        /// Navigation to client company (optional)
+        /// Navigation to company client (optional).
         /// </summary>
         public virtual CompanyClient? CompanyClient { get; set; }
 
         /// <summary>
-        /// Navegation inventory category
+        /// Navigation to inventory category.
         /// </summary>
-        public virtual Inventorycategories InventoryCategory { get; set; }
-
+        public virtual Inventorycategories InventoryCategory { get; set; } = null!;
     }
 }

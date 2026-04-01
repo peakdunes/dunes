@@ -4,8 +4,17 @@ namespace DUNES.UI.Models
 {
     public class CrudActionsModel
     {
-        public string? RouteId { get; set; }
         public string? Controller { get; set; }
+
+        /// <summary>
+        /// Source values available to resolve RouteParamsTemplate placeholders.
+        /// Examples:
+        /// { "Id" : 10 }
+        /// { "CompanyId" : 5, "CompanyClientId" : 9 }
+        /// { "Code" : "WH1" }
+        /// </summary>
+        public Dictionary<string, object?> RouteSourceValues { get; set; } = new();
+
         public List<CrudActionItemModel> Actions { get; set; } = new();
     }
 

@@ -1,103 +1,151 @@
-﻿namespace DUNES.API.RepositoriesWMS.Masters.Items
+﻿using DUNES.API.ModelsWMS.Masters;
+using DUNES.Shared.DTOs;
+using DUNES.Shared.DTOs.WMS;
+
+namespace DUNES.API.RepositoriesWMS.Masters.Items
 {
     /// <summary>
-    /// Items Repository
-    /// Data access layer for inventory items.
-    /// Scoped by Company (STANDARD COMPANYID).
+    /// Repository contract for managing Items within WMS.
+    /// Supports retrieval of master/company items, client-owned items, or both,
+    /// depending on the ownership mode resolved by the service layer.
     /// </summary>
     public interface IItemsWMSAPIRepository
     {
         /// <summary>
-        /// Get all items for a company (CompanyClientId = null)
+        /// Returns all items available for the given company and client context,
+        /// according to the ownership filters provided.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of items</returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Items>> GetAllAsync(
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of items available under the resolved ownership scope.</returns>
+        Task<List<WMSItemsReadDTO>> GetAllAsync(
             int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
             CancellationToken ct);
 
         /// <summary>
-        /// Get all active items for a company (CompanyClientId = null)
+        /// Returns a single item by Id within the given company and client context,
+        /// according to the ownership filters provided.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of active items</returns>
-        Task<List<DUNES.API.ModelsWMS.Masters.Items>> GetActiveAsync(
-            int companyId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Get item by id (scoped by company)
-        /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Item entity or null</returns>
-        Task<DUNES.API.ModelsWMS.Masters.Items?> GetByIdAsync(
-            int companyId,
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The requested item if found within the allowed scope; otherwise null.</returns>
+        Task<WMSItemsReadDTO?> GetByIdAsync(
             int id,
+            int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
             CancellationToken ct);
 
         /// <summary>
-        /// Check if an item exists by SKU (scoped by company)
+        /// Returns the entity instance for a specific item by Id within the given company and client context,
+        /// according to the ownership filters provided.
+        /// This method is intended for update/delete operations.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="sku">SKU value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if SKU exists</returns>
-        Task<bool> ExistsBySkuAsync(
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The entity if found within the allowed scope; otherwise null.</returns>
+        Task<DUNES.API.ModelsWMS.Masters.Items?> GetEntityByIdAsync(
+            int id,
             int companyId,
-            string sku,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Checks whether a Part Number already exists in the Items catalog.
+        /// Business rule: Part Number must be unique globally.
+        /// </summary>
+        /// <param name="partNumber">Part Number to validate.</param>
+        /// <param name="excludeId">
+        /// Optional item Id to exclude from the validation.
+        /// Used during update scenarios.
+        /// </param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if the Part Number already exists; otherwise false.</returns>
+        Task<bool> ExistsPartNumberAsync(
+            string partNumber,
             int? excludeId,
             CancellationToken ct);
 
         /// <summary>
-        /// Check if an item exists by Barcode (scoped by company)
+        /// Creates a new item record.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="barcode">Barcode value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if barcode exists</returns>
-        Task<bool> ExistsByBarcodeAsync(
-            int companyId,
-            string barcode,
-            int? excludeId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Create a new item
-        /// </summary>
-        /// <param name="entity">Item entity</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Created item</returns>
+        /// <param name="entity">Entity to persist.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created entity including generated Id.</returns>
         Task<DUNES.API.ModelsWMS.Masters.Items> CreateAsync(
             DUNES.API.ModelsWMS.Masters.Items entity,
             CancellationToken ct);
 
         /// <summary>
-        /// Update an existing item
+        /// Updates an existing item record.
         /// </summary>
-        /// <param name="entity">Item entity</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Updated item</returns>
-        Task<DUNES.API.ModelsWMS.Masters.Items> UpdateAsync(
+        /// <param name="entity">Entity with modified values.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
+        Task<bool> UpdateAsync(
             DUNES.API.ModelsWMS.Masters.Items entity,
             CancellationToken ct);
 
         /// <summary>
-        /// Activate or deactivate an item
+        /// Deletes an existing item record.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="isActive">Activation flag</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if operation succeeded</returns>
+        /// <param name="entity">Entity to delete.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
+        Task<bool> DeleteAsync(
+            DUNES.API.ModelsWMS.Masters.Items entity,
+            CancellationToken ct);
+
+        /// <summary>
+        /// Updates the active status of an item within the allowed ownership scope.
+        /// </summary>
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token scope.</param>
+        /// <param name="companyClientId">Company client identifier from token scope.</param>
+        /// <param name="includeMasterItems">
+        /// Indicates whether company/master items (CompanyClientId = null) should be included.
+        /// </param>
+        /// <param name="includeClientItems">
+        /// Indicates whether client-owned items (CompanyClientId = current client) should be included.
+        /// </param>
+        /// <param name="isActive">New active status.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>True if at least one database row was affected; otherwise false.</returns>
         Task<bool> SetActiveAsync(
-            int companyId,
             int id,
+            int companyId,
+            int companyClientId,
+            bool includeMasterItems,
+            bool includeClientItems,
             bool isActive,
             CancellationToken ct);
     }

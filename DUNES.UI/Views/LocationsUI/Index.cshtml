@@ -61,7 +61,10 @@
                     <partial name="_CrudActions"
                              model="@(new CrudActionsModel
                              {
-                                 RouteId = item.Id.ToString(),
+                                 RouteSourceValues = new Dictionary<string, object?>
+                                 {
+                                     ["Id"] = item.Id,
+                                 },
                                  Controller = "LocationsUI",
                                  Actions = rowActions
                              })" />

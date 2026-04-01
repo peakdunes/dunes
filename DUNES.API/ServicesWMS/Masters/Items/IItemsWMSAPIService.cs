@@ -1,115 +1,102 @@
-﻿using DUNES.Shared.DTOs.WMS;
+﻿using DUNES.Shared.DTOs;
+using DUNES.Shared.DTOs.WMS;
 using DUNES.Shared.Models;
 
 namespace DUNES.API.ServicesWMS.Masters.Items
 {
     /// <summary>
-    /// Items Service
-    /// Business logic layer for company-owned inventory items.
-    /// Scoped strictly by Company (STANDARD COMPANYID).
+    /// Service contract for managing Items within WMS.
+    /// Applies tenant scope, ownership mode rules, validation,
+    /// and business constraints on top of the repository layer.
     /// </summary>
     public interface IItemsWMSAPIService
     {
         /// <summary>
-        /// Get all items for a company
+        /// Returns all items available for the current tenant scope
+        /// according to the configured ownership mode.
         /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of items</returns>
-        Task<ApiResponse<List<WMSItemsDTO>>> GetAllAsync(
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>List of items visible to the current client context.</returns>
+        Task<ApiResponse<List<WMSItemsReadDTO>>> GetAllAsync(
             int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Get all active items for a company
+        /// Returns a specific item by Id within the current tenant scope
+        /// according to the configured ownership mode.
         /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>List of active items</returns>
-        Task<ApiResponse<List<WMSItemsDTO>>> GetActiveAsync(
-            int companyId,
-            CancellationToken ct);
-
-        /// <summary>
-        /// Get item by id (scoped by company)
-        /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Item data</returns>
-        Task<ApiResponse<WMSItemsDTO>> GetByIdAsync(
-            int companyId,
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The requested item if found.</returns>
+        Task<ApiResponse<WMSItemsReadDTO>> GetByIdAsync(
             int id,
+            int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Create a new item
+        /// Creates a new item according to the ownership mode and tenant rules.
         /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="dto">Item DTO</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Operation result</returns>
-        Task<ApiResponse<bool>> CreateAsync(
+        /// <param name="dto">Create DTO.</param>
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The created item.</returns>
+        Task<ApiResponse<WMSItemsReadDTO>> CreateAsync(
+            WMSItemsCreateDTO dto,
             int companyId,
-            WMSItemsDTO dto,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Update an existing item
+        /// Updates an existing item within the current tenant scope.
         /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="dto">Item DTO</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Operation result</returns>
-        Task<ApiResponse<bool>> UpdateAsync(
-            int companyId,
+        /// <param name="id">Item identifier.</param>
+        /// <param name="dto">Update DTO.</param>
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>The updated item.</returns>
+        Task<ApiResponse<WMSItemsReadDTO>> UpdateAsync(
             int id,
-            WMSItemsDTO dto,
+            WMSItemsUpdateDTO dto,
+            int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Activate or deactivate an item
+        /// Updates the active status of an item within the current tenant scope.
         /// </summary>
-        /// <param name="companyId">Company identifier (from token)</param>
-        /// <param name="id">Item identifier</param>
-        /// <param name="isActive">Activation flag</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>Operation result</returns>
+        /// <param name="id">Item identifier.</param>
+        /// <param name="isActive">New active state.</param>
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Result of the active status update.</returns>
         Task<ApiResponse<bool>> SetActiveAsync(
-            int companyId,
             int id,
             bool isActive,
+            int companyId,
+            int companyClientId,
             CancellationToken ct);
 
         /// <summary>
-        /// Validate if an item exists with the same SKU (scoped)
+        /// Deletes an item within the current tenant scope.
         /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="sku">SKU value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if SKU exists</returns>
-        Task<ApiResponse<bool>> ExistsBySkuAsync(
+        /// <param name="id">Item identifier.</param>
+        /// <param name="companyId">Company identifier from token.</param>
+        /// <param name="companyClientId">Company client identifier from token.</param>
+        /// <param name="ct">Cancellation token.</param>
+        /// <returns>Result of the delete operation.</returns>
+        Task<ApiResponse<bool>> DeleteAsync(
+            int id,
             int companyId,
-            string sku,
-            int? excludeId,
+            int companyClientId,
             CancellationToken ct);
-
-        /// <summary>
-        /// Validate if an item exists with the same Barcode (scoped)
-        /// </summary>
-        /// <param name="companyId">Company identifier</param>
-        /// <param name="barcode">Barcode value</param>
-        /// <param name="excludeId">Optional item id to exclude</param>
-        /// <param name="ct">Cancellation token</param>
-        /// <returns>True if barcode exists</returns>
-        Task<ApiResponse<bool>> ExistsByBarcodeAsync(
-            int companyId,
-            string barcode,
-            int? excludeId,
-            CancellationToken ct);
-
-       
     }
 }

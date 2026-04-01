@@ -53,7 +53,10 @@
                 <tr>
                     <td>
                         <partial name="_CrudActions"
-                                 model="@(new DUNES.UI.Models.CrudActionsModel { RouteId = item.Id.ToString(), Controller = "InventoryTypesUI", Actions = rowActions })" />
+                                 model="@(new DUNES.UI.Models.CrudActionsModel { RouteSourceValues = new Dictionary<string, object?>
+                         {
+                             ["Id"] = item.Id,
+                         }, Controller = "InventoryTypesUI", Actions = rowActions })" />
                     </td>
                     <td>@Html.DisplayFor(modelItem => item.Id)</td>
                     <td>@Html.DisplayFor(modelItem => item.Name)</td>

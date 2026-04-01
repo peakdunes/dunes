@@ -174,11 +174,8 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConceptClient
         /// Api response containing the updated mapping.
         /// </returns>
         public async Task<ApiResponse<WMSTransactionConceptClientReadDTO>> UpdateAsync(
-            int id,
-            WMSTransactionConceptClientUpdateDTO dto,
-            int companyId,
-            int companyClientId,
-            CancellationToken ct)
+             int id, WMSTransactionConceptClientUpdateDTO dto,int companyId,
+             int companyClientId,    CancellationToken ct)
         {
             var entity = await _repository.GetEntityByIdAsync(id, companyId, companyClientId, ct);
             if (entity is null)
@@ -187,47 +184,18 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConceptClient
                     "Transaction concept client mapping was not found.");
             }
 
-            var masterExists = await _repository.MasterExistsAsync(dto.TransactionConceptId, ct);
-            if (!masterExists)
-            {
-               
-                return ApiResponseFactory.Fail<WMSTransactionConceptClientReadDTO>(
-                       error: "CONCEPT_NOT_FOUND",
-                      message: "The selected Transaction Concept does not exist.",
-                       statusCode: 400);
-
-            }
-
-            var existsMapping = await _repository.ExistsMappingAsync(
-                companyId,
-                companyClientId,
-                dto.Id,
-                excludeId: id,
-                ct);
-
-            if (existsMapping)
-            {
-                
-                return ApiResponseFactory.Fail<WMSTransactionConceptClientReadDTO>(
-                     error: "MAPPING_EXIST",
-                    message: "A mapping for this Transaction Concept already exists for the selected client.",
-                     statusCode: 400);
-
-            }
-
             if (dto.Active)
             {
-                var masterIsActive = await _repository.MasterIsActiveAsync(dto.TransactionConceptId, ct);
+                var masterIsActive = await _repository.MasterIsActiveAsync(entity.TransactionConceptId, ct);
                 if (!masterIsActive)
                 {
                     return ApiResponseFactory.Fail<WMSTransactionConceptClientReadDTO>(
-                         error: "MASTER_INACTIVE",
+                        error: "MASTER_INACTIVE",
                         message: "The mapping cannot be updated as active because the master Transaction Concept is inactive.",
                         statusCode: 400);
                 }
             }
 
-            entity.Id = dto.Id;
             entity.Active = dto.Active;
 
             var updated = await _repository.UpdateAsync(entity, ct);
@@ -235,7 +203,7 @@ namespace DUNES.API.ServicesWMS.Masters.TransactionConceptClient
             if (!updated)
             {
                 return ApiResponseFactory.Fail<WMSTransactionConceptClientReadDTO>(
-                     error: "NOT_UPDATE",
+                    error: "NOT_UPDATE",
                     message: "The transaction concept client mapping could not be updated.",
                     statusCode: 500);
             }

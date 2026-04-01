@@ -119,7 +119,10 @@
                         
                     <partial name="_CrudActions"
                              model="@(new DUNES.UI.Models.CrudActionsModel 
-                                 { RouteId = item.Id.ToString(), Controller = "CompaniesContract", Actions = rowActions })" />
+                                 { RouteSourceValues = new Dictionary<string, object?>
+                         {
+                             ["Id"] = item.Id,
+                         },Controller = "CompaniesContract", Actions = rowActions })" />
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Id)

@@ -1,6 +1,7 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.Bins;
 using DUNES.Shared.DTOs.WMS;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.Bins
@@ -9,6 +10,8 @@ namespace DUNES.API.ControllersWMS.Masters.Bins
     /// Bins WMS Controller
     /// Scoped by Company (from token) + Location + Rack
     /// </summary>
+    /// 
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class BinsWMSController : BaseController

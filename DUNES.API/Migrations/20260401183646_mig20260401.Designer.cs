@@ -4,6 +4,7 @@ using DUNES.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DUNES.API.Migrations
 {
     [DbContext(typeof(appWmsDbContext))]
-    partial class appWmsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260401183646_mig20260401")]
+    partial class mig20260401
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1105,7 +1108,7 @@ namespace DUNES.API.Migrations
 
                     b.Property<string>("Barcode")
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int?>("CompanyClientId")
                         .HasColumnType("int");
@@ -1128,16 +1131,16 @@ namespace DUNES.API.Migrations
                     b.Property<string>("ItemDescription")
                         .IsRequired()
                         .HasMaxLength(500)
-                        .HasColumnType("varchar(500)");
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("PartNumber")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Sku")
                         .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -1150,8 +1153,7 @@ namespace DUNES.API.Migrations
                     b.HasIndex("InventoryCategoryId");
 
                     b.HasIndex("PartNumber")
-                        .IsUnique()
-                        .HasDatabaseName("UX_Items_PartNumber");
+                        .IsUnique();
 
                     b.ToTable("Items", (string)null);
                 });

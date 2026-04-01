@@ -1,24 +1,21 @@
 ﻿using DUNES.API.Controllers;
 using DUNES.API.ServicesWMS.Masters.Items;
+using DUNES.Shared.DTOs;
 using DUNES.Shared.DTOs.WMS;
+using DUNES.Shared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.Items
 {
     /// <summary>
-    /// Items API Controller.
-    /// 
-    /// Provides CRUD and state management endpoints for inventory items.
-    /// 
-    /// IMPORTANT (STANDARD COMPANYID):
-    /// - CompanyId is NEVER accepted from route, query, or body.
-    /// - CompanyId is always obtained from the authenticated token
-    ///   via BaseController (CurrentCompanyId).
-    /// - This controller contains NO business logic.
+    /// Manages Items within WMS.
+    /// Supports retrieval of company/master items, client-owned items, or both,
+    /// depending on the item ownership mode resolved by the service layer.
+    /// Uses tenant scope from token (CompanyId / CompanyClientId).
     /// </summary>
-    [Authorize]
     [ApiController]
+    [Authorize]
     [Route("api/wms/masters/items")]
     public class ItemsWMSController : BaseController
     {
@@ -27,168 +24,125 @@ namespace DUNES.API.ControllersWMS.Masters.Items
         /// <summary>
         /// Initializes a new instance of the <see cref="ItemsWMSController"/> class.
         /// </summary>
-        /// <param name="service">
-        /// Items service injected via dependency injection.
-        /// </param>
+        /// <param name="service">Service for Items business logic.</param>
         public ItemsWMSController(IItemsWMSAPIService service)
         {
             _service = service;
         }
 
         /// <summary>
-        /// Retrieves all items for the current company.
+        /// Returns all items available for the current tenant scope
+        /// according to the configured ownership mode.
         /// </summary>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse containing the list of items.
-        /// </returns>
+        /// <returns>List of items visible to the current client context.</returns>
         [HttpGet("GetAll")]
+        [ProducesResponseType(typeof(ApiResponse<List<WMSItemsReadDTO>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll(CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.GetAllAsync(CurrentCompanyId, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.GetAllAsync(CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Retrieves all active items for the current company.
-        /// </summary>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse containing the list of active items.
-        /// </returns>
-        [HttpGet("GetActive")]
-        public async Task<IActionResult> GetActive(CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.GetActiveAsync(CurrentCompanyId, ct),
-                ct);
-        }
-
-        /// <summary>
-        /// Retrieves an item by its identifier.
+        /// Returns a specific item by Id within the current tenant scope
+        /// according to the configured ownership mode.
         /// </summary>
         /// <param name="id">Item identifier.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse containing the item if found.
-        /// </returns>
+        /// <returns>The requested item if found.</returns>
         [HttpGet("GetById/{id:int}")]
-        public async Task<IActionResult> GetById(
-            int id,
-            CancellationToken ct)
+        [ProducesResponseType(typeof(ApiResponse<WMSItemsReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetById(int id, CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.GetByIdAsync(CurrentCompanyId, id, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.GetByIdAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Creates a new inventory item.
+        /// Creates a new item.
+        /// Ownership and tenant scope are resolved in the service layer.
         /// </summary>
-        /// <param name="dto">
-        /// Item DTO to create.
-        /// CompanyId will be enforced from the authenticated context.
-        /// </param>
+        /// <param name="dto">Create DTO.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse indicating the result of the operation.
-        /// </returns>
+        /// <returns>The created item.</returns>
         [HttpPost("Create")]
+        [ProducesResponseType(typeof(ApiResponse<WMSItemsReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Create(
-            [FromBody] WMSItemsDTO dto,
+            [FromBody] WMSItemsCreateDTO dto,
             CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.CreateAsync(CurrentCompanyId, dto, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.CreateAsync(dto, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Updates an existing inventory item.
+        /// Updates an existing item by Id.
         /// </summary>
         /// <param name="id">Item identifier.</param>
-        /// <param name="dto">
-        /// Item DTO containing updated values.
-        /// CompanyId cannot be modified.
-        /// </param>
+        /// <param name="dto">Update DTO.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse indicating the result of the operation.
-        /// </returns>
+        /// <returns>The updated item.</returns>
         [HttpPut("Update/{id:int}")]
+        [ProducesResponseType(typeof(ApiResponse<WMSItemsReadDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Update(
             int id,
-            [FromBody] WMSItemsDTO dto,
+            [FromBody] WMSItemsUpdateDTO dto,
             CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.UpdateAsync(CurrentCompanyId, id, dto, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.UpdateAsync(id, dto, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Activates or deactivates an inventory item.
+        /// Enables or disables an existing item.
         /// </summary>
         /// <param name="id">Item identifier.</param>
-        /// <param name="isActive">Active state to apply.</param>
+        /// <param name="dto">DTO containing the new active value.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse indicating the result of the operation.
-        /// </returns>
-        [HttpPatch("SetActive/{id:int}")]
+        /// <returns>Result of the active status update.</returns>
+        [HttpPut("SetActive/{id:int}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> SetActive(
             int id,
-            [FromQuery] bool isActive,
+            [FromBody] WMSSetActiveDTO dto,
             CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.SetActiveAsync(CurrentCompanyId, id, isActive, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.SetActiveAsync(id, dto.Active, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
 
         /// <summary>
-        /// Checks if an item exists with the specified SKU.
+        /// Deletes an item by Id.
         /// </summary>
-        /// <param name="sku">Item SKU.</param>
-        /// <param name="excludeId">
-        /// Optional item identifier to exclude from the validation.
-        /// </param>
+        /// <param name="id">Item identifier.</param>
         /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse indicating whether the SKU exists.
-        /// </returns>
-        [HttpGet("ExistsBySku")]
-        public async Task<IActionResult> ExistsBySku(
-            [FromQuery] string sku,
-            [FromQuery] int? excludeId,
-            CancellationToken ct)
+        /// <returns>Result of the delete operation.</returns>
+        [HttpDelete("Delete/{id:int}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Delete(int id, CancellationToken ct)
         {
-            return await HandleApi(
-                ct => _service.ExistsBySkuAsync(CurrentCompanyId, sku, excludeId, ct),
-                ct);
-        }
-
-        /// <summary>
-        /// Checks if an item exists with the specified Barcode.
-        /// </summary>
-        /// <param name="barcode">Item barcode.</param>
-        /// <param name="excludeId">
-        /// Optional item identifier to exclude from the validation.
-        /// </param>
-        /// <param name="ct">Cancellation token.</param>
-        /// <returns>
-        /// ApiResponse indicating whether the barcode exists.
-        /// </returns>
-        [HttpGet("ExistsByBarcode")]
-        public async Task<IActionResult> ExistsByBarcode(
-            [FromQuery] string barcode,
-            [FromQuery] int? excludeId,
-            CancellationToken ct)
-        {
-            return await HandleApi(
-                ct => _service.ExistsByBarcodeAsync(CurrentCompanyId, barcode, excludeId, ct),
-                ct);
+            return await HandleApi(ct =>
+                _service.DeleteAsync(id, CurrentCompanyId, CurrentCompanyClientId, ct), ct);
         }
     }
 }

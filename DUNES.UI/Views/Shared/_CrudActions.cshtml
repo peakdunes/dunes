@@ -1,5 +1,6 @@
 ﻿@model DUNES.UI.Models.CrudActionsModel
 @using Microsoft.AspNetCore.Routing
+@using System.Text.RegularExpressions
 
 <style>
     .btn-outline-danger:hover i,
@@ -12,19 +13,14 @@
 </style>
 
 @functions {
-    private RouteValueDictionary BuildRouteValues(string? template, object? routeId)
+    private RouteValueDictionary BuildRouteValues(
+        string? template,
+        Dictionary<string, object?>? sourceValues)
     {
         var values = new RouteValueDictionary();
 
         if (string.IsNullOrWhiteSpace(template))
-        {
-            if (routeId != null)
-            {
-                values["id"] = routeId;
-            }
-
             return values;
-        }
 
         var pairs = template.Split('&', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -35,27 +31,46 @@
             if (parts.Length != 2)
                 continue;
 
-            var key = parts[0];
+            var routeKey = parts[0];
             var rawValue = parts[1];
 
-            if (string.IsNullOrWhiteSpace(key))
+            if (string.IsNullOrWhiteSpace(routeKey))
                 continue;
 
-            object? resolvedValue = rawValue;
-
-            // Soporte inicial/transitorio para {Id}
-            if (rawValue.Equals("{Id}", StringComparison.OrdinalIgnoreCase))
-            {
-                resolvedValue = routeId;
-            }
+            object? resolvedValue = ResolveTemplateValue(rawValue, sourceValues);
 
             if (resolvedValue != null)
             {
-                values[key] = resolvedValue;
+                values[routeKey] = resolvedValue;
             }
         }
 
         return values;
+    }
+
+    private object? ResolveTemplateValue(
+        string rawValue,
+        Dictionary<string, object?>? sourceValues)
+    {
+        if (string.IsNullOrWhiteSpace(rawValue))
+            return null;
+
+        var match = Regex.Match(rawValue, @"^\{(?<key>[A-Za-z0-9_]+)\}$");
+
+        if (!match.Success)
+        {
+            // Static literal value
+            return rawValue;
+        }
+
+        var sourceKey = match.Groups["key"].Value;
+
+        if (sourceValues == null || !sourceValues.TryGetValue(sourceKey, out var value))
+        {
+            return null;
+        }
+
+        return value;
     }
 }
 
@@ -67,7 +82,7 @@
 {
     foreach (var action in Model.Actions.OrderBy(x => x.ButtonOrder))
     {
-        var routeValues = BuildRouteValues(action.RouteParamsTemplate, Model.RouteId);
+        var routeValues = BuildRouteValues(action.RouteParamsTemplate, Model.RouteSourceValues);
 
         var url = Url.Action(
             action.MvcActionName,
@@ -75,12 +90,15 @@
             routeValues
         );
 
-        <a href="@url"
-           class="@($"{action.TextCss} {action.ButtonCss}")"
-           title="@action.ButtonText"
-           data-requires-confirmation="@(action.RequiresConfirmation ? "true" : "false")"
-           data-confirmation-message="@action.ConfirmationMessage">
-            <i class="@action.IconCss"></i>
-        </a>
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            <a href="@url"
+               class="@($"{action.TextCss} {action.ButtonCss}")"
+               title="@action.ButtonText"
+               data-requires-confirmation="@(action.RequiresConfirmation ? "true" : "false")"
+               data-confirmation-message="@action.ConfirmationMessage">
+                <i class="@action.IconCss"></i>
+            </a>
+        }
     }
 }

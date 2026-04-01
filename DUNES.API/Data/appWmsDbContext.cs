@@ -327,20 +327,50 @@ namespace DUNES.API.Data
             });
 
 
-
-
             modelBuilder.Entity<Items>(entity =>
             {
-                entity.HasKey(x => x.Id);
+                entity.ToTable("Items");
 
-                entity.HasIndex(x => new { x.companyId, x.sku })
+                entity.HasKey(e => e.Id);
+
+                entity.Property(e => e.PartNumber)
+                    .IsRequired()
+                    .HasMaxLength(50)
+                    .HasColumnType("varchar(50)");
+
+                entity.HasIndex(e => e.PartNumber)
+                    .HasDatabaseName("UX_Items_PartNumber")
                     .IsUnique();
 
-                entity.HasOne(x => x.CompanyClient)
-                      .WithMany(c => c.Items)
-                      .HasForeignKey(x => x.CompanyClientId)
-                      .OnDelete(DeleteBehavior.Restrict); // importante
+                entity.Property(e => e.ItemDescription)
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("varchar(500)");
+
+                entity.Property(e => e.Sku)
+                    .HasMaxLength(50)
+                    .HasColumnType("varchar(50)");
+
+                entity.Property(e => e.Barcode)
+                    .HasMaxLength(50)
+                    .HasColumnType("varchar(50)");
+
+                entity.HasOne(e => e.Company)
+                    .WithMany()
+                    .HasForeignKey(e => e.CompanyId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CompanyClient)
+                    .WithMany()
+                    .HasForeignKey(e => e.CompanyClientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.InventoryCategory)
+                    .WithMany()
+                    .HasForeignKey(e => e.InventoryCategoryId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
+
 
 
             modelBuilder.Entity<CompanyClientDivision>(entity =>

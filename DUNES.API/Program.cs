@@ -26,7 +26,7 @@ using DUNES.API.RepositoriesWMS.Masters.CompanyClientItemStatus;
 using DUNES.API.RepositoriesWMS.Masters.Countries;
 using DUNES.API.RepositoriesWMS.Masters.InventoryCategories;
 using DUNES.API.RepositoriesWMS.Masters.InventoryTypes;
-using DUNES.API.RepositoriesWMS.Masters.Items;
+//using DUNES.API.RepositoriesWMS.Masters.Items;
 using DUNES.API.RepositoriesWMS.Masters.ItemStatus;
 using DUNES.API.RepositoriesWMS.Masters.Locations;
 using DUNES.API.RepositoriesWMS.Masters.Racks;
@@ -60,7 +60,7 @@ using DUNES.API.ServicesWMS.Masters.CompanyClientItemStatus;
 using DUNES.API.ServicesWMS.Masters.Countries;
 using DUNES.API.ServicesWMS.Masters.InventoryCategories;
 using DUNES.API.ServicesWMS.Masters.InventoryTypes;
-using DUNES.API.ServicesWMS.Masters.Items;
+//using DUNES.API.ServicesWMS.Masters.Items;
 using DUNES.API.ServicesWMS.Masters.ItemStatus;
 using DUNES.API.ServicesWMS.Masters.Locations;
 using DUNES.API.ServicesWMS.Masters.Racks;
@@ -432,8 +432,8 @@ builder.Services.AddScoped<ICompanyClientItemStatusWMSAPIService, CompanyClientI
 builder.Services.AddScoped<ITransactionTypeClientWMSAPIRepository, TransactionTypeClientWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIRepository, LocationsWMSAPIRepository>();
 builder.Services.AddScoped<ILocationsWMSAPIService, LocationsWMSAPIService>();
-builder.Services.AddScoped<IItemsWMSAPIRepository, ItemsWMSAPIRepository>();
-builder.Services.AddScoped<IItemsWMSAPIService, ItemsWMSAPIService>();
+//builder.Services.AddScoped<IItemsWMSAPIRepository, ItemsWMSAPIRepository>();
+//builder.Services.AddScoped<IItemsWMSAPIService, ItemsWMSAPIService>();
 
 //#######################
 //END WMS SERVICES

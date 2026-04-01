@@ -2,6 +2,7 @@
 using DUNES.API.ServicesWMS.Masters.Racks;
 using DUNES.Shared.DTOs.WMS;
 using Humanizer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DUNES.API.ControllersWMS.Masters.Racks
@@ -9,6 +10,8 @@ namespace DUNES.API.ControllersWMS.Masters.Racks
     /// <summary>
     /// Racks Controller
     /// </summary>
+    /// 
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class RacksWMSController : BaseController
